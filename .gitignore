@@ -6,8 +6,7 @@ node_modules/
 # Testing
 /coverage
 
-# Build output
-/dist
+# Build output (개발 임시 파일만 제외)
 
 # Lockfiles
 package-lock.json
