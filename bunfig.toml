@@ -1,0 +1,8 @@
+[install]
+# 자동 설치 활성화
+auto = true
+# 프로덕션 모드 (devDependencies 제외)
+production = false
+# 캐시 설정
+cache = true
+

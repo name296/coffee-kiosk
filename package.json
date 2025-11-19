@@ -1,0 +1,36 @@
+{
+  "name": "coffee",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "focus-trap-react": "^10.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1"
+  },
+  "scripts": {
+    "dev": "bun run server.js",
+    "start": "bun run server.js",
+    "build": "bun build ./src/index.js --outdir ./dist --target browser --minify --sourcemap --external:\"/images/*\" --external:\"/sound/*\" --external:\"/fonts/*\"",
+    "preview": "bun run server.js --preview",
+    "update-icons": "bun run scripts/update-icons.js",
+    "test": "bun test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
