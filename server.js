@@ -156,11 +156,7 @@ startIconWatcher();
 // ---------------------------------------------------------------------------
 // 헬퍼
 // ---------------------------------------------------------------------------
-const rewriteHtml = (rawHtml) =>
-  rawHtml.replace(
-    config.htmlPlaceholder,
-    `<script type="module" src="${config.bundlePublicPath}/index.js"></script>`
-  );
+// HTML을 그대로 사용 (rewriteHtml 제거)
 
 const serveStatic = async (pathname) => {
   // public/ 디렉터리 (폰트, 이미지 등)
@@ -220,7 +216,7 @@ const server = serve({
         return new Response("index.html not found", { status: 500 });
       }
       const html = await htmlFile.text();
-      return new Response(rewriteHtml(html), {
+      return new Response(html, {
         headers: { "Content-Type": "text/html" },
       });
     }
