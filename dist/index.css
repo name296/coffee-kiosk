@@ -104,8 +104,10 @@ a {
 
 .wrap {
   background-color: #fafafa;
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 100%;
+  margin: 0 auto;
   font-size: 4rem;
 }
 
@@ -117,7 +119,7 @@ a {
   flex-direction: column;
   justify-content: center;
   align-items:  center;
-  width: 1080px;
+  width: 100%;
   height: 70px;
   padding: 0 30px;
 }
@@ -129,7 +131,7 @@ a {
   border-bottom: 1px solid #d3d3d3;
   justify-content: center;
   align-items:  center;
-  width: 1080px;
+  width: 100%;
   height: 120px;
   padding: 0 30px;
   top: 70px;
@@ -137,12 +139,15 @@ a {
 }
 
 .max-width {
-  width: 1080px;
-  height: 1920px;
+  width: 100%;
+  max-width: 1080px;
+  height: 100%;
+  margin: 0 auto;
 }
 
 .first-image {
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
 }
 
 .footer-coffeelogo {
@@ -201,11 +206,13 @@ a {
   border-top: 1px solid gray;
   justify-content: space-between;
   align-items:  center;
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 112px;
   padding: 0 30px;
   bottom: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .second-up-footer {
@@ -216,11 +223,13 @@ a {
   border-top: 1px solid gray;
   justify-content: space-between;
   align-items:  center;
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 174px;
   padding: 0 30px;
   bottom: 111.5px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .low-mode .second-up-footer {
@@ -231,11 +240,13 @@ a {
   border-top: 1px solid gray;
   justify-content: space-between;
   align-items:  center;
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 130px;
   padding: 0 50px;
   bottom: 111.5px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .second-up-footer-text {

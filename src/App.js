@@ -388,6 +388,14 @@ const LayoutWithHeaderAndFooter = () => (
 );
 
 // 라우터 설정
+// basename: BASE_PATH 환경 변수로 명시적으로 설정 (개발/배포 모두 .env에서 관리)
+// 빌드 시점에 process.env가 번들러에 의해 값으로 치환됨
+const getBasename = () => {
+  // 환경 변수 사용 (빌드 시 define으로 주입됨)
+  const basePath = typeof process !== 'undefined' && process.env?.BASE_PATH;
+  return basePath || "";
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -410,7 +418,7 @@ const router = createBrowserRouter([
     children: [{ index: true, element: <ForthPage /> }],
   },
 ], {
-  basename: "/coffee-kiosk"
+  basename: getBasename()
 });
 
 const App = () => {

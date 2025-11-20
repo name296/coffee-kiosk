@@ -1,26 +1,48 @@
 import { build, serve } from "bun";
-import { watch } from "fs";
-import { updateIconIndex } from "./scripts/update-icons.js";
+import { watch, existsSync } from "fs";
+import { config } from "./config.js";
 
 // ---------------------------------------------------------------------------
-// 환경 설정
+// 모드 설정
 // ---------------------------------------------------------------------------
-const PORT = Number(process.env.PORT ?? 3000);
-const ENTRY_FILE = "./src/index.js";
-const HTML_ENTRY = "index.html";
-const HTML_PLACEHOLDER = '<script type="module" src="/src/index.js"></script>';
-const STATIC_PREFIXES = ["/images/", "/sound/"];
-const STATIC_FILES = ["/menu_data.json"];
-const WATCHED_EXTENSIONS = [".js", ".jsx", ".ts", ".tsx", ".css"];
-const ICONS_DIR = "./src/assets/icons";
-
-const args = new Set(process.argv.slice(2));
-const MODE = args.has("--preview") ? "preview" : "dev";
-const isPreview = MODE === "preview";
-const bundlePublicPath = "/dist";
-const bundleOutputDir = "./dist";
+// BASE_PATH를 기준으로 개발/배포 구분
+const isPreview = config.isProduction;
+const MODE = isPreview ? "production" : "dev";
 
 console.log(`🚀 Starting Bun server in ${MODE.toUpperCase()} mode`);
+if (config.isProduction) {
+  console.log(`📦 Production mode: serving pre-built files from ./dist`);
+  console.log(`   Run 'bun run build' first if assets are missing.`);
+} else {
+  console.log(`⚙️  Development mode: bundler + watcher active`);
+}
+
+// ---------------------------------------------------------------------------
+// 자동 의존성 설치
+// ---------------------------------------------------------------------------
+const ensureDependencies = async () => {
+  if (!existsSync("./node_modules")) {
+    console.log("📦 node_modules not found. Installing dependencies...");
+    try {
+      const proc = Bun.spawn(["bun", "install"], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      const exitCode = await proc.exited;
+      if (exitCode === 0) {
+        console.log("✅ Dependencies installed successfully!");
+      } else {
+        console.error(`❌ Installation failed with code ${exitCode}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error("❌ Failed to install dependencies:", error);
+      process.exit(1);
+    }
+  }
+};
+
+await ensureDependencies();
 
 // ---------------------------------------------------------------------------
 // 번들링 파이프라인
@@ -39,14 +61,9 @@ const bundleOnce = async (tag = "manual") => {
   console.log(`📦 Bundling with Bun (${tag})...`);
   try {
     const result = await build({
-      entrypoints: [ENTRY_FILE],
-      outdir: bundleOutputDir,
-      target: "browser",
-      format: "esm",
-      minify: false,
-      sourcemap: "inline",
-      splitting: false,
-      external: ["/images/*", "/sound/*", "/fonts/*"],
+      entrypoints: [config.entryFile],
+      outdir: config.bundleOutputDir,
+      ...config.buildOptions,
     });
 
     if (result.success) {
@@ -74,7 +91,7 @@ const startWatcher = () => {
   try {
     watch("./src", { recursive: true }, async (_, filename) => {
       if (!filename) return;
-      if (!WATCHED_EXTENSIONS.some((ext) => filename.endsWith(ext))) return;
+      if (!config.watchedExtensions.some((ext) => filename.endsWith(ext))) return;
       console.log(`🔄 File changed: ${filename}, rebuilding...`);
       await bundleOnce("watch");
     });
@@ -121,7 +138,7 @@ const startIconWatcher = () => {
   if (isPreview) return;
 
   try {
-    watch(ICONS_DIR, { recursive: true }, async (_, filename) => {
+    watch(config.iconsDir, { recursive: true }, async (_, filename) => {
       if (!filename?.endsWith(".svg")) return;
       console.log(`🎨 Icon file changed: ${filename}`);
       await runIconIndexer();
@@ -141,22 +158,40 @@ startIconWatcher();
 // ---------------------------------------------------------------------------
 const rewriteHtml = (rawHtml) =>
   rawHtml.replace(
-    HTML_PLACEHOLDER,
-    `<script type="module" src="${bundlePublicPath}/index.js"></script>`
+    config.htmlPlaceholder,
+    `<script type="module" src="${config.bundlePublicPath}/index.js"></script>`
   );
 
 const serveStatic = async (pathname) => {
-  if (STATIC_FILES.includes(pathname) || STATIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+  // public/ 디렉터리 (폰트, 이미지 등)
+  if (pathname.startsWith('/public/')) {
+    const file = Bun.file(`.${pathname}`);
+    if (await file.exists()) {
+      return new Response(file);
+    }
+  }
+  
+  // src/ 디렉터리 (아이콘 등)
+  if (pathname.startsWith('/src/')) {
+    const file = Bun.file(`.${pathname}`);
+    if (await file.exists()) {
+      return new Response(file);
+    }
+  }
+  
+  // 기존 STATIC_PREFIXES, STATIC_FILES 처리
+  if (config.staticFiles.includes(pathname) || config.staticPrefixes.some((prefix) => pathname.startsWith(prefix))) {
     const file = Bun.file(`public${pathname}`);
     if (await file.exists()) {
       return new Response(file);
     }
   }
+  
   return null;
 };
 
 const serveBundleAsset = async (pathname) => {
-  if (!pathname.startsWith(`${bundlePublicPath}/`)) return null;
+  if (!pathname.startsWith(`${config.bundlePublicPath}/`)) return null;
   const filePath = pathname.slice(1); // remove leading slash
   const file = Bun.file(filePath);
   if (!(await file.exists())) {
@@ -174,13 +209,13 @@ const serveBundleAsset = async (pathname) => {
 // HTTP 서버
 // ---------------------------------------------------------------------------
 const server = serve({
-  port: PORT,
+  port: config.port,
   async fetch(req) {
     const url = new URL(req.url);
     const { pathname } = url;
 
     if (pathname === "/" || pathname === "/index.html") {
-      const htmlFile = Bun.file(HTML_ENTRY);
+      const htmlFile = Bun.file(config.htmlEntry);
       if (!(await htmlFile.exists())) {
         return new Response("index.html not found", { status: 500 });
       }
@@ -201,8 +236,3 @@ const server = serve({
 });
 
 console.log(`🌐 Server running at http://localhost:${server.port}`);
-if (isPreview) {
-  console.log("🔎 Preview mode: serving ./dist (run 'bun run build' if assets are missing).");
-} else {
-  console.log("⚙️  Dev mode: bundler + watcher active (output -> dist/).");
-}

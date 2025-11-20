@@ -2,13 +2,13 @@
   "name": "coffee",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://name296.github.io/coffee-kiosk",
   "type": "module",
   "dependencies": {
     "focus-trap-react": "^10.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
@@ -16,9 +16,9 @@
   },
   "scripts": {
     "dev": "bun run server.js",
-    "start": "bun run server.js",
-    "build": "bun build ./src/index.js --outdir ./dist --target browser --minify --sourcemap --external:\"/images/*\" --external:\"/sound/*\" --external:\"/fonts/*\"",
-    "preview": "bun run server.js --preview",
+    "start": "bun run dev",
+    "build": "bun run scripts/build.js",
+    "build:dev": "bun build ./src/index.js --outdir ./dist --target browser --sourcemap --define:\"process.env.NODE_ENV='development'\" --external:\"/images/*\" --external:\"/sound/*\" --external:\"/fonts/*\"",
     "update-icons": "bun run scripts/update-icons.js",
     "test": "bun test"
   },

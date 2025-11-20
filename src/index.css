@@ -107,13 +107,15 @@ a {
 
 .wrap {
   background-color: #fafafa;
-  width: 1080px;
+  width: 100%;
   height: 100%;
   font-size: 4rem;
+  max-width: 1080px;
+  margin: 0 auto;
 }
 
 .up-header {
-  width: 1080px;
+  width: 100%;
   height: 70px;
   background-color: var(--layout-background-color);
   color: #fff;
@@ -125,7 +127,7 @@ a {
   border-bottom: 1px solid lightgray;
 }
 .down-header {
-  width: 1080px;
+  width: 100%;
   height: 120px;
   background-color: var(--layout-background-color);
   top: 70px;
@@ -139,12 +141,15 @@ a {
 }
 
 .max-width {
-  width: 1080px;
-  height: 1920px;
+  width: 100%;
+  max-width: 1080px;
+  height: 100%;
+  margin: 0 auto;
 }
 
 .first-image {
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
 }
 
 .footer-coffeelogo {
@@ -196,13 +201,15 @@ a {
 
 .down-footer {
   /* height:var(--footerHeight) */
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 112px;
   border-top: 1px solid gray;
   background-color:  var(--layout-background-color);
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   color: #fff;
   display: flex;
   justify-content: space-between;
@@ -210,12 +217,14 @@ a {
   padding: 0 30px;
 }
 .second-up-footer {
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 174px;
   background-color:  var(--layout-background-color);
   position: fixed;
   bottom: 111.5px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   color: #fff;
   display: flex;
   justify-content: space-between;
@@ -224,12 +233,14 @@ a {
   border-top: 1px solid gray;
 }
 .low-mode .second-up-footer {
-  width: 1080px;
+  width: 100%;
+  max-width: 1080px;
   height: 130px;
   background-color:  var(--layout-background-color);
   position: fixed;
   bottom: 111.5px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   color: #fff;
   display: flex;
   justify-content: space-between;
