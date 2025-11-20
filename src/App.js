@@ -40,63 +40,63 @@ export const AppProvider = ({ children }) => {
       id: 1,
       name: "아메리카노 (아이스)",
       price: "2500",
-      img: "public/images/item-아메리카노.svg",
+      img: "./public/images/item-아메리카노.svg",
     },
     {
       id: 2,
       name: "바닐라라떼 (아이스)",
       price: "2500",
-      img: "public/images/item-바닐라라떼.svg",
+      img: "./public/images/item-바닐라라떼.svg",
     },
     {
       id: 3,
       name: "콜드브루 디카페인",
       price: "2900",
-      img: "public/images/item-콜드브루.svg",
+      img: "./public/images/item-콜드브루.svg",
     },
-    { id: 4, name: "흑당라떼", price: "2500", img: "public/images/item-흑당라떼.svg" },
-    { id: 5, name: "딸기라떼", price: "2500", img: "public/images/item-딸기라떼.svg" },
+    { id: 4, name: "흑당라떼", price: "2500", img: "./public/images/item-흑당라떼.svg" },
+    { id: 5, name: "딸기라떼", price: "2500", img: "./public/images/item-딸기라떼.svg" },
     {
       id: 6,
       name: "미숫가루 달고나라떼",
       price: "2500",
-      img: "public/images/item-달고나라떼.svg",
+      img: "./public/images/item-달고나라떼.svg",
     },
     {
       id: 7,
       name: "콜드브루 (아이스)",
       price: "2500",
-      img: "public/images/item-콜드브루.svg",
+      img: "./public/images/item-콜드브루.svg",
     },
     {
       id: 8,
       name: "바닐라라떼 (아이스)",
       price: "2500",
-      img: "public/images/item-바닐라라떼.svg",
+      img: "./public/images/item-바닐라라떼.svg",
     },
     {
       id: 9,
       name: "딸기라떼 (아이스)",
       price: "2500",
-      img: "public/images/item-딸기라떼.svg",
+      img: "./public/images/item-딸기라떼.svg",
     },
     {
       id: 10,
       name: "카라멜 마끼아또",
       price: "3000",
-      img: "public/images/item-바닐라라떼.svg",
+      img: "./public/images/item-바닐라라떼.svg",
     },
     {
       id: 11,
       name: "녹차라떼",
       price: "2800",
-      img: "public/images/item-달고나라떼.svg",
+      img: "./public/images/item-달고나라떼.svg",
     },
     {
       id: 12,
       name: "헤이즐넛라떼",
       price: "2900",
-      img: "public/images/item-콜드브루.svg",
+      img: "./public/images/item-콜드브루.svg",
     },
   ];
   const [selectedTab, setSelectedTab] = useState("전체메뉴");
@@ -124,7 +124,7 @@ export const AppProvider = ({ children }) => {
           id: 13,
           name: "추가예정",
           price: "0",
-          img: "public/images/item-아메리카노.svg",
+          img: "./public/images/item-아메리카노.svg",
         },
       ];
   };
@@ -485,7 +485,7 @@ const App = () => {
       ></audio>
       <audio
         id="beapSound"
-        src="public/sound/beap_sound2.mp3"
+        src="./public/sound/beap_sound2.mp3"
         controls
         style={{
           width: "1px",
