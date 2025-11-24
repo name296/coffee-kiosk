@@ -67,27 +67,22 @@ try {
   throw error;
 }
 
-// BASE_PATH로 개발/배포 구분
-// BASE_PATH가 있으면 배포 환경, 없으면 개발 환경
-const hasBasePath = !!env.BASE_PATH;
-const isProduction = hasBasePath;
-const isDevelopment = !hasBasePath;
+// BASE_PATH 설정 (개발/배포 모두 동일하게 처리)
+// BASE_PATH가 없으면 빈 문자열 (루트), 있으면 해당 경로 사용
+// 서버는 항상 실시간 번들링 모드로 동작
+const basename = env.BASE_PATH || "";
 
-// NODE_ENV는 빌드 시 번들러에 주입되므로, 런타임에서는 BASE_PATH로 구분
-const nodeEnv = env.NODE_ENV || (isProduction ? "production" : "development");
+// NODE_ENV는 빌드 시 번들러에 주입
+const nodeEnv = env.NODE_ENV || "development";
 
 export const config = {
   // 서버 설정
   port: env.PORT,
   
-  // 환경 (BASE_PATH로 구분)
-  isDevelopment,
-  isProduction,
-  
-  // URL 설정 (확장성을 위해)
+  // URL 설정
   // BASE_PATH 환경 변수로 명시적으로 설정 (빌드 스크립트나 CI/CD에서 주입)
-  // BASE_PATH가 있으면 배포 환경, 없으면 개발 환경
-  basename: env.BASE_PATH || "",
+  // 예: BASE_PATH=/coffee-kiosk npm start
+  basename,
   
   // 파일 경로
   entryFile: env.ENTRY_FILE,

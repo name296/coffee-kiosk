@@ -3,18 +3,18 @@ import { watch, existsSync } from "fs";
 import { config } from "./config.js";
 
 // ---------------------------------------------------------------------------
-// 모드 설정
+// 서버 모드 설정
 // ---------------------------------------------------------------------------
-// BASE_PATH를 기준으로 개발/배포 구분
-const isPreview = config.isProduction;
-const MODE = isPreview ? "production" : "dev";
-
-console.log(`🚀 Starting Bun server in ${MODE.toUpperCase()} mode`);
-if (config.isProduction) {
-  console.log(`📦 Production mode: serving pre-built files from ./dist`);
-  console.log(`   Run 'bun run build' first if assets are missing.`);
+// 항상 개발 모드 (실시간 번들링 + 파일 감시)
+// BASE_PATH가 있어도 번들링은 계속 실행
+console.log(`🚀 Starting Bun development server`);
+console.log(`⚙️  Bundler + watcher active`);
+if (config.basename) {
+  console.log(`📍 BASE_PATH: ${config.basename}`);
+  console.log(`   Access at: http://localhost:${config.port}${config.basename}/`);
 } else {
-  console.log(`⚙️  Development mode: bundler + watcher active`);
+  console.log(`📍 BASE_PATH: (none)`);
+  console.log(`   Access at: http://localhost:${config.port}/`);
 }
 
 // ---------------------------------------------------------------------------
@@ -50,11 +50,6 @@ await ensureDependencies();
 let isBuilding = false;
 
 const bundleOnce = async (tag = "manual") => {
-  if (isPreview) {
-    console.log("ℹ️ Preview 모드에서는 번들 작업을 건너뜁니다. 먼저 'bun run build'를 실행하세요.");
-    return;
-  }
-
   if (isBuilding) return;
   isBuilding = true;
 
@@ -78,16 +73,13 @@ const bundleOnce = async (tag = "manual") => {
   }
 };
 
-if (!isPreview) {
-  await bundleOnce("initial");
-}
+// 초기 번들링 실행
+await bundleOnce("initial");
 
 // ---------------------------------------------------------------------------
 // 파일 감시
 // ---------------------------------------------------------------------------
 const startWatcher = () => {
-  if (isPreview) return;
-
   try {
     watch("./src", { recursive: true }, async (_, filename) => {
       if (!filename) return;
@@ -109,7 +101,7 @@ startWatcher();
 let isUpdatingIcons = false;
 
 const runIconIndexer = async () => {
-  if (isPreview || isUpdatingIcons) return;
+  if (isUpdatingIcons) return;
   isUpdatingIcons = true;
 
   console.log("🎨 Regenerating icon index...");
@@ -135,8 +127,6 @@ const runIconIndexer = async () => {
 };
 
 const startIconWatcher = () => {
-  if (isPreview) return;
-
   try {
     watch(config.iconsDir, { recursive: true }, async (_, filename) => {
       if (!filename?.endsWith(".svg")) return;
@@ -212,9 +202,20 @@ const server = serve({
   port: config.port,
   async fetch(req) {
     const url = new URL(req.url);
-    const { pathname } = url;
+    let { pathname } = url;
+    
+    // BASE_PATH 처리 (예: /coffee-kiosk/second → /second)
+    const basePath = config.basename || "";
+    if (basePath && pathname.startsWith(basePath)) {
+      pathname = pathname.slice(basePath.length) || "/";
+    }
 
-    if (pathname === "/" || pathname === "/index.html") {
+    // HTML 서빙: / 또는 /index.html
+    // BASE_PATH가 있으면 /coffee-kiosk/, /coffee-kiosk/index.html, /coffee-kiosk도 허용
+    const isHtmlRequest = pathname === "/" || pathname === "/index.html";
+    const isBasePathRoot = basePath && (url.pathname === basePath || url.pathname === basePath + "/");
+    
+    if (isHtmlRequest || isBasePathRoot) {
       const htmlFile = Bun.file(config.htmlEntry);
       if (!(await htmlFile.exists())) {
         return new Response("index.html not found", { status: 500 });
