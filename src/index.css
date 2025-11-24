@@ -743,8 +743,8 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    width: 1920px;
-    height: 1080px;
+    width: 1080px;
+    height: 1920px;
     contain: layout size;
     background-color: #fafafa;
     font-size: var(--font-size-b1);

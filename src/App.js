@@ -84,10 +84,10 @@ const App = () => {
     // 버튼 이벤트 핸들러 초기화 (공통 유틸 - 클릭/사운드 처리 포함)
     ButtonEventHandler.init();
     
-    // 뷰포트에 맞춰 줌 배율 조절 (1920x1080 기준)
+    // 뷰포트에 맞춰 줌 배율 조절 (1080x1920 기준)
     function setZoom() {
-      const bodyWidth = 1920;
-      const bodyHeight = 1080;
+      const bodyWidth = 1080;
+      const bodyHeight = 1920;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       
