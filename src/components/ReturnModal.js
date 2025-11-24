@@ -101,7 +101,7 @@ const ReturnModal = ({ }) => {
               className="return-btn-confirm"
               onClick={(e) => {
                 e.preventDefault();
-                navigate("/");
+                navigate("/first");
                 setisReturnModal(false);
               }}
               onKeyDown={(e) => {
@@ -109,7 +109,7 @@ const ReturnModal = ({ }) => {
                   e.preventDefault();
                   handleText('실행, ', false);
                   setTimeout(() => {
-                    navigate("/");
+                    navigate("/first");
                     setisReturnModal(false);
                   }, 300);
                 }

@@ -1,6 +1,7 @@
 import React, { useRef, createContext, useState, useEffect } from "react";
 import FocusTrap from "focus-trap-react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import EntryPage from "./pages/EntryPage";
 import FirstPage from "./pages/FirstPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -417,6 +418,10 @@ const getAssetPath = (path) => {
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <EntryPage />,
+  },
+  {
+    path: "/first",
     element: <LayoutWithFooterOnly />,
     children: [{ index: true, element: <FirstPage /> }],
   },

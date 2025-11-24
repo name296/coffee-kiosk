@@ -265,7 +265,7 @@ export const useKeyboardNavigation = ({
               if(currentPage === 'forth' && [1,2].includes(isCreditPayContent)){
                 setisCreditPayContent(0);
               }else{
-                window.history.length > 1 ? window.history.back() : navigate("/");
+                window.history.length > 1 ? window.history.back() : navigate("/first");
               }
 
             }, 300);

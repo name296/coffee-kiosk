@@ -104,7 +104,7 @@ const ForthPage = () => {
               setVolume(1);
               setisBigSize(false);
               setisLowScreen(false);
-              navigate("/");
+              navigate("/first");
               return 0;
             }, 0);
           }
