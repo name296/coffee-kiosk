@@ -53,14 +53,19 @@ if (basePath) {
   writeFileSync('./dist/public/fonts.css', fontsCss);
 }
 
-// 3. index.html 복사 및 경로 수정
+// 4. index.html 복사 및 경로 수정
 console.log('📄 Processing index.html...');
 let html = readFileSync('./index.html', 'utf8');
 
 // 경로를 BASE_PATH 포함하도록 수정
-html = html.replace('./public/fonts.css', `${basePath}/public/fonts.css`);
-html = html.replace('./dist/index.css', `${basePath}/index.css`);
-html = html.replace('./dist/index.js', `${basePath}/index.js`);
+// basePath가 비어있으면 "/" 유지, 있으면 "/coffee-kiosk" prefix 추가
+const publicPath = basePath ? `${basePath}/public/fonts.css` : '/public/fonts.css';
+const cssPath = basePath ? `${basePath}/index.css` : '/index.css';
+const jsPath = basePath ? `${basePath}/index.js` : '/index.js';
+
+html = html.replace('./public/fonts.css', publicPath);
+html = html.replace('./dist/index.css', cssPath);
+html = html.replace('./dist/index.js', jsPath);
 
 writeFileSync('./dist/index.html', html);
 
