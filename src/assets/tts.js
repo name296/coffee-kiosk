@@ -124,15 +124,11 @@ async function playText(text, speed, volume) {
             };
         } else {
             console.error('Failed to convert text to speech. Status:', response.status);
-            // 폴백: 브라우저 내장 TTS 사용
-            useBrowserTTS(text, speed, volume);
-            isPlaying = false;
+            isPlaying = false; // 실패한 경우 상태 업데이트
         }
     } catch (error) {
-        console.error('Error during TTS processing (falling back to browser TTS):', error);
-        // 폴백: 브라우저 내장 TTS 사용 (HTTPS에서도 작동)
-        useBrowserTTS(text, speed, volume);
-        isPlaying = false;
+        console.error('Error during TTS processing:', error);
+        isPlaying = false; // 예외 발생 시 상태 업데이트
     }
 }
 
@@ -178,24 +174,6 @@ async function getDB() {
     }
     return db;
 }
-
-// 브라우저 내장 TTS (폴백용)
-function useBrowserTTS(text, speed, volume) {
-    if ('speechSynthesis' in window) {
-        // 기존 음성 중지
-        window.speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ko-KR'; // 한국어
-        utterance.rate = speed;
-        utterance.volume = volume;
-        
-        window.speechSynthesis.speak(utterance);
-    } else {
-        console.warn('Browser does not support Speech Synthesis API');
-    }
-}
-
     return { initDB, handleText, handleReplayText};
 }
 
