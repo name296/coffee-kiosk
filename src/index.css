@@ -110,7 +110,6 @@ a {
   width: 100%;
   height: 100%;
   font-size: 4rem;
-  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -142,14 +141,12 @@ a {
 
 .max-width {
   width: 100%;
-  max-width: 1080px;
   height: 100%;
   margin: 0 auto;
 }
 
 .first-image {
   width: 100%;
-  max-width: 1080px;
 }
 
 .footer-coffeelogo {
@@ -202,7 +199,6 @@ a {
 .down-footer {
   /* height:var(--footerHeight) */
   width: 100%;
-  max-width: 1080px;
   height: 112px;
   border-top: 1px solid gray;
   background-color:  var(--layout-background-color);
@@ -218,7 +214,6 @@ a {
 }
 .second-up-footer {
   width: 100%;
-  max-width: 1080px;
   height: 174px;
   background-color:  var(--layout-background-color);
   position: fixed;
@@ -234,7 +229,6 @@ a {
 }
 .low-mode .second-up-footer {
   width: 100%;
-  max-width: 1080px;
   height: 130px;
   background-color:  var(--layout-background-color);
   position: fixed;
@@ -255,7 +249,7 @@ a {
 }
 
 /* .third-up-footer {
-width: 1080px;
+width: 100%;
   height: 346px;
   background-color: #252525;
   position: fixed;
