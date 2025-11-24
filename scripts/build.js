@@ -44,6 +44,15 @@ await build({
 console.log('📁 Copying public folder...');
 cpSync('./public', './dist/public', { recursive: true });
 
+// 3. fonts.css 경로 수정 (BASE_PATH 반영)
+if (basePath) {
+  console.log('🎨 Processing fonts.css...');
+  let fontsCss = readFileSync('./dist/public/fonts.css', 'utf8');
+  // /fonts/ → /coffee-kiosk/public/fonts/
+  fontsCss = fontsCss.replace(/url\("\/fonts\//g, `url("${basePath}/public/fonts/`);
+  writeFileSync('./dist/public/fonts.css', fontsCss);
+}
+
 // 3. index.html 복사 및 경로 수정
 console.log('📄 Processing index.html...');
 let html = readFileSync('./index.html', 'utf8');

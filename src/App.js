@@ -392,8 +392,12 @@ const LayoutWithHeaderAndFooter = () => (
 // 빌드 시점에 process.env가 번들러에 의해 값으로 치환됨
 const getBasename = () => {
   // 환경 변수 사용 (빌드 시 define으로 주입됨)
-  const basePath = typeof process !== 'undefined' && process.env?.BASE_PATH;
-  return basePath || "";
+  // 개발 모드: process가 없으므로 빈 문자열
+  // 빌드 모드: process.env.BASE_PATH가 실제 값으로 치환됨
+  if (typeof process !== 'undefined' && process.env?.BASE_PATH) {
+    return process.env.BASE_PATH;
+  }
+  return "";
 };
 
 // 정적 자원 경로 헬퍼 함수 (BASE_PATH 포함)

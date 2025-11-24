@@ -161,6 +161,14 @@ const serveStatic = async (pathname) => {
     }
   }
   
+  // /fonts/ → /public/fonts/ 매핑 (fonts.css에서 사용)
+  if (pathname.startsWith('/fonts/')) {
+    const file = Bun.file(`./public${pathname}`);
+    if (await file.exists()) {
+      return new Response(file);
+    }
+  }
+  
   // src/ 디렉터리 (아이콘 등)
   if (pathname.startsWith('/src/')) {
     const file = Bun.file(`.${pathname}`);
