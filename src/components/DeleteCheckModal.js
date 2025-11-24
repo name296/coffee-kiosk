@@ -88,7 +88,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                     <div data-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="return-modal-buttons">
                         <button data-text="취소, "
                             className="return-btn-cancel"
-                            onTouchEnd={(e) => { e.preventDefault(); setisDeleteCheckModal(false);readCurrentPage();}}
+                            onClick={(e) => { e.preventDefault(); setisDeleteCheckModal(false);readCurrentPage();}}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
@@ -101,7 +101,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                         </button>
                         <button data-text="확인, "
                             className="return-btn-confirm"
-                            onTouchEnd={(e) => { e.preventDefault(); handleTouchCheckDelete(id)}}
+                            onClick={(e) => { e.preventDefault(); handleTouchCheckDelete(id)}}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                 e.preventDefault();

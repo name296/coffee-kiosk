@@ -76,7 +76,7 @@ const FirstPage = ({ }) => {
         className="first-content"
       >
         <button data-text="포장하기" 
-          onTouchEnd={(e) => {e.preventDefault(); navigate("/second")}} 
+          onClick={(e) => {e.preventDefault(); navigate("/second")}}
           onKeyDown={(e)=> {
             if(e.key === 'Enter'){
               e.preventDefault();
@@ -89,7 +89,7 @@ const FirstPage = ({ }) => {
           <p>포장하기</p>
         </button>
         <button data-text="먹고가기" 
-        onTouchEnd={(e) =>{e.preventDefault(); navigate("/second");}}
+        onClick={(e) => {e.preventDefault(); navigate("/second")}}
         onKeyDown={(e)=> {
           if(e.key === 'Enter'){
             e.preventDefault();

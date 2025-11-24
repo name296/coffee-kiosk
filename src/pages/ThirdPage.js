@@ -230,7 +230,7 @@ const ThirdPage = () => {
                     <button
                       data-text="수량 빼기"
                       className="qty-btn"
-                      onTouchEnd={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
                         handleTouchDecrease(item.id);
@@ -249,7 +249,7 @@ const ThirdPage = () => {
                     <button
                       data-text="수량 더하기"
                       className="qty-btn"
-                      onTouchEnd={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
                         handleIncrease(item.id);
@@ -271,7 +271,7 @@ const ThirdPage = () => {
                   <button
                     data-text="삭제"
                     className="delete-btn"
-                    onTouchEnd={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       e.currentTarget.focus();
                       handleTouchDelete(item.id);
@@ -298,7 +298,7 @@ const ThirdPage = () => {
           ref={sections.bottom}
           data-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${currentPage}페이지, 버튼 두 개,`}
         >
-          <button data-text=" 이전," onTouchEnd={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
+          <button data-text=" 이전," onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -320,7 +320,7 @@ const ThirdPage = () => {
             <span style={{ color: "#707070" }}>{totalPages}</span>
           </span>
           <button data-text=" 다음," 
-          onTouchEnd={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}
+          onClick={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

@@ -130,7 +130,7 @@ const SecondPage = ({ }) => {
                   background: "#252525",
                 }}
                 className={`tab-button tab-pagination`}
-                onTouchEnd={(e) => { 
+                onClick={(e) => { 
                   e.preventDefault();
                   e.target.focus(); 
                   handlePrevious(); }}
@@ -154,7 +154,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus(); 
                     setSelectedTab("주스") }}
@@ -174,7 +174,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus(); 
                     setSelectedTab("라떼"); }}
@@ -194,7 +194,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus(); 
                     setSelectedTab("버블티"); }}
@@ -214,7 +214,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault();
+                  onClick={(e) => { e.preventDefault();
                     e.target.focus(); setSelectedTab("에이드"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -232,7 +232,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("기타"); }}
+                  onClick={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("기타"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -251,7 +251,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`전체메뉴, ${selectedTab === "전체메뉴" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("전체메뉴"); }}
+                  onClick={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("전체메뉴"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -268,7 +268,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`커피, ${selectedTab === "커피" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("커피"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("커피"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -285,7 +285,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`밀크티, ${selectedTab === "밀크티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("밀크티"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("밀크티"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -302,7 +302,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`스무디, ${selectedTab === "스무디" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("스무디"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("스무디"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -319,7 +319,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`차, ${selectedTab === "차" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("차"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("차"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -337,7 +337,7 @@ const SecondPage = ({ }) => {
               <button data-text="다음"
                 style={{ marginLeft: "15px", background: "#252525" }}
                 className={`tab-button tab-pagination`}
-                onTouchEnd={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
+                onClick={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -359,7 +359,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("주스"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("주스"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -376,7 +376,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("라떼"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("라떼"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -393,7 +393,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("버블티"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("버블티"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -410,7 +410,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("에이드"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("에이드"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -427,7 +427,7 @@ const SecondPage = ({ }) => {
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("기타"); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("기타"); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -451,7 +451,7 @@ const SecondPage = ({ }) => {
             <button
               data-text={item.id == 13 ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
               className={`touch-blocker menu-item ${item.id == 13 ? 'disabled' : ''}`}
-              onTouchEnd={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
                 handleTouchEndWrapper(e, item.id);
@@ -479,7 +479,7 @@ const SecondPage = ({ }) => {
           data-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${currentPage} 페이지, 버튼 두 개,`}
         >
           <button data-text="이전, "
-            onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
+            onClick={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -502,7 +502,7 @@ const SecondPage = ({ }) => {
               {totalPages === 0 ? 1 : totalPages}
             </span>
           </span>
-          <button data-text="다음,"  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+          <button data-text="다음,"  onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

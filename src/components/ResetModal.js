@@ -92,7 +92,7 @@ const ResetModal = ({ }) => {
             ref={sections.confirmSections} className="return-modal-buttons">
             <button data-text="취소, "
               className="return-btn-cancel"
-              onTouchEnd={(e) => { 
+              onClick={(e) => { 
                 e.preventDefault();
                 setisResetModal(false); readCurrentPage(); }}
               onKeyDown={(e) => {
@@ -107,7 +107,7 @@ const ResetModal = ({ }) => {
             </button>
             <button data-text="확인, "
               className="return-btn-confirm"
-              onTouchEnd={(e) => { 
+              onClick={(e) => { 
                 e.preventDefault();
                 handleTouchConfirm(); }}
               onKeyDown={(e) => {

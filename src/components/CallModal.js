@@ -88,7 +88,7 @@ const CallModal = ({ }) => {
                         ref={sections.confirmSections} className="return-modal-buttons">
                         <button data-text="취소, "
                             className="return-btn-cancel"
-                            onTouchEnd={(e) => { e.preventDefault(); setisCallModal(false); readCurrentPage();}}
+                            onClick={(e) => { e.preventDefault(); setisCallModal(false); readCurrentPage();}}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
@@ -101,7 +101,7 @@ const CallModal = ({ }) => {
                         </button>
                         <button data-text="확인, "
                             className="return-btn-confirm"
-                            onTouchEnd={(e) => { e.preventDefault(); setisCallModal(false); readCurrentPage();}}
+                            onClick={(e) => { e.preventDefault(); setisCallModal(false); readCurrentPage();}}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();

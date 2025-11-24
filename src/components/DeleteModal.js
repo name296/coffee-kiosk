@@ -90,7 +90,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
             ref={sections.confirmSections} className="return-modal-buttons">
             <button data-text="취소,"
               className="return-btn-cancel"
-              onTouchEnd={(e) => { e.preventDefault(); setisDeleteModal(false);readCurrentPage();}}
+              onClick={(e) => { e.preventDefault(); setisDeleteModal(false);readCurrentPage();}}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -103,7 +103,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
             </button>
             <button data-text="확인,"
               className="return-btn-confirm"
-              onTouchEnd={(e) => { e.preventDefault(); handleTouchDeleteButton(id)}}
+              onClick={(e) => { e.preventDefault(); handleTouchDeleteButton(id)}}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();

@@ -267,7 +267,7 @@ const ForthPage = () => {
           </div>
           <div
             className="forth-middle-content"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               updateOrderNumber();
@@ -298,7 +298,7 @@ const ForthPage = () => {
               <button
                 data-text="신용카드,"
                 className="pay-type-div"
-                onTouchEnd={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
                   sendOrderDataToApp("card");
@@ -329,7 +329,7 @@ const ForthPage = () => {
               <button
                 className="pay-type-div"
                 data-text="모바일페이,"
-                onTouchEnd={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
                   sendOrderDataToApp("mobile");
@@ -374,7 +374,7 @@ const ForthPage = () => {
               <button
                 data-text="취소,"
                 className="forth-main-btn"
-                onTouchEnd={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   navigate("/third");
                 }}
@@ -426,7 +426,7 @@ const ForthPage = () => {
           <button
             data-text="취소"
             className="forth-main-btn2"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               // setisCreditPayContent(3);
@@ -482,7 +482,7 @@ const ForthPage = () => {
           <button
             data-text="취소"
             className="forth-main-btn2"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               // setisCreditPayContent(4)
@@ -530,7 +530,7 @@ const ForthPage = () => {
           {/* <button
             data-text="확인"
             className="forth-main-btn2 btn-confirm"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               handleText('카드를 제거하세요, ')
@@ -587,7 +587,7 @@ const ForthPage = () => {
             <button
               data-text="영수증 출력,"
               className="forth-main-two-btn1"
-              onTouchEnd={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
                 sendPrintReceiptToApp();
@@ -609,7 +609,7 @@ const ForthPage = () => {
             <button
               data-text="출력 안함,"
               className="forth-main-two-btn2"
-              onTouchEnd={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
                 setisCreditPayContent(7)
@@ -672,7 +672,7 @@ const ForthPage = () => {
           <button
             data-text="마무리하기"
             className="forth-main-btn2 btn-confirm"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               setisCreditPayContent(7)
@@ -725,7 +725,7 @@ const ForthPage = () => {
           <button
             data-text="마무리하기"
             className="forth-main-btn2 btn-confirm"
-            onTouchEnd={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               setisCreditPayContent(7)

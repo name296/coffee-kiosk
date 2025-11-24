@@ -467,14 +467,27 @@ const App = () => {
       }
     };
 
+    // 클릭 및 사운드 처리
     document.addEventListener("click", handleClick);
+    document.addEventListener("touchend", handleClick);
+    
+    // 터치 pressed 효과
     document.addEventListener('touchstart', function(e){
       e.target.classList.add('pressed');
     });
     document.addEventListener('touchend', function(e){
       e.target.classList.remove('pressed');
     });
-    document.addEventListener("touchend", handleClick);
+    
+    // 마우스 pressed 효과 (터치와 동일)
+    document.addEventListener('mousedown', function(e){
+      e.target.classList.add('pressed');
+    });
+    document.addEventListener('mouseup', function(e){
+      e.target.classList.remove('pressed');
+    });
+    
+    // 우클릭 방지
     document.addEventListener('contextmenu', function (e) {
       e.preventDefault(); 
     });

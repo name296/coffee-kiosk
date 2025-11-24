@@ -65,7 +65,7 @@ const Footer = () => {
                 <button
                   data-text="초기화,"
                   className="second-footer-btn"
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     setisResetModal(true);
                    }}
@@ -90,7 +90,7 @@ const Footer = () => {
                   className={`second-footer-btn2 order-btn ${
                     isDisabledBtn ? "disabled" : ""
                   }`}
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus();
                     if (totalCount > 0) {
@@ -132,7 +132,7 @@ const Footer = () => {
                 <button
                   data-text="추가하기 ,"
                   className="second-footer-btn"
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     navigate("/second");
                    }}
@@ -155,7 +155,7 @@ const Footer = () => {
                 <button
                   data-text="결제하기, "
                   className="second-footer-btn2"
-                  onTouchEnd={(e) => { 
+                  onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus();
                     if (totalCount > 0) {
@@ -219,7 +219,7 @@ const Footer = () => {
           <button
             className="flex down-footer-button btn-home"
             data-text="처음으로,"
-            onTouchEnd={(e) => { 
+            onClick={(e) => { 
               e.preventDefault();
               setisReturnModal(true);
               document.activeElement.blur();
@@ -253,7 +253,7 @@ const Footer = () => {
         <button 
           data-text={path === "" ? "접근성," : "접근성,"}
           className="flex down-footer-button"
-          onTouchEnd={(e) => { 
+          onClick={(e) => { 
             e.preventDefault();
             setisAccessibilityModal(true)
            }}

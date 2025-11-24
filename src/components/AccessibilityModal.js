@@ -136,7 +136,7 @@ const AccessibilityModal = ({ }) => {
             >
               <p>초기 설정으로 일괄선택</p>
               <button data-text="초기설정,"
-                onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false }); }}
+                onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false }); }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -173,7 +173,7 @@ const AccessibilityModal = ({ }) => {
                 <button data-text={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "" : "accessibility-btn-active"}`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false })); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false })); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -189,7 +189,7 @@ const AccessibilityModal = ({ }) => {
                 <button data-text={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true })); }}
+                  onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true })); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -225,7 +225,7 @@ const AccessibilityModal = ({ }) => {
               >
                 <button data-text={`끔, ${prevAccessibility.volume === 0 ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 0 }));
@@ -246,7 +246,7 @@ const AccessibilityModal = ({ }) => {
                 </button>
                 <button data-text={`약, ${prevAccessibility.volume === 1 ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 1 }));
@@ -267,7 +267,7 @@ const AccessibilityModal = ({ }) => {
                 </button>
                 <button data-text={`중, ${prevAccessibility.volume === 2 ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 2 }));
@@ -288,7 +288,7 @@ const AccessibilityModal = ({ }) => {
                 </button>
                 <button data-text={`강, ${prevAccessibility.volume === 3 ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 3 }));
@@ -330,7 +330,7 @@ const AccessibilityModal = ({ }) => {
               >
                 <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, isBigSize: false }));
@@ -349,7 +349,7 @@ const AccessibilityModal = ({ }) => {
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, isBigSize: true }));
@@ -390,7 +390,7 @@ const AccessibilityModal = ({ }) => {
               >
                 <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: false }));
@@ -409,7 +409,7 @@ const AccessibilityModal = ({ }) => {
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
                   className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
-                  onTouchEnd={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
                     setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: true }));
@@ -435,7 +435,7 @@ const AccessibilityModal = ({ }) => {
             >
               <button data-text="적용안함, "
                 className="accessibility-btn-cancel"
-                onTouchEnd={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   setAccessibility({ isHighContrast: isHighContrast, volume: volume, isBigSize: isBigSize, isLowScreen: isLowScreen });
                   setisAccessibilityModal(false);
@@ -457,7 +457,7 @@ const AccessibilityModal = ({ }) => {
               </button>
               <button data-text="적용하기, "
                 className="accessibility-btn-confirm"
-                onTouchEnd={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   handleTouchSetAccessibility();
                 }}
