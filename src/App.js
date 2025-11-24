@@ -391,13 +391,15 @@ const LayoutWithHeaderAndFooter = () => (
 // basename: BASE_PATH 환경 변수로 명시적으로 설정 (개발/배포 모두 .env에서 관리)
 // 빌드 시점에 process.env가 번들러에 의해 값으로 치환됨
 const getBasename = () => {
-  // 환경 변수 사용 (빌드 시 define으로 주입됨)
-  // 개발 모드: process가 없으므로 빈 문자열
-  // 빌드 모드: process.env.BASE_PATH가 실제 값으로 치환됨
-  if (typeof process !== 'undefined' && process.env?.BASE_PATH) {
-    return process.env.BASE_PATH;
+  // 빌드 시 define으로 주입됨: process.env.BASE_PATH는 실제 값으로 치환됨
+  // 예: "/coffee-kiosk" 또는 undefined
+  // Bun 번들러가 확실하게 치환할 수 있도록 단순하게 작성
+  try {
+    return process.env.BASE_PATH || "";
+  } catch {
+    // 개발 모드에서 process가 undefined인 경우
+    return "";
   }
-  return "";
 };
 
 // 정적 자원 경로 헬퍼 함수 (BASE_PATH 포함)
