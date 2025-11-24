@@ -80,7 +80,7 @@ const ReturnModal = ({ }) => {
           </div>
           <div data-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="return-modal-buttons">
             <button data-text="취소, "
-              className="return-btn-cancel"
+              className="button return-btn-cancel"
               onClick={(e) => {
                 e.preventDefault();
                 setisReturnModal(false); readCurrentPage();
@@ -95,10 +95,12 @@ const ReturnModal = ({ }) => {
                 }
               }}
             >
-              취소
+              <div className="background dynamic">
+                <span className="content label">취소</span>
+              </div>
             </button>
             <button data-text="확인, "
-              className="return-btn-confirm"
+              className="button return-btn-confirm"
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/first");
@@ -115,7 +117,9 @@ const ReturnModal = ({ }) => {
                 }
               }}
             >
-              확인
+              <div className="background dynamic">
+                <span className="content label">확인</span>
+              </div>
             </button>
           </div>
         </div>

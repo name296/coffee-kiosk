@@ -136,6 +136,7 @@ const AccessibilityModal = ({ }) => {
             >
               <p>초기 설정으로 일괄선택</p>
               <button data-text="초기설정,"
+                className="button accessibility-down-content-div-btn"
                 onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false }); }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -146,9 +147,10 @@ const AccessibilityModal = ({ }) => {
                     }, 100);
                   }
                 }}
-                className="accessibility-down-content-div-btn"
               >
-                초기설정
+                <div className="background dynamic">
+                  <span className="content label">초기설정</span>
+                </div>
               </button>
             </div>
             <div className="accessibility-down-content-line"></div>
@@ -171,7 +173,7 @@ const AccessibilityModal = ({ }) => {
                 data-text={`고대비 화면, 선택상태, ${prevAccessibility.isHighContrast ? '켬' : '끔'}, 버튼 두 개,`}
               >
                 <button data-text={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 
+                  className={`button select-btn accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false })); }}
                   onKeyDown={(e) => {
@@ -184,10 +186,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  끔
+                  <div className="background dynamic">
+                    <span className="content label">끔</span>
+                  </div>
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 
+                  className={`button select-btn accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true })); }}
                   onKeyDown={(e) => {
@@ -200,7 +204,9 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  켬
+                  <div className="background dynamic">
+                    <span className="content label">켬</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -224,7 +230,7 @@ const AccessibilityModal = ({ }) => {
                 data-text={`소리크기, 선택상태, ${volumeMap[prevAccessibility.volume]}, 버튼 네 개, `}
               >
                 <button data-text={`끔, ${prevAccessibility.volume === 0 ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -242,10 +248,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  끔
+                  <div className="background dynamic">
+                    <span className="content label">끔</span>
+                  </div>
                 </button>
                 <button data-text={`약, ${prevAccessibility.volume === 1 ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -263,10 +271,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  약
+                  <div className="background dynamic">
+                    <span className="content label">약</span>
+                  </div>
                 </button>
                 <button data-text={`중, ${prevAccessibility.volume === 2 ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -284,10 +294,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  중
+                  <div className="background dynamic">
+                    <span className="content label">중</span>
+                  </div>
                 </button>
                 <button data-text={`강, ${prevAccessibility.volume === 3 ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -305,7 +317,9 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  강
+                  <div className="background dynamic">
+                    <span className="content label">강</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -329,7 +343,7 @@ const AccessibilityModal = ({ }) => {
                 data-text={`큰글씨 화면, 선택상태, ${prevAccessibility.isBigSize ? '켬' : '끔'}, 버튼 두 개, `}
               >
                 <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
+                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -345,10 +359,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  끔
+                  <div className="background dynamic">
+                    <span className="content label">끔</span>
+                  </div>
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -364,7 +380,9 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  켬
+                  <div className="background dynamic">
+                    <span className="content label">켬</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -389,7 +407,7 @@ const AccessibilityModal = ({ }) => {
                 data-text={`낮은 화면, 선택상태, ${prevAccessibility.isLowScreen ? '켬' : '끔'}, 버튼 두 개, `}
               >
                 <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
+                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -405,10 +423,12 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  끔
+                  <div className="background dynamic">
+                    <span className="content label">끔</span>
+                  </div>
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
-                  className={`select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
+                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -424,7 +444,9 @@ const AccessibilityModal = ({ }) => {
                     }
                   }}
                 >
-                  켬
+                  <div className="background dynamic">
+                    <span className="content label">켬</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -434,7 +456,7 @@ const AccessibilityModal = ({ }) => {
               data-text="작업 관리, 버튼 두 개, "
             >
               <button data-text="적용안함, "
-                className="accessibility-btn-cancel"
+                className="button accessibility-btn-cancel"
                 onClick={(e) => {
                   e.preventDefault();
                   setAccessibility({ isHighContrast: isHighContrast, volume: volume, isBigSize: isBigSize, isLowScreen: isLowScreen });
@@ -453,10 +475,12 @@ const AccessibilityModal = ({ }) => {
                   }
                 }}
               >
-                적용안함
+                <div className="background dynamic">
+                  <span className="content label">적용안함</span>
+                </div>
               </button>
               <button data-text="적용하기, "
-                className="accessibility-btn-confirm"
+                className="button accessibility-btn-confirm"
                 onClick={(e) => {
                   e.preventDefault();
                   handleTouchSetAccessibility();
@@ -471,7 +495,9 @@ const AccessibilityModal = ({ }) => {
                   }
                 }}
               >
-                적용하기
+                <div className="background dynamic">
+                  <span className="content label">적용하기</span>
+                </div>
               </button>
             </div>
           </div>

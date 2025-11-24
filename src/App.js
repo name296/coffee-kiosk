@@ -11,6 +11,9 @@ import ForthPage from "./pages/ForthPage";
 import { useTextHandler } from "./assets/tts";
 import { updateTimer } from "./assets/timer";
 import DeleteModal from "./components/DeleteModal";
+import { ButtonStyleGenerator } from "./utils/buttonStyleGenerator";
+import { SizeControlManager } from "./utils/sizeControlManager";
+import { ButtonEventHandler } from "./utils/buttonEventHandler";
 
 export const AppContext = createContext();
 
@@ -457,6 +460,25 @@ const App = () => {
 
   // 전역적으로 button click에 비프음 추가 (내부 요소에 pointer-events:none 추가하기)
   useEffect(() => {
+    // 버튼 스타일 자동 생성 시스템 초기화
+    ButtonStyleGenerator.init();
+    
+    // 크기 조절 시스템 초기화
+    SizeControlManager.init();
+    
+    // 전역 접근 (Footer에서 사용)
+    window.ButtonStyleGenerator = ButtonStyleGenerator;
+    window.SizeControlManager = SizeControlManager;
+    window.BUTTON_CONSTANTS = ButtonStyleGenerator.CONSTANTS;
+
+    // ========================================
+    // 27 스타일 버튼 이벤트 처리 시스템
+    // ========================================
+    
+    // 버튼 이벤트 핸들러 초기화 (공통 유틸)
+    ButtonEventHandler.init();
+
+    // 클릭 및 사운드 처리 (기존 로직 유지)
     const handleClick = (event) => {
       const target = event.target;
       updateTimer();
@@ -471,26 +493,8 @@ const App = () => {
         }
       }
     };
-
-    // 클릭 및 사운드 처리
     document.addEventListener("click", handleClick);
     document.addEventListener("touchend", handleClick);
-    
-    // 터치 pressed 효과
-    document.addEventListener('touchstart', function(e){
-      e.target.classList.add('pressed');
-    });
-    document.addEventListener('touchend', function(e){
-      e.target.classList.remove('pressed');
-    });
-    
-    // 마우스 pressed 효과 (터치와 동일)
-    document.addEventListener('mousedown', function(e){
-      e.target.classList.add('pressed');
-    });
-    document.addEventListener('mouseup', function(e){
-      e.target.classList.remove('pressed');
-    });
     
     // 우클릭 방지
     document.addEventListener('contextmenu', function (e) {

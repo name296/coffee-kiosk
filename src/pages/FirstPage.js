@@ -2,6 +2,7 @@ import React, { useContext, useRef, useEffect, useLayoutEffect } from "react";
 import { AppContext } from "../App";
 import TakeInIcon from "../components/icons/TakeInIcon";
 import TakeOutIcon from "../components/icons/TakeOutIcon";
+import Button from "../components/Button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { startIntroTimer } from "../assets/timer";
 import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
@@ -65,7 +66,7 @@ const FirstPage = ({ }) => {
     <div className="max-width" >
       <img
         className="first-image"
-        src="/images/poster_home.png"
+        src="public/images/poster.svg"
         alt="coffee"
       ></img>
       <div className="hidden-div" ref={sections.page}>
@@ -75,32 +76,34 @@ const FirstPage = ({ }) => {
         ref={sections.middle}
         className="first-content"
       >
-        <button data-text="포장하기" 
+        <Button
+          className="home-btn"
+          dataText="포장하기"
+          icon={<TakeOutIcon />}
+          label="포장하기"
           onClick={(e) => {e.preventDefault(); navigate("/second")}}
-          onKeyDown={(e)=> {
+          onKeyDown={(e) => {
             if(e.key === 'Enter'){
               e.preventDefault();
               handleText('실행, ', false);
               setTimeout(()=>{navigate("/second")},100);
-          }
-        }}
-          className="home-btn">
-          <TakeOutIcon></TakeOutIcon>
-          <p>포장하기</p>
-        </button>
-        <button data-text="먹고가기" 
-        onClick={(e) => {e.preventDefault(); navigate("/second")}}
-        onKeyDown={(e)=> {
-          if(e.key === 'Enter'){
-            e.preventDefault();
-            handleText('실행, ', false);
-            setTimeout(()=>{navigate("/second")},100);
-        }
-      }}
-        className="home-btn">
-          <TakeInIcon></TakeInIcon>
-          <p>먹고가기</p>
-        </button>
+            }
+          }}
+        />
+        <Button
+          className="home-btn"
+          dataText="먹고가기"
+          icon={<TakeInIcon />}
+          label="먹고가기"
+          onClick={(e) => {e.preventDefault(); navigate("/second")}}
+          onKeyDown={(e) => {
+            if(e.key === 'Enter'){
+              e.preventDefault();
+              handleText('실행, ', false);
+              setTimeout(()=>{navigate("/second")},100);
+            }
+          }}
+        />
       </div>
     </div>
   );

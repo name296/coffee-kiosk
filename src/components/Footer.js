@@ -7,6 +7,7 @@ import FocusTrap from "focus-trap-react";
 import ResetModal from "./ResetModal";
 import CallModal from "./CallModal";
 import { useTextHandler } from '../assets/tts';
+import { SizeControlManager } from '../utils/sizeControlManager';
 
 
 const Footer = () => {
@@ -31,12 +32,33 @@ const Footer = () => {
   const location = useLocation();
   const path = location.pathname.split("/").at(-1);
   const [isDisabledBtn, setisDisabledBtn] = useState(true);
+  const [buttonWidthScale, setButtonWidthScale] = useState(1.0);
+  const [buttonHeightScale, setButtonHeightScale] = useState(1.0);
   const { handleText } = useTextHandler(volume);
 
   useEffect(() => {
     if (totalCount > 0) setisDisabledBtn(false);
     else setisDisabledBtn(true);
   }, [totalCount]);
+
+  // 크기 조절 핸들러
+  const handleWidthScaleChange = (e) => {
+    const newScale = parseFloat(e.target.value);
+    setButtonWidthScale(newScale);
+    SizeControlManager.setWidthScale(newScale);
+  };
+
+  const handleHeightScaleChange = (e) => {
+    const newScale = parseFloat(e.target.value);
+    setButtonHeightScale(newScale);
+    SizeControlManager.setHeightScale(newScale);
+  };
+
+  const handleResetScale = () => {
+    setButtonWidthScale(1.0);
+    setButtonHeightScale(1.0);
+    SizeControlManager.reset();
+  };
 
   return (
     <>
@@ -45,13 +67,13 @@ const Footer = () => {
       {isAccessibilityModal ? <AccessibilityModal></AccessibilityModal> : ""}
       {isCallModal ? <CallModal></CallModal> : ""}
       {path === "second" || path === "third" ? (
-        <div className="second-up-footer">
+        <div className="summary">
           <div className="flex-between" style={{ width: "560px" }}>
             <p style={{ color: "#ffffff", fontWeight: "600" }}>주문수량</p>
-            <p className="second-up-footer-text">{totalCount}개</p>
+            <p className="summary-text">{totalCount}개</p>
             <div className="short-colline"></div>
             <p style={{ color: "#ffffff", fontWeight: "600" }}>금액</p>
-            <p className="second-up-footer-text">
+            <p className="summary-text">
               {totalSum.toLocaleString("ko-KR")}원
             </p>
           </div>
@@ -64,7 +86,7 @@ const Footer = () => {
               <>
                 <button
                   data-text="초기화,"
-                  className="second-footer-btn"
+                  className="button second-footer-btn"
                   onClick={(e) => { 
                     e.preventDefault();
                     setisResetModal(true);
@@ -77,19 +99,23 @@ const Footer = () => {
                     }
                   }}
                 >
-                  <div className={isLowScreen? 'flex' :'flex-centered'}>
-                    <img
-                      className="footer-btn-icon"
-                      src={"/images/ico_reset.png"}
-                    ></img>
-                    <p>초기화</p>
+                  <div className="background dynamic">
+                    <span className="content icon" aria-hidden="true">
+                      <img
+                        className="footer-btn-icon"
+                        src={"/images/ico_reset.png"}
+                        alt="초기화"
+                      />
+                    </span>
+                    <span className="content label">초기화</span>
                   </div>
                 </button>
                 <button
                   data-text={`주문하기,  ${isDisabledBtn ? "비활성" : ""}`}
-                  className={`second-footer-btn2 order-btn ${
+                  className={`button second-footer-btn2 order-btn ${
                     isDisabledBtn ? "disabled" : ""
                   }`}
+                  aria-disabled={isDisabledBtn}
                   onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus();
@@ -112,16 +138,19 @@ const Footer = () => {
                     }
                   }}
                 >
-                  <div className={isLowScreen? 'flex' :'flex-centered'}>
-                    <img
-                      className="footer-btn-icon"
-                      src={
-                        isHighContrast
-                          ? "/images/contrast_ico_order.png"
-                          : "/images/ico_order.png"
-                      }
-                    ></img>
-                    <p>주문</p>
+                  <div className="background dynamic">
+                    <span className="content icon" aria-hidden="true">
+                      <img
+                        className="footer-btn-icon"
+                        src={
+                          isHighContrast
+                            ? "/images/contrast_ico_order.png"
+                            : "/images/ico_order.png"
+                        }
+                        alt="주문"
+                      />
+                    </span>
+                    <span className="content label">주문</span>
                   </div>
                 </button>
               </>
@@ -131,7 +160,7 @@ const Footer = () => {
               <>
                 <button
                   data-text="추가하기 ,"
-                  className="second-footer-btn"
+                  className="button second-footer-btn"
                   onClick={(e) => { 
                     e.preventDefault();
                     navigate("/second");
@@ -144,17 +173,20 @@ const Footer = () => {
                     }
                   }}
                 >
-                  <div className={isLowScreen? 'flex' :'flex-centered'}>
-                    <img
-                      className="footer-btn-icon"
-                      src={"/images/ico_add_order.png"}
-                    ></img>
-                    <p>추가</p>
+                  <div className="background dynamic">
+                    <span className="content icon" aria-hidden="true">
+                      <img
+                        className="footer-btn-icon"
+                        src={"/images/ico_add_order.png"}
+                        alt="추가"
+                      />
+                    </span>
+                    <span className="content label">추가</span>
                   </div>
                 </button>
                 <button
                   data-text="결제하기, "
-                  className="second-footer-btn2"
+                  className="button second-footer-btn2"
                   onClick={(e) => { 
                     e.preventDefault();
                     e.target.focus();
@@ -177,16 +209,19 @@ const Footer = () => {
                     }
                   }}
                 >
-                  <div className={isLowScreen? 'flex' :'flex-centered'}>
-                    <img
-                      className="footer-btn-icon"
-                      src={
-                        isHighContrast
-                          ? "/images/contrast_Mask group.png"
-                          : "/images/Mask group.png"
-                      }
-                    ></img>
-                    <p>결제</p>
+                  <div className="background dynamic">
+                    <span className="content icon" aria-hidden="true">
+                      <img
+                        className="footer-btn-icon"
+                        src={
+                          isHighContrast
+                            ? "/images/contrast_Mask group.png"
+                            : "/images/Mask group.png"
+                        }
+                        alt="결제"
+                      />
+                    </span>
+                    <span className="content label">결제</span>
                   </div>
                 </button>
               </>
@@ -217,7 +252,7 @@ const Footer = () => {
           <div className="footer-coffeelogo"></div>
         ) : (
           <button
-            className="flex down-footer-button btn-home"
+            className="button down-footer-button btn-home"
             data-text="처음으로,"
             onClick={(e) => { 
               e.preventDefault();
@@ -234,25 +269,94 @@ const Footer = () => {
                   }, 300);
               }
             }}
-
-
           >
-            <div className="div-footer-circle">
-              <img
-                className="black-circle"
-                src="images/home_btn.png"
-                alt="home"
-              ></img>
+            <div className="background dynamic">
+              <span className="content icon" aria-hidden="true">
+                <div className="div-footer-circle">
+                  <img
+                    className="black-circle"
+                    src="images/home_btn.png"
+                    alt="home"
+                  />
+                </div>
+              </span>
+              <span className="content label">처음으로</span>
             </div>
-
-
-            <p className="black-circle-text">처음으로</p>
           </button>
         )}
 
+        {/* 크기 조절 슬라이더 (가로/세로 분리) */}
+        <div className="size-control-container" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#fff',
+          fontSize: '2rem',
+          padding: '0 15px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <label htmlFor="button-width-scale" style={{ fontSize: '2.5rem', minWidth: '60px' }}>
+              가로:
+            </label>
+            <input
+              type="range"
+              id="button-width-scale"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={buttonWidthScale}
+              onChange={handleWidthScaleChange}
+              style={{
+                width: '120px',
+                cursor: 'pointer'
+              }}
+            />
+            <span style={{ fontSize: '2.5rem', minWidth: '60px' }}>
+              {(buttonWidthScale * 100).toFixed(0)}%
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <label htmlFor="button-height-scale" style={{ fontSize: '2.5rem', minWidth: '60px' }}>
+              세로:
+            </label>
+            <input
+              type="range"
+              id="button-height-scale"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={buttonHeightScale}
+              onChange={handleHeightScaleChange}
+              style={{
+                width: '120px',
+                cursor: 'pointer'
+              }}
+            />
+            <span style={{ fontSize: '2.5rem', minWidth: '60px' }}>
+              {(buttonHeightScale * 100).toFixed(0)}%
+            </span>
+          </div>
+          <button
+            onClick={handleResetScale}
+            style={{
+              fontSize: '2rem',
+              padding: '5px 15px',
+              background: '#757575',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              marginTop: '5px'
+            }}
+          >
+            초기화
+          </button>
+        </div>
+
         <button 
           data-text={path === "" ? "접근성," : "접근성,"}
-          className="flex down-footer-button"
+          className="button down-footer-button"
           onClick={(e) => { 
             e.preventDefault();
             setisAccessibilityModal(true)
@@ -267,20 +371,18 @@ const Footer = () => {
             }
           }}
         >
-          <div className="div-footer-circle">
-            <img
-              className="black-circle"
-              // src={
-              //   isHighContrast
-              //     ? "/images/contrast_wheelchair.png"
-              //     : "/images/wheelchairbtn.png"
-              // }
-              src="/images/contrast_ico_low_sc.png"
-              alt="wheelchair"
-            ></img>
-
+          <div className="background dynamic">
+            <span className="content icon" aria-hidden="true">
+              <div className="div-footer-circle">
+                <img
+                  className="black-circle"
+                  src="/images/contrast_ico_low_sc.png"
+                  alt="wheelchair"
+                />
+              </div>
+            </span>
+            <span className="content label">접근성</span>
           </div>
-          <p className="black-circle-text">접근성</p>
         </button>
       </div>
     </>

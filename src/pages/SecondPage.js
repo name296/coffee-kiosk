@@ -129,7 +129,7 @@ const SecondPage = ({ }) => {
                   marginRight: "15px",
                   background: "#252525",
                 }}
-                className={`tab-button tab-pagination`}
+                className={`button tab-button tab-pagination`}
                 onClick={(e) => { 
                   e.preventDefault();
                   e.target.focus(); 
@@ -142,7 +142,9 @@ const SecondPage = ({ }) => {
                   }
                 }}
               >
-                &lt;&nbsp; 이전
+                <div className="background dynamic">
+                  <span className="content label">&lt;&nbsp; 이전</span>
+                </div>
               </button>
             )}
             {["주스", "라떼", "버블티", "에이드", "기타"].includes(
@@ -150,7 +152,7 @@ const SecondPage = ({ }) => {
             ) && isLowScreen ? (
               <>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "주스" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "주스" ? "active" : ""
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
@@ -166,11 +168,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  주스
+                  <div className="background dynamic">
+                    <span className="content label">주스</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
@@ -186,11 +190,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  라떼
+                  <div className="background dynamic">
+                    <span className="content label">라떼</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -206,11 +212,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  버블티
+                  <div className="background dynamic">
+                    <span className="content label">버블티</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
@@ -224,11 +232,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  에이드
+                  <div className="background dynamic">
+                    <span className="content label">에이드</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "기타" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "기타" ? "active" : ""
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
@@ -241,13 +251,15 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  기타
+                  <div className="background dynamic">
+                    <span className="content label">기타</span>
+                  </div>
                 </button>
               </>
             ) : (
               <>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "전체메뉴" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "전체메뉴" ? "active" : ""
                     }`}
                   data-text={`전체메뉴, ${selectedTab === "전체메뉴" ? "선택됨, " : "선택가능, "
                     }`}
@@ -260,11 +272,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  전체메뉴
+                  <div className="background dynamic">
+                    <span className="content label">전체메뉴</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button  ${selectedTab === "커피" ? "active" : ""
+                  className={`button select-btn tab-button  ${selectedTab === "커피" ? "active" : ""
                     }`}
                   data-text={`커피, ${selectedTab === "커피" ? "선택됨, " : "선택가능, "
                     }`}
@@ -277,11 +291,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  커피
+                  <div className="background dynamic">
+                    <span className="content label">커피</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "밀크티" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "밀크티" ? "active" : ""
                     }`}
                   data-text={`밀크티, ${selectedTab === "밀크티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -294,11 +310,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  밀크티
+                  <div className="background dynamic">
+                    <span className="content label">밀크티</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "스무디" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "스무디" ? "active" : ""
                     }`}
                   data-text={`스무디, ${selectedTab === "스무디" ? "선택됨, " : "선택가능, "
                     }`}
@@ -311,11 +329,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  스무디
+                  <div className="background dynamic">
+                    <span className="content label">스무디</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "차" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "차" ? "active" : ""
                     }`}
                   data-text={`차, ${selectedTab === "차" ? "선택됨, " : "선택가능, "
                     }`}
@@ -328,7 +348,9 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  차
+                  <div className="background dynamic">
+                    <span className="content label">차</span>
+                  </div>
                 </button>
               </>
             )}
@@ -336,7 +358,7 @@ const SecondPage = ({ }) => {
             {isLowScreen && (
               <button data-text="다음"
                 style={{ marginLeft: "15px", background: "#252525" }}
-                className={`tab-button tab-pagination`}
+                className={`button tab-button tab-pagination`}
                 onClick={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -346,7 +368,9 @@ const SecondPage = ({ }) => {
                   }
                 }}
               >
-                다음 &nbsp;&gt;
+                <div className="background dynamic">
+                  <span className="content label">다음 &nbsp;&gt;</span>
+                </div>
               </button>
             )}
           </div>
@@ -355,7 +379,7 @@ const SecondPage = ({ }) => {
               <div className="secondpage-long-rowline"></div>
               <div className="menu-tabs-flex-div">
                 <button
-                  className={`select-btn tab-button ${selectedTab === "주스" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "주스" ? "active" : ""
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
@@ -368,11 +392,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  주스
+                  <div className="background dynamic">
+                    <span className="content label">주스</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
@@ -385,11 +411,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  라떼
+                  <div className="background dynamic">
+                    <span className="content label">라떼</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -402,11 +430,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  버블티
+                  <div className="background dynamic">
+                    <span className="content label">버블티</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
@@ -419,11 +449,13 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  에이드
+                  <div className="background dynamic">
+                    <span className="content label">에이드</span>
+                  </div>
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`select-btn tab-button ${selectedTab === "기타" ? "active" : ""
+                  className={`button select-btn tab-button ${selectedTab === "기타" ? "active" : ""
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
@@ -436,7 +468,9 @@ const SecondPage = ({ }) => {
                     }
                   }}
                 >
-                  기타
+                  <div className="background dynamic">
+                    <span className="content label">기타</span>
+                  </div>
                 </button>
               </div>
             </>
@@ -450,7 +484,8 @@ const SecondPage = ({ }) => {
           {currentItems?.map((item, index) => (
             <button
               data-text={item.id == 13 ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
-              className={`touch-blocker menu-item ${item.id == 13 ? 'disabled' : ''}`}
+              className={`button touch-blocker menu-item ${item.id == 13 ? 'disabled' : ''}`}
+              aria-disabled={item.id == 13}
               onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
@@ -464,10 +499,16 @@ const SecondPage = ({ }) => {
               }}
               key={item.id}
             >
-              <img src={item.img} alt={item.name} />
-              <div className="txt-box">
-                <p>{item.name}</p>
-                <p>{Number(item.price).toLocaleString()}원</p>
+              <div className="background dynamic">
+                <span className="content icon" aria-hidden="true">
+                  <img src={item.img} alt={item.name} />
+                </span>
+                <span className="content label">
+                  <div className="txt-box">
+                    <p>{item.name}</p>
+                    <p>{Number(item.price).toLocaleString()}원</p>
+                  </div>
+                </span>
               </div>
             </button>
           ))}
@@ -478,7 +519,7 @@ const SecondPage = ({ }) => {
           ref={sections.bottom}
           data-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${currentPage} 페이지, 버튼 두 개,`}
         >
-          <button data-text="이전, "
+          <button data-text="이전, " className="button"
             onClick={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -487,7 +528,9 @@ const SecondPage = ({ }) => {
                 setTimeout(handlePrevPage, 100);
               }
             }}>
-            &lt;&nbsp; 이전
+            <div className="background dynamic">
+              <span className="content label">&lt;&nbsp; 이전</span>
+            </div>
           </button>
           <span style={{ fontSize: "4rem" }}>
             <span
@@ -502,7 +545,7 @@ const SecondPage = ({ }) => {
               {totalPages === 0 ? 1 : totalPages}
             </span>
           </span>
-          <button data-text="다음,"  onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+          <button data-text="다음," className="button" onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -510,7 +553,9 @@ const SecondPage = ({ }) => {
                 setTimeout(handleNextPage, 100);
               }
             }}>
-            다음 &nbsp;&gt;
+            <div className="background dynamic">
+              <span className="content label">다음 &nbsp;&gt;</span>
+            </div>
           </button>
         </div>
 

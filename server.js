@@ -240,6 +240,16 @@ const server = serve({
     const bundleResponse = await serveBundleAsset(pathname);
     if (bundleResponse) return bundleResponse;
 
+    // SPA Fallback: 다른 모든 경로는 index.html로 (클라이언트 라우팅)
+    // /first, /second, /third, /forth 등 React Router가 처리
+    const htmlFile = Bun.file(config.htmlEntry);
+    if (await htmlFile.exists()) {
+      const html = await htmlFile.text();
+      return new Response(rewriteHtml(html), {
+        headers: { "Content-Type": "text/html" },
+      });
+    }
+
     return new Response("Not Found", { status: 404 });
   },
 });

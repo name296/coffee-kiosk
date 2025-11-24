@@ -229,7 +229,7 @@ const ThirdPage = () => {
                   <div className="order-quantity">
                     <button
                       data-text="수량 빼기"
-                      className="qty-btn"
+                      className="button qty-btn"
                       onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
@@ -243,12 +243,14 @@ const ThirdPage = () => {
                         }
                       }}
                     >
-                      -
+                      <div className="background dynamic">
+                        <span className="content label">-</span>
+                      </div>
                     </button>
                     <span className="qty">{quantities[item.id]}</span>
                     <button
                       data-text="수량 더하기"
-                      className="qty-btn"
+                      className="button qty-btn"
                       onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
@@ -262,7 +264,9 @@ const ThirdPage = () => {
                         }
                       }}
                     >
-                      +
+                      <div className="background dynamic">
+                        <span className="content label">+</span>
+                      </div>
                     </button>
                   </div>
                   <span className="order-price">
@@ -270,7 +274,7 @@ const ThirdPage = () => {
                   </span>
                   <button
                     data-text="삭제"
-                    className="delete-btn"
+                    className="button delete-btn"
                     onClick={(e) => {
                       e.preventDefault();
                       e.currentTarget.focus();
@@ -284,7 +288,11 @@ const ThirdPage = () => {
                       }
                     }}
                   >
-                    <img src= "/images/trash.png"></img>
+                    <div className="background dynamic">
+                      <span className="content icon" aria-hidden="true">
+                        <img src="/images/trash.png" alt="삭제" />
+                      </span>
+                    </div>
                   </button>
                 </div>
 
@@ -298,7 +306,7 @@ const ThirdPage = () => {
           ref={sections.bottom}
           data-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${currentPage}페이지, 버튼 두 개,`}
         >
-          <button data-text=" 이전," onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
+          <button data-text=" 이전," className="button" onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -306,7 +314,9 @@ const ThirdPage = () => {
                 setTimeout(handlePrevPage, 100);
               }
             }}>
-            &lt;&nbsp; 이전
+            <div className="background dynamic">
+              <span className="content label">&lt;&nbsp; 이전</span>
+            </div>
           </button>
           <span style={{ fontSize: "4rem" }}>
             <span
@@ -319,7 +329,7 @@ const ThirdPage = () => {
             <span style={{ color: "#707070" }}>&nbsp;/&nbsp;</span>
             <span style={{ color: "#707070" }}>{totalPages}</span>
           </span>
-          <button data-text=" 다음," 
+          <button data-text=" 다음," className="button"
           onClick={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -328,7 +338,9 @@ const ThirdPage = () => {
                 setTimeout(handleNextPage, 100);
               }
             }}>
-            다음 &nbsp;&gt;
+            <div className="background dynamic">
+              <span className="content label">다음 &nbsp;&gt;</span>
+            </div>
           </button>
         </div>
       </div>

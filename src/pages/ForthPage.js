@@ -297,7 +297,7 @@ const ForthPage = () => {
             >
               <button
                 data-text="신용카드,"
-                className="pay-type-div"
+                className="button pay-type-div"
                 onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
@@ -315,19 +315,23 @@ const ForthPage = () => {
                   }
                 }}
               >
-                <img
-                  style={
-                    isLowScreen
-                      ? { width: "100px", height: "65px" }
-                      : { width: "125px", height: "85px" }
-                  }
-                  src="/images/img_credit_card.png"
-                  alt="card"
-                ></img>
-                <p>신용카드</p>
+                <div className="background dynamic">
+                  <span className="content icon" aria-hidden="true">
+                    <img
+                      style={
+                        isLowScreen
+                          ? { width: "100px", height: "65px" }
+                          : { width: "125px", height: "85px" }
+                      }
+                      src="/images/img_credit_card.png"
+                      alt="card"
+                    />
+                  </span>
+                  <span className="content label">신용카드</span>
+                </div>
               </button>
               <button
-                className="pay-type-div"
+                className="button pay-type-div"
                 data-text="모바일페이,"
                 onClick={(e) => {
                   e.preventDefault();
@@ -346,16 +350,20 @@ const ForthPage = () => {
                   }
                 }}
               >
-                <img
-                  style={
-                    isLowScreen
-                      ? { width: "77px", height: "130px" }
-                      : { width: "110px", height: "200px" }
-                  }
-                  src="/images/img_Mpay.png"
-                  alt="mobile"
-                ></img>
-                <p style={{ marginTop: "-50px" }}>모바일 페이</p>
+                <div className="background dynamic">
+                  <span className="content icon" aria-hidden="true">
+                    <img
+                      style={
+                        isLowScreen
+                          ? { width: "77px", height: "130px" }
+                          : { width: "110px", height: "200px" }
+                      }
+                      src="/images/img_Mpay.png"
+                      alt="mobile"
+                    />
+                  </span>
+                  <span className="content label" style={{ marginTop: "-50px" }}>모바일 페이</span>
+                </div>
               </button>
               {/* <div className="pay-type-div">
                 <img
@@ -373,7 +381,7 @@ const ForthPage = () => {
             >
               <button
                 data-text="취소,"
-                className="forth-main-btn"
+                className="button forth-main-btn"
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/third");
@@ -388,7 +396,9 @@ const ForthPage = () => {
                   }
                 }}
               >
-                취소
+                <div className="background dynamic">
+                  <span className="content label">취소</span>
+                </div>
               </button>
             </div>
           </div>
@@ -425,7 +435,7 @@ const ForthPage = () => {
           ></img>
           <button
             data-text="취소"
-            className="forth-main-btn2"
+            className="button forth-main-btn2"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
@@ -445,7 +455,9 @@ const ForthPage = () => {
               }
             }}
           >
-            취소
+            <div className="background dynamic">
+              <span className="content label">취소</span>
+            </div>
           </button>
         </div>
       ) : isCreditPayContent === 2 ? (
@@ -481,7 +493,7 @@ const ForthPage = () => {
           ></img>
           <button
             data-text="취소"
-            className="forth-main-btn2"
+            className="button forth-main-btn2"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
@@ -501,7 +513,9 @@ const ForthPage = () => {
               }
             }}
           >
-            취소
+            <div className="background dynamic">
+              <span className="content label">취소</span>
+            </div>
           </button>
         </div>
       ) : isCreditPayContent === 3 ? (
@@ -586,7 +600,7 @@ const ForthPage = () => {
           <div className="forth-main-two-btn">
             <button
               data-text="영수증 출력,"
-              className="forth-main-two-btn1"
+              className="button forth-main-two-btn1"
               onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
@@ -604,11 +618,13 @@ const ForthPage = () => {
                 }
               }}
             >
-              영수증 출력
+              <div className="background dynamic">
+                <span className="content label">영수증 출력</span>
+              </div>
             </button>
             <button
               data-text="출력 안함,"
-              className="forth-main-two-btn2"
+              className="button forth-main-two-btn2"
               onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
@@ -624,7 +640,9 @@ const ForthPage = () => {
                 }
               }}
             >
-              출력 안함{countdown}
+              <div className="background dynamic">
+                <span className="content label">출력 안함{countdown}</span>
+              </div>
             </button>
           </div>
         </div>
@@ -671,7 +689,7 @@ const ForthPage = () => {
           </div>
           <button
             data-text="마무리하기"
-            className="forth-main-btn2 btn-confirm"
+            className="button forth-main-btn2 btn-confirm"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
@@ -687,7 +705,9 @@ const ForthPage = () => {
               }
             }}
           >
-            마무리하기
+            <div className="background dynamic">
+              <span className="content label">마무리하기</span>
+            </div>
           </button>
         </div>
       ) : isCreditPayContent === 6 ? (
@@ -724,7 +744,7 @@ const ForthPage = () => {
           </div> */}
           <button
             data-text="마무리하기"
-            className="forth-main-btn2 btn-confirm"
+            className="button forth-main-btn2 btn-confirm"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
@@ -740,7 +760,9 @@ const ForthPage = () => {
               }
             }}
           >
-            마무리{countdown}
+            <div className="background dynamic">
+              <span className="content label">마무리{countdown}</span>
+            </div>
           </button>
         </div>
       ) : isCreditPayContent === 7 ? (
