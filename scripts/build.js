@@ -69,6 +69,10 @@ html = html.replace('./dist/index.js', jsPath);
 
 writeFileSync('./dist/index.html', html);
 
+// 5. 404.html 생성 (SPA 라우팅을 위해 index.html과 동일)
+console.log('📄 Creating 404.html for SPA routing...');
+writeFileSync('./dist/404.html', html);
+
 console.log('✅ Build complete!');
 console.log('📦 Output directory: ./dist');
 console.log('🚀 Deploy the ./dist folder to GitHub Pages');

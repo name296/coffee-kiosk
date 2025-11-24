@@ -74,7 +74,7 @@ const bundleOnce = async (tag = "manual") => {
 };
 
 // 초기 번들링 실행
-await bundleOnce("initial");
+  await bundleOnce("initial");
 
 // ---------------------------------------------------------------------------
 // 파일 감시
@@ -211,7 +211,7 @@ const server = serve({
   async fetch(req) {
     const url = new URL(req.url);
     let { pathname } = url;
-    
+
     // BASE_PATH 처리 (예: /coffee-kiosk/second → /second)
     const basePath = config.basename || "";
     if (basePath && pathname.startsWith(basePath)) {
