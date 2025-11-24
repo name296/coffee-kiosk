@@ -1,20 +1,15 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/ThirdPage.css";
-import { AppContext } from "../App";
-import DeleteModal from "../components/DeleteModal";
-import DeleteCheckModal from "../components/DeleteCheckModal";
+import { AppContext } from "../context/AppContext";
 // import { startReturnTimer, updateTimer } from "../assets/timer";
 import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
 import { useTextHandler } from "../assets/tts";
 
 const ThirdPage = () => {
-  const navigate = useNavigate();
   const {
     sections,
     totalMenuItems,
-    isHighContrast,
-    isLowScreen,
+    isDark,
+    isLow,
     quantities,
     handleIncrease,
     handleDecrease,
@@ -23,19 +18,20 @@ const ThirdPage = () => {
     setisDeleteModal,
     isDeleteCheckModal,
     setisDeleteCheckModal,
+    setDeleteItemId,
     commonScript,
     volume,
-    convertToKoreanQuantity
+    convertToKoreanQuantity,
+    setCurrentPage
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   // 각 아이템의 수량을 관리
 
-  const ITEMS_PER_PAGE = isLowScreen ? 3 : 6; // 페이지당 항목 수
-  const [currentPage, setCurrentPage] = useState(1);
-  const [id, setid] = useState(0);
+  const ITEMS_PER_PAGE = isLow ? 3 : 6; // 페이지당 항목 수
+  const [pageNumber, setPageNumber] = useState(1);
 
   // 현재 페이지에 해당하는 항목 가져오기
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
   const priceItems = filterMenuItems(totalMenuItems, quantities);
 
   const currentItems = priceItems.slice(
@@ -48,14 +44,14 @@ const ThirdPage = () => {
 
   // 페이지 이동 함수
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (pageNumber > 1) {
+      setPageNumber(pageNumber - 1);
     }
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+    if (pageNumber < totalPages) {
+      setPageNumber(pageNumber + 1);
     }
   };
   
@@ -83,7 +79,7 @@ const ThirdPage = () => {
 
   const handleTouchDecrease = (id) => {
     if (quantities[id] === 1) {
-      setid(id);
+      setDeleteItemId(id);
       if (currentItems.length > 1) {
         setisDeleteModal(true);
       } else {
@@ -95,7 +91,7 @@ const ThirdPage = () => {
   }
 
   const handleTouchDelete = (id)=>{
-    setid(id);
+    setDeleteItemId(id);
     if (currentItems.length > 1) {
       setisDeleteModal(true);
     } else {
@@ -112,11 +108,11 @@ const ThirdPage = () => {
     );
     updateFocusableSections(updatedSections); // 업데이트 호출
 
-  },[currentPage])
+  },[pageNumber])
 
   useEffect(() => {
     if (currentItems.length === 0) {
-      navigate("/second");
+      setCurrentPage("second");
     }
   }, [currentItems]);
 
@@ -133,39 +129,14 @@ const ThirdPage = () => {
     }, 0);
 
     return () => clearTimeout(timer); // 클린업
-
-    document.querySelectorAll('button').forEach(btn => {
-      const { width, height } = btn.getBoundingClientRect();
-      const shortSize = Math.min(width, height);
-      btn.style.setProperty('--short-size', `${shortSize}px`);
-    });
+    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
   }, []);
 
 
 
   return (
     <>
-      {isDeleteModal ? (
-        <DeleteModal
-          currentItems={currentItems}
-          quantities={quantities}
-          id={id}
-          handleDecrease={handleDecrease}
-        ></DeleteModal>
-      ) : (
-        ""
-      )}
-      {isDeleteCheckModal ? (
-        <DeleteCheckModal
-          currentItems={currentItems}
-          quantities={quantities}
-          id={id}
-          handleDecrease={handleDecrease}
-        ></DeleteCheckModal>
-      ) : (
-        ""
-      )}
-      <div className="third-content">
+      <div className="main third">
         <div className="hidden-div" ref={sections.page}>
           <button
             type="hidden"
@@ -175,34 +146,34 @@ const ThirdPage = () => {
           "메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,"  + commonScript.replay}
           ></button>
         </div>
-        <div className="third-up-content">
+        <div className="title">
           <span
-            style={isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }}
+            style={isDark ? { color: "#FFE101" } : { color: "#8C532C" }}
           >
             내역
           </span>
           을 확인하시고&nbsp;
           <span
-            style={isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }}
+            style={isDark ? { color: "#FFE101" } : { color: "#8C532C" }}
           >
             결제하기
           </span>
           &nbsp;버튼을 누르세요
         </div>
         <div className="third-middle-content">
-          {isLowScreen ? (
+          {isLow ? (
             <>
-              <p style={{ marginLeft: "-30px" }}>상품명</p>
-              <p style={{ marginLeft: "10px" }}>수량</p>
-              <p style={{ marginLeft: "-20px" }}>가격</p>
-              <p style={{ marginLeft: "-50px" }}>삭제</p>
+              <p className="third-middle-content-header">상품명</p>
+              <p className="third-middle-content-header-qty">수량</p>
+              <p className="third-middle-content-header-price">가격</p>
+              <p className="third-middle-content-header-delete">삭제</p>
             </>
           ) : (
             <>
-              <p style={{ marginLeft: "110px" }}>상품명</p>
-              <p style={{ marginLeft: "110px" }}>수량</p>
-              <p style={{ marginLeft: "55px" }}>가격</p>
-              <p style={{ marginLeft: "-20px" }}>삭제</p>
+              <p className="third-middle-content-header-normal">상품명</p>
+              <p className="third-middle-content-header-qty-normal">수량</p>
+              <p className="third-middle-content-header-price-normal">가격</p>
+              <p className="third-middle-content-header-delete-normal">삭제</p>
             </>
           )}
         </div>
@@ -304,7 +275,7 @@ const ThirdPage = () => {
         <div
           className="pagination2"
           ref={sections.bottom}
-          data-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${currentPage}페이지, 버튼 두 개,`}
+          data-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
         >
           <button data-text=" 이전," className="button" onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
@@ -318,16 +289,14 @@ const ThirdPage = () => {
               <span className="content label">&lt;&nbsp; 이전</span>
             </div>
           </button>
-          <span style={{ fontSize: "4rem" }}>
+          <span className="pagination-page-number">
             <span
-              style={
-                isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }
-              }
+              className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}
             >
-              {currentPage}
+              {pageNumber}
             </span>
-            <span style={{ color: "#707070" }}>&nbsp;/&nbsp;</span>
-            <span style={{ color: "#707070" }}>{totalPages}</span>
+            <span className="pagination-separator">&nbsp;/&nbsp;</span>
+            <span className="pagination-separator">{totalPages}</span>
           </span>
           <button data-text=" 다음," className="button"
           onClick={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}

@@ -1,14 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 // import { updateTimer } from "../assets/timer";
 import { useTextHandler } from '../assets/tts';
 
 const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
-  const navigate = useNavigate();
   const {
     sections,
-    isHighContrast,
+    isDark,
     isDeleteModal,
     setisDeleteModal,
     volume,
@@ -53,7 +51,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
           <img
             className="return-modal-image"
             src={
-              isHighContrast
+              isDark
                 ? "/images/contrast-Group 13.png"
                 : "/images/ico_notice.png"
             }
@@ -66,7 +64,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 삭제
@@ -78,7 +76,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 확인

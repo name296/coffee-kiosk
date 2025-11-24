@@ -174,8 +174,7 @@ export const ButtonStyleGenerator = {
     const buttonConfigs = [
       // 버튼별 설정 (클래스, 너비, 높이, 원래 값들)
       { selector: '.home-btn', w: 285, h: 285, br: 18, pd: 20, gap: 50 },
-      { selector: '.second-footer-btn', w: 185, h: 135, br: 10, gap: 5 },
-      { selector: '.second-footer-btn2', w: 185, h: 135, br: 10, gap: 5 },
+      { selector: '.summary-btn', w: 185, h: 135, br: 10, gap: 5 },
       { selector: '.return-btn-cancel', w: 280, h: 100, br: 5 },
       { selector: '.return-btn-confirm', w: 280, h: 100, br: 5 },
       { selector: '.accessibility-btn-cancel', w: 290, h: 105, br: 10 },

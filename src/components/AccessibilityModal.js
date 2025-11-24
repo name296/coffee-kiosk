@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
-import { AppContext } from "../App";
+import { AppContext } from "../context/AppContext";
 import FocusTrap from "focus-trap-react";
 import { useTextHandler } from '../assets/tts';
 
@@ -8,16 +8,16 @@ const AccessibilityModal = ({ }) => {
     accessibility,
     setAccessibility,
     sections,
-    isLowScreen,
-    setisLowScreen,
-    isHighContrast,
-    setisHighContrast,
+    isLow,
+    setisLow,
+    isDark,
+    setisDark,
     isAccessibilityModal,
     setisAccessibilityModal,
     volume,
     setVolume,
-    isBigSize,
-    setisBigSize,
+    isLarge,
+    setisLarge,
     commonScript,
     readCurrentPage
   } = useContext(AppContext);
@@ -31,9 +31,9 @@ const AccessibilityModal = ({ }) => {
   };
 
   const [prevAccessibility, setPrevAccessibility] = useState({
-    isHighContrast: isHighContrast,
-    isLowScreen: isLowScreen,
-    isBigSize: isBigSize,
+    isHighContrast: isDark,
+    isLowScreen: isLow,
+    isBigSize: isLarge,
     volume: volume
   });
 
@@ -54,10 +54,10 @@ const AccessibilityModal = ({ }) => {
     const audioPlayer = document.getElementById('audioPlayer');
     audioPlayer.volume = volumeValue[prevAccessibility.volume];
 
-    setisHighContrast(prevAccessibility.isHighContrast);
+    setisDark(prevAccessibility.isHighContrast);
     setVolume(prevAccessibility.volume);
-    setisBigSize(prevAccessibility.isBigSize)
-    setisLowScreen(prevAccessibility.isLowScreen);
+    setisLarge(prevAccessibility.isBigSize);
+    setisLow(prevAccessibility.isLowScreen);
     setAccessibility(prevAccessibility);
     setisAccessibilityModal(false);
     readCurrentPage(prevAccessibility.volume);
@@ -83,43 +83,27 @@ const AccessibilityModal = ({ }) => {
           className="accessibility-modal-overlay"
         ></div>
         <div
-          className={`accessibility-modal-content ${isLowScreen ? "reverse" : ""
-            }
-          `}
+          className={`accessibility-modal-content ${isLow ? "reverse" : ""}`}
         >
           <div
             className="accessibility-up-content"
           >
-            <div
-              style={{ color: "#E7E3E0", fontSize: "6rem", fontWeight: "600" }}
-            >
+            <div className="accessibility-title">
               접근성
             </div>
             <div>
-              <div style={{ color: "#E7E3E0", fontSize: "4.1rem" }}>
+              <div className="accessibility-subtitle">
                 원하시는&nbsp;
                 <span
-                  style={
-                    isHighContrast
-                      ? { color: "#FFE101", fontSize: "4.1rem" }
-                      : { color: "#EB9B63", fontSize: "4.1rem" }
-                  }
+                  className={isDark ? "accessibility-subtitle-highlight" : "accessibility-subtitle-highlight-light"}
                 >
                   접근성 옵션
                 </span>
                 을 선택하시고
               </div>
-              <div
-                style={{
-                  color: "#E7E3E0",
-                  textAlign: "center",
-                  marginTop: "3px",
-                }}
-              >
+              <div className="accessibility-description">
                 <span
-                  style={
-                    isHighContrast ? { color: "#FFE101" } : { color: "#EB9B63" }
-                  }
+                  className={isDark ? "accessibility-subtitle-highlight" : "accessibility-subtitle-highlight-light"}
                 >
                   적용하기
                 </span>
@@ -155,10 +139,10 @@ const AccessibilityModal = ({ }) => {
             </div>
             <div className="accessibility-down-content-line"></div>
             <div className="accessibility-down-content-div2">
-              <div className="flex" style={{ alignItems: "center" }}>
+              <div className="flex align-center">
                 <img
                   src={
-                    isHighContrast
+                    isDark
                       ? "/images/contrast_ico_high_cont.png"
                       : "/images/ico_high_cont.png"
                   }
@@ -167,13 +151,12 @@ const AccessibilityModal = ({ }) => {
                 <p>고대비화면</p>
               </div>
               <div
-                className="flex"
-                style={{ gap: "10px" }}
+                className="flex gap-10"
                 ref={sections.AccessibilitySections2}
                 data-text={`고대비 화면, 선택상태, ${prevAccessibility.isHighContrast ? '켬' : '끔'}, 버튼 두 개,`}
               >
                 <button data-text={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 
+                  className={`button toggle accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false })); }}
                   onKeyDown={(e) => {
@@ -191,7 +174,7 @@ const AccessibilityModal = ({ }) => {
                   </div>
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 
+                  className={`button toggle accessibility-down-content-div-btn1 
                     ${prevAccessibility.isHighContrast ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true })); }}
                   onKeyDown={(e) => {
@@ -212,10 +195,10 @@ const AccessibilityModal = ({ }) => {
             </div>
             <div className="accessibility-down-content-line"></div>
             <div className="accessibility-down-content-div3">
-              <div className="flex" style={{ alignItems: "center" }}>
+              <div className="flex align-center">
                 <img
                   src={
-                    isHighContrast
+                    isDark
                       ? "/images/contrast_ico_volume.png"
                       : "/images/ico_volume.png"
                   }
@@ -224,13 +207,12 @@ const AccessibilityModal = ({ }) => {
                 <p>소리크기</p>
               </div>
               <div
-                className="flex"
-                style={{ gap: "10px" }}
+                className="flex gap-10"
                 ref={sections.AccessibilitySections3}
                 data-text={`소리크기, 선택상태, ${volumeMap[prevAccessibility.volume]}, 버튼 네 개, `}
               >
                 <button data-text={`끔, ${prevAccessibility.volume === 0 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -253,7 +235,7 @@ const AccessibilityModal = ({ }) => {
                   </div>
                 </button>
                 <button data-text={`약, ${prevAccessibility.volume === 1 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -276,7 +258,7 @@ const AccessibilityModal = ({ }) => {
                   </div>
                 </button>
                 <button data-text={`중, ${prevAccessibility.volume === 2 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -299,7 +281,7 @@ const AccessibilityModal = ({ }) => {
                   </div>
                 </button>
                 <button data-text={`강, ${prevAccessibility.volume === 3 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -325,10 +307,10 @@ const AccessibilityModal = ({ }) => {
             </div>
             <div className="accessibility-down-content-line"></div>
             <div className="accessibility-down-content-div4">
-              <div className="flex" style={{ alignItems: "center" }}>
+              <div className="flex align-center">
                 <img
                   src={
-                    isHighContrast
+                    isDark
                       ? "/images/contrast_ico_zoom.png"
                       : "/images/ico_zoom.png"
                   }
@@ -337,13 +319,12 @@ const AccessibilityModal = ({ }) => {
                 <p>큰글씨 화면</p>
               </div>
               <div
-                className="flex"
-                style={{ gap: "10px" }}
+                className="flex gap-10"
                 ref={sections.AccessibilitySections4}
                 data-text={`큰글씨 화면, 선택상태, ${prevAccessibility.isBigSize ? '켬' : '끔'}, 버튼 두 개, `}
               >
                 <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -364,7 +345,7 @@ const AccessibilityModal = ({ }) => {
                   </div>
                 </button>
                 <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -389,10 +370,10 @@ const AccessibilityModal = ({ }) => {
             <div className="accessibility-down-content-line"></div>
 
             <div className="accessibility-down-content-div5">
-              <div className="flex" style={{ alignItems: "center" }}>
+              <div className="flex align-center">
                 <img
                   src={
-                    isHighContrast
+                    isDark
                       ? "/images/contrast_ico_low_sc.png"
                       : "/images/ico_low_sc.png"
                   }
@@ -401,13 +382,12 @@ const AccessibilityModal = ({ }) => {
                 <p>낮은화면</p>
               </div>
               <div
-                className="flex"
-                style={{ gap: "10px" }}
+                className="flex gap-10"
                 ref={sections.AccessibilitySections5}
                 data-text={`낮은 화면, 선택상태, ${prevAccessibility.isLowScreen ? '켬' : '끔'}, 버튼 두 개, `}
               >
-                <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
+                <button data-text={`끔, ${prevAccessibility.isLowScreen ? '선택가능, ' : '선택됨, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -427,8 +407,8 @@ const AccessibilityModal = ({ }) => {
                     <span className="content label">끔</span>
                   </div>
                 </button>
-                <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
-                  className={`button select-btn accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
+                <button data-text={`켬, ${prevAccessibility.isLowScreen ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.target.focus();
@@ -459,7 +439,7 @@ const AccessibilityModal = ({ }) => {
                 className="button accessibility-btn-cancel"
                 onClick={(e) => {
                   e.preventDefault();
-                  setAccessibility({ isHighContrast: isHighContrast, volume: volume, isBigSize: isBigSize, isLowScreen: isLowScreen });
+                  setAccessibility({ isHighContrast: isDark, volume: volume, isBigSize: isLarge, isLowScreen: isLow });
                   setisAccessibilityModal(false);
                   readCurrentPage();
                 }}
@@ -468,7 +448,7 @@ const AccessibilityModal = ({ }) => {
                     e.preventDefault();
                     handleText('실행, ', false);
                     setTimeout(() => {
-                      setAccessibility({ isHighContrast: isHighContrast, volume: volume, isBigSize: isBigSize, isLowScreen: isLowScreen });
+                      setAccessibility({ isHighContrast: isDark, volume: volume, isBigSize: isLarge, isLowScreen: isLow });
                       setisAccessibilityModal(false);
                       readCurrentPage();
                     }, 300);

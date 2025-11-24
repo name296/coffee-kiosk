@@ -1,7 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/ForthPage.css";
-import { AppContext } from "../App";
+import { AppContext } from "../context/AppContext";
 // import { startReturnTimer, updateTimer } from "../assets/timer";
 import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
 import { useTextHandler } from "../assets/tts";
@@ -10,10 +8,10 @@ const ForthPage = () => {
   const {
     sections,
     totalSum,
-    isLowScreen,
-    setisLowScreen,
-    isHighContrast,
-    setisHighContrast,
+    isLow,
+    setisLow,
+    isDark,
+    setisDark,
     isCreditPayContent,
     setisCreditPayContent,
     commonScript,
@@ -23,12 +21,12 @@ const ForthPage = () => {
     createOrderItems,
     volume,
     setVolume,
-    isBigSize,
-    setisBigSize,
+    isLarge,
+    setisLarge,
     setisReturnModal,
-    setisAccessibilityModal
+    setisAccessibilityModal,
+    setCurrentPage
   } = useContext(AppContext);
-  const navigate = useNavigate();
   const orderItems = createOrderItems(totalMenuItems, quantities);
   const { handleText } = useTextHandler(volume);
   const [countdown, setCountdown] = useState(60);
@@ -100,11 +98,11 @@ const ForthPage = () => {
               );
 
               // 초기설정
-              setisHighContrast(false);
+              setisDark(false);
               setVolume(1);
-              setisBigSize(false);
-              setisLowScreen(false);
-              navigate("/first");
+              setisLarge(false);
+              setisLow(false);
+              setCurrentPage("first");
               return 0;
             }, 0);
           }
@@ -114,11 +112,10 @@ const ForthPage = () => {
 
       return () => clearInterval(timer);
     }
-    document.querySelectorAll('button').forEach(btn => {
-      const { width, height } = btn.getBoundingClientRect();
-      const shortSize = Math.min(width, height);
-      btn.style.setProperty('--short-size', `${shortSize}px`);
-    });
+    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
+    if (window.ButtonStyleGenerator) {
+      window.ButtonStyleGenerator.calculateButtonSizes();
+    }
   }, [isCreditPayContent]);
 
   useEffect(() => {
@@ -248,7 +245,7 @@ const ForthPage = () => {
   };
 
   return (
-    <div className="forth-content">
+    <div className="main forth">
       <div className="hidden-div" ref={sections.page}>
         <button
           type="hidden"
@@ -259,7 +256,7 @@ const ForthPage = () => {
       </div>
       {isCreditPayContent === 0 ? (
         <>
-          <div className="forth-up-content">
+          <div className="title">
             <span className="highlight-text">
               결제방법
             </span>
@@ -285,7 +282,7 @@ const ForthPage = () => {
             }}
           >
             <span>결제금액</span>
-            <span style={{ fontSize: "8rem" }}>
+            <span className="payment-amount-large">
               {totalSum.toLocaleString("ko-KR")}원
             </span>
           </div>
@@ -319,7 +316,7 @@ const ForthPage = () => {
                   <span className="content icon" aria-hidden="true">
                     <img
                       style={
-                        isLowScreen
+                        isLow
                           ? { width: "100px", height: "65px" }
                           : { width: "125px", height: "85px" }
                       }
@@ -354,7 +351,7 @@ const ForthPage = () => {
                   <span className="content icon" aria-hidden="true">
                     <img
                       style={
-                        isLowScreen
+                        isLow
                           ? { width: "77px", height: "130px" }
                           : { width: "110px", height: "200px" }
                       }
@@ -362,12 +359,11 @@ const ForthPage = () => {
                       alt="mobile"
                     />
                   </span>
-                  <span className="content label" style={{ marginTop: "-50px" }}>모바일 페이</span>
+                  <span className="content label mobile-pay-label">모바일 페이</span>
                 </div>
               </button>
               {/* <div className="pay-type-div">
                 <img
-                  style={{ width: "110px", height: "200px" }}
                   src="/images/img_QRpay.png"
                   alt="qr"
                 ></img>
@@ -376,7 +372,7 @@ const ForthPage = () => {
             </div>
             <div
               ref={sections.bottom}
-              className="flex-center"
+              className="flex center"
               data-text="작업관리. 버튼 한 개,"
             >
               <button
@@ -384,14 +380,14 @@ const ForthPage = () => {
                 className="button forth-main-btn"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/third");
+                  setCurrentPage("third");
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     handleText('실행, ', false);
                     setTimeout(() => {
-                      navigate("/third");
+                      setCurrentPage("third");
                     }, 100);
                   }
                 }}
@@ -412,11 +408,11 @@ const ForthPage = () => {
           <div className="credit-pay-text">
             <div>
               가운데 아래에 있는{" "}
-              <span className="highlight-text">카드리{isLowScreen && isBigSize ? <br /> : ''}더기</span>
-              {isLowScreen && !isBigSize ? (
+              <span className="highlight-text">카드리{isLow && isLarge ? <br /> : ''}더기</span>
+              {isLow && !isLarge ? (
                 <>
                   <br />
-                  <div className="flex-center">에</div>
+                  <div className="flex center">에</div>
                 </>
               ) : (
                 "에"
@@ -469,11 +465,11 @@ const ForthPage = () => {
           <div className="credit-pay-text">
             <div>
               가운데 아래에 있는{" "}
-              <span className="highlight-text">카드리{isLowScreen && isBigSize ? <br /> : ''}더기</span>
-              {isLowScreen && !isBigSize ? (
+              <span className="highlight-text">카드리{isLow && isLarge ? <br /> : ''}더기</span>
+              {isLow && !isLarge ? (
                 <>
                   <br></br>
-                  <div className="flex-center">에</div>
+                  <div className="flex center">에</div>
                 </>
               ) : (
                 "에"
@@ -484,7 +480,7 @@ const ForthPage = () => {
               <span className="highlight-text" >
                 모바일페이
               </span>
-              를{isLowScreen && isBigSize ? <br /> : ''} 켜고 {isLowScreen && !isBigSize ? <><br></br><div className="flex-center">접근시키세요</div> </> : "접근시키세요"}
+              를{isLow && isLarge ? <br /> : ''} 켜고 {isLow && !isLarge ? <><br></br><div className="flex center">접근시키세요</div> </> : "접근시키세요"}
             </div>
           </div>
           <img onClick={() => setisCreditPayContent(4)}
@@ -532,8 +528,8 @@ const ForthPage = () => {
               를 뽑으세요.
               {/* 를 뽑고&nbsp;
               <span className="highlight-text">확인</span>
-              &nbsp;버튼{isLowScreen && isBigSize? <br/>: '' }을 누
-              {isLowScreen && !isBigSize ? <><br></br><div className="flex-center">르세요</div> </>: "르세요"} */}
+              &nbsp;버튼{isLow && isLarge? <br/>: '' }을 누
+              {isLow && !isLarge ? <><br></br><div className="flex center">르세요</div> </>: "르세요"} */}
 
             </div>
           </div>
@@ -574,14 +570,14 @@ const ForthPage = () => {
             <div>
               왼쪽 아래의 프린터에서{" "}
               <span className="highlight-text">
-                주{isLowScreen && isBigSize ? <br /> : ''}문표
+                주{isLow && isLarge ? <br /> : ''}문표
               </span>
-              {isLowScreen && !isBigSize ? <br /> : ""}를 받으시고
+              {isLow && !isLarge ? <br /> : ""}를 받으시고
             </div>
             <div>
               <span
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }
+                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
                 }
               >
                 영수증 출력
@@ -657,7 +653,7 @@ const ForthPage = () => {
               왼쪽 아래의{" "}
               <span
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }
+                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
                 }
               >
                 프린터
@@ -672,7 +668,7 @@ const ForthPage = () => {
               인쇄가 완전히{" "}
               <span
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }
+                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
                 }
               >
                 끝나고
@@ -724,15 +720,15 @@ const ForthPage = () => {
               </span>
               에서{" "}
               <span className="highlight-text">
-                영{isLowScreen && isBigSize ? <br /> : ''}수증
+                영{isLow && isLarge ? <br /> : ''}수증
               </span>
-              을{isLowScreen && !isBigSize ? <br /> : ''} 받으시고
+              을{isLow && !isLarge ? <br /> : ''} 받으시고
             </div>
             <div>
               <span className="highlight-text">
                 마무리하기
               </span>
-              &nbsp;버튼을 누르세{isLowScreen && isBigSize ? <br /> : ''}요.
+              &nbsp;버튼을 누르세{isLow && isLarge ? <br /> : ''}요.
             </div>
           </div>
           <img
@@ -773,13 +769,13 @@ const ForthPage = () => {
               <span className="highlight-text">
                 놓고 가시는 물건
               </span>
-              이 없는지 확인{isLowScreen ? <><br></br><div className="flex-center">하세요</div> </>: "하세요"}
+              이 없는지 확인{isLow ? <><br></br><div className="flex center">하세요</div> </>: "하세요"}
             </div> */}
           </div>
           <img
             className="end-checked-image"
             src={
-              isHighContrast
+              isDark
                 ? "/images/contrast_ico_end.png"
                 : "/images/ico_end.png"
             }
@@ -805,7 +801,7 @@ export default ForthPage;
 //   <div
 //     ref={sections.bottom}
 //     className={
-//       isHighContrast
+//       isDark
 //         ? "contrast-credit-pay-content"
 //         : "credit-pay-content"
 //     }
@@ -825,7 +821,7 @@ export default ForthPage;
 //     ></img>
 //     <button
 //       className={
-//         isHighContrast ? "contrast-forth-main-btn" : "forth-main-btn"
+//         isDark ? "contrast-forth-main-btn" : "forth-main-btn"
 //       }
 //     >
 //       취소

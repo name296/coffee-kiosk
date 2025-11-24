@@ -1,25 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 // import { startReturnTimer, updateTimer } from "../assets/timer";
 import { useTextHandler } from '../assets/tts';
 
 const ReturnModal = ({ }) => {
-  const navigate = useNavigate();
   const {
     sections,
-    setisLowScreen,
-    isHighContrast,
-    setisHighContrast,
+    setisLow,
+    isDark,
+    setisDark,
     totalMenuItems,
     setQuantities,
     isReturnModal,
     setisReturnModal,
     volume,
     setVolume,
-    setisBigSize,
+    setisLarge,
     commonScript,
-    readCurrentPage
+    readCurrentPage,
+    setCurrentPage
   } = useContext(AppContext);
 
   const { handleText } = useTextHandler(volume);
@@ -48,7 +47,7 @@ const ReturnModal = ({ }) => {
           <img
             className="return-modal-image"
             src={
-              isHighContrast? "/images/contrast-Group 13.png" : "/images/ico_notice.png"
+              isDark? "/images/contrast-Group 13.png" : "/images/ico_notice.png"
             }
           ></img>
           <div
@@ -58,7 +57,7 @@ const ReturnModal = ({ }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 시작화면
@@ -70,7 +69,7 @@ const ReturnModal = ({ }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 확인
@@ -103,7 +102,7 @@ const ReturnModal = ({ }) => {
               className="button return-btn-confirm"
               onClick={(e) => {
                 e.preventDefault();
-                navigate("/first");
+                setCurrentPage("first");
                 setisReturnModal(false);
               }}
               onKeyDown={(e) => {
@@ -111,7 +110,7 @@ const ReturnModal = ({ }) => {
                   e.preventDefault();
                   handleText('실행, ', false);
                   setTimeout(() => {
-                    navigate("/first");
+                    setCurrentPage("first");
                     setisReturnModal(false);
                   }, 300);
                 }

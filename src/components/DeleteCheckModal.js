@@ -1,19 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 // import { updateTimer } from "../assets/timer";
 import { useTextHandler } from '../assets/tts';
 
 const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
-    const navigate = useNavigate();
     const {
         sections,
-        isHighContrast,
+        isDark,
         isDeleteCheckModal,
         setisDeleteCheckModal,
         volume,
         commonScript,
-        readCurrentPage
+        readCurrentPage,
+        setCurrentPage
     } = useContext(AppContext);
     const { handleText } = useTextHandler(volume);
 
@@ -34,7 +33,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
             handleDecrease(id);
         }
         setisDeleteCheckModal(false);
-        navigate("/third");
+        setCurrentPage("third");
     }
 
     if (isDeleteCheckModal) {
@@ -52,7 +51,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                     <img
                         className="return-modal-image"
                         src={
-                            isHighContrast
+                            isDark
                                 ? "/images/contrast-Group 13.png"
                                 : "/images/ico_notice.png"
                         }
@@ -65,7 +64,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                             <span
                                 className="return-highlight"
                                 style={
-                                    isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                                    isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                                 }
                             >
                                 메뉴선택
@@ -77,7 +76,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                             <span
                                 className="return-highlight"
                                 style={
-                                    isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                                    isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                                 }
                             >
                                 확인

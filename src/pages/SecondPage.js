@@ -1,18 +1,15 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { AppContext } from "../App";
-import "../styles/SecondPage.css";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import FocusTrap from "focus-trap-react";
 import { startReturnTimer, updateTimer, stopIntroTimer } from "../assets/timer";
 import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
 import { useTextHandler } from "../assets/tts";
 
 const SecondPage = ({ }) => {
-  const navigate = useNavigate();
   const {
     sections,
-    isLowScreen,
-    isHighContrast,
+    isLow,
+    isDark,
     tabs,
     menuItems,
     selectedTab,
@@ -31,7 +28,7 @@ const SecondPage = ({ }) => {
   }, []);
 
   useEffect(() => {
-    setCurrentPage(1);
+    setPageNumber(1);
   }, [selectedTab]);
 
   useEffect(() => {
@@ -47,11 +44,7 @@ const SecondPage = ({ }) => {
       startReturnTimer(commonScript.return, handleText, navigate);
     }, 0);
 
-    document.querySelectorAll('button').forEach(btn => {
-      const { width, height } = btn.getBoundingClientRect();
-      const shortSize = Math.min(width, height);
-      btn.style.setProperty('--short-size', `${shortSize}px`);
-    });
+    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
 
     return () => clearTimeout(timer); // 클린업
   }, []);
@@ -69,20 +62,20 @@ const SecondPage = ({ }) => {
     initFirstButtonSection: "top",
   });
 
-  const itemsPerPage = isLowScreen ? 3 : 9; // 한 페이지에 표시할 항목 수
-  const [currentPage, setCurrentPage] = useState(1);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const itemsPerPage = isLow ? 3 : 9; // 한 페이지에 표시할 항목 수
+  const [pageNumber, setPageNumber] = useState(1);
+  const startIndex = (pageNumber - 1) * itemsPerPage;
   const currentItems = menuItems.slice(startIndex, startIndex + itemsPerPage);
 
   // 총 페이지 수 계산
   const totalPages = Math.ceil(menuItems.length / itemsPerPage);
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (pageNumber > 1) setPageNumber(pageNumber - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (pageNumber < totalPages) setPageNumber(pageNumber + 1);
   };
 
   const handlePrevious = () => {
@@ -106,7 +99,7 @@ const SecondPage = ({ }) => {
     }
   }
   return (
-    <div className="second-content">
+    <div className="main second">
       <div className="hidden-div" ref={sections.page}>
         <button
           type="hidden"
@@ -116,20 +109,15 @@ const SecondPage = ({ }) => {
         ></button>
       </div>
       <div
-        className="second-up-content"
+        className="title"
         ref={sections.top}
-        data-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLowScreen ? '일곱' : '열'} 개,`}
+        data-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}
       >
         <div className="menu-tabs">
           <div className="menu-tabs-flex-div">
-            {isLowScreen && (
+            {isLow && (
               <button data-text="이전"
-                style={{
-                  marginLeft: "-10px",
-                  marginRight: "15px",
-                  background: "#252525",
-                }}
-                className={`button tab-button tab-pagination`}
+                className={`button toggle tab-pagination tab-button-prev`}
                 onClick={(e) => { 
                   e.preventDefault();
                   e.target.focus(); 
@@ -149,10 +137,10 @@ const SecondPage = ({ }) => {
             )}
             {["주스", "라떼", "버블티", "에이드", "기타"].includes(
               selectedTab
-            ) && isLowScreen ? (
+            ) && isLow ? (
               <>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "주스" ? "active" : ""
+                  className={`button toggle ${selectedTab === "주스" ? "active" : ""
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
@@ -174,7 +162,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
+                  className={`button toggle ${selectedTab === "라떼" ? "active" : ""
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
@@ -196,7 +184,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "버블티" ? "active" : ""
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -218,7 +206,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
+                  className={`button toggle ${selectedTab === "에이드" ? "active" : ""
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
@@ -238,7 +226,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "기타" ? "active" : ""
+                  className={`button toggle ${selectedTab === "기타" ? "active" : ""
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
@@ -259,7 +247,7 @@ const SecondPage = ({ }) => {
             ) : (
               <>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "전체메뉴" ? "active" : ""
+                  className={`button toggle ${selectedTab === "전체메뉴" ? "active" : ""
                     }`}
                   data-text={`전체메뉴, ${selectedTab === "전체메뉴" ? "선택됨, " : "선택가능, "
                     }`}
@@ -278,7 +266,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button  ${selectedTab === "커피" ? "active" : ""
+                  className={`button toggle  ${selectedTab === "커피" ? "active" : ""
                     }`}
                   data-text={`커피, ${selectedTab === "커피" ? "선택됨, " : "선택가능, "
                     }`}
@@ -297,7 +285,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "밀크티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "밀크티" ? "active" : ""
                     }`}
                   data-text={`밀크티, ${selectedTab === "밀크티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -316,7 +304,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "스무디" ? "active" : ""
+                  className={`button toggle ${selectedTab === "스무디" ? "active" : ""
                     }`}
                   data-text={`스무디, ${selectedTab === "스무디" ? "선택됨, " : "선택가능, "
                     }`}
@@ -335,7 +323,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "차" ? "active" : ""
+                  className={`button toggle ${selectedTab === "차" ? "active" : ""
                     }`}
                   data-text={`차, ${selectedTab === "차" ? "선택됨, " : "선택가능, "
                     }`}
@@ -355,10 +343,9 @@ const SecondPage = ({ }) => {
               </>
             )}
 
-            {isLowScreen && (
+            {isLow && (
               <button data-text="다음"
-                style={{ marginLeft: "15px", background: "#252525" }}
-                className={`button tab-button tab-pagination`}
+                className={`button toggle tab-pagination tab-button-prev`}
                 onClick={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -374,12 +361,12 @@ const SecondPage = ({ }) => {
               </button>
             )}
           </div>
-          {!isLowScreen && (
+          {!isLow && (
             <>
               <div className="secondpage-long-rowline"></div>
               <div className="menu-tabs-flex-div">
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "주스" ? "active" : ""
+                  className={`button toggle ${selectedTab === "주스" ? "active" : ""
                     }`}
                   data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
@@ -398,7 +385,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "라떼" ? "active" : ""
+                  className={`button toggle ${selectedTab === "라떼" ? "active" : ""
                     }`}
                   data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
@@ -417,7 +404,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "버블티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "버블티" ? "active" : ""
                     }`}
                   data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
@@ -436,7 +423,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "에이드" ? "active" : ""
+                  className={`button toggle ${selectedTab === "에이드" ? "active" : ""
                     }`}
                   data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
@@ -455,7 +442,7 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button select-btn tab-button ${selectedTab === "기타" ? "active" : ""
+                  className={`button toggle ${selectedTab === "기타" ? "active" : ""
                     }`}
                   data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
@@ -479,8 +466,7 @@ const SecondPage = ({ }) => {
       </div>
 
       {/* 컨텐츠 */}
-      <div className={`${isLowScreen ? "flex-center" : ""}`}>
-        <div className="menu-grid" ref={sections.middle} data-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
+      <div className="menu-grid" ref={sections.middle} data-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
           {currentItems?.map((item, index) => (
             <button
               data-text={item.id == 13 ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
@@ -512,13 +498,13 @@ const SecondPage = ({ }) => {
               </div>
             </button>
           ))}
-        </div>
+      </div>
 
-        <div
-          className="pagination"
-          ref={sections.bottom}
-          data-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${currentPage} 페이지, 버튼 두 개,`}
-        >
+      <div
+        className="pagination"
+        ref={sections.bottom}
+        data-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
+      >
           <button data-text="이전, " className="button"
             onClick={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
             onKeyDown={(e) => {
@@ -532,16 +518,14 @@ const SecondPage = ({ }) => {
               <span className="content label">&lt;&nbsp; 이전</span>
             </div>
           </button>
-          <span style={{ fontSize: "4rem" }}>
+          <span className="pagination-page-number">
             <span
-              style={
-                isHighContrast ? { color: "#FFE101" } : { color: "#8C532C" }
-              }
+              className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}
             >
-              {currentPage}
+              {pageNumber}
             </span>
-            <span style={{ color: "#707070" }}>&nbsp;/&nbsp;</span>
-            <span style={{ color: "#707070" }}>
+            <span className="pagination-separator">&nbsp;/&nbsp;</span>
+            <span className="pagination-separator">
               {totalPages === 0 ? 1 : totalPages}
             </span>
           </span>
@@ -557,8 +541,6 @@ const SecondPage = ({ }) => {
               <span className="content label">다음 &nbsp;&gt;</span>
             </div>
           </button>
-        </div>
-
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
   🎮 버튼 이벤트 핸들러 시스템 (27 구조)
   ============================== */
 
+import { updateTimer } from "../assets/timer";
+
 export const ButtonEventHandler = {
   /**
    * 버튼 이벤트 시스템 초기화 (27 구조 - 정확히 동일)
@@ -19,6 +21,27 @@ export const ButtonEventHandler = {
         resizeScheduled = false;
       });
     });
+
+    // 클릭 및 사운드 처리 (비프음 재생 및 타이머 업데이트)
+    const handleClick = (event) => {
+      const target = event.target;
+      updateTimer();
+      if (
+        target.tagName === "BUTTON" ||
+        target.getAttribute("role") === "button"
+      ) {
+        // 마우스 또는 터치로 클릭된 경우만 실행
+        if (event.detail !== 0) {
+          const beapSound = document.querySelector("#beapSound");
+          if (beapSound) {
+            beapSound.volume = 0.5;
+            beapSound.play();
+          }
+        }
+      }
+    };
+    document.addEventListener("click", handleClick);
+    document.addEventListener("touchend", handleClick);
 
     // 토글 버튼 클릭 처리
     document.addEventListener('click', (event) => {

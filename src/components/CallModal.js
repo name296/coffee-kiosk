@@ -1,17 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 // import { updateTimer } from "../assets/timer";
 import { useTextHandler } from '../assets/tts';
 
 const CallModal = ({ }) => {
-    const navigate = useNavigate();
     const {
         sections,
-        isLowScreen,
-        setisLowScreen,
-        isHighContrast,
-        setisHighContrast,
+        isLow,
+        setisLow,
+        isDark,
+        setisDark,
         isCreditPayContent,
         setisCreditPayContent,
         menuItems,
@@ -51,7 +49,7 @@ const CallModal = ({ }) => {
                     <img
                         className="return-modal-image"
                         src={
-                            isHighContrast
+                            isDark
                                 ? "/images/contrast_ico_help.png"
                                 : "/images/ico_help.png"
                         }
@@ -64,7 +62,7 @@ const CallModal = ({ }) => {
                             <span
                                 className="return-highlight"
                                 style={
-                                    isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                                    isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                                 }
                             >
                                 호출
@@ -76,7 +74,7 @@ const CallModal = ({ }) => {
                             <span
                                 className="return-highlight"
                                 style={
-                                    isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                                    isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                                 }
                             >
                                 확인

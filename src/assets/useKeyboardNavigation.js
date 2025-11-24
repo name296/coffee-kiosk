@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate, useLocation } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import { updateTimer } from "../assets/timer";
 import ReturnModal from "../components/ReturnModal";
 import { useTextHandler } from '../assets/tts';
@@ -16,8 +15,6 @@ export const useKeyboardNavigation = ({
   // isCallModal = false,
   // isCreditPayContent = 0
 }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { sections, 
     isAccessibilityModal, setisAccessibilityModal, 
     isReturnModal, setisReturnModal, 
@@ -29,11 +26,14 @@ export const useKeyboardNavigation = ({
     volume, setVolume,
     setQuantities,
     totalMenuItems,
-    setisBigSize,
-    setisLowScreen,
-    setisHighContrast,
+    setisLarge,
+    setisLow,
+    setisDark,
     setisCreditPayContent,
-    commonScript
+    commonScript,
+    currentPage,
+    setCurrentPage,
+    goBack
    } = useContext(AppContext);
   const { handleText, handleReplayText } = useTextHandler(volume);
   const initialState = React.useRef({
@@ -60,7 +60,7 @@ export const useKeyboardNavigation = ({
     } else if(isReturnModal || isResetModal || isDeleteModal || isDeleteCheckModal || isCallModal) {
       setFocusableSections( ["modalPage", "confirmSections"]);
       setFirstButtonSection('confirmSections');
-    } else if (location.pathname.split("/").at(-1) === 'forth') {
+    } else if (currentPage === 'forth') {
       const creditPaySections = isCreditPayContent === 0 ? ["page", "middle", "bottom", "bottomfooter"]
         : isCreditPayContent === 7 ? ["page", "bottomfooter"]
           : ["page", "bottom", "bottomfooter"];
@@ -123,7 +123,7 @@ export const useKeyboardNavigation = ({
           ) || []
         );
         const currentItemIndex = focusableItems.indexOf(activeElement);
-        const currentPage = location.pathname.split("/").at(-1);
+        // currentPage는 이미 Context에서 가져옴
         switch (key) {
           case "ArrowUp":
             if (currentSectionIndex > 0) moveFocus(currentSectionIndex - 1);
@@ -217,7 +217,7 @@ export const useKeyboardNavigation = ({
 
           // case "Enter": 
           //   event.preventDefault();
-          //   if(event.target.classList.contains('order-btn')&&
+          //   if(event.target.classList.contains('summary-btn')&&
           //      event.target.classList.contains('disabled')){
           //     handleText('메뉴를 선택하세요.');
           //     return;
@@ -265,7 +265,7 @@ export const useKeyboardNavigation = ({
               if(currentPage === 'forth' && [1,2].includes(isCreditPayContent)){
                 setisCreditPayContent(0);
               }else{
-                window.history.length > 1 ? window.history.back() : navigate("/first");
+                goBack(); // 히스토리에서 이전 페이지로 이동
               }
 
             }, 300);

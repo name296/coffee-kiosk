@@ -1,14 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 // import { updateTimer } from "../assets/timer";
 import { useTextHandler } from '../assets/tts';
 
 const ResetModal = ({ }) => {
-  const navigate = useNavigate();
   const {
     sections,
-    isHighContrast,
+    isDark,
     totalMenuItems,
     setQuantities,
     isResetModal,
@@ -55,7 +53,7 @@ const ResetModal = ({ }) => {
           <img
             className="return-modal-image"
             src={
-              isHighContrast
+              isDark
                 ? "/images/contrast-Group 13.png"
                 : "/images/ico_notice.png"
             }
@@ -68,7 +66,7 @@ const ResetModal = ({ }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 초기화
@@ -80,7 +78,7 @@ const ResetModal = ({ }) => {
               <span
                 className="return-highlight"
                 style={
-                  isHighContrast ? { color: "#FFE101" } : { color: "#A4693F" }
+                  isDark ? { color: "#FFE101" } : { color: "#A4693F" }
                 }
               >
                 확인
