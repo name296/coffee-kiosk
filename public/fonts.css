@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Thin.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Thin.otf") format("opentype");
   font-weight: 100;
   font-style: normal;
   font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-ExtraLight.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-ExtraLight.otf") format("opentype");
   font-weight: 200;
   font-style: normal;
   font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Light.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Light.otf") format("opentype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Regular.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -32,7 +32,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Medium.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -40,7 +40,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-SemiBold.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -48,7 +48,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Bold.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -56,7 +56,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-ExtraBold.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-ExtraBold.otf") format("opentype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -64,7 +64,7 @@
 
 @font-face {
   font-family: "Pretendard GOV";
-  src: url("/fonts/PretendardGOV-Black.otf") format("opentype");
+  src: url("/coffee-kiosk/public/fonts/PretendardGOV-Black.otf") format("opentype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
