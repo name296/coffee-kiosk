@@ -33,11 +33,6 @@ jobs:
           BASE_PATH: /${{ github.event.repository.name }}
         run: bun run build
 
-      - name: Copy necessary files to dist
-        run: |
-          cp index.html dist/
-          cp -r public dist/
-
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
