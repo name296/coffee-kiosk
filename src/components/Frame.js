@@ -25,7 +25,7 @@ export const Top = () => {
         return "작업 안내, 메뉴선택 단계, 카테고리에서 메뉴종류를 선택하시고, 메뉴에서 상품을 선택합니다, 초기화 버튼으로 상품을 다시 선택할 수 있습니다, 주문하기 버튼으로 다음 단계, 내역확인으로 이동 할 수 있습니다, " + commonScript.replay;
       case 'third':
         return "작업 안내, 내역확인 단계, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, 메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다," + commonScript.replay;
-      case 'forth':
+      case 'forth': {
         // ForthPage는 isCreditPayContent에 따라 다른 텍스트
         const orderNum = parseInt(localStorage.getItem("ordernum") || "0");
         if (isCreditPayContent === 0) {
@@ -47,6 +47,7 @@ export const Top = () => {
         } else {
           return "";
         }
+      }
       default:
         return "";
     }
