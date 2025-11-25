@@ -20,6 +20,8 @@
     "build": "bun run scripts/build.js",
     "build:dev": "bun build ./src/index.js --outdir ./dist --target browser --sourcemap --define:\"process.env.NODE_ENV='development'\" --external:\"/images/*\" --external:\"/sound/*\" --external:\"/fonts/*\"",
     "update-icons": "bun run scripts/update-icons.js",
+    "svg-to-react": "bun run scripts/svg-to-react.js",
+    "svg-to-react:watch": "bun run scripts/svg-to-react.js --watch",
     "test": "bun test"
   },
   "browserslist": {

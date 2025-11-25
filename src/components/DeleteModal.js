@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../context/AppContext";
-// import { updateTimer } from "../assets/timer";
+import React, { useContext } from "react";
+import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
+import { useActiveElementTTS } from "../hooks";
 
 const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
   const {
@@ -15,15 +15,8 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
 
-  useEffect(() => {
-    if (document.activeElement) {
-      const pageTTS = document.activeElement.dataset.text;
-      // document.activeElement.blur(); // 현재 포커스를 제거
-      setTimeout(() => {
-        handleText(pageTTS);
-      }, 500); // "실행" 송출 후에 실행 되도록 딜레이
-    }
-  }, [isDeleteModal]);
+  // 모달이 열릴 때만 포커스된 요소의 TTS 재생
+  useActiveElementTTS(handleText, 500, isDeleteModal);
 
   const handleTouchDeleteButton = (id)=>{
     if (quantities[id] !== 1) {
@@ -40,7 +33,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
     return (
       <>
         <div className="hidden-div" ref={sections.modalPage}>
-          <button type="hidden" autoFocus className="hidden-btn" data-text={"오버레이, 알림, 상품삭제, 상품을 삭제합니다, 계속 진행하시려면 확인 버튼을 누릅니다, " + commonScript.replay}></button>
+          <button type="hidden" autoFocus className="hidden-btn" data-tts-text={"오버레이, 알림, 상품삭제, 상품을 삭제합니다, 계속 진행하시려면 확인 버튼을 누릅니다, " + commonScript.replay}></button>
         </div>
         <div
           className="return-modal-overlay"
@@ -84,9 +77,9 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
               버튼을 누르세요
             </p>
           </div>
-          <div data-text="작업 관리, 버튼 두 개, "
+          <div data-tts-text="작업 관리, 버튼 두 개, "
             ref={sections.confirmSections} className="return-modal-buttons">
-            <button data-text="취소,"
+            <button data-tts-text="취소,"
               className="return-btn-cancel"
               onClick={(e) => { e.preventDefault(); setisDeleteModal(false);readCurrentPage();}}
               onKeyDown={(e) => {
@@ -99,7 +92,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
             >
               취소
             </button>
-            <button data-text="확인,"
+            <button data-tts-text="확인,"
               className="return-btn-confirm"
               onClick={(e) => { e.preventDefault(); handleTouchDeleteButton(id)}}
               onKeyDown={(e) => {

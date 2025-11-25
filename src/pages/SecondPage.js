@@ -1,11 +1,13 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { AppContext } from "../context/AppContext";
+import React, { useContext, useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
+import { AppContext } from "../context";
 import FocusTrap from "focus-trap-react";
 import { startReturnTimer, updateTimer, stopIntroTimer } from "../assets/timer";
-import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
 import { useTextHandler } from "../assets/tts";
+import { usePagination, useSafeDocument, useMultiModalButtonHandler } from "../hooks";
+import { PAGINATION_CONFIG, FOCUS_SECTIONS, TIMER_CONFIG, DEFAULT_SETTINGS, DISABLED_MENU_ID, ERROR_MESSAGES } from "../config";
+import { safeQuerySelector } from "../utils/browserCompatibility";
 
-const SecondPage = ({ }) => {
+const SecondPage = memo(() => {
   const {
     sections,
     isLow,
@@ -23,99 +25,120 @@ const SecondPage = ({ }) => {
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
 
+  const { blurActiveElement } = useSafeDocument();
+
+  // 초기 탭 설정
   useEffect(() => {
-    setSelectedTab("전체메뉴");
+    setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB);
+  }, [setSelectedTab]);
 
-  }, []);
-
-  useEffect(() => {
-    setPageNumber(1);
-  }, [selectedTab]);
-
+  // 페이지 로드 시 TTS 및 타이머 시작
   useEffect(() => {
     stopIntroTimer();
-    // 페이지 로드 시 모든 포커스 제거
+    blurActiveElement();
+    
     const timer = setTimeout(() => {
-      if (document.activeElement) {
-        const pageTTS = document.activeElement.dataset.text;
-        setTimeout(() => {
-          handleText(pageTTS);
-        }, 500); // "실행" 송출 후에 실행 되도록 딜레이
+      if (typeof document !== 'undefined' && document.activeElement) {
+        const pageTTS = document.activeElement.dataset.ttsText;
+        if (pageTTS) {
+          setTimeout(() => {
+            handleText(pageTTS);
+          }, TIMER_CONFIG.TTS_DELAY);
+        }
       }
       startReturnTimer(commonScript.return, handleText, setCurrentPage);
+      
+      // 페이지 로드 후 toggle 버튼 아이콘 마운트 확인
+      if (window.ButtonStyleGenerator) {
+        setTimeout(() => {
+          window.ButtonStyleGenerator.setupIconInjection();
+        }, 100);
+      }
     }, 0);
 
-    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
-
-    return () => clearTimeout(timer); // 클린업
-  }, []);
+    return () => clearTimeout(timer);
+  }, [handleText, setCurrentPage, blurActiveElement]);
 
   // useKeyboardNavigation
-  useKeyboardNavigation({
+  useMultiModalButtonHandler({
     initFocusableSections: [
-      "page",
-      "top",
-      "middle",
-      "bottom",
-      "footer",
-      "bottomfooter",
+      FOCUS_SECTIONS.PAGE,
+      FOCUS_SECTIONS.TOP,
+      FOCUS_SECTIONS.MIDDLE,
+      FOCUS_SECTIONS.BOTTOM,
+      FOCUS_SECTIONS.FOOTER,
+      FOCUS_SECTIONS.BOTTOM_FOOTER,
     ],
-    initFirstButtonSection: "top",
+    initFirstButtonSection: FOCUS_SECTIONS.TOP,
+    enableGlobalHandlers: false,
+    enableKeyboardNavigation: true
   });
 
-  const itemsPerPage = isLow ? 3 : 9; // 한 페이지에 표시할 항목 수
-  const [pageNumber, setPageNumber] = useState(1);
-  const startIndex = (pageNumber - 1) * itemsPerPage;
-  const currentItems = menuItems.slice(startIndex, startIndex + itemsPerPage);
+  // 페이지네이션 훅 사용
+  const {
+    pageNumber,
+    totalPages,
+    currentItems,
+    handlePrevPage,
+    handleNextPage,
+    resetOnChange,
+  } = usePagination(
+    menuItems,
+    PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL,
+    PAGINATION_CONFIG.ITEMS_PER_PAGE_LOW,
+    isLow
+  );
 
-  // 총 페이지 수 계산
-  const totalPages = Math.ceil(menuItems.length / itemsPerPage);
+  // selectedTab 변경 시 페이지 리셋
+  useEffect(() => {
+    resetOnChange();
+  }, [selectedTab, resetOnChange]);
 
-  const handlePrevPage = () => {
-    if (pageNumber > 1) setPageNumber(pageNumber - 1);
-  };
-
-  const handleNextPage = () => {
-    if (pageNumber < totalPages) setPageNumber(pageNumber + 1);
-  };
-
-  const handlePrevious = () => {
+  // 탭 네비게이션 함수들 (메모이제이션)
+  const handlePrevious = useCallback(() => {
     const currentIndex = tabs.indexOf(selectedTab);
-    const previousIndex = (currentIndex - 1 + tabs.length) % tabs.length; // 왼쪽으로 이동
+    const previousIndex = (currentIndex - 1 + tabs.length) % tabs.length;
     setSelectedTab(tabs[previousIndex]);
-  };
+  }, [tabs, selectedTab, setSelectedTab]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const currentIndex = tabs.indexOf(selectedTab);
-    const nextIndex = (currentIndex + 1) % tabs.length; // 오른쪽으로 이동
+    const nextIndex = (currentIndex + 1) % tabs.length;
     setSelectedTab(tabs[nextIndex]);
-  };
+  }, [tabs, selectedTab, setSelectedTab]);
 
-  const handleTouchEndWrapper = (e, id) => {
-    if (id !== 13) {
+  // 메뉴 아이템 클릭 핸들러 (메모이제이션)
+  const handleTouchEndWrapper = useCallback((e, id) => {
+    if (id !== DISABLED_MENU_ID) {
       handleIncrease(id);
       handleText('담기, ');
     } else {
-      handleText('없는 상품입니다.');
+      handleText(ERROR_MESSAGES.NO_PRODUCT);
     }
-  }
+  }, [handleIncrease, handleText]);
+
+  // 토글 그룹 핸들러 (메모이제이션)
+  const handleTabToggle = useCallback((tabName) => {
+    setSelectedTab(tabName);
+  }, [setSelectedTab]);
+
+  // 멀티모달 버튼 핸들러 (TTS + 토글 그룹 스위칭 통합)
+  const handleButtonClick = useMultiModalButtonHandler(
+    handleText,
+    '.menu-tabs',
+    handleTabToggle,
+    '선택, '
+  );
   return (
     <div className="main second">
-      <div className="menu-tabs" ref={sections.top} data-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}>
+      <div className="menu-tabs" ref={sections.top} data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}>
             {isLow && (
-              <button data-text="이전"
+              <button data-tts-text="이전"
                 className={`button toggle tab-pagination tab-button-prev`}
                 onClick={(e) => { 
                   e.preventDefault();
                   e.target.focus(); 
                   handlePrevious(); }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(handlePrevious, 100);
-                  }
-                }}
               >
                 <div className="background dynamic">
                   <span className="content label">&lt;&nbsp; 이전</span>
@@ -127,20 +150,22 @@ const SecondPage = ({ }) => {
             ) && isLow ? (
               <>
                 <button
-                  className={`button toggle ${selectedTab === "주스" ? "active" : ""
+                  className={`button toggle ${selectedTab === "주스" ? "pressed" : ""
                     }`}
-                  data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
                   onClick={(e) => { 
                     e.preventDefault();
-                    e.target.focus(); 
-                    setSelectedTab("주스") }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("주스"), 100);
+                    // 같은 그룹 내 다른 버튼의 pressed 제거
+                    const group = e.target.closest('.menu-tabs');
+                    if (group) {
+                      group.querySelectorAll('.button.toggle').forEach(btn => {
+                        if (btn !== e.target.closest('.button')) {
+                          btn.classList.remove('pressed');
+                        }
+                      });
                     }
+                    setSelectedTab("주스");
                   }}
                 >
                   <div className="background dynamic">
@@ -149,20 +174,22 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "라떼" ? "active" : ""
+                  className={`button toggle ${selectedTab === "라떼" ? "pressed" : ""
                     }`}
-                  data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
                   onClick={(e) => { 
                     e.preventDefault();
-                    e.target.focus(); 
-                    setSelectedTab("라떼"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("라떼"), 100);
+                    // 같은 그룹 내 다른 버튼의 pressed 제거
+                    const group = e.target.closest('.menu-tabs');
+                    if (group) {
+                      group.querySelectorAll('.button.toggle').forEach(btn => {
+                        if (btn !== e.target.closest('.button')) {
+                          btn.classList.remove('pressed');
+                        }
+                      });
                     }
+                    setSelectedTab("라떼");
                   }}
                 >
                   <div className="background dynamic">
@@ -171,20 +198,22 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "버블티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "버블티" ? "pressed" : ""
                     }`}
-                  data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
                   onClick={(e) => { 
                     e.preventDefault();
-                    e.target.focus(); 
-                    setSelectedTab("버블티"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("버블티"), 100);
+                    // 같은 그룹 내 다른 버튼의 pressed 제거
+                    const group = e.target.closest('.menu-tabs');
+                    if (group) {
+                      group.querySelectorAll('.button.toggle').forEach(btn => {
+                        if (btn !== e.target.closest('.button')) {
+                          btn.classList.remove('pressed');
+                        }
+                      });
                     }
+                    setSelectedTab("버블티");
                   }}
                 >
                   <div className="background dynamic">
@@ -193,18 +222,22 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "에이드" ? "active" : ""
+                  className={`button toggle ${selectedTab === "에이드" ? "pressed" : ""
                     }`}
-                  data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault();
-                    e.target.focus(); setSelectedTab("에이드"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("에이드"), 100);
+                  onClick={(e) => { 
+                    e.preventDefault();
+                    // 같은 그룹 내 다른 버튼의 pressed 제거
+                    const group = e.target.closest('.menu-tabs');
+                    if (group) {
+                      group.querySelectorAll('.button.toggle').forEach(btn => {
+                        if (btn !== e.target.closest('.button')) {
+                          btn.classList.remove('pressed');
+                        }
+                      });
                     }
+                    setSelectedTab("에이드");
                   }}
                 >
                   <div className="background dynamic">
@@ -213,18 +246,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "기타" ? "active" : ""
+                  className={`button toggle ${selectedTab === "기타" ? "pressed" : ""
                     }`}
-                  data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("기타"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("기타"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "기타")}
                 >
                   <div className="background dynamic">
                     <span className="content label">기타</span>
@@ -234,18 +260,11 @@ const SecondPage = ({ }) => {
             ) : (
               <>
                 <button
-                  className={`button toggle ${selectedTab === "전체메뉴" ? "active" : ""
+                  className={`button toggle ${selectedTab === "전체메뉴" ? "pressed" : ""
                     }`}
-                  data-text={`전체메뉴, ${selectedTab === "전체메뉴" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`전체메뉴, ${selectedTab === "전체메뉴" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault();e.target.focus(); setSelectedTab("전체메뉴"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("전체메뉴"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "전체메뉴")}
                 >
                   <div className="background dynamic">
                     <span className="content label">전체메뉴</span>
@@ -253,18 +272,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle  ${selectedTab === "커피" ? "active" : ""
+                  className={`button toggle ${selectedTab === "커피" ? "pressed" : ""
                     }`}
-                  data-text={`커피, ${selectedTab === "커피" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`커피, ${selectedTab === "커피" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("커피"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("커피"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "커피")}
                 >
                   <div className="background dynamic">
                     <span className="content label">커피</span>
@@ -272,18 +284,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "밀크티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "밀크티" ? "pressed" : ""
                     }`}
-                  data-text={`밀크티, ${selectedTab === "밀크티" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`밀크티, ${selectedTab === "밀크티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("밀크티"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("밀크티"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "밀크티")}
                 >
                   <div className="background dynamic">
                     <span className="content label">밀크티</span>
@@ -291,18 +296,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "스무디" ? "active" : ""
+                  className={`button toggle ${selectedTab === "스무디" ? "pressed" : ""
                     }`}
-                  data-text={`스무디, ${selectedTab === "스무디" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`스무디, ${selectedTab === "스무디" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("스무디"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("스무디"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "스무디")}
                 >
                   <div className="background dynamic">
                     <span className="content label">스무디</span>
@@ -310,18 +308,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "차" ? "active" : ""
+                  className={`button toggle ${selectedTab === "차" ? "pressed" : ""
                     }`}
-                  data-text={`차, ${selectedTab === "차" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`차, ${selectedTab === "차" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("차"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("차"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "차")}
                 >
                   <div className="background dynamic">
                     <span className="content label">차</span>
@@ -331,16 +322,9 @@ const SecondPage = ({ }) => {
             )}
 
             {isLow && (
-              <button data-text="다음"
+              <button data-tts-text="다음"
                 className={`button toggle tab-pagination tab-button-prev`}
                 onClick={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(handleNext, 100);
-                  }
-                }}
               >
                 <div className="background dynamic">
                   <span className="content label">다음 &nbsp;&gt;</span>
@@ -350,18 +334,11 @@ const SecondPage = ({ }) => {
           {!isLow && (
             <>
                 <button
-                  className={`button toggle ${selectedTab === "주스" ? "active" : ""
+                  className={`button toggle ${selectedTab === "주스" ? "pressed" : ""
                     }`}
-                  data-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("주스"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("주스"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "주스")}
                 >
                   <div className="background dynamic">
                     <span className="content label">주스</span>
@@ -369,18 +346,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "라떼" ? "active" : ""
+                  className={`button toggle ${selectedTab === "라떼" ? "pressed" : ""
                     }`}
-                  data-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("라떼"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("라떼"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "라떼")}
                 >
                   <div className="background dynamic">
                     <span className="content label">라떼</span>
@@ -388,18 +358,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "버블티" ? "active" : ""
+                  className={`button toggle ${selectedTab === "버블티" ? "pressed" : ""
                     }`}
-                  data-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("버블티"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("버블티"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "버블티")}
                 >
                   <div className="background dynamic">
                     <span className="content label">버블티</span>
@@ -407,18 +370,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "에이드" ? "active" : ""
+                  className={`button toggle ${selectedTab === "에이드" ? "pressed" : ""
                     }`}
-                  data-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("에이드"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("에이드"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "에이드")}
                 >
                   <div className="background dynamic">
                     <span className="content label">에이드</span>
@@ -426,18 +382,11 @@ const SecondPage = ({ }) => {
                 </button>
                 <div className="secondpage-short-colline"></div>
                 <button
-                  className={`button toggle ${selectedTab === "기타" ? "active" : ""
+                  className={`button toggle ${selectedTab === "기타" ? "pressed" : ""
                     }`}
-                  data-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
+                  data-tts-text={`기타, ${selectedTab === "기타" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setSelectedTab("기타"); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('선택, ', false);
-                      setTimeout(() => setSelectedTab("기타"), 100);
-                    }
-                  }}
+                  onClick={(e) => handleButtonClick(e, "기타")}
                 >
                   <div className="background dynamic">
                     <span className="content label">기타</span>
@@ -448,22 +397,16 @@ const SecondPage = ({ }) => {
         </div>
 
       {/* 컨텐츠 */}
-      <div className="menu-grid" ref={sections.middle} data-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
+      <div className="menu-grid" ref={sections.middle} data-tts-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
           {currentItems?.map((item, index) => (
             <button
-              data-text={item.id == 13 ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
-              className={`button menu-item ${item.id == 13 ? 'disabled' : ''}`}
-              aria-disabled={item.id == 13}
+              data-tts-text={item.id === DISABLED_MENU_ID ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
+              className={`button menu-item ${item.id === DISABLED_MENU_ID ? 'disabled' : ''}`}
+              aria-disabled={item.id === DISABLED_MENU_ID}
               onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
                 handleTouchEndWrapper(e, item.id);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleTouchEndWrapper(e, item.id);
-                }
               }}
               key={item.id}
             >
@@ -485,17 +428,11 @@ const SecondPage = ({ }) => {
       <div
         className="pagination"
         ref={sections.bottom}
-        data-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
+        data-tts-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
       >
-          <button data-text="이전, " className="button"
+          <button data-tts-text="이전, " className="button"
             onClick={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(handlePrevPage, 100);
-              }
-            }}>
+          >
             <div className="background dynamic">
               <span className="content label">&lt;&nbsp; 이전</span>
             </div>
@@ -511,14 +448,8 @@ const SecondPage = ({ }) => {
               {totalPages === 0 ? 1 : totalPages}
             </span>
           </span>
-          <button data-text="다음," className="button" onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(handleNextPage, 100);
-              }
-            }}>
+          <button data-tts-text="다음," className="button" onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+          >
             <div className="background dynamic">
               <span className="content label">다음 &nbsp;&gt;</span>
             </div>
@@ -526,6 +457,8 @@ const SecondPage = ({ }) => {
       </div>
     </div>
   );
-};
+});
+
+SecondPage.displayName = 'SecondPage';
 
 export default SecondPage;

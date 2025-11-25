@@ -1,16 +1,18 @@
-import React, { useEffect, useContext, useLayoutEffect } from "react";
+import React, { useEffect, useContext, useLayoutEffect, useMemo } from "react";
 import { useTextHandler } from "./assets/tts";
 import { updateTimer } from "./assets/timer";
 import { ButtonStyleGenerator } from "./utils/buttonStyleGenerator";
 import { SizeControlManager } from "./utils/sizeControlManager";
-import { ButtonEventHandler } from "./utils/buttonEventHandler";
-import { AppProvider, AppContext } from "./context/AppContext";
+import { useMultiModalButtonHandler } from "./hooks/useMultiModalButtonHandler";
+import { AppProvider, AppContext } from "./context";
 import { getAssetPath } from "./utils/pathUtils";
 import FirstPage from "./pages/FirstPage";
 import SecondPage from "./pages/SecondPage";
 import ThirdPage from "./pages/ThirdPage";
 import ForthPage from "./pages/ForthPage";
-import { LayoutWithHeaderAndFooter } from "./layouts/Layouts";
+import { Layout } from "./layouts/Layouts";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { SCREEN_CONFIG, TIMER_CONFIG } from "./config/appConfig";
 
 // 페이지 렌더링 컴포넌트
 const AppContent = () => {
@@ -45,12 +47,12 @@ const AppContent = () => {
 
 
   return (
-    <LayoutWithHeaderAndFooter>
+    <Layout>
       {currentPage === 'first' && <FirstPage />}
       {currentPage === 'second' && <SecondPage />}
       {currentPage === 'third' && <ThirdPage />}
       {currentPage === 'forth' && <ForthPage />}
-    </LayoutWithHeaderAndFooter>
+    </Layout>
   );
 };
 
@@ -64,8 +66,15 @@ const App = () => {
     initializeDatabase();
   }, [initDB]);
 
+  // 전역 버튼 이벤트 핸들러 (React 훅으로 통합)
+  useMultiModalButtonHandler({
+    enableGlobalHandlers: true,
+    enableKeyboardNavigation: false
+  });
+
   // 전역적으로 button click에 비프음 추가 (내부 요소에 pointer-events:none 추가하기)
-  useEffect(() => {
+  // useLayoutEffect를 사용하여 DOM이 업데이트된 직후에 실행 (버튼 렌더링 보장)
+  useLayoutEffect(() => {
     // 버튼 스타일 자동 생성 시스템 초기화
     ButtonStyleGenerator.init();
     
@@ -80,14 +89,11 @@ const App = () => {
     // ========================================
     // 27 스타일 버튼 이벤트 처리 시스템
     // ========================================
+    // 버튼 이벤트 핸들러는 useMultiModalButtonHandler 훅으로 처리됨
     
-    // 버튼 이벤트 핸들러 초기화 (공통 유틸 - 클릭/사운드 처리 포함)
-    ButtonEventHandler.init();
-    
-    // 뷰포트에 맞춰 줌 배율 조절 (1080x1920 기준)
+    // 뷰포트에 맞춰 줌 배율 조절
     function setZoom() {
-      const bodyWidth = 1080;
-      const bodyHeight = 1920;
+      const { BASE_WIDTH: bodyWidth, BASE_HEIGHT: bodyHeight } = SCREEN_CONFIG;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       
@@ -129,7 +135,7 @@ const App = () => {
     let resizeTimer;
     const handleResize = () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(setZoom, 100);
+      resizeTimer = setTimeout(setZoom, SCREEN_CONFIG.ZOOM_RESIZE_DELAY);
     };
     
     window.addEventListener('resize', handleResize);
@@ -141,6 +147,7 @@ const App = () => {
   }, []);
 
   return (
+    <ErrorBoundary>
     <AppProvider>
       <audio
         id="audioPlayer"
@@ -154,8 +161,11 @@ const App = () => {
         controls
         className="hidden-audio"
       ></audio>
+        <ErrorBoundary>
       <AppContent />
+        </ErrorBoundary>
     </AppProvider>
+    </ErrorBoundary>
   );
 };
 

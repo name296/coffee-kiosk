@@ -1,10 +1,13 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AppContext } from "../context/AppContext";
+import React, { useContext, useState, useEffect, memo, useCallback, useMemo } from "react";
+import { AppContext } from "../context";
 // import { startReturnTimer, updateTimer } from "../assets/timer";
-import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
+import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
 import { useTextHandler } from "../assets/tts";
+import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
+import { TIMER_CONFIG, PAYMENT_STEPS, WEBVIEW_COMMANDS, WEBVIEW_RESPONSE, STORAGE_KEYS, FOCUS_SECTIONS } from "../config/appConfig";
+import { useSafeDocument } from "../hooks";
 
-const ForthPage = () => {
+const ForthPage = memo(() => {
   const {
     sections,
     totalSum,
@@ -27,49 +30,54 @@ const ForthPage = () => {
     setisAccessibilityModal,
     setCurrentPage
   } = useContext(AppContext);
-  const orderItems = createOrderItems(totalMenuItems, quantities);
+  // orderItems 메모이제이션
+  const orderItems = useMemo(
+    () => createOrderItems(totalMenuItems, quantities),
+    [totalMenuItems, quantities, createOrderItems]
+  );
   const { handleText } = useTextHandler(volume);
   const [countdown, setCountdown] = useState(60);
   const [orderNum, setOrderNum] = useState(0);
 
   useEffect(() => {
-    if (isCreditPayContent !== 0) {
-      setisCreditPayContent(0);
+    if (isCreditPayContent !== PAYMENT_STEPS.SELECT_METHOD) {
+      setisCreditPayContent(PAYMENT_STEPS.SELECT_METHOD);
     }
   }, []);
 
+  const { querySelector, getActiveElementText } = useSafeDocument();
+
   useEffect(() => {
-    const hiddenBtn = document.querySelector('.hidden-btn.page-btn');
+    const hiddenBtn = querySelector('.hidden-btn.page-btn');
     if (hiddenBtn) {
       hiddenBtn.focus();
-      if (document.activeElement) {
-        const pageTTS = document.activeElement.dataset.text;
-        // document.activeElement.blur(); // 현재 포커스를 제거
+      const pageTTS = getActiveElementText();
+      if (pageTTS) {
         setTimeout(() => {
           handleText(pageTTS);
-        }, 500); // "실행" 송출 후에 실행 되도록 딜레이
+        }, TIMER_CONFIG.TTS_DELAY);
       }
     }
     // startReturnTimer(commonScript.return, handleText, navigate);
 
-    // 타이머 설정 : 영수증 미출력 60초 지나면 자동 마무리 단계
-    if (isCreditPayContent === 4 || isCreditPayContent === 6) {
-      const resetCountdown = () => setCountdown(60); // 카운트다운 초기화 함수
+    // 타이머 설정 : 영수증 미출력 시 자동 마무리 단계
+    if (isCreditPayContent === PAYMENT_STEPS.PRINT_SELECT || isCreditPayContent === PAYMENT_STEPS.RECEIPT_PRINT) {
+      const resetCountdown = () => setCountdown(TIMER_CONFIG.AUTO_FINISH_DELAY); // 카운트다운 초기화 함수
 
       // 카운트다운 설정
-      setCountdown(60);
+      setCountdown(TIMER_CONFIG.AUTO_FINISH_DELAY);
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev === 0) {
             clearInterval(timer);
             setTimeout(() => {
-              setisCreditPayContent(7);
+              setisCreditPayContent(PAYMENT_STEPS.FINISH);
             }, 0);
             return 0;
           }
           return prev - 1;
         });
-      }, 1000);
+      }, TIMER_CONFIG.INTERVAL_DELAY);
 
       // keydown 및 click 이벤트 추가
       const handleReset = () => resetCountdown();
@@ -84,10 +92,10 @@ const ForthPage = () => {
       };
     }
 
-    // 타이머 설정 : 마무리 단계 3초 후 첫화면으로 이동
+    // 타이머 설정 : 마무리 단계 후 첫화면으로 이동
 
-    if (isCreditPayContent === 7) {
-      setCountdown(4);
+    if (isCreditPayContent === PAYMENT_STEPS.FINISH) {
+      setCountdown(TIMER_CONFIG.FINAL_PAGE_DELAY);
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev === 0) {
@@ -111,7 +119,7 @@ const ForthPage = () => {
           }
           return prev - 1;
         });
-      }, 1000);
+        }, TIMER_CONFIG.INTERVAL_DELAY);
 
       return () => clearInterval(timer);
     }
@@ -122,18 +130,18 @@ const ForthPage = () => {
   }, [isCreditPayContent]);
 
   useEffect(() => {
-    if (window.chrome.webview) {
+    if (window.chrome?.webview) {
       window.chrome.webview.addEventListener("message", (event) => {
         let resData = event.data;
         // 결과값 받으면
         // 카드 :  뽑기-> 영수증 출력 여부 : setisCreditPayContent(3) -> setisCreditPayContent(4)
         // 모바일 : 영수증 출력 여부 : setisCreditPayContent(4)
-        if (resData.arg.result === "SUCCESS") {
-          if (resData.Command === "PAY") {
-            setisCreditPayContent(3); // 카드 뽑는 화면 넘어가기
+        if (resData.arg.result === WEBVIEW_RESPONSE.SUCCESS) {
+          if (resData.Command === WEBVIEW_COMMANDS.PAY) {
+            setisCreditPayContent(PAYMENT_STEPS.CARD_REMOVE); // 카드 뽑는 화면 넘어가기
           }
-          if (resData.Command === "PRINT") {
-            setisCreditPayContent(4); // 주문번호 출력 페이지
+          if (resData.Command === WEBVIEW_COMMANDS.PRINT) {
+            setisCreditPayContent(PAYMENT_STEPS.PRINT_SELECT); // 주문번호 출력 페이지
           }
         } else {
           console.log(resData.arg.errorMessage);
@@ -142,8 +150,33 @@ const ForthPage = () => {
     }
   });
 
-  // 애플리케이션에 주문정보 전달
-  const sendOrderDataToApp = (paymentType) => {
+  // 주문 정보 전달할 때 업데이트 (메모이제이션) - 먼저 정의
+  const updateOrderNumber = useCallback(() => {
+    const currentNum = safeParseInt(safeLocalStorage.getItem(STORAGE_KEYS.ORDER_NUM), 0);
+    const tmpOrderNum = currentNum + 1;
+
+    safeLocalStorage.setItem(STORAGE_KEYS.ORDER_NUM, tmpOrderNum);
+    setOrderNum(tmpOrderNum);
+
+    return tmpOrderNum;
+  }, []);
+
+  // setCallWebToApp을 먼저 정의 (다른 함수들이 사용하므로)
+  const setCallWebToApp = useCallback((p_cmd, p_val) => {
+    var obj_cmd = {
+      Command: p_cmd,
+      arg: p_val,
+    };
+
+    console.log("obj_cmd: " + JSON.stringify(obj_cmd));
+
+    if (window.chrome?.webview) {
+      window.chrome.webview.postMessage(JSON.stringify(obj_cmd));
+    }
+  }, []);
+
+  // 애플리케이션에 주문정보 전달 (메모이제이션)
+  const sendOrderDataToApp = useCallback((paymentType) => {
     var arr_order_data = [];
     orderItems.forEach((item) => {
       arr_order_data.push({
@@ -161,44 +194,16 @@ const ForthPage = () => {
       paymentType: paymentType,
       orderNumber: updateOrderNumber(),
     };
-    setCallWebToApp('PAY', cmd_val);
-  }
+    setCallWebToApp(WEBVIEW_COMMANDS.PAY, cmd_val);
+  }, [orderItems, totalSum, updateOrderNumber, setCallWebToApp]);
 
-  const sendPrintReceiptToApp = () => {
-    setCallWebToApp('PRINT', '');
-  }
+  const sendPrintReceiptToApp = useCallback(() => {
+    setCallWebToApp(WEBVIEW_COMMANDS.PRINT, '');
+  }, [setCallWebToApp]);
 
-  const sendCancelPayment = () => {
-    setCallWebToApp("CANCEL", "");
-  };
-
-  const setCallWebToApp = (p_cmd, p_val) => {
-    var obj_cmd = {
-      Command: p_cmd,
-      arg: p_val,
-    };
-
-    console.log("obj_cmd: " + JSON.stringify(obj_cmd));
-
-    if (window.chrome.webview) {
-      window.chrome.webview.postMessage(JSON.stringify(obj_cmd));
-    }
-  };
-
-  // 주문 정보 전달할 때 업데이트
-  const updateOrderNumber = () => {
-    let tmpOrderNum = localStorage.getItem("ordernum");
-    if (tmpOrderNum === null) {
-      tmpOrderNum = 1;
-    } else {
-      tmpOrderNum = parseInt(tmpOrderNum, 10) + 1;
-    }
-
-    localStorage.setItem("ordernum", tmpOrderNum);
-    setOrderNum(tmpOrderNum);
-
-    return tmpOrderNum;
-  };
+  const sendCancelPayment = useCallback(() => {
+    setCallWebToApp(WEBVIEW_COMMANDS.CANCEL, "");
+  }, [setCallWebToApp]);
 
   // // 주문 번호 가져오기
   // const getOrderNumber = () => {
@@ -206,11 +211,11 @@ const ForthPage = () => {
   // }
 
   // useKeyboardNavigation
-  useKeyboardNavigation({
-    initFocusableSections: ["page", "middle", "bottom", "bottomfooter"],
-    initFirstButtonSection: "page",
-    // isAccessibilityModal,
-    // isCreditPayContent
+  useMultiModalButtonHandler({
+    initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.BOTTOM_FOOTER],
+    initFirstButtonSection: FOCUS_SECTIONS.PAGE,
+    enableGlobalHandlers: false,
+    enableKeyboardNavigation: true
   });
 
   //isCreditPayContent
@@ -265,46 +270,25 @@ const ForthPage = () => {
               updateOrderNumber();
               setisCreditPayContent(4);
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  updateOrderNumber();
-                  setisCreditPayContent(4);
-                }, 100);
-              }
-            }}
           >
             <span>결제금액</span>
             <span className="payment-amount-large">
               {totalSum.toLocaleString("ko-KR")}원
             </span>
           </div>
-          <div className="forth-main-content">
-            <div
-              className="wrap-horizontal"
-              ref={sections.middle}
-              data-text="결제 선택. 버튼 두 개, "
-            >
+          <div
+            className="wrap-horizontal"
+            ref={sections.middle}
+            data-tts-text="결제 선택. 버튼 두 개, "
+          >
               <button
-                data-text="신용카드,"
-                className="button"
+                data-tts-text="신용카드,"
+                className="button pay"
                 onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
                   sendOrderDataToApp("card");
                   setisCreditPayContent(1);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      sendOrderDataToApp("card");
-                      setisCreditPayContent(1);
-                    }, 100);
-                  }
                 }}
               >
                 <div className="background dynamic">
@@ -323,23 +307,13 @@ const ForthPage = () => {
                 </div>
               </button>
               <button
-                className="button"
-                data-text="모바일페이,"
+                className="button pay"
+                data-tts-text="모바일페이,"
                 onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
                   sendOrderDataToApp("mobile");
                   setisCreditPayContent(2);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      sendOrderDataToApp("mobile");
-                      setisCreditPayContent(2);
-                    }, 100);
-                  }
                 }}
               >
                 <div className="background dynamic">
@@ -368,23 +342,14 @@ const ForthPage = () => {
             <div
               ref={sections.bottom}
               className="task-manager"
-              data-text="작업관리. 버튼 한 개,"
+              data-tts-text="작업관리. 버튼 한 개,"
             >
               <button
-                data-text="취소,"
+                data-tts-text="취소,"
                 className="button no"
                 onClick={(e) => {
                   e.preventDefault();
                   setCurrentPage("third");
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      setCurrentPage("third");
-                    }, 100);
-                  }
                 }}
               >
                 <div className="background dynamic">
@@ -392,11 +357,10 @@ const ForthPage = () => {
                 </div>
               </button>
             </div>
-          </div>
         </>
       ) : isCreditPayContent === 1 ? (
         <div
-          data-text="작업 관리, 버튼 한 개,"
+          data-tts-text="작업 관리, 버튼 한 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
@@ -425,7 +389,7 @@ const ForthPage = () => {
             src={"/images/img_card_in.png"}
           ></img>
           <button
-            data-text="취소"
+            data-tts-text="취소"
             className="button forth-main-btn2"
             onClick={(e) => {
               e.preventDefault();
@@ -435,16 +399,6 @@ const ForthPage = () => {
               setisCreditPayContent(0);
               // navigate("/third");
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  sendCancelPayment();
-                  setisCreditPayContent(0);
-                }, 100);
-              }
-            }}
           >
             <div className="background dynamic">
               <span className="content label">취소</span>
@@ -453,7 +407,7 @@ const ForthPage = () => {
         </div>
       ) : isCreditPayContent === 2 ? (
         <div
-          data-text="작업 관리, 버튼 한 개,"
+          data-tts-text="작업 관리, 버튼 한 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
@@ -483,7 +437,7 @@ const ForthPage = () => {
             src={"/images/img_Mpay_big 1.png"}
           ></img>
           <button
-            data-text="취소"
+            data-tts-text="취소"
             className="button forth-main-btn2"
             onClick={(e) => {
               e.preventDefault();
@@ -493,16 +447,6 @@ const ForthPage = () => {
               setisCreditPayContent(0);
               // navigate("/third");
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  sendCancelPayment();
-                  setisCreditPayContent(0);
-                }, 100);
-              }
-            }}
           >
             <div className="background dynamic">
               <span className="content label">취소</span>
@@ -511,7 +455,7 @@ const ForthPage = () => {
         </div>
       ) : isCreditPayContent === 3 ? (
         <div
-          data-text="작업 관리, 버튼 한 개,"
+          data-tts-text="작업 관리, 버튼 한 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
@@ -533,18 +477,12 @@ const ForthPage = () => {
             src={"/images/img_card_out.png"}
           ></img>
           {/* <button
-            data-text="확인"
+            data-tts-text="확인"
             className="forth-main-btn2 btn-confirm"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               handleText('카드를 제거하세요, ')
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('카드를 제거하세요, ');
-              }
             }}
           >
             확인
@@ -552,7 +490,7 @@ const ForthPage = () => {
         </div>
       ) : isCreditPayContent === 4 ? (
         <div
-          data-text="인쇄 서택, 버튼 두 개,"
+          data-tts-text="인쇄 서택, 버튼 두 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
@@ -590,7 +528,7 @@ const ForthPage = () => {
           </div>
           <div className="forth-main-two-btn">
             <button
-              data-text="영수증 출력,"
+              data-tts-text="영수증 출력,"
               className="button forth-main-two-btn1"
               onClick={(e) => {
                 e.preventDefault();
@@ -598,37 +536,18 @@ const ForthPage = () => {
                 sendPrintReceiptToApp();
                 setisCreditPayContent(6);
               }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => {
-                    sendPrintReceiptToApp();
-                    setisCreditPayContent(6);
-                  }, 100);
-                }
-              }}
             >
               <div className="background dynamic">
                 <span className="content label">영수증 출력</span>
               </div>
             </button>
             <button
-              data-text="출력 안함,"
+              data-tts-text="출력 안함,"
               className="button forth-main-two-btn2"
               onClick={(e) => {
                 e.preventDefault();
                 e.target.focus();
                 setisCreditPayContent(7)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => {
-                    setisCreditPayContent(7)
-                  }, 100);
-                }
               }}
             >
               <div className="background dynamic">
@@ -639,7 +558,7 @@ const ForthPage = () => {
         </div>
       ) : isCreditPayContent === 5 ? (  // 사용 안함
         <div
-          data-text="작업 관리, 버튼 한 개,"
+          data-tts-text="작업 관리, 버튼 한 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
@@ -679,21 +598,12 @@ const ForthPage = () => {
             <span>{orderNum}</span>
           </div>
           <button
-            data-text="마무리하기"
+            data-tts-text="마무리하기"
             className="button forth-main-btn2 btn-confirm"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               setisCreditPayContent(7)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  setisCreditPayContent(7)
-                }, 100);
-              }
             }}
           >
             <div className="background dynamic">
@@ -703,7 +613,7 @@ const ForthPage = () => {
         </div>
       ) : isCreditPayContent === 6 ? (
         <div
-          data-text="작업 관리, 버튼 한 개,"
+          data-tts-text="작업 관리, 버튼 한 개,"
           className="credit-pay-content"
           ref={sections.bottom}
         >
@@ -734,21 +644,12 @@ const ForthPage = () => {
             <span>{orderNum}</span>
           </div> */}
           <button
-            data-text="마무리하기"
+            data-tts-text="마무리하기"
             className="button forth-main-btn2 btn-confirm"
             onClick={(e) => {
               e.preventDefault();
               e.target.focus();
               setisCreditPayContent(7)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  setisCreditPayContent(7)
-                }, 100);
-              }
             }}
           >
             <div className="background dynamic">
@@ -788,7 +689,9 @@ const ForthPage = () => {
       )}
     </div>
   );
-};
+});
+
+ForthPage.displayName = 'ForthPage';
 
 export default ForthPage;
 

@@ -543,6 +543,24 @@
   }
 
   /* ========================================
+     🎨 아이콘 시스템 (JavaScript 연동)
+     ======================================== */
+     .icon {
+      display: flex;
+      width: var(--icon-size);
+      height: var(--icon-size);
+      align-items: center;
+      justify-content: center;
+  
+      & svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+      }
+    }
+
+  /* ========================================
      ?�� 버튼 컴포?�트 ?�스??     ======================================== */
   .button {
     background: none;
@@ -566,7 +584,7 @@
     position: relative;
     display: flex;
     box-sizing: border-box;
-  width: 100%;
+    width: 100%;
     height: 100%;
     background: var(--btn-background-default, var(--primary1-background-color-default));
     outline: 0 var(--btn-border-style, var(--border-style-default)) var(--btn-border-default, var(--primary1-border-color-default));
@@ -578,17 +596,16 @@
 
     & .content {
       color: var(--btn-content-default, var(--primary1-content-color-default));
-      &.icon {          
+      &.icon {
         &.pressed { 
           position: absolute;
           display: var(--content-icon-display-default); 
           z-index: var(--content-icon-z-index-pressed); 
-}
+        }
       }
       
       &.label { 
         display: flex;
-        padding: 16px 16px;
         text-align: center;
         white-space: nowrap;
         width: fit-content;
@@ -614,11 +631,18 @@
     outline: 0 var(--border-style-pointed) var(--border-color-pointed);
     outline-offset: 0;
   }
-
-  &.home-btn {
+/* ========================================
+   버튼 다양성 시작
+   ======================================== */
+  &.start {
     width: 285px;
     height: 285px;
 }
+
+  &.pay {
+    width: 328px;
+    height: 460px;
+  }
 
   &.summary-btn {
     width: 199px;
@@ -656,6 +680,7 @@
     height: 76px;
     width: fit-content;
     min-width: 70px;
+    padding: var(--spacing-sm);
   }
 
   &.menu-item {
@@ -841,35 +866,31 @@
      ?�� ?�이지 컨텐�??�역
      ======================================== */
   .main {
-    height: fit-content;
-  width: 100%;
-    flex: 1;
-  display: flex;
-    justify-content: space-around;
-  align-items: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-flow: column nowrap;
     
     &.first {
-      & .first-image {
-        width: 100%;
-        max-width: 100%;
-      }
-       
+
       & .task-manager {
-        flex: 1;
-  display: flex;
+        width: 100%;
+        height: 100%;
+        display: flex;
         flex-flow: row nowrap;
-        justify-content: space-between;
-  align-items: center;
+        justify-content: center;
+        align-items: center;
         gap: var(--spacing-sm);
-}
-}
+      }
+    }
+    
 
     &.second {
-  position: relative;
-      font-size: var(--font-size-b1);
-
-      .title {
+      justify-content: space-evenly;
+      
+      & .title {
         height: 255px;
         padding-top: 10px;
         display: flex;
@@ -1249,7 +1270,6 @@
   color: #8c532c;
 }
 
-
 .menu-tabs {
   width: 726px;
   row-gap: 16px;
@@ -1366,60 +1386,27 @@
   color: #ffe100 !important;
 }
 
-/* ?�이지?�이??*/
 .pagination {
   position: relative;
-  bottom: 54px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 45px;
+  gap: var(--spacing-md);
 
-  .low & {
-    position: fixed;
-    bottom: 16.7%;
-    left: 80.5%;
-  display: flex;
-  flex-direction: column;
-    gap: 10px;
-  }
-
-  button {
-    display: flex;
-  justify-content: center;
-  align-items: center;
-    font-size: var(--font-size-b1);
+  & .button {
     width: 184px;
     height: 64px;
-    background-color: var(--pagination-btn-background-color);
-    color: var(--layout-circle-background-color);
-    border: 1px solid gray;
-    padding: 10px 20px;
-    border-radius: 5px;
     cursor: pointer;
 
-    .low & {
+    &.low & {
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: var(--font-size-b1);
-      min-width: 160px;
       height: 64px;
-      background-color: var(--pagination-btn-background-color);
-      color: var(--layout-circle-background-color);
-      border: 1px solid gray;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-}
-
-    &:disabled {
-      background-color: e5e5e5;
-      border: 1px solid gray;
-      cursor: not-allowed;
     }
   }
 }
+
 .low .tab-pagination {
   color: #ffffff !important;
 }
@@ -1708,25 +1695,12 @@
 
 .wrap-horizontal {
   display: flex;
+  width: fit-content;
+  height: fit-content;
   position: relative;
-  top: 598px;
   gap: 16px;
-  font-size: var(--font-size-b1);
-  font-weight: 600;
   justify-content: center;
   align-items: center;
-
-  .low & {
-    display: flex;
-    gap: 25px;
-    position: absolute;
-    top: 10%;
-    left: 3%;
-    font-size: var(--font-size-b1);
-    font-weight: 600;
-    justify-content: center;
-    align-items: center;
-  }
 }
 
 

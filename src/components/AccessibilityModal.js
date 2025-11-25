@@ -1,7 +1,8 @@
-import React, { useState, useRef, useContext, useEffect } from "react";
-import { AppContext } from "../context/AppContext";
+import React, { useState, useRef, useContext, useCallback } from "react";
+import { AppContext } from "../context";
 import FocusTrap from "focus-trap-react";
 import { useTextHandler } from '../assets/tts';
+import { useActiveElementTTS, useMultiModalButtonHandler } from "../hooks";
 
 const AccessibilityModal = ({ }) => {
   const {
@@ -63,21 +64,23 @@ const AccessibilityModal = ({ }) => {
     readCurrentPage(prevAccessibility.volume);
   }
 
-  useEffect(() => {
-    if (document.activeElement) {
-      const pageTTS = document.activeElement.dataset.text;
-      setTimeout(() => {
-        handleText(pageTTS);
-      }, 500); // "실행" 송출 후에 실행 되도록 0.5초 뒤로 설정
-    }
-  }, [isAccessibilityModal]);
+  // 모달이 열릴 때만 포커스된 요소의 TTS 재생
+  useActiveElementTTS(handleText, 500, isAccessibilityModal);
+
+  // 멀티모달 버튼 핸들러 (TTS + 토글 그룹 스위칭 통합)
+  const handleButtonClick = useMultiModalButtonHandler(
+    handleText,
+    '.flex.gap-10',
+    null,
+    '선택, '
+  );
 
 
   if (isAccessibilityModal) {
     return (
       <>
         <div className="hidden-div" ref={sections.modalPage}>
-          <button type="hidden" autoFocus className="hidden-btn" data-text={'오버레이, 설정, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다,' + commonScript.replay}></button>
+          <button type="hidden" autoFocus className="hidden-btn" data-tts-text={'오버레이, 설정, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다,' + commonScript.replay}></button>
         </div>
         <div
           className="accessibility-modal-overlay"
@@ -115,11 +118,11 @@ const AccessibilityModal = ({ }) => {
             className="accessibility-down-content"
           >
             <div
-              className="accessibility-down-content-div1" data-text="초기설정으로 일괄선택, 버튼 한 개, "
+              className="accessibility-down-content-div1" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, "
               ref={sections.AccessibilitySections1}
             >
               <p>초기 설정으로 일괄선택</p>
-              <button data-text="초기설정,"
+              <button data-tts-text="초기설정,"
                 className="button accessibility-down-content-div-btn"
                 onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false }); }}
                 onKeyDown={(e) => {
@@ -153,38 +156,26 @@ const AccessibilityModal = ({ }) => {
               <div
                 className="flex gap-10"
                 ref={sections.AccessibilitySections2}
-                data-text={`고대비 화면, 선택상태, ${prevAccessibility.isHighContrast ? '켬' : '끔'}, 버튼 두 개,`}
+                data-tts-text={`고대비 화면, 선택상태, ${prevAccessibility.isHighContrast ? '켬' : '끔'}, 버튼 두 개,`}
               >
-                <button data-text={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
+                <button data-tts-text={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
                   className={`button toggle accessibility-down-content-div-btn1 
-                    ${prevAccessibility.isHighContrast ? "" : "accessibility-btn-active"}`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false })); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false }));
-                      }, 100);
-                    }
+                    ${prevAccessibility.isHighContrast ? "" : "pressed"}`}
+                  onClick={(e) => {
+                    handleButtonClick(e, null);
+                    setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: false }));
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">끔</span>
                   </div>
                 </button>
-                <button data-text={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
+                <button data-tts-text={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
                   className={`button toggle accessibility-down-content-div-btn1 
-                    ${prevAccessibility.isHighContrast ? "accessibility-btn-active" : ""}`}
-                  onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true })); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true }));
-                      }, 100);
-                    }
+                    ${prevAccessibility.isHighContrast ? "pressed" : ""}`}
+                  onClick={(e) => {
+                    handleButtonClick(e, null);
+                    setPrevAccessibility(prevState => ({ ...prevState, isHighContrast: true }));
                   }}
                 >
                   <div className="background dynamic">
@@ -209,94 +200,59 @@ const AccessibilityModal = ({ }) => {
               <div
                 className="flex gap-10"
                 ref={sections.AccessibilitySections3}
-                data-text={`소리크기, 선택상태, ${volumeMap[prevAccessibility.volume]}, 버튼 네 개, `}
+                data-tts-text={`소리크기, 선택상태, ${volumeMap[prevAccessibility.volume]}, 버튼 네 개, `}
               >
-                <button data-text={`끔, ${prevAccessibility.volume === 0 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`끔, ${prevAccessibility.volume === 0 ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 0 ? "pressed" : ""}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.target.focus();
+                    // 같은 그룹 내 다른 버튼의 pressed 제거
+                    const group = e.target.closest('.flex.gap-10');
+                    if (group) {
+                      group.querySelectorAll('.button.toggle').forEach(btn => {
+                        if (btn !== e.target.closest('.button')) {
+                          btn.classList.remove('pressed');
+                        }
+                      });
+                    }
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 0 }));
                     setTmpVolume(0);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, volume: 0 }));
-                        setTmpVolume(0);
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">끔</span>
                   </div>
                 </button>
-                <button data-text={`약, ${prevAccessibility.volume === 1 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`약, ${prevAccessibility.volume === 1 ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 1 ? "pressed" : ""}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 1 }));
                     setTmpVolume(0.5);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, volume: 1 }));
-                        setTmpVolume(0.5);
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">약</span>
                   </div>
                 </button>
-                <button data-text={`중, ${prevAccessibility.volume === 2 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`중, ${prevAccessibility.volume === 2 ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 2 ? "pressed" : ""}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 2 }));
                     setTmpVolume(0.75);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, volume: 2 }));
-                    setTmpVolume(0.75);
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">중</span>
                   </div>
                 </button>
-                <button data-text={`강, ${prevAccessibility.volume === 3 ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`강, ${prevAccessibility.volume === 3 ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn2 ${prevAccessibility.volume === 3 ? "pressed" : ""}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, volume: 3 }));
                     setTmpVolume(1);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, volume: 3 }));
-                        setTmpVolume(1);
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
@@ -321,44 +277,24 @@ const AccessibilityModal = ({ }) => {
               <div
                 className="flex gap-10"
                 ref={sections.AccessibilitySections4}
-                data-text={`큰글씨 화면, 선택상태, ${prevAccessibility.isBigSize ? '켬' : '끔'}, 버튼 두 개, `}
+                data-tts-text={`큰글씨 화면, 선택상태, ${prevAccessibility.isBigSize ? '켬' : '끔'}, 버튼 두 개, `}
               >
-                <button data-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
-                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "accessibility-btn-active"}`}
+                <button data-tts-text={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "" : "pressed"}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, isBigSize: false }));
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isBigSize: false }));
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">끔</span>
                   </div>
                 </button>
-                <button data-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isBigSize ? "pressed" : ""}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, isBigSize: true }));
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isBigSize: true }));
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
@@ -384,44 +320,24 @@ const AccessibilityModal = ({ }) => {
               <div
                 className="flex gap-10"
                 ref={sections.AccessibilitySections5}
-                data-text={`낮은 화면, 선택상태, ${prevAccessibility.isLowScreen ? '켬' : '끔'}, 버튼 두 개, `}
+                data-tts-text={`낮은 화면, 선택상태, ${prevAccessibility.isLowScreen ? '켬' : '끔'}, 버튼 두 개, `}
               >
-                <button data-text={`끔, ${prevAccessibility.isLowScreen ? '선택가능, ' : '선택됨, '}`}
-                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "accessibility-btn-active"}`}
+                <button data-tts-text={`끔, ${prevAccessibility.isLowScreen ? '선택가능, ' : '선택됨, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "" : "pressed"}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: false }));
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: false }));
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
                     <span className="content label">끔</span>
                   </div>
                 </button>
-                <button data-text={`켬, ${prevAccessibility.isLowScreen ? '선택됨, ' : '선택가능, '}`}
-                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "accessibility-btn-active" : ""}`}
+                <button data-tts-text={`켬, ${prevAccessibility.isLowScreen ? '선택됨, ' : '선택가능, '}`}
+                  className={`button toggle accessibility-down-content-div-btn1 ${prevAccessibility.isLowScreen ? "pressed" : ""}`}
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.target.focus();
+                    handleButtonClick(e, null);
                     setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: true }));
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleText('실행, ', false);
-                      setTimeout(() => {
-                        setPrevAccessibility(prevState => ({ ...prevState, isLowScreen: true }));
-                      }, 100);
-                    }
                   }}
                 >
                   <div className="background dynamic">
@@ -433,9 +349,9 @@ const AccessibilityModal = ({ }) => {
             <div
               className="accessibility-modal-buttons"
               ref={sections.AccessibilitySections6}
-              data-text="작업 관리, 버튼 두 개, "
+              data-tts-text="작업 관리, 버튼 두 개, "
             >
-              <button data-text="적용안함, "
+              <button data-tts-text="적용안함, "
                 className="button accessibility-btn-cancel"
                 onClick={(e) => {
                   e.preventDefault();
@@ -459,7 +375,7 @@ const AccessibilityModal = ({ }) => {
                   <span className="content label">적용안함</span>
                 </div>
               </button>
-              <button data-text="적용하기, "
+              <button data-tts-text="적용하기, "
                 className="button accessibility-btn-confirm"
                 onClick={(e) => {
                   e.preventDefault();

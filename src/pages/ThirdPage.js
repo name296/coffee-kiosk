@@ -1,10 +1,13 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AppContext } from "../context/AppContext";
+import React, { useContext, useState, useEffect, useMemo, useCallback, memo } from "react";
+import { AppContext } from "../context";
 // import { startReturnTimer, updateTimer } from "../assets/timer";
-import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
+import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
 import { useTextHandler } from "../assets/tts";
+import { usePagination, useSafeDocument } from "../hooks";
+import { PAGINATION_CONFIG, FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG } from "../config";
+import { safeQuerySelector, formatNumber } from "../utils/browserCompatibility";
 
-const ThirdPage = () => {
+const ThirdPage = memo(() => {
   const {
     sections,
     totalMenuItems,
@@ -27,57 +30,65 @@ const ThirdPage = () => {
   const { handleText } = useTextHandler(volume);
   // 각 아이템의 수량을 관리
 
-  const ITEMS_PER_PAGE = isLow ? 3 : 6; // 페이지당 항목 수
-  const [pageNumber, setPageNumber] = useState(1);
-
-  // 현재 페이지에 해당하는 항목 가져오기
-  const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
-  const priceItems = filterMenuItems(totalMenuItems, quantities);
-
-  const currentItems = priceItems.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
+  // 필터링된 아이템들 (메모이제이션)
+  const priceItems = useMemo(
+    () => filterMenuItems(totalMenuItems, quantities),
+    [totalMenuItems, quantities]
   );
-  // 총 페이지 수 계산
-  const totalPages =
-    priceItems.length === 0 ? 1 : Math.ceil(priceItems.length / ITEMS_PER_PAGE);
 
-  // 페이지 이동 함수
-  const handlePrevPage = () => {
-    if (pageNumber > 1) {
-      setPageNumber(pageNumber - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pageNumber < totalPages) {
-      setPageNumber(pageNumber + 1);
-    }
-  };
+  // 페이지네이션 훅 사용 (ThirdPage는 다른 페이지 크기 사용)
+  const ITEMS_PER_PAGE_NORMAL = 6;
+  const ITEMS_PER_PAGE_LOW = 3;
+  const ITEMS_PER_PAGE = isLow ? ITEMS_PER_PAGE_LOW : ITEMS_PER_PAGE_NORMAL;
   
-  function prependRows(existingArray, currentItems) {
-    // row1부터 rowN까지 배열 생성
+  const {
+    pageNumber,
+    totalPages,
+    currentItems,
+    handlePrevPage,
+    handleNextPage,
+    itemsPerPage,
+  } = usePagination(
+    priceItems,
+    ITEMS_PER_PAGE_NORMAL,
+    ITEMS_PER_PAGE_LOW,
+    isLow
+  );
+
+  // 현재 페이지의 시작 인덱스 계산 (메모이제이션)
+  const startIndex = useMemo(
+    () => (pageNumber - 1) * itemsPerPage,
+    [pageNumber, itemsPerPage]
+  );
+
+  // 포커스 섹션 생성 함수 (메모이제이션)
+  const prependRows = useCallback((existingArray, itemCount) => {
     const newRows = Array.from(
-      { length: currentItems },
+      { length: itemCount },
       (_, index) => `row${index + 1}`
     );
+    return [FOCUS_SECTIONS.PAGE, ...newRows, ...existingArray];
+  }, []);
 
-    // 기존 배열의 앞에 새 요소를 추가
-    return ["page", ...newRows, ...existingArray];
-  }
-
-  const focusableSections = prependRows(
-    ["bottom", "footer", "bottomfooter"],
-    currentItems.length
+  // 포커스 섹션 (메모이제이션)
+  const focusableSections = useMemo(
+    () => prependRows(
+      [FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.FOOTER, FOCUS_SECTIONS.BOTTOM_FOOTER],
+      currentItems.length
+    ),
+    [currentItems.length, prependRows]
   );
 
   // useKeyboardNavigation
-  const { updateFocusableSections } = useKeyboardNavigation({
+  const { updateFocusableSections } = useMultiModalButtonHandler({
     initFocusableSections: focusableSections,
     initFirstButtonSection: "row1",
+    enableGlobalHandlers: false,
+    enableKeyboardNavigation: true
   });
 
-  const handleTouchDecrease = (id) => {
+  // 수량 감소 핸들러 (메모이제이션)
+  const handleTouchDecrease = useCallback((id) => {
     if (quantities[id] === 1) {
       setDeleteItemId(id);
       if (currentItems.length > 1) {
@@ -88,49 +99,46 @@ const ThirdPage = () => {
     } else {
       handleDecrease(id);
     }
-  }
+  }, [quantities, currentItems.length, setDeleteItemId, setisDeleteModal, setisDeleteCheckModal, handleDecrease]);
 
-  const handleTouchDelete = (id)=>{
+  // 삭제 핸들러 (메모이제이션)
+  const handleTouchDelete = useCallback((id) => {
     setDeleteItemId(id);
     if (currentItems.length > 1) {
       setisDeleteModal(true);
     } else {
       setisDeleteCheckModal(true);
     }
-  }
+  }, [currentItems.length, setDeleteItemId, setisDeleteModal, setisDeleteCheckModal]);
 
+  // 페이지 변경 시 포커스 섹션 업데이트
+  useEffect(() => {
+    updateFocusableSections(focusableSections);
+  }, [pageNumber, focusableSections, updateFocusableSections]);
 
-  useEffect(()=>{
-     // 새로 계산된 focusableSections로 업데이트
-     const updatedSections = prependRows(
-      ["bottom", "footer", "bottomfooter"],
-      currentItems.length
-    );
-    updateFocusableSections(updatedSections); // 업데이트 호출
-
-  },[pageNumber])
-
+  // 아이템이 없으면 이전 페이지로
   useEffect(() => {
     if (currentItems.length === 0) {
-      setCurrentPage("second");
+      setCurrentPage(PAGE_CONFIG.SECOND);
     }
-  }, [currentItems]);
+  }, [currentItems.length, setCurrentPage]);
 
+  const { blurActiveElement, getActiveElementText } = useSafeDocument();
+
+  // 페이지 로드 시 TTS
   useEffect(() => {
-    // 페이지 로드 시 모든 포커스 제거
+    blurActiveElement();
     const timer = setTimeout(() => {
-      if (document.activeElement) {
-        const pageTTS = document.activeElement.dataset.text;
+      const pageTTS = getActiveElementText();
+      if (pageTTS) {
         setTimeout(() => {
           handleText(pageTTS);
-        }, 500); // "실행" 송출 후에 실행 되도록 0.5초 뒤로 설정
+        }, TIMER_CONFIG.TTS_DELAY);
       }
-      // startReturnTimer(commonScript.return, handleText, navigate);
     }, 0);
 
-    return () => clearTimeout(timer); // 클린업
-    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
-  }, []);
+    return () => clearTimeout(timer);
+  }, [handleText, blurActiveElement, getActiveElementText]);
 
 
 
@@ -171,11 +179,11 @@ const ThirdPage = () => {
         <div className="third-main-content">
           {currentItems.map((item, i) => {
             const globalIndex = startIndex + i + 1;
-            const rowIndex = (i % ITEMS_PER_PAGE) + 1;
+            const rowIndex = (i % itemsPerPage) + 1;
             const refKey = `row${rowIndex}`;
             return (
               <div key={item.id}>
-                <div className="order-item" ref={sections[refKey]} data-text={`주문목록,${globalIndex}번, ${item.name}, ${convertToKoreanQuantity(quantities[item.id])} 개, ${item.price * quantities[item.id]}원, 버튼 세 개, `}>
+                <div className="order-item" ref={sections[refKey]} data-tts-text={`주문목록,${globalIndex}번, ${item.name}, ${convertToKoreanQuantity(quantities[item.id])} 개, ${item.price * quantities[item.id]}원, 버튼 세 개, `}>
                   <div
                     className="order-image-div"
                   >
@@ -190,19 +198,12 @@ const ThirdPage = () => {
                   <p className="order-name">{item.name}</p>
                   <div className="order-quantity">
                     <button
-                      data-text="수량 빼기"
+                      data-tts-text="수량 빼기"
                       className="button qty-btn"
                       onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
                         handleTouchDecrease(item.id);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleText('실행', false);
-                          setTimeout(() => handleTouchDecrease(item.id), 100);
-                        }
                       }}
                     >
                       <div className="background dynamic">
@@ -211,19 +212,12 @@ const ThirdPage = () => {
                     </button>
                     <span className="qty">{quantities[item.id]}</span>
                     <button
-                      data-text="수량 더하기"
+                      data-tts-text="수량 더하기"
                       className="button qty-btn"
                       onClick={(e) => {
                         e.preventDefault();
                         e.currentTarget.focus();
                         handleIncrease(item.id);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleText('실행', false);
-                          setTimeout(() => handleIncrease(item.id), 100);
-                        }
                       }}
                     >
                       <div className="background dynamic">
@@ -232,22 +226,15 @@ const ThirdPage = () => {
                     </button>
                   </div>
                   <span className="order-price">
-                    {Number(item.price * quantities[item.id]).toLocaleString()}원
+                    {formatNumber(Number(item.price * quantities[item.id]))}원
                   </span>
                   <button
-                    data-text="삭제"
+                    data-tts-text="삭제"
                     className="button delete-btn"
                     onClick={(e) => {
                       e.preventDefault();
                       e.currentTarget.focus();
                       handleTouchDelete(item.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleText('실행', false);
-                        setTimeout(() => handleTouchDelete(item.id), 100);
-                      }
                     }}
                   >
                     <div className="background dynamic">
@@ -266,16 +253,10 @@ const ThirdPage = () => {
         <div
           className="pagination2"
           ref={sections.bottom}
-          data-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
+          data-tts-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
         >
-          <button data-text=" 이전," className="button" onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(handlePrevPage, 100);
-              }
-            }}>
+          <button data-tts-text=" 이전," className="button" onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
+>
             <div className="background dynamic">
               <span className="content label">&lt;&nbsp; 이전</span>
             </div>
@@ -289,15 +270,9 @@ const ThirdPage = () => {
             <span className="pagination-separator">&nbsp;/&nbsp;</span>
             <span className="pagination-separator">{totalPages}</span>
           </span>
-          <button data-text=" 다음," className="button"
+          <button data-tts-text=" 다음," className="button"
           onClick={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(handleNextPage, 100);
-              }
-            }}>
+          >
             <div className="background dynamic">
               <span className="content label">다음 &nbsp;&gt;</span>
             </div>
@@ -306,6 +281,8 @@ const ThirdPage = () => {
       </div>
     </>
   );
-};
+});
+
+ThirdPage.displayName = 'ThirdPage';
 
 export default ThirdPage;

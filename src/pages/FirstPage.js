@@ -1,14 +1,16 @@
-import React, { useContext, useEffect } from "react";
-import { AppContext } from "../context/AppContext";
+import React, { useContext, useEffect, memo, useCallback } from "react";
+import { AppContext } from "../context";
 import TakeInIcon from "../components/icons/TakeInIcon";
 import TakeOutIcon from "../components/icons/TakeOutIcon";
 import Button from "../components/Button";
-import { useKeyboardNavigation } from "../assets/useKeyboardNavigation";
+import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
 import { useTextHandler } from '../assets/tts';
 import { startIntroTimer } from "../assets/timer";
 import { commonScript } from "../constants/commonScript";
+import { FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG, DEFAULT_SETTINGS } from "../config";
+import { useSafeDocument } from "../hooks";
 
-const FirstPage = () => {
+const FirstPage = memo(() => {
   const {
     sections,
     setCurrentPage,
@@ -20,88 +22,74 @@ const FirstPage = () => {
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
 
+  const { blurActiveElement } = useSafeDocument();
+
   // useKeyboardNavigation
-  useKeyboardNavigation({
-    initFocusableSections: ["page", "middle", "bottomfooter"],
-    initFirstButtonSection: "page",
+  useMultiModalButtonHandler({
+    initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM_FOOTER],
+    initFirstButtonSection: FOCUS_SECTIONS.PAGE,
+    enableGlobalHandlers: true,
+    handleTextOpt: handleText,
+    enableKeyboardNavigation: true
   });
+
+  // 초기화 콜백 (메모이제이션)
+  const handleIntroComplete = useCallback(() => {
+    setisDark(DEFAULT_SETTINGS.IS_DARK);
+    setVolume(DEFAULT_SETTINGS.VOLUME);
+    setisLarge(DEFAULT_SETTINGS.IS_LARGE);
+    setisLow(DEFAULT_SETTINGS.IS_LOW);
+  }, [setisDark, setVolume, setisLarge, setisLow]);
 
   // FirstPage 진입 시 TTS 및 타이머 시작
   useEffect(() => {
     const timer = setTimeout(() => {
-      // 포커스 제거
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
-      // TTS 초기화
+      blurActiveElement();
       handleText(commonScript.intro);
-      // 인트로 타이머 시작
-      startIntroTimer(commonScript.intro, handleText, () => {
-        setisDark(false);
-        setVolume(1);
-        setisLarge(false);
-        setisLow(false);
-      });
-    }, 200);
+      startIntroTimer(commonScript.intro, handleText, handleIntroComplete);
+    }, TIMER_CONFIG.ACTION_DELAY * 2);
 
     return () => clearTimeout(timer);
-  }, [handleText, setisDark, setVolume, setisLarge, setisLow]);
+  }, [handleText, handleIntroComplete, blurActiveElement]);
 
   return (
     <div
       className="main first"
     >
         <img
-          className="first-image"
-          src="public/images/poster.svg"
+          src="/images/poster.svg"
           alt="coffee"
         />
         <div 
           className="task-manager"
-          data-text="취식방식, 버튼 두개,"
+          data-tts-text="취식방식, 버튼 두개,"
           ref={sections.middle}
         >
           <Button
-            className="home-btn"
-            dataText="포장하기"
+            styleClass="button start"
+            ttsText="포장하기"
             icon={<TakeOutIcon />}
             label="포장하기"
             onClick={(e) => {
               e.preventDefault();
-              setCurrentPage('second');
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  setCurrentPage('second');
-                }, 100);
-              }
+              setCurrentPage(PAGE_CONFIG.SECOND);
             }}
           />
           <Button
-            className="home-btn"
-            dataText="먹고가기"
+            styleClass="button start"
+            ttsText="먹고가기"
             icon={<TakeInIcon />}
             label="먹고가기"
             onClick={(e) => {
               e.preventDefault();
-              setCurrentPage('second');
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  setCurrentPage('second');
-                }, 100);
-              }
+              setCurrentPage(PAGE_CONFIG.SECOND);
             }}
           />
         </div>
     </div>
   );
-};
+});
+
+FirstPage.displayName = 'FirstPage';
 
 export default FirstPage;

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Step, Summary, Bottom } from "../components/Frame";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../context";
 import ReturnModal from "../components/ReturnModal";
 import AccessibilityModal from "../components/AccessibilityModal";
 import ResetModal from "../components/ResetModal";
@@ -54,7 +54,11 @@ const GlobalModals = () => {
   );
 };
 
-export const LayoutWithHeaderAndFooter = ({ children }) => {
+/**
+ * 메인 레이아웃 컴포넌트
+ * 헤더(Step), 본문(children), 푸터(Summary, Bottom) 및 전역 모달을 포함
+ */
+export const Layout = ({ children }) => {
   return (
     <div className="frame">
       <div className="black"></div>
