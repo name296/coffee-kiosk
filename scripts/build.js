@@ -73,6 +73,10 @@ writeFileSync('./dist/index.html', html);
 console.log('📄 Creating 404.html for SPA routing...');
 writeFileSync('./dist/404.html', html);
 
+// 6. .nojekyll 파일 생성 (Jekyll 처리 방지)
+console.log('📄 Creating .nojekyll...');
+writeFileSync('./dist/.nojekyll', '');
+
 console.log('✅ Build complete!');
 console.log('📦 Output directory: ./dist');
 console.log('🚀 Deploy the ./dist folder to GitHub Pages');
