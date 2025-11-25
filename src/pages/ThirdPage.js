@@ -6,6 +6,8 @@ import { useTextHandler } from "../assets/tts";
 import { usePagination, useSafeDocument } from "../hooks";
 import { PAGINATION_CONFIG, FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG } from "../config";
 import { safeQuerySelector, formatNumber } from "../utils/browserCompatibility";
+import { getAssetPath } from "../utils/pathUtils";
+import { DeleteIcon } from "../components/icons";
 
 const ThirdPage = memo(() => {
   const {
@@ -239,7 +241,7 @@ const ThirdPage = memo(() => {
                   >
                     <div className="background dynamic">
                       <span className="content icon" aria-hidden="true">
-                        <img src="/images/trash.png" alt="삭제" />
+                        <DeleteIcon />
                       </span>
                     </div>
                   </button>

@@ -9,6 +9,7 @@ import { startIntroTimer } from "../assets/timer";
 import { commonScript } from "../constants/commonScript";
 import { FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG, DEFAULT_SETTINGS } from "../config";
 import { useSafeDocument } from "../hooks";
+import { getAssetPath } from "../utils/pathUtils";
 
 const FirstPage = memo(() => {
   const {
@@ -57,7 +58,7 @@ const FirstPage = memo(() => {
       className="main first"
     >
         <img
-          src="/images/poster.svg"
+          src={getAssetPath("/images/poster.svg")}
           alt="coffee"
         />
         <div 

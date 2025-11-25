@@ -3,6 +3,8 @@ import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { safeLocalStorage, safeParseInt, formatNumber } from "../utils/browserCompatibility";
 import { PAGE_MESSAGES, PAYMENT_MESSAGES, PAYMENT_STEPS } from "../config";
+import { getAssetPath } from "../utils/pathUtils";
+import { ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon } from "../components/icons";
 
 export const Top = memo(() => {
   const {
@@ -254,11 +256,7 @@ export const Summary = memo(() => {
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
-                    <img
-                      className="summary-btn-icon"
-                      src={"/images/ico_reset.png"}
-                      alt="초기화"
-                    />
+                    <ResetIcon className="summary-btn-icon" />
                   </span>
                   <span className="content label">초기화</span>
                 </div>
@@ -293,15 +291,7 @@ export const Summary = memo(() => {
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
-                    <img
-                      className="summary-btn-icon"
-                      src={
-                        isDark
-                          ? "/images/contrast_ico_order.png"
-                          : "/images/ico_order.png"
-                      }
-                      alt="주문"
-                    />
+                    <OrderIcon className="summary-btn-icon" />
                   </span>
                   <span className="content label">주문</span>
                 </div>
@@ -328,11 +318,7 @@ export const Summary = memo(() => {
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
-                    <img
-                      className="summary-btn-icon"
-                      src={"/images/ico_add_order.png"}
-                      alt="추가"
-                    />
+                    <AddIcon className="summary-btn-icon" />
                   </span>
                   <span className="content label">추가</span>
                 </div>
@@ -364,15 +350,7 @@ export const Summary = memo(() => {
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
-                    <img
-                      className="summary-btn-icon"
-                      src={
-                        isDark
-                          ? "/images/contrast_Mask group.png"
-                          : "/images/Mask group.png"
-                      }
-                      alt="결제"
-                    />
+                    <PayIcon className="summary-btn-icon" />
                   </span>
                   <span className="content label">결제</span>
                 </div>
@@ -432,11 +410,7 @@ export const Bottom = memo(() => {
             <div className="background dynamic">
               <span className="content icon" aria-hidden="true">
                 <div className="div-footer-circle">
-                  <img
-                    className="black-circle"
-                    src="images/home_btn.png"
-                    alt="home"
-                  />
+                  <HomeIcon className="black-circle" />
                 </div>
               </span>
               <span className="content label">처음으로</span>
@@ -464,11 +438,7 @@ export const Bottom = memo(() => {
           <div className="background dynamic">
             <span className="content icon" aria-hidden="true">
               <div className="div-footer-circle">
-                <img
-                  className="black-circle"
-                  src="/images/contrast_ico_low_sc.png"
-                  alt="wheelchair"
-                />
+                <ExtentionIcon className="black-circle" />
               </div>
             </span>
             <span className="content label">접근성</span>

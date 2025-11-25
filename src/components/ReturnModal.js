@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS } from "../hooks";
+import { getAssetPath } from "../utils/pathUtils";
 
 const ReturnModal = ({ }) => {
   const {
@@ -41,7 +42,7 @@ const ReturnModal = ({ }) => {
           <img
             className="return-modal-image"
             src={
-              isDark? "/images/contrast-Group 13.png" : "/images/ico_notice.png"
+              isDark? getAssetPath("/images/contrast-Group 13.png") : getAssetPath("/images/ico_notice.png")
             }
           ></img>
           <div

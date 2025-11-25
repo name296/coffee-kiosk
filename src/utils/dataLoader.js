@@ -40,7 +40,7 @@ const getDefaultMenuData = () => {
       id: 13,
       name: "추가예정",
       price: "0",
-      img: getAssetPath("./public/images/item-아메리카노.svg")
+      img: getAssetPath("/images/item-아메리카노.svg")
     }
   };
 };

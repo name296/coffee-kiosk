@@ -3,6 +3,7 @@ import { AppContext } from "../context";
 import FocusTrap from "focus-trap-react";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS, useMultiModalButtonHandler } from "../hooks";
+import { getAssetPath } from "../utils/pathUtils";
 
 const AccessibilityModal = ({ }) => {
   const {
@@ -146,8 +147,8 @@ const AccessibilityModal = ({ }) => {
                 <img
                   src={
                     isDark
-                      ? "/images/contrast_ico_high_cont.png"
-                      : "/images/ico_high_cont.png"
+                      ? getAssetPath("/images/contrast_ico_high_cont.png")
+                      : getAssetPath("/images/ico_high_cont.png")
                   }
                   className="accessibility-down-content-div-img"
                 ></img>
@@ -190,8 +191,8 @@ const AccessibilityModal = ({ }) => {
                 <img
                   src={
                     isDark
-                      ? "/images/contrast_ico_volume.png"
-                      : "/images/ico_volume.png"
+                      ? getAssetPath("/images/contrast_ico_volume.png")
+                      : getAssetPath("/images/ico_volume.png")
                   }
                   className="accessibility-down-content-div-img"
                 ></img>
@@ -267,8 +268,8 @@ const AccessibilityModal = ({ }) => {
                 <img
                   src={
                     isDark
-                      ? "/images/contrast_ico_zoom.png"
-                      : "/images/ico_zoom.png"
+                      ? getAssetPath("/images/contrast_ico_zoom.png")
+                      : getAssetPath("/images/ico_zoom.png")
                   }
                   className="accessibility-down-content-div-img"
                 ></img>
@@ -310,8 +311,8 @@ const AccessibilityModal = ({ }) => {
                 <img
                   src={
                     isDark
-                      ? "/images/contrast_ico_low_sc.png"
-                      : "/images/ico_low_sc.png"
+                      ? getAssetPath("/images/contrast_ico_low_sc.png")
+                      : getAssetPath("/images/ico_low_sc.png")
                   }
                   className="accessibility-down-content-div-img"
                 ></img>

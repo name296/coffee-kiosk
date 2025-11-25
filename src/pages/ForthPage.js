@@ -6,6 +6,7 @@ import { useTextHandler } from "../assets/tts";
 import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
 import { TIMER_CONFIG, PAYMENT_STEPS, WEBVIEW_COMMANDS, WEBVIEW_RESPONSE, STORAGE_KEYS, FOCUS_SECTIONS } from "../config/appConfig";
 import { useSafeDocument } from "../hooks";
+import { getAssetPath } from "../utils/pathUtils";
 
 const ForthPage = memo(() => {
   const {
@@ -299,7 +300,7 @@ const ForthPage = memo(() => {
                           ? { width: "100px", height: "65px" }
                           : { width: "125px", height: "85px" }
                       }
-                      src="/images/img_credit_card.png"
+                      src={getAssetPath("/images/payment-card.svg")}
                       alt="card"
                     />
                   </span>
@@ -324,7 +325,7 @@ const ForthPage = memo(() => {
                           ? { width: "77px", height: "130px" }
                           : { width: "110px", height: "200px" }
                       }
-                      src="/images/img_Mpay.png"
+                      src={getAssetPath("/images/payment-mobile.svg")}
                       alt="mobile"
                     />
                   </span>
@@ -333,7 +334,7 @@ const ForthPage = memo(() => {
               </button>
               {/* <div className="pay-type-div">
                 <img
-                  src="/images/img_QRpay.png"
+                  src={getAssetPath("/images/img_QRpay.png")}
                   alt="qr"
                 ></img>
                 <p>QR 페이</p>
@@ -386,7 +387,7 @@ const ForthPage = memo(() => {
           </div>
           <img onClick={() => setisCreditPayContent(3)}
             className="credit-pay-image"
-            src={"/images/img_card_in.png"}
+            src={getAssetPath("/images/device-cardReader-insert.svg")}
           ></img>
           <button
             data-tts-text="취소"
@@ -434,7 +435,7 @@ const ForthPage = memo(() => {
           </div>
           <img onClick={() => setisCreditPayContent(4)}
             className="credit-pay-image"
-            src={"/images/img_Mpay_big 1.png"}
+            src={getAssetPath("/images/device-cardReader-mobile.svg")}
           ></img>
           <button
             data-tts-text="취소"
@@ -474,7 +475,7 @@ const ForthPage = memo(() => {
           </div>
           <img onClick={() => setisCreditPayContent(4)}
             className="credit-pay-image"
-            src={"/images/img_card_out.png"}
+            src={getAssetPath("/images/device-cardReader-remove.svg")}
           ></img>
           {/* <button
             data-tts-text="확인"
@@ -520,7 +521,7 @@ const ForthPage = memo(() => {
           </div>
           <img
             className="credit-pay-image"
-            src={"/images/img_order_paper.png"}
+            src={getAssetPath("/images/device-printer-order.svg")}
           ></img>
           <div className="order-num-txt">
             {/* <span>{orderNum}</span> */}
@@ -592,7 +593,7 @@ const ForthPage = memo(() => {
           </div>
           <img
             className="credit-pay-image"
-            src={"/images/img_order_paper.png"}
+            src={getAssetPath("/images/device-printer-order.svg")}
           ></img>
           <div className="order-num-txt">
             <span>{orderNum}</span>
@@ -638,7 +639,7 @@ const ForthPage = memo(() => {
           </div>
           <img
             className="credit-pay-image"
-            src={"/images/img_receipt.png"}
+            src={getAssetPath("/images/device-printer-receipt.svg")}
           ></img>
           {/* <div className="order-num-txt">
             <span>{orderNum}</span>
@@ -672,8 +673,8 @@ const ForthPage = memo(() => {
             className="end-checked-image"
             src={
               isDark
-                ? "/images/contrast_ico_end.png"
-                : "/images/ico_end.png"
+                ? getAssetPath("/images/contrast_ico_end.png")
+                : getAssetPath("/images/ico_end.png")
             }
           ></img>
           <div className="return-num-txt">
@@ -681,7 +682,7 @@ const ForthPage = memo(() => {
           </div>
           {/* <img
             className="end-logo-image"
-            src={"/images/logo_grey_big.png"}
+            src={getAssetPath("/images/logo_grey_big.png")}
           ></img> */}
         </div>
       ) : (
@@ -710,7 +711,7 @@ export default ForthPage;
 //     </div>
 //     <img
 //       className="credit-pay-image"
-//       src={"/images/img_QRpay_big.png"}
+//       src={getAssetPath("/images/img_QRpay_big.png")}
 //       onClick={() =>
 //         setisCreditPayContent(
 //           (isCreditPayContent) => isCreditPayContent + 1

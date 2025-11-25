@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS } from "../hooks";
+import { getAssetPath } from "../utils/pathUtils";
 
 const CallModal = ({ }) => {
     const {
@@ -43,8 +44,8 @@ const CallModal = ({ }) => {
                         className="return-modal-image"
                         src={
                             isDark
-                                ? "/images/contrast_ico_help.png"
-                                : "/images/ico_help.png"
+                                ? getAssetPath("/images/contrast_ico_help.png")
+                                : getAssetPath("/images/ico_help.png")
                         }
                     ></img>
                     <div
