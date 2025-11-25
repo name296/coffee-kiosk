@@ -100,8 +100,15 @@ const App = () => {
       const zoom = Math.min(zoomByWidth, zoomByHeight);
       
       const html = document.documentElement;
+      
       if (html) {
-        html.style.zoom = zoom;
+        // 모든 브라우저에서 scale 사용 (일관된 동작)
+        html.style.transform = `scale(${zoom})`;
+        html.style.transformOrigin = 'top left';
+        
+        // html의 실제 크기를 조정하여 레이아웃에 영향 (zoom처럼 작동)
+        html.style.width = `${bodyWidth * zoom}px`;
+        html.style.height = `${bodyHeight * zoom}px`;
       }
     }
     
