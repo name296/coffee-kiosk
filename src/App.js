@@ -99,16 +99,26 @@ const App = () => {
       // 둘 중 작은 값을 선택 (뷰포트에 완전히 들어가도록)
       const zoom = Math.min(zoomByWidth, zoomByHeight);
       
-      const html = document.documentElement;
+      const body = document.body;
       
-      if (html) {
-        // 모든 브라우저에서 scale 사용 (일관된 동작)
-        html.style.transform = `scale(${zoom})`;
-        html.style.transformOrigin = 'top left';
+      if (body) {
+        // body에 scale 적용
+        body.style.transform = `scale(${zoom})`;
+        body.style.transformOrigin = 'top left';
         
-        // html의 실제 크기를 조정하여 레이아웃에 영향 (zoom처럼 작동)
-        html.style.width = `${bodyWidth * zoom}px`;
-        html.style.height = `${bodyHeight * zoom}px`;
+        // 스케일 후 실제 크기 계산
+        const scaledWidth = bodyWidth * zoom;
+        const scaledHeight = bodyHeight * zoom;
+        
+        // 중앙 정렬을 위한 위치 조정
+        const offsetX = (vw - scaledWidth) / 2;
+        const offsetY = (vh - scaledHeight) / 2;
+        
+        body.style.position = 'fixed';
+        body.style.top = `${offsetY}px`;
+        body.style.left = `${offsetX}px`;
+        body.style.width = `${bodyWidth}px`;
+        body.style.height = `${bodyHeight}px`;
       }
     }
     

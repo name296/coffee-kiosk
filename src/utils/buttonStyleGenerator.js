@@ -38,17 +38,39 @@ export const ButtonStyleGenerator = {
     const widthScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--button-width-scale') || '1');
     const heightScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--button-height-scale') || '1');
     
-    // 현재 줌 배율 가져오기
-    const htmlElement = document.documentElement;
-    const currentZoom = parseFloat(htmlElement.style.zoom) || 1;
+    // 현재 스케일 배율 가져오기 (transform: scale() 기준)
+    const bodyElement = document.body;
+    let currentScale = 1;
+    
+    if (bodyElement) {
+      const bodyStyle = getComputedStyle(bodyElement);
+      const transform = bodyStyle.transform;
+      
+      // transform: scale(x) 또는 scale(x, y) 파싱
+      if (transform && transform !== 'none') {
+        const matrixMatch = transform.match(/matrix\(([^)]+)\)/);
+        if (matrixMatch) {
+          const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()));
+          // matrix(a, b, c, d, e, f)에서 scale은 a와 d 값
+          // scale(x, y)일 경우 a와 d가 다를 수 있지만, 일반적으로 같음
+          currentScale = Math.abs(values[0]) || 1;
+        } else {
+          const scaleMatch = transform.match(/scale\(([^)]+)\)/);
+          if (scaleMatch) {
+            const scaleValues = scaleMatch[1].split(',').map(v => parseFloat(v.trim()));
+            currentScale = scaleValues[0] || 1;
+          }
+        }
+      }
+    }
     
     document.querySelectorAll('button').forEach(btn => {
       // 원본 크기 저장 (첫 실행 시에만)
       if (!this._originalSizes.has(btn)) {
         const { width, height } = btn.getBoundingClientRect();
-        // 줌이 적용된 크기를 원본으로 변환
-        const originalWidth = width / currentZoom;
-        const originalHeight = height / currentZoom;
+        // scale이 적용된 크기를 원본으로 변환
+        const originalWidth = width / currentScale;
+        const originalHeight = height / currentScale;
         this._originalSizes.set(btn, { width: originalWidth, height: originalHeight });
       }
       
