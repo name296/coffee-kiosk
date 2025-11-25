@@ -39,13 +39,16 @@ const ForthPage = () => {
   }, []);
 
   useEffect(() => {
-    document.querySelector('.hidden-btn').focus();
-    if (document.activeElement) {
-      const pageTTS = document.activeElement.dataset.text;
-      // document.activeElement.blur(); // 현재 포커스를 제거
-      setTimeout(() => {
-        handleText(pageTTS);
-      }, 500); // "실행" 송출 후에 실행 되도록 딜레이
+    const hiddenBtn = document.querySelector('.hidden-btn.page-btn');
+    if (hiddenBtn) {
+      hiddenBtn.focus();
+      if (document.activeElement) {
+        const pageTTS = document.activeElement.dataset.text;
+        // document.activeElement.blur(); // 현재 포커스를 제거
+        setTimeout(() => {
+          handleText(pageTTS);
+        }, 500); // "실행" 송출 후에 실행 되도록 딜레이
+      }
     }
     // startReturnTimer(commonScript.return, handleText, navigate);
 
@@ -246,14 +249,6 @@ const ForthPage = () => {
 
   return (
     <div className="main forth">
-      <div className="hidden-div" ref={sections.page}>
-        <button
-          type="hidden"
-          className="hidden-btn page-btn"
-          autoFocus
-          data-text={getPageScript()}
-        />
-      </div>
       {isCreditPayContent === 0 ? (
         <>
           <div className="title">
@@ -288,13 +283,13 @@ const ForthPage = () => {
           </div>
           <div className="forth-main-content">
             <div
-              className="forth-main-flex"
+              className="wrap-horizontal"
               ref={sections.middle}
               data-text="결제 선택. 버튼 두 개, "
             >
               <button
                 data-text="신용카드,"
-                className="button pay-type-div"
+                className="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.target.focus();
@@ -328,7 +323,7 @@ const ForthPage = () => {
                 </div>
               </button>
               <button
-                className="button pay-type-div"
+                className="button"
                 data-text="모바일페이,"
                 onClick={(e) => {
                   e.preventDefault();
@@ -372,12 +367,12 @@ const ForthPage = () => {
             </div>
             <div
               ref={sections.bottom}
-              className="flex center"
+              className="task-manager"
               data-text="작업관리. 버튼 한 개,"
             >
               <button
                 data-text="취소,"
-                className="button forth-main-btn"
+                className="button no"
                 onClick={(e) => {
                   e.preventDefault();
                   setCurrentPage("third");

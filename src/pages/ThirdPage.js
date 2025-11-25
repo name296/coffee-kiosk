@@ -137,15 +137,6 @@ const ThirdPage = () => {
   return (
     <>
       <div className="main third">
-        <div className="hidden-div" ref={sections.page}>
-          <button
-            type="hidden"
-            autoFocus
-            className="hidden-btn page-btn"
-            data-text={"작업 안내, 주문내역 확인 단계, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, " +
-          "메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,"  + commonScript.replay}
-          ></button>
-        </div>
         <div className="title">
           <span
             style={isDark ? { color: "#FFE101" } : { color: "#8C532C" }}

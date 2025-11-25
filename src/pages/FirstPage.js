@@ -51,13 +51,6 @@ const FirstPage = () => {
     <div
       className="main first"
     >
-      <div className="hidden-div" ref={sections.page}>
-        <button
-          type="hidden"
-          className="hidden-btn page-btn"
-          data-text={"작업 안내, 시작화면 단계, 음식을 포장할지 먹고갈지 선택합니다." + commonScript.replay}
-        />
-      </div>
         <img
           className="first-image"
           src="public/images/poster.svg"

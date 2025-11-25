@@ -18,7 +18,8 @@ const SecondPage = ({ }) => {
     commonScript,
     volume,
     quantities,
-    convertToKoreanQuantity
+    convertToKoreanQuantity,
+    setCurrentPage
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
 
@@ -41,7 +42,7 @@ const SecondPage = ({ }) => {
           handleText(pageTTS);
         }, 500); // "실행" 송출 후에 실행 되도록 딜레이
       }
-      startReturnTimer(commonScript.return, handleText, navigate);
+      startReturnTimer(commonScript.return, handleText, setCurrentPage);
     }, 0);
 
     // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
@@ -100,21 +101,7 @@ const SecondPage = ({ }) => {
   }
   return (
     <div className="main second">
-      <div className="hidden-div" ref={sections.page}>
-        <button
-          type="hidden"
-          autoFocus
-          className="hidden-btn page-btn"
-          data-text={"작업안내, 메뉴선택 단계, 카테고리에서 메뉴종류를 선택하시고, 메뉴에서 상품을 선택합니다, 초기화 버튼으로 상품을 다시 선택할 수 있습니다, 주문하기 버튼으로 다음 단계, 내역확인으로 이동 할 수 있습니다, " + commonScript.replay}
-        ></button>
-      </div>
-      <div
-        className="title"
-        ref={sections.top}
-        data-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}
-      >
-        <div className="menu-tabs">
-          <div className="menu-tabs-flex-div">
+      <div className="menu-tabs" ref={sections.top} data-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}>
             {isLow && (
               <button data-text="이전"
                 className={`button toggle tab-pagination tab-button-prev`}
@@ -360,11 +347,8 @@ const SecondPage = ({ }) => {
                 </div>
               </button>
             )}
-          </div>
           {!isLow && (
             <>
-              <div className="secondpage-long-rowline"></div>
-              <div className="menu-tabs-flex-div">
                 <button
                   className={`button toggle ${selectedTab === "주스" ? "active" : ""
                     }`}
@@ -459,18 +443,16 @@ const SecondPage = ({ }) => {
                     <span className="content label">기타</span>
                   </div>
                 </button>
-              </div>
             </>
           )}
         </div>
-      </div>
 
       {/* 컨텐츠 */}
       <div className="menu-grid" ref={sections.middle} data-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
           {currentItems?.map((item, index) => (
             <button
               data-text={item.id == 13 ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
-              className={`button touch-blocker menu-item ${item.id == 13 ? 'disabled' : ''}`}
+              className={`button menu-item ${item.id == 13 ? 'disabled' : ''}`}
               aria-disabled={item.id == 13}
               onClick={(e) => {
                 e.preventDefault();

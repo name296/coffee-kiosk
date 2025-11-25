@@ -38,11 +38,18 @@ export const ButtonStyleGenerator = {
     const widthScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--button-width-scale') || '1');
     const heightScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--button-height-scale') || '1');
     
+    // 현재 줌 배율 가져오기
+    const htmlElement = document.documentElement;
+    const currentZoom = parseFloat(htmlElement.style.zoom) || 1;
+    
     document.querySelectorAll('button').forEach(btn => {
       // 원본 크기 저장 (첫 실행 시에만)
       if (!this._originalSizes.has(btn)) {
         const { width, height } = btn.getBoundingClientRect();
-        this._originalSizes.set(btn, { width, height });
+        // 줌이 적용된 크기를 원본으로 변환
+        const originalWidth = width / currentZoom;
+        const originalHeight = height / currentZoom;
+        this._originalSizes.set(btn, { width: originalWidth, height: originalHeight });
       }
       
       // 원본 크기 가져오기

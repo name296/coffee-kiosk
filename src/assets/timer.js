@@ -22,7 +22,7 @@ export const startIntroTimer = (scriptText, handleText, onInitSetting) => {
 }
 
 // 자동 초기화면 타이아웃 제거 (미사용)
-export const startReturnTimer = (scriptText, handleText, navigate) => {
+export const startReturnTimer = (scriptText, handleText, setCurrentPage) => {
     if(intervalId){
       clearInterval(intervalId);
       intervalId = null;
@@ -31,7 +31,9 @@ export const startReturnTimer = (scriptText, handleText, navigate) => {
     intervalId = setInterval(() => {
       if(intervalTime === returnHomeTime){
         // handleText(scriptText); 
-        navigate("/", {state: true});
+        if (setCurrentPage) {
+          setCurrentPage('first');
+        }
       }      
       intervalTime++;
     }, 1000); // 1초마다 실행
