@@ -1,13 +1,16 @@
+// ============================================================================
+// 세 번째 페이지 컴포넌트 (주문 확인 화면)
+// ============================================================================
+
 import React, { useContext, useState, useEffect, useMemo, useCallback, memo } from "react";
 import { AppContext } from "../context";
-// import { startReturnTimer, updateTimer } from "../assets/timer";
+import { DeleteIcon } from "../components/icons";
 import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
-import { useTextHandler } from "../assets/tts";
 import { usePagination, useSafeDocument } from "../hooks";
+import { useTextHandler } from "../assets/tts";
 import { PAGINATION_CONFIG, FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG } from "../config";
 import { safeQuerySelector, formatNumber } from "../utils/browserCompatibility";
 import { getAssetPath } from "../utils/pathUtils";
-import { DeleteIcon } from "../components/icons";
 
 const ThirdPage = memo(() => {
   const {

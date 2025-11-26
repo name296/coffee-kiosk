@@ -20,6 +20,17 @@ export const getAssetPath = (path) => {
     return path;
   }
   // ./public/... → /public/... 정규화
-  const normalizedPath = path.replace(/^\.\//, '/');
+  let normalizedPath = path.replace(/^\.\/public\//, '/public/').replace(/^\.\//, '/');
+  
+  // /images/, /sound/, /fonts/, /data/ 등은 /public/ 접두사 추가 (빌드 시 public 폴더가 dist/public으로 복사됨)
+  if (!normalizedPath.startsWith('/public/')) {
+    if (normalizedPath.startsWith('/images/') || 
+        normalizedPath.startsWith('/sound/') || 
+        normalizedPath.startsWith('/fonts/') ||
+        normalizedPath.startsWith('/data/')) {
+      normalizedPath = `/public${normalizedPath}`;
+    }
+  }
+  
   return `${basePath}${normalizedPath}`;
 };

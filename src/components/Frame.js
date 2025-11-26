@@ -1,10 +1,14 @@
+// ============================================================================
+// 프레임 컴포넌트 (상단/하단 네비게이션)
+// ============================================================================
+
 import React, { useContext, useEffect, useState, useMemo, memo } from "react";
 import { AppContext } from "../context";
-import { useTextHandler } from '../assets/tts';
-import { safeLocalStorage, safeParseInt, formatNumber } from "../utils/browserCompatibility";
-import { PAGE_MESSAGES, PAYMENT_MESSAGES, PAYMENT_STEPS } from "../config";
-import { getAssetPath } from "../utils/pathUtils";
 import { ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon } from "../components/icons";
+import { useTextHandler } from '../assets/tts';
+import { PAGE_MESSAGES, PAYMENT_MESSAGES, PAYMENT_STEPS } from "../config";
+import { safeLocalStorage, safeParseInt, formatNumber } from "../utils/browserCompatibility";
+import { getAssetPath } from "../utils/pathUtils";
 
 export const Top = memo(() => {
   const {

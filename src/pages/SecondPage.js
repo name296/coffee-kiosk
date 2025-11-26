@@ -1,9 +1,13 @@
+// ============================================================================
+// 두 번째 페이지 컴포넌트 (메뉴 선택 화면)
+// ============================================================================
+
 import React, { useContext, useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
-import { AppContext } from "../context";
 import FocusTrap from "focus-trap-react";
-import { startReturnTimer, updateTimer, stopIntroTimer } from "../assets/timer";
-import { useTextHandler } from "../assets/tts";
+import { AppContext } from "../context";
 import { usePagination, useSafeDocument, useMultiModalButtonHandler } from "../hooks";
+import { useTimer } from "../hooks/useSingletonTimer";
+import { useTextHandler } from "../assets/tts";
 import { PAGINATION_CONFIG, FOCUS_SECTIONS, TIMER_CONFIG, DEFAULT_SETTINGS, DISABLED_MENU_ID, ERROR_MESSAGES } from "../config";
 import { safeQuerySelector } from "../utils/browserCompatibility";
 
@@ -24,6 +28,7 @@ const SecondPage = memo(() => {
     setCurrentPage
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
+  const { startReturnTimer, stopIntroTimer } = useTimer();
 
   const { blurActiveElement } = useSafeDocument();
 
@@ -57,7 +62,7 @@ const SecondPage = memo(() => {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [handleText, setCurrentPage, blurActiveElement]);
+  }, [handleText, setCurrentPage, blurActiveElement, startReturnTimer, stopIntroTimer]);
 
   // useKeyboardNavigation
   useMultiModalButtonHandler({

@@ -1,15 +1,15 @@
-/**
- * 버튼 스타일 자동 생성기
- * 27 프로젝트의 "강철 스타일" - 비례 기반 자동 스타일링
- */
-import { CSSInjector } from './cssInjector';
-import { PaletteManager } from './paletteManager';
-import { mountReactComponent } from './reactMount';
-import { ToggleIcon } from '../components/icons';
+// ============================================================================
+// 버튼 스타일 자동 생성기
+// 27 프로젝트의 "강철 스타일" - 비례 기반 자동 스타일링
+// ============================================================================
 
-/* ==============================
-  🔘 버튼 시스템 상수 (27에서 가져옴)
-  ============================== */
+import { PaletteManager } from './paletteManager';
+import { getToggleButtonManager } from './toggleButtonManager';
+
+// ============================================================================
+// 버튼 시스템 상수 (27 프로젝트)
+// ============================================================================
+
 export const BUTTON_CONSTANTS = {
   BASE: 0.03125,
   get BACKGROUND_BORDER_RADIUS() { return this.BASE; },
@@ -41,6 +41,17 @@ export const ButtonStyleGenerator = {
    * 스타일 캐시 (27 시스템)
    */
   _styleCache: new WeakMap(),
+
+  /**
+   * 훅 인스턴스 저장 (init에서 설정)
+   */
+  _injectCSS: null,
+  _mountComponent: null,
+
+  /**
+   * 토글 버튼 관리자
+   */
+  ToggleButtonManager: null,
 
   /**
    * 27 프로젝트 방식: 동적 스타일 적용 (모든 버튼의 아이콘 배치 및 스케일링)
@@ -88,9 +99,20 @@ export const ButtonStyleGenerator = {
       background.style.borderRadius = `${backgroundBorderRadius}px`;
       background.style.outlineWidth = `${backgroundOutlineWidth}px`;
 
-      // 토글 아이콘 배치 및 스케일링 (27 프로젝트 방식)
+      // 토글 버튼의 토글 상태 표시 아이콘 자동 생성 (상수 체계 사용)
       const iconPressed = button.querySelector('.content.icon.pressed');
-      if (iconPressed) {
+      if (button.classList.contains('toggle') && iconPressed) {
+        const minSide = Math.min(rect.width, rect.height);
+        // ICON_TOGGLED_SIZE = 32/256 = 4 * BASE = 0.125
+        const toggleIconSize = minSide * this.CONSTANTS.SELECTED_ICON_SIZE;
+        // PADDING = 8/256 = 1 * BASE = 0.03125
+        const togglePadding = minSide * this.CONSTANTS.BUTTON_PADDING;
+        iconPressed.style.width = `${toggleIconSize}px`;
+        iconPressed.style.height = `${toggleIconSize}px`;
+        iconPressed.style.top = `${togglePadding}px`;
+        iconPressed.style.right = `${togglePadding}px`;
+      } else if (iconPressed && !button.classList.contains('toggle')) {
+        // 일반 버튼의 pressed 아이콘은 기존 방식 유지
         iconPressed.style.width = `${iconSelectedSize}px`;
         iconPressed.style.height = `${iconSelectedSize}px`;
         iconPressed.style.top = `${buttonPadding}px`;
@@ -219,9 +241,19 @@ export const ButtonStyleGenerator = {
     background.style.borderRadius = `${backgroundBorderRadius}px`;
     background.style.outlineWidth = `${backgroundOutlineWidth}px`;
     
-    // pressed 아이콘 크기 적용
+    // 토글 버튼의 토글 상태 표시 아이콘 자동 생성 (상수 체계 사용)
     const iconPressed = button.querySelector('.content.icon.pressed');
-    if (iconPressed) {
+    if (button.classList.contains('toggle') && iconPressed) {
+      // ICON_TOGGLED_SIZE = 32/256 = 4 * BASE = 0.125
+      const toggleIconSize = minSide * this.CONSTANTS.SELECTED_ICON_SIZE;
+      // PADDING = 8/256 = 1 * BASE = 0.03125
+      const togglePadding = minSide * this.CONSTANTS.BUTTON_PADDING;
+      iconPressed.style.width = `${toggleIconSize}px`;
+      iconPressed.style.height = `${toggleIconSize}px`;
+      iconPressed.style.top = `${togglePadding}px`;
+      iconPressed.style.right = `${togglePadding}px`;
+    } else if (iconPressed && !button.classList.contains('toggle')) {
+      // 일반 버튼의 pressed 아이콘은 기존 방식 유지
       iconPressed.style.width = `${iconSelectedSize}px`;
       iconPressed.style.height = `${iconSelectedSize}px`;
       iconPressed.style.top = `${buttonPadding}px`;
@@ -269,119 +301,35 @@ export const ButtonStyleGenerator = {
       }
     `;
 
-    CSSInjector.inject('button-template-system', css);
+    if (this._injectCSS) {
+      this._injectCSS('button-template-system', css);
+    }
   },
 
 
 
   /**
-   * ToggleIcon을 마운트하는 헬퍼 함수
+   * ToggleIcon을 마운트하는 헬퍼 함수 (위임)
    * @param {HTMLElement} iconPressedSpan - 아이콘을 마운트할 span 요소
    * @param {HTMLElement} button - 버튼 요소 (로깅용)
    */
   mountToggleIcon(iconPressedSpan, button) {
-    if (iconPressedSpan._reactMounted) return;
-    
-    try {
-      console.log('🔧 [mountToggleIcon] Attempting to mount ToggleIcon to:', iconPressedSpan);
-      const mountResult = mountReactComponent(ToggleIcon, iconPressedSpan);
-      if (mountResult && mountResult.root) {
-        iconPressedSpan._reactMounted = true;
-        console.log('✅ [mountToggleIcon] ToggleIcon mounted successfully for button:', button);
-      } else {
-        console.warn('⚠️ [mountToggleIcon] mountReactComponent returned null or no root for button:', button);
-      }
-    } catch (error) {
-      console.error('❌ [mountToggleIcon] Failed to mount ToggleIcon:', error);
-      console.error('Error stack:', error.stack);
+    if (this.ToggleButtonManager) {
+      return this.ToggleButtonManager.mountToggleIcon(iconPressedSpan, button);
     }
+    console.warn('⚠️ [mountToggleIcon] ToggleButtonManager is not initialized');
+    return false;
   },
 
   /**
-   * toggle 버튼에 체크 심볼 자동 주입 (27 프로젝트 방식)
-   * React 컴포넌트를 사용하여 아이콘을 마운트
-   * 동기 처리 - 버튼이 이미 렌더링된 상태에서 실행됨
+   * toggle 버튼에 체크 심볼 자동 주입 (위임)
    */
   setupIconInjection() {
-    const allButtons = document.querySelectorAll('.button.toggle');
-    if (allButtons.length === 0) {
-      console.log('ℹ️ [setupIconInjection] No toggle buttons found');
-      return;
+    if (this.ToggleButtonManager) {
+      return this.ToggleButtonManager.setupIconInjection();
     }
-    
-    console.log(`🔍 [setupIconInjection] Found ${allButtons.length} toggle buttons`);
-    
-    for (const button of allButtons) {
-      const background = button.querySelector('.background.dynamic') || button.querySelector('.background');
-      if (!background) {
-        console.warn('⚠️ [setupIconInjection] No background found for button:', button);
-        continue;
-      }
-      
-      // .content.icon.pressed가 없으면 생성
-      let iconPressedSpan = background.querySelector('.content.icon.pressed');
-      
-      if (!iconPressedSpan) {
-        iconPressedSpan = document.createElement('span');
-        iconPressedSpan.className = 'content icon pressed';
-        iconPressedSpan.setAttribute('aria-hidden', 'true');
-        
-        // 기존 아이콘 앞에 삽입
-        const iconEl = background.querySelector('.content.icon:not(.pressed)');
-        if (iconEl && iconEl.parentNode) {
-          background.insertBefore(iconPressedSpan, iconEl);
-        } else {
-          // label 앞에 삽입
-          const labelEl = background.querySelector('.content.label');
-          if (labelEl && labelEl.parentNode) {
-            background.insertBefore(iconPressedSpan, labelEl);
-          } else {
-            background.insertBefore(iconPressedSpan, background.firstChild);
-          }
-        }
-      }
-      
-      // React 컴포넌트로 ToggleIcon 마운트
-      // 이미 마운트되어 있으면 다시 마운트하지 않음
-      if (!iconPressedSpan._reactMounted) {
-        // DOM에 삽입된 후 마운트 (isConnected 체크를 통과하기 위해)
-        requestAnimationFrame(() => {
-          try {
-            // DOM에 연결되어 있는지 다시 확인
-            if (!iconPressedSpan.isConnected) {
-              console.warn('⚠️ [setupIconInjection] iconPressedSpan not connected, retrying...');
-              setTimeout(() => {
-                if (iconPressedSpan.isConnected && !iconPressedSpan._reactMounted) {
-                  this.mountToggleIcon(iconPressedSpan, button);
-                }
-              }, 16);
-              return;
-            }
-            
-            this.mountToggleIcon(iconPressedSpan, button);
-          } catch (error) {
-            console.error('❌ [setupIconInjection] Failed to mount ToggleIcon:', error);
-            console.error('Error stack:', error.stack);
-          }
-        });
-      } else {
-        // 이미 마운트되어 있으면 확인만
-        const svg = iconPressedSpan.querySelector('svg');
-        if (!svg) {
-          // SVG가 없으면 다시 마운트
-          console.warn('⚠️ [setupIconInjection] ToggleIcon mounted but SVG not found, remounting...');
-          iconPressedSpan._reactMounted = false;
-          requestAnimationFrame(() => {
-            this.mountToggleIcon(iconPressedSpan, button);
-    });
-        }
-      }
-      
-      // data 속성 설정
-      button.dataset.isToggleButton = 'true';
-      const isInitiallyPressed = button.classList.contains('pressed');
-      button.setAttribute('aria-pressed', isInitiallyPressed ? 'true' : 'false');
-    }
+    console.warn('⚠️ [setupIconInjection] ToggleButtonManager is not initialized');
+    return 0;
   },
 
   /**
@@ -393,11 +341,15 @@ export const ButtonStyleGenerator = {
     const initialButtons = document.querySelectorAll('button');
     if (initialButtons.length > 0) {
       requestAnimationFrame(() => {
-        this.setupIconInjection();
+        if (this.ToggleButtonManager) {
+          this.ToggleButtonManager.setupIconInjection();
+        }
         this.calculateButtonSizes();
         this.applyDynamicStyles();
         // 초기 버튼이 있으면 팔레트 CSS도 생성
-        this.PaletteManager.generateCSS();
+        if (this._injectCSS) {
+          this.PaletteManager.generateCSS(this._injectCSS);
+        }
       });
     }
     
@@ -415,12 +367,16 @@ export const ButtonStyleGenerator = {
       if (needsUpdate) {
         requestAnimationFrame(() => {
           // 새로 추가된 toggle 버튼에도 아이콘 주입
-          this.setupIconInjection();
+          if (this.ToggleButtonManager) {
+          this.ToggleButtonManager.setupIconInjection();
+        }
           // 새로 추가된 버튼의 크기 계산 및 스타일 적용
           this.calculateButtonSizes();
           this.applyDynamicStyles();
           // 새로 추가된 버튼의 팔레트도 재생성
-          this.PaletteManager.generateCSS();
+          if (this._injectCSS) {
+            this.PaletteManager.generateCSS(this._injectCSS);
+          }
         });
       }
     });
@@ -437,10 +393,31 @@ export const ButtonStyleGenerator = {
    * 버튼 시스템 초기화 (강철 스타일 시스템)
    * 27 프로젝트 방식 기반, 논리적으로 최적화된 순서
    * 동기 처리 - 버튼이 이미 렌더링된 상태에서 실행됨
+   * @param {Object} options - 초기화 옵션
+   * @param {Function} options.injectCSS - CSS 인젝션 함수
+   * @param {Function} options.mountComponent - React 컴포넌트 마운트 함수
    */
-  init() {
+  init({ injectCSS, mountComponent } = {}) {
     console.log('🔘 [ButtonStyleGenerator] 강철 스타일 시스템 초기화');
     const initStart = performance.now();
+    
+    // 훅 인스턴스 저장
+    if (injectCSS) {
+      this._injectCSS = injectCSS;
+    }
+    if (mountComponent) {
+      this._mountComponent = mountComponent;
+    }
+    
+    // ToggleButtonManager 초기화
+    if (!this.ToggleButtonManager) {
+      this.ToggleButtonManager = getToggleButtonManager();
+    }
+    if (this._mountComponent) {
+      this.ToggleButtonManager.init(this._mountComponent);
+    } else {
+      console.warn('⚠️ [init] mountComponent is not provided, ToggleButtonManager will not be initialized');
+    }
     
     // 1단계: CSS 생성 (버튼 불필요, 먼저 실행)
     console.log('  ├─ 1단계: 버튼 템플릿 CSS 생성');
@@ -449,8 +426,12 @@ export const ButtonStyleGenerator = {
     // 2단계: 팔레트 CSS 생성 (27 프로젝트: 3단계)
     // 주의: 버튼이 없으면 빈 CSS가 생성되지만, watchDynamicButtons에서 다시 생성됨
     console.log('  ├─ 2단계: 팔레트 CSS 생성');
-    const discoveredPalettes = this.PaletteManager.generateCSS();
-    console.log(`  ✅ 팔레트 CSS 생성 완료 (${discoveredPalettes.size}개 팔레트 발견)`);
+    if (!this._injectCSS) {
+      console.warn('⚠️ [init] injectCSS is not provided, skipping palette CSS generation');
+    } else {
+        const discoveredPalettes = this.PaletteManager.generateCSS(this._injectCSS);
+      console.log(`  ✅ 팔레트 CSS 생성 완료 (${discoveredPalettes.size}개 팔레트 발견)`);
+    }
     
     // 3단계: 동적 스타일 적용 (27 프로젝트: 4단계)
     console.log('  ├─ 3단계: 동적 스타일 적용');
@@ -478,6 +459,11 @@ export const ButtonStyleGenerator = {
     });
     
     // 동적 버튼 감지 (27 프로젝트: 5단계 setupUpdateManager와 유사)
+    // 토글 버튼 아이콘 감지는 ToggleButtonManager에서 처리
+    if (this.ToggleButtonManager) {
+      this.ToggleButtonManager.watchDynamicButtons();
+    }
+    // 일반 버튼 스타일링 감지는 여기서 처리
     this.watchDynamicButtons();
     console.log('  ✅ 이벤트 리스너 및 자동 업데이트 설정 완료');
     

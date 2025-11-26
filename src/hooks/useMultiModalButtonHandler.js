@@ -1,11 +1,12 @@
 import { useEffect, useCallback, useRef, useContext, useState } from 'react';
-import { updateTimer } from '../assets/timer';
 import { AppContext } from '../context';
 import { useTextHandler } from '../assets/tts';
+import { useButtonUtils } from './useButtonUtils';
+import { useTimer } from './useSingletonTimer';
 
-// ============================================
+// ============================================================================
 // 상수 정의
-// ============================================
+// ============================================================================
 const BEEP_SOUND_VOLUME = 0.5;
 const PRESSED_STATE_TIMEOUT = 100;
 const KEYBOARD_NAV_DELAY = 300;
@@ -28,97 +29,9 @@ const KEYBOARD_KEYS = {
 
 const KEYPAD_SCRIPT = '키패드 사용법,상 하 버튼으로 탐색 영역을 이동할 수 있습니다,좌 우 버튼으로 초점을 이동할 수 있습니다,동그라미 버튼으로 초점의 대상을 실행 또는 선택할 수 있습니다,홈 버튼으로 시작단계에서 음성유도 안내를 다시 듣거나, 작업 중인 경우 모든 선택을 취소하고 시작단계로 돌아올 수 있습니다,뒤로 버튼으로 이전 작업단계로 이동 할 수 있습니다, 별 버튼으로 키패드 사용법을 재생할 수 있습니다, 샵 버튼으로 직전 안내를 다시 들을 수 있습니다,';
 
-// ============================================
+// ============================================================================
 // 유틸리티 함수
-// ============================================
-
-/**
- * 비프음 재생
- */
-const playBeepSound = () => {
-      const beapSound = document.querySelector('#beapSound');
-      if (beapSound) {
-    beapSound.volume = BEEP_SOUND_VOLUME;
-        beapSound.play();
-      }
-};
-
-/**
- * 버튼의 pressed 상태를 토글하고 포커스를 유지
- */
-const toggleButtonPressedState = (button, wasPressed, iconPressed) => {
-  if (wasPressed) {
-    // pressed 상태 해제
-    if (iconPressed) iconPressed.style.display = 'none';
-    button.classList.remove('pressed');
-    button.setAttribute('aria-pressed', 'false');
-    requestAnimationFrame(() => {
-      if (iconPressed) iconPressed.style.removeProperty('display');
-      if (button instanceof HTMLElement) {
-        button.focus();
-      }
-    });
-  } else {
-    // pressed 상태 설정 (동기적으로 먼저 설정)
-    button.classList.add('pressed');
-    button.setAttribute('aria-pressed', 'true');
-    if (iconPressed) iconPressed.style.removeProperty('display');
-    // 포커스는 requestAnimationFrame으로 처리
-    requestAnimationFrame(() => {
-      if (button instanceof HTMLElement) {
-        button.focus();
-      }
-    });
-  }
-};
-
-/**
- * 버튼의 TTS 텍스트 가져오기 (data-tts-text만 확인)
- */
-const getButtonTTS = (button, prefixOpt) => {
-  const ttsText = button?.dataset.ttsText;
-  
-  if (ttsText) {
-    return prefixOpt ? `${prefixOpt}${ttsText}` : ttsText;
-  }
-  
-  return '실행, ';
-};
-
-/**
- * 같은 그룹 내 다른 버튼의 pressed 상태 제거
- */
-const clearOtherButtonsInGroup = (button, group) => {
-        group.querySelectorAll('.button.toggle').forEach(btn => {
-          if (btn !== button && btn.classList.contains('pressed')) {
-            const otherIconPressed = btn.querySelector('.content.icon.pressed');
-            if (otherIconPressed) {
-              otherIconPressed.style.display = 'none';
-            }
-            btn.classList.remove('pressed');
-            btn.setAttribute('aria-pressed', 'false');
-            requestAnimationFrame(() => {
-              if (otherIconPressed) {
-                otherIconPressed.style.removeProperty('display');
-              }
-            });
-          }
-        });
-};
-
-/**
- * 버튼이 비활성화되어 있는지 확인
- */
-const isButtonDisabled = (button) => {
-  return button.getAttribute('aria-disabled') === 'true';
-};
-
-/**
- * 버튼이 토글 버튼인지 확인
- */
-const isToggleButton = (button) => {
-  return button.classList.contains('toggle');
-};
+// ============================================================================
 
 /**
  * 옵션 객체 정규화 (기존 API 호환성)
@@ -136,40 +49,9 @@ const normalizeOptions = (handleText, groupSelector, onToggle, prefix, options) 
   };
 };
 
-/**
- * 포커스 가능한 버튼 배열 생성 및 정렬
- */
-const getFocusableButtons = () => {
-  return Array.from(document.querySelectorAll('.button'))
-    .filter(btn => {
-      if (btn.offsetParent === null) return false;
-      if (isButtonDisabled(btn)) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      const aTabIndex = a.tabIndex;
-      const bTabIndex = b.tabIndex;
-      
-      if (aTabIndex > 0 && bTabIndex > 0) {
-        return aTabIndex - bTabIndex;
-      }
-      if (aTabIndex > 0) return -1;
-      if (bTabIndex > 0) return 1;
-      
-      const position = a.compareDocumentPosition(b);
-      if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-        return -1;
-      }
-      if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-        return 1;
-      }
-      return 0;
-    });
-};
-
-// ============================================
+// ============================================================================
 // 메인 훅
-// ============================================
+// ============================================================================
 
 /**
  * 통합 버튼 이벤트 핸들러 훅
@@ -205,6 +87,20 @@ export const useMultiModalButtonHandler = (
     enableGlobalHandlers = true,
     enableKeyboardNavigation = false
   } = opts;
+
+  // 버튼 유틸리티 훅 사용
+  const {
+    playBeepSound,
+    toggleButtonPressedState,
+    getButtonTTS,
+    clearOtherButtonsInGroup,
+    isButtonDisabled,
+    isToggleButton,
+    getFocusableButtons,
+  } = useButtonUtils();
+
+  // 타이머 훅 사용
+  const { updateTimer } = useTimer();
 
   // AppContext에서 필요한 값들 가져오기
   const contextValue = enableKeyboardNavigation ? useContext(AppContext) : null;
@@ -264,9 +160,9 @@ export const useMultiModalButtonHandler = (
     setFocusableSections(newSections);
   }, []);
 
-  // ============================================
+  // ============================================================================
   // 키보드 네비게이션: 포커스 가능한 섹션 업데이트
-  // ============================================
+  // ============================================================================
   useEffect(() => {
     if (!enableKeyboardNavigation || !contextValue) return;
 
@@ -289,9 +185,9 @@ export const useMultiModalButtonHandler = (
     }
   }, [enableKeyboardNavigation, contextValue, isAccessibilityModal, isReturnModal, isResetModal, isDeleteModal, isDeleteCheckModal, isCallModal, isCreditPayContent, currentPage]);
 
-  // ============================================
+  // ============================================================================
   // 버튼 클릭 핸들러
-  // ============================================
+  // ============================================================================
   const handleButtonClick = useCallback((e, value = null) => {
     const button = e.target.closest('.button');
     if (!button || isButtonDisabled(button)) {
@@ -328,22 +224,19 @@ export const useMultiModalButtonHandler = (
     const wasPressed = button.classList.contains('pressed');
     const iconPressed = button.querySelector('.content.icon.pressed');
     
-    // 토글 버튼 처리
+    // 토글 버튼 처리 (React 이벤트에서 먼저 처리)
     if (isToggleButton(button)) {
-      // 토글 버튼 그룹 스위칭 처리 (처음 눌렀을 때만)
+      // 토글 버튼 그룹 스위칭 처리
       if (groupSelectorOpt) {
         const group = button.closest(groupSelectorOpt);
-        if (group && !wasPressed) {
+        if (group) {
+          // 같은 그룹 내 다른 버튼의 pressed 상태 제거
           clearOtherButtonsInGroup(button, group);
         }
       }
       
-      // pressed 상태가 아닐 때만 상태 변경 (처음 눌렀을 때)
-      if (!wasPressed) {
-        toggleButtonPressedState(button, wasPressed, iconPressed);
-      }
-      // 이미 pressed 상태일 때는 상태를 변경하지 않고 그대로 유지
-      // (다시 클릭해도 실행되도록)
+      // 토글 상태 변경 (항상 실행 - 이미 pressed 상태일 때도 토글)
+      toggleButtonPressedState(button, wasPressed, iconPressed);
     }
     
     // TTS 재생은 전역 핸들러에서 처리
@@ -353,11 +246,22 @@ export const useMultiModalButtonHandler = (
     if (onToggleOpt) {
       onToggleOpt(value !== null ? value : button.dataset.ttsText);
     }
-  }, [finalHandleText, groupSelectorOpt, onToggleOpt, prefixOpt]);
+  }, [
+    finalHandleText,
+    groupSelectorOpt,
+    onToggleOpt,
+    prefixOpt,
+    playBeepSound,
+    toggleButtonPressedState,
+    clearOtherButtonsInGroup,
+    isButtonDisabled,
+    isToggleButton,
+    updateTimer,
+  ]);
 
-  // ============================================
+  // ============================================================================
   // 전역 이벤트 핸들러: 윈도우 리사이즈
-  // ============================================
+  // ============================================================================
   useEffect(() => {
     if (!enableGlobalHandlers) return;
 
@@ -381,9 +285,9 @@ export const useMultiModalButtonHandler = (
     };
   }, [enableGlobalHandlers]);
 
-  // ============================================
+  // ============================================================================
   // 전역 이벤트 핸들러: 클릭 및 사운드 처리
-  // ============================================
+  // ============================================================================
   useEffect(() => {
     if (!enableGlobalHandlers) return;
 
@@ -402,7 +306,7 @@ export const useMultiModalButtonHandler = (
         updateTimer();
         
         const target = event.target;
-        if ((target.tagName === 'BUTTON' || target.getAttribute('role') === 'button') && event.detail !== 0) {
+        if (target && (target.tagName === 'BUTTON' || target.getAttribute('role') === 'button') && event.detail !== 0) {
           playBeepSound();
         }
         
@@ -422,11 +326,11 @@ export const useMultiModalButtonHandler = (
         return;
       }
       
-      // React의 onClick이 아직 실행되지 않은 경우
-      // (일반적으로는 React의 onClick이 먼저 실행되므로 여기는 실행되지 않아야 함)
-      if (onButtonClick) {
-        onButtonClick(event);
-      }
+      // React의 onClick이 실행되지 않은 경우 - 직접 입력 차단
+      // React 이벤트 시스템을 거치지 않은 직접 입력은 무시
+      event.preventDefault();
+      event.stopPropagation();
+      console.warn('⚠️ [handleClick] Direct input detected without React handler. Event blocked.');
     };
     
     // bubble phase에서 실행하여 React의 onClick이 먼저 실행되도록 함
@@ -438,11 +342,20 @@ export const useMultiModalButtonHandler = (
       document.removeEventListener('click', handleClick, false);
       document.removeEventListener('touchend', handleClick, false);
     };
-  }, [enableGlobalHandlers, onButtonClick]);
+  }, [
+    enableGlobalHandlers,
+    onButtonClick,
+    playBeepSound,
+    getButtonTTS,
+    isButtonDisabled,
+    prefixOpt,
+    finalHandleText,
+    updateTimer,
+  ]);
 
-  // ============================================
-  // 전역 이벤트 핸들러: 토글 버튼 클릭 처리
-  // ============================================
+  // ============================================================================
+  // 전역 이벤트 핸들러: 토글 버튼 클릭 처리 (React 이벤트 버블링만 처리)
+  // ============================================================================
   useEffect(() => {
     if (!enableGlobalHandlers) return;
 
@@ -452,38 +365,21 @@ export const useMultiModalButtonHandler = (
         return;
       }
 
-      if (button.hasAttribute('data-react-handler')) {
+      // React의 onClick이 있으면 이미 처리되었으므로 무시
+      // React 이벤트 시스템이 먼저 처리하도록 함
+      if (!button.hasAttribute('data-react-handler')) {
+        // React 이벤트를 거치지 않은 직접 입력 차단
+        event.preventDefault();
+        event.stopPropagation();
+        console.warn('⚠️ [handleToggleClick] Direct input detected without React handler. Event blocked.');
         return;
       }
 
+      // React 이벤트가 처리한 경우, 추가 처리가 필요한 경우만 실행
+      // (현재는 React의 handleButtonClick에서 모든 토글 처리를 하므로 여기는 실행되지 않음)
       if (onToggleButtonClick) {
         onToggleButtonClick(event, button);
-        return;
       }
-
-      // 기본 처리
-      const wasPressed = button.classList.contains('pressed');
-      const iconPressed = button.querySelector('.content.icon.pressed');
-      const group = button.closest('.menu-tabs, .flex.gap-10, [data-toggle-group]');
-      
-      // 토글 그룹 스위칭 처리 (처음 눌렀을 때만)
-      if (group && !wasPressed) {
-        clearOtherButtonsInGroup(button, group);
-      }
-      
-      // pressed 상태가 아닐 때만 상태 변경 (처음 눌렀을 때)
-      if (!wasPressed) {
-        toggleButtonPressedState(button, wasPressed, iconPressed);
-      }
-      // 이미 pressed 상태일 때는 상태를 변경하지 않고 그대로 유지
-      // (다시 클릭해도 실행되도록)
-      
-      // 포커스 유지
-      requestAnimationFrame(() => {
-        if (button instanceof HTMLElement) {
-          button.focus();
-        }
-      });
     };
     
     document.addEventListener('click', handleToggleClick, false);
@@ -492,11 +388,16 @@ export const useMultiModalButtonHandler = (
     return () => {
       document.removeEventListener('click', handleToggleClick, false);
     };
-  }, [enableGlobalHandlers, onToggleButtonClick]);
+  }, [
+    enableGlobalHandlers,
+    onToggleButtonClick,
+    isButtonDisabled,
+    isToggleButton,
+  ]);
 
-  // ============================================
+  // ============================================================================
   // 전역 이벤트 핸들러: 비활성 버튼 차단
-  // ============================================
+  // ============================================================================
   useEffect(() => {
     if (!enableGlobalHandlers) return;
 
@@ -563,16 +464,12 @@ export const useMultiModalButtonHandler = (
         }
         
         // React의 onClick이 아직 실행되지 않은 경우
-        // React의 이벤트 시스템을 거치도록 onClick 핸들러를 직접 호출
+        // React의 이벤트 시스템을 거치도록 클릭 이벤트를 dispatch
         event.preventDefault();
         event.stopPropagation();
         
-        // React의 onClick 핸들러를 호출하기 위해 클릭 이벤트를 dispatch
-        // 하지만 React의 이벤트 시스템을 거치도록 함
-        button.setAttribute('data-react-handler', 'true');
-        
         // React의 이벤트 시스템을 거치도록 클릭 이벤트를 dispatch
-        // React는 이벤트를 가상 DOM을 통해 처리하므로, 
+        // React는 이벤트를 가상 DOM을 통해 처리하므로,
         // 실제 DOM 이벤트를 dispatch하면 React의 이벤트 시스템이 자동으로 처리함
         const syntheticEvent = new MouseEvent('click', {
           bubbles: true,
@@ -582,11 +479,8 @@ export const useMultiModalButtonHandler = (
         });
         
         // React의 이벤트 시스템이 이벤트를 감지하도록 dispatch
+        // React의 onClick이 먼저 실행되고, 그 다음 버블링되어 전역 핸들러로 전달됨
         button.dispatchEvent(syntheticEvent);
-        
-        setTimeout(() => {
-          button.removeAttribute('data-react-handler');
-        }, 100);
       }
     };
     
@@ -598,11 +492,21 @@ export const useMultiModalButtonHandler = (
     return () => {
       document.removeEventListener('keydown', handleKeydown, false);
     };
-  }, [enableGlobalHandlers, finalHandleText, prefixOpt, onToggleOpt, groupSelectorOpt, updateTimer]);
+  }, [
+    enableGlobalHandlers,
+    finalHandleText,
+    prefixOpt,
+    onToggleOpt,
+    groupSelectorOpt,
+    updateTimer,
+    getButtonTTS,
+    isButtonDisabled,
+    isToggleButton,
+  ]);
 
-  // ============================================
+  // ============================================================================
   // 전역 이벤트 핸들러: 방향키 네비게이션
-  // ============================================
+  // ============================================================================
   useEffect(() => {
     if (!enableGlobalHandlers) return;
 
@@ -864,16 +768,19 @@ export const useMultiModalButtonHandler = (
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [
-    enableKeyboardNavigation, 
-    contextValue, 
-    focusableSections, 
-    sections, 
-    isAccessibilityModal, 
-    isReturnModal, 
-    isDeleteModal, 
-    isDeleteCheckModal, 
-    isResetModal, 
-    isCallModal, 
+    enableKeyboardNavigation,
+    contextValue,
+    focusableSections,
+    sections,
+    isAccessibilityModal,
+    isReturnModal,
+    isDeleteModal,
+    isDeleteCheckModal,
+    isResetModal,
+    isCallModal,
+    getFocusableButtons,
+    isButtonDisabled,
+    isToggleButton, 
     isCreditPayContent, 
     currentPage, 
     commonScript, 
@@ -899,8 +806,8 @@ export const useMultiModalButtonHandler = (
       const button = event.target?.closest?.('.button');
       if (!button || isButtonDisabled(button) || isToggleButton(button)) {
         return;
-      }
-      
+    }
+    
       if (action === 'add') {
         button.classList.add('pressed');
       } else if (action === 'remove' && button.classList.contains('pressed')) {

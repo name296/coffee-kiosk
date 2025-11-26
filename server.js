@@ -1,10 +1,10 @@
 import { build, serve } from "bun";
-import { watch, existsSync } from "fs";
+import { watch, existsSync, cpSync, mkdirSync, writeFileSync } from "fs";
 import { config } from "./config.js";
 
-// ---------------------------------------------------------------------------
+// ============================================================================
 // 서버 모드 설정
-// ---------------------------------------------------------------------------
+// ============================================================================
 // 항상 개발 모드 (실시간 번들링 + 파일 감시)
 // BASE_PATH가 있어도 번들링은 계속 실행
 console.log(`🚀 Starting Bun development server`);
@@ -17,9 +17,9 @@ if (config.basename) {
   console.log(`   Access at: http://localhost:${config.port}/`);
 }
 
-// ---------------------------------------------------------------------------
+// ============================================================================
 // 자동 의존성 설치
-// ---------------------------------------------------------------------------
+// ============================================================================
 const ensureDependencies = async () => {
   if (!existsSync("./node_modules")) {
     console.log("📦 node_modules not found. Installing dependencies...");
@@ -44,9 +44,49 @@ const ensureDependencies = async () => {
 
 await ensureDependencies();
 
-// ---------------------------------------------------------------------------
+// ============================================================================
+// 개발 환경 초기 설정 (public 복사, dist/index.html 생성)
+// ============================================================================
+const setupDevDist = () => {
+  try {
+    // dist 폴더가 없으면 생성
+    mkdirSync("./dist", { recursive: true });
+
+    // public 폴더를 dist/public으로 복사 (없으면 생성)
+    if (existsSync("./public") && !existsSync("./dist/public")) {
+      cpSync("./public", "./dist/public", { recursive: true });
+      console.log("📁 Copied public folder to dist/public");
+    }
+
+    // dist/index.html 생성 (개발용, 상대 경로 사용)
+    if (!existsSync("./dist/index.html")) {
+      const html = `<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>coffee-kiosk</title>
+    <link rel="stylesheet" href="./public/fonts.css" />
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>`;
+      writeFileSync("./dist/index.html", html);
+      console.log("📄 Created dist/index.html for development");
+    }
+  } catch (error) {
+    console.error("⚠️  Failed to setup dev dist:", error);
+  }
+};
+
+setupDevDist();
+
+// ============================================================================
 // 번들링 파이프라인
-// ---------------------------------------------------------------------------
+// ============================================================================
 let isBuilding = false;
 
 const bundleOnce = async (tag = "manual") => {
@@ -74,11 +114,11 @@ const bundleOnce = async (tag = "manual") => {
 };
 
 // 초기 번들링 실행
-  await bundleOnce("initial");
+await bundleOnce("initial");
 
-// ---------------------------------------------------------------------------
+// ============================================================================
 // 파일 감시
-// ---------------------------------------------------------------------------
+// ============================================================================
 const startWatcher = () => {
   try {
     watch("./src", { recursive: true }, async (_, filename) => {
@@ -95,9 +135,9 @@ const startWatcher = () => {
 
 startWatcher();
 
-// ---------------------------------------------------------------------------
+// ============================================================================
 // 아이콘 인덱스 자동 갱신
-// ---------------------------------------------------------------------------
+// ============================================================================
 let isUpdatingIcons = false;
 
 const runIconIndexer = async () => {
@@ -105,25 +145,27 @@ const runIconIndexer = async () => {
   isUpdatingIcons = true;
 
   console.log("🎨 Regenerating icon index...");
-  
+
   // spawn으로 비동기 실행 (감시 블록 방지)
   const proc = Bun.spawn(["bun", "run", "scripts/update-icons.js"], {
     stdout: "inherit",
     stderr: "inherit",
   });
-  
+
   // 메인 흐름을 막지 않도록 별도로 처리
-  proc.exited.then((exitCode) => {
-    if (exitCode === 0) {
-      console.log("✅ Icon index updated.");
-    } else {
-      console.error(`❌ Icon index script failed with code ${exitCode}.`);
-    }
-    isUpdatingIcons = false;
-  }).catch((error) => {
-    console.error("❌ Icon index script threw an error:", error);
-    isUpdatingIcons = false;
-  });
+  proc.exited
+    .then((exitCode) => {
+      if (exitCode === 0) {
+        console.log("✅ Icon index updated.");
+      } else {
+        console.error(`❌ Icon index script failed with code ${exitCode}.`);
+      }
+      isUpdatingIcons = false;
+    })
+    .catch((error) => {
+      console.error("❌ Icon index script threw an error:", error);
+      isUpdatingIcons = false;
+    });
 };
 
 const startIconWatcher = () => {
@@ -143,9 +185,9 @@ const startIconWatcher = () => {
 await runIconIndexer();
 startIconWatcher();
 
-// ---------------------------------------------------------------------------
-// 헬퍼
-// ---------------------------------------------------------------------------
+// ============================================================================
+// 헬퍼 함수
+// ============================================================================
 const rewriteHtml = (rawHtml) =>
   rawHtml.replace(
     config.htmlPlaceholder,
@@ -154,42 +196,46 @@ const rewriteHtml = (rawHtml) =>
 
 const serveStatic = async (pathname) => {
   // public/ 디렉터리 (폰트, 이미지 등)
-  if (pathname.startsWith('/public/')) {
+  if (pathname.startsWith("/public/")) {
     const file = Bun.file(`.${pathname}`);
     if (await file.exists()) {
       return new Response(file);
     }
   }
-  
+
   // /fonts/ → /public/fonts/ 매핑 (fonts.css에서 사용)
-  if (pathname.startsWith('/fonts/')) {
+  if (pathname.startsWith("/fonts/")) {
     const file = Bun.file(`./public${pathname}`);
     if (await file.exists()) {
       return new Response(file);
     }
   }
-  
+
   // src/ 디렉터리 (아이콘 등)
-  if (pathname.startsWith('/src/')) {
+  if (pathname.startsWith("/src/")) {
     const file = Bun.file(`.${pathname}`);
     if (await file.exists()) {
       return new Response(file);
     }
   }
-  
+
   // 기존 STATIC_PREFIXES, STATIC_FILES 처리
-  if (config.staticFiles.includes(pathname) || config.staticPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+  if (
+    config.staticFiles.includes(pathname) ||
+    config.staticPrefixes.some((prefix) => pathname.startsWith(prefix))
+  ) {
     const file = Bun.file(`public${pathname}`);
     if (await file.exists()) {
       return new Response(file);
     }
   }
-  
+
   return null;
 };
 
 const serveBundleAsset = async (pathname) => {
   if (!pathname.startsWith(`${config.bundlePublicPath}/`)) return null;
+
   const filePath = pathname.slice(1); // remove leading slash
   const file = Bun.file(filePath);
   if (!(await file.exists())) {
@@ -203,9 +249,9 @@ const serveBundleAsset = async (pathname) => {
   return new Response(file, { headers });
 };
 
-// ---------------------------------------------------------------------------
+// ============================================================================
 // HTTP 서버
-// ---------------------------------------------------------------------------
+// ============================================================================
 const server = serve({
   port: config.port,
   async fetch(req) {
@@ -221,8 +267,9 @@ const server = serve({
     // HTML 서빙: / 또는 /index.html
     // BASE_PATH가 있으면 /coffee-kiosk/, /coffee-kiosk/index.html, /coffee-kiosk도 허용
     const isHtmlRequest = pathname === "/" || pathname === "/index.html";
-    const isBasePathRoot = basePath && (url.pathname === basePath || url.pathname === basePath + "/");
-    
+    const isBasePathRoot =
+      basePath && (url.pathname === basePath || url.pathname === basePath + "/");
+
     if (isHtmlRequest || isBasePathRoot) {
       const htmlFile = Bun.file(config.htmlEntry);
       if (!(await htmlFile.exists())) {

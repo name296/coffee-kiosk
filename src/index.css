@@ -1,10 +1,10 @@
-/* ==============================
-  ?�� CSS ?�스?�매??모듈 구조
+﻿/* ==============================
+  전체 CSS 시스템/모듈 구조
   ============================== */
 @layer reset, design-system, layout, components, utilities;
 
 /* ==============================
-  ?�� CSS Reset & Base
+  전체 CSS Reset & Base
   ============================== */
 @layer reset {
   *, 
@@ -19,7 +19,7 @@
     font-size: 62.5%;
     font-family: var(--font-family);
     -webkit-text-size-adjust: 100%;
-    touch-action: pan-x pan-y pinch-zoom; /* ?�직/?�평 ?��??�프?� ?��?�?모두 ?�용 */
+    touch-action: pan-x pan-y pinch-zoom; /* 직접/터치 입력 및 핀치줌 모두 허용 */
     
     @media (prefers-reduced-motion: no-preference) {
       scroll-behavior: smooth;
@@ -32,15 +32,15 @@
 }
 
 /* ========================================
-   ?�� ?�자???�스??(Design System)
+   전체 디자인 시스템(Design System)
    ======================================== */
 @layer design-system {
 :root { 
     /* ========================================
-       ?�� 강철 ?��????�스??(27?�서 가?�옴)
+       전체 강철 시스템(27에서 가져옴)
        ======================================== */
     
-    /* === ?�� ?�?�포그래???�스??=== */
+    /* === 전체 타이포그래피 시스템=== */
     --font-family: 'Pretendard GOV', sans-serif;
     --font-size-scale: 1;
     
@@ -57,7 +57,7 @@
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     
-    /* 기본�?(기존 ?�환???��?) */
+    /* 기본값(기존 환경에서 가져옴) */
     --icon-size: var(--font-size-b1);
     
     /* === spacing === */
@@ -69,34 +69,34 @@
     --spacing-xl: calc(var(--spacing-base) * 2.25);  /* 2.25rem = 36px */
     
     /* ========================================
-       ?�� ?�스??(Systems)
+       전체 시스템(Systems)
        ======================================== */
-    /* 버튼 ?�스???�성 */
+    /* 버튼 시스템 속성 */
     --button-width: 16rem; 
     --button-height: 16rem;
     --button-z-index: 0; 
     --background-z-index: -1; 
     --content-icon-z-index-pressed: 1;
     
-    /* ?�두�??��???(?�태�? */
+    /* 테두리 스타일(상태별) */
     --border-style-default: solid; 
     --border-style-pressed: solid; 
     --border-style-disabled: dashed; 
     --border-style-pointed: dashed;
     
-    /* ?�마/?�레???�립???�성 */
+    /* 테마/팔레트 독립 속성 */
     --border-color-pointed: var(--color-system-01);
     
-    /* 버튼 ?�정??공통 ?�성 */
+    /* 버튼 설정의 공통 속성 */
     --button-cursor-disabled: not-allowed;
     --content-icon-display-pressed-toggle: flex;
     --content-icon-display-default: none;
 
     /* ========================================
-       ?�� ?�레??(Palettes)
+       전체 팔레트(Palettes)
        ======================================== */
-    /* ?�시 ?�레??(Primitive Palette) */
-    /* Brown 계열 (6�? */
+    /* 원시 팔레트(Primitive Palette) */
+    /* Brown 怨??(6占? */
     --color-brown-01: rgba(76, 63, 55, 1);
     --color-brown-02: rgba(140, 83, 44, 1);
     --color-brown-03: rgba(164, 105, 63, 1);
@@ -104,13 +104,13 @@
     --color-brown-05: rgba(235, 155, 99, 1);
     --color-brown-06: rgba(238, 220, 210, 1);
     
-    /* Yellow 계열 (4�? */
+    /* Yellow 怨??(4占? */
     --color-yellow-01: rgba(36, 31, 0, 1);
     --color-yellow-02: rgba(128, 112, 0, 1);
     --color-yellow-03: rgba(255, 225, 0, 1);
     --color-yellow-04: rgba(255, 239, 128, 1);
     
-    /* Gray 계열 (14�? */
+    /* Gray 怨??(14占? */
     --color-gray-01: rgba(0, 0, 0, 1);
     --color-gray-02: rgba(31, 31, 31, 1);
     --color-gray-03: rgba(37, 37, 37, 1);
@@ -126,15 +126,15 @@
     --color-gray-13: rgba(250, 250, 250, 1);
     --color-gray-14: rgba(255, 255, 255, 1);
     
-    /* System 계열 (5�? */
+    /* System 怨??(5占? */
     --color-system-01: rgba(255, 0, 225, 1);
     --color-system-02: rgba(184, 26, 0, 1);
     --color-system-03: rgba(117, 18, 0, 1);
     --color-system-04: rgba(255, 72, 0, 1);
     --color-system-05: rgba(0, 0, 0, 0.6);
 
-    /* 참조 ?�레??(Reference Palette) */
-    /* Body 참조 ?�레??*/
+    /* 참조 팔레트(Reference Palette) */
+    /* Body 참조 팔레트*/
     --body1-background: var(--color-gray-13);
     --body1-border: var(--color-gray-09);
     --body1-content-primary: var(--color-brown-02);
@@ -152,8 +152,8 @@
     --body3-background: var(--color-gray-12);
     --body3-content: var(--color-gray-02);
 
-    /* 버튼 ?�레??(Light ?�마) */
-    /* Primary1 ?�레??*/
+    /* 버튼 팔레트(Light 테마) */
+    /* Primary1 팔레트*/
     --primary1-background-color-default: var(--color-brown-03);
     --primary1-background-color-pressed: var(--color-brown-06);
     --primary1-background-color-disabled: transparent;
@@ -166,7 +166,7 @@
     --primary1-content-color-pressed: var(--color-brown-02); 
     --primary1-content-color-disabled: var(--color-brown-02);
     
-    /* Primary2 ?�레??*/
+    /* Primary2 팔레트*/
     --primary2-background-color-default: var(--color-gray-11);
     --primary2-background-color-pressed: var(--color-brown-03);
     --primary2-background-color-disabled: transparent;
@@ -179,36 +179,36 @@
     --primary2-content-color-pressed: var(--color-gray-14); 
     --primary2-content-color-disabled: var(--color-gray-06);
     
-    /* Primary3 ?�레??(?�중 배경 ?�스?? */
-    /* Background1 (?�중 배경) */
+    /* Primary3 팔레트(중첩 배경 시스템) */
+    /* Background1 (중첩 배경) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-14);
     --primary3-background1-color-disabled: var(--color-gray-14);
     
-    /* Border (?�두�? */
+    /* Border (테두리) */
     --primary3-border-color-default: var(--color-gray-09);
     --primary3-border-color-pressed: var(--color-brown-03);
     --primary3-border-color-disabled: var(--color-gray-09);
     
-    /* Background2 (그라?�이???�이?? - Default */
+    /* Background2 (그라디언트 레이어 - Default */
     --primary3-background2-color-default-g000: rgba(232, 232, 232, 0);
     --primary3-background2-color-default-g015: rgba(232, 232, 232, 0.9);
     --primary3-background2-color-default-g043: rgba(232, 232, 232, 1);
     --primary3-background2-color-default-g100: rgba(232, 232, 232, 1);
     
-    /* Background2 (그라?�이???�이?? - Pressed */
+    /* Background2 (그라디언트 레이어 - Pressed */
     --primary3-background2-color-pressed-g000: rgba(164, 105, 63, 0);
     --primary3-background2-color-pressed-g015: rgba(164, 105, 63, 0.9);
     --primary3-background2-color-pressed-g043: rgba(164, 105, 63, 1);
     --primary3-background2-color-pressed-g100: rgba(164, 105, 63, 1);
     
-    /* Background2 (그라?�이???�이?? - Disabled */
+    /* Background2 (그라디언트 레이어 - Disabled */
     --primary3-background2-color-disabled-g000: rgba(232, 232, 232, 0);
     --primary3-background2-color-disabled-g015: rgba(232, 232, 232, 0.9);
     --primary3-background2-color-disabled-g043: rgba(232, 232, 232, 1);
     --primary3-background2-color-disabled-g100: rgba(232, 232, 232, 1);
     
-    /* Content2 (background2 ?��? HTML ?�소) */
+    /* Content2 (background2 위의 HTML 요소) */
     --primary3-content2-color-default1: var(--color-gray-03);
     --primary3-content2-color-default2: var(--color-gray-12);
     --primary3-content2-color-pressed1: var(--color-gray-14);
@@ -216,10 +216,10 @@
     --primary3-content2-color-disabled1: var(--color-gray-03);
     --primary3-content2-color-disabled2: var(--color-gray-12);
     
-    /* Content3 (별도 ?�별 HTML ?�소) */
+    /* Content3 (별도 구분 HTML 요소) */
     --primary3-content3-color-disabled: var(--color-system-02);
     
-    /* Secondary1 ?�레??*/
+    /* Secondary1 팔레트*/
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-11);
     --secondary1-background-color-disabled: transparent;
@@ -232,7 +232,7 @@
     --secondary1-content-color-pressed: var(--color-gray-03); 
     --secondary1-content-color-disabled: var(--color-gray-06);
     
-    /* Secondary2 ?�레??*/
+    /* Secondary2 팔레트*/
     --secondary2-background-color-default: var(--color-gray-11);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
@@ -245,8 +245,8 @@
     --secondary2-content-color-pressed: var(--color-gray-14); 
     --secondary2-content-color-disabled: var(--color-gray-06);
     
-    /* Secondary3 ?�레??(?�중 배경 ?�스??- ?�이�??�용) */
-    /* Background1 (기본 버튼 배경) */
+    /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
+    /* Background1 (湲곕낯 踰??諛곌꼍) */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
@@ -256,15 +256,15 @@
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-06);
     
-    /* Content1 (background1 ?��? HTML ?�소) */
+    /* Content1 (background1 위의 HTML 요소) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-06);
     
-    /* Background2 (?�이�??�용 배경) */
+    /* Background2 (레이어 적용 배경) */
     --secondary3-background2-color-default: var(--color-gray-01);
     
-    /* Content2 (background2 ?��? HTML ?�소 - ?�이�? */
+    /* Content2 (background2 위의 HTML 요소 - 레이어) */
     --secondary3-content2-color-default: var(--color-gray-14);
 }
 
@@ -285,10 +285,10 @@
 }
 
   /* ========================================
-     ?�� 고�?�?모드 (Dark Theme - 27 구조)
+     전체 고대비 모드 (Dark Theme - 27 구조)
      ======================================== */
   .dark {
-    /* Body 참조 ?�레??(Dark ?�마) */
+    /* Body 참조 팔레트(Dark 테마) */
     --body1-background: var(--color-gray-01);
     --body1-border: var(--color-gray-07);
     --body1-content-primary: var(--color-yellow-03);
@@ -306,8 +306,8 @@
     --body3-background: var(--color-gray-03);
     --body3-content: var(--color-gray-14);
 
-    /* 버튼 ?�레??(Dark ?�마) */
-    /* Primary1 ?�레??*/
+    /* 버튼 팔레트(Dark 테마) */
+    /* Primary1 팔레트*/
     --primary1-background-color-default: var(--color-yellow-03);
     --primary1-background-color-pressed: var(--color-yellow-01);
     --primary1-background-color-disabled: transparent;
@@ -320,7 +320,7 @@
     --primary1-content-color-pressed: var(--color-yellow-04); 
     --primary1-content-color-disabled: var(--color-yellow-03);
     
-    /* Primary2 ?�레??*/
+    /* Primary2 팔레트*/
     --primary2-background-color-default: var(--color-gray-03);
     --primary2-background-color-pressed: var(--color-yellow-03);
     --primary2-background-color-disabled: transparent;
@@ -333,36 +333,36 @@
     --primary2-content-color-pressed: var(--color-gray-01); 
     --primary2-content-color-disabled: var(--color-gray-07);
     
-    /* Primary3 ?�레??(?�중 배경 ?�스?? */
-    /* Background1 (?�중 배경) */
+    /* Primary3 팔레트(중첩 배경 시스템) */
+    /* Background1 (중첩 배경) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-01);
     --primary3-background1-color-disabled: var(--color-gray-14);
     
-    /* Border (?�두�? */
+    /* Border (테두리) */
     --primary3-border-color-default: var(--color-gray-07);
     --primary3-border-color-pressed: var(--color-yellow-03);
     --primary3-border-color-disabled: var(--color-gray-07);
     
-    /* Background2 (그라?�이???�이?? - Default */
+    /* Background2 (그라디언트 레이어 - Default */
     --primary3-background2-color-default-g000: rgba(0, 0, 0, 0);
     --primary3-background2-color-default-g015: rgba(0, 0, 0, 0.9);
     --primary3-background2-color-default-g043: rgba(0, 0, 0, 1);
     --primary3-background2-color-default-g100: rgba(0, 0, 0, 1);
     
-    /* Background2 (그라?�이???�이?? - Pressed */
+    /* Background2 (그라디언트 레이어 - Pressed */
     --primary3-background2-color-pressed-g000: rgba(255, 225, 0, 0);
     --primary3-background2-color-pressed-g015: rgba(255, 225, 0, 0.9);
     --primary3-background2-color-pressed-g043: rgba(255, 225, 0, 1);
     --primary3-background2-color-pressed-g100: rgba(255, 225, 0, 1);
     
-    /* Background2 (그라?�이???�이?? - Disabled */
+    /* Background2 (그라디언트 레이어 - Disabled */
     --primary3-background2-color-disabled-g000: rgba(0, 0, 0, 0);
     --primary3-background2-color-disabled-g015: rgba(0, 0, 0, 0.9);
     --primary3-background2-color-disabled-g043: rgba(0, 0, 0, 1);
     --primary3-background2-color-disabled-g100: rgba(0, 0, 0, 1);
     
-    /* Content2 (background2 ?��? HTML ?�소) */
+    /* Content2 (background2 위의 HTML 요소) */
     --primary3-content2-color-default1: var(--color-gray-03);
     --primary3-content2-color-default2: var(--color-gray-12);
     --primary3-content2-color-pressed1: var(--color-gray-14);
@@ -370,10 +370,10 @@
     --primary3-content2-color-disabled1: var(--color-gray-03);
     --primary3-content2-color-disabled2: var(--color-gray-12);
     
-    /* Content3 (별도 ?�별 HTML ?�소) */
+    /* Content3 (별도 구분 HTML 요소) */
     --primary3-content3-color-disabled: var(--color-system-04);
     
-    /* Secondary1 ?�레??*/
+    /* Secondary1 팔레트*/
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-03);
     --secondary1-background-color-disabled: transparent;
@@ -386,7 +386,7 @@
     --secondary1-content-color-pressed: var(--color-gray-12); 
     --secondary1-content-color-disabled: var(--color-gray-07);
     
-    /* Secondary2 ?�레??*/
+    /* Secondary2 팔레트*/
     --secondary2-background-color-default: var(--color-gray-03);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
@@ -400,8 +400,8 @@
     --secondary2-content-color-disabled: var(--color-gray-07);
     --secondary2-border-color-pointed: var(--color-system-01);
     
-    /* Secondary3 ?�레??(?�중 배경 ?�스??- ?�이�??�용) */
-    /* Background1 (기본 버튼 배경) */
+    /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
+    /* Background1 (湲곕낯 踰??諛곌꼍) */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
@@ -411,20 +411,20 @@
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-07);
     
-    /* Content1 (background1 ?��? HTML ?�소) */
+    /* Content1 (background1 위의 HTML 요소) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-07);
     
-    /* Background2 (?�이�??�용 배경) */
+    /* Background2 (레이어 적용 배경) */
     --secondary3-background2-color-default: var(--color-gray-01);
     
-    /* Content2 (background2 ?��? HTML ?�소 - ?�이�? */
+    /* Content2 (background2 위의 HTML 요소 - 레이어) */
     --secondary3-content2-color-default: var(--color-gray-14);
   }
 
   /* ========================================
-     ?�� ??글??모드 (Large Font Mode - 27 구조)
+     전체 큰글씨 모드 (Large Font Mode - 27 구조)
      ======================================== */
   .large {
     --font-size-scale: 1.2;
@@ -534,7 +534,7 @@
 }
 
 /* ========================================
-   ?�� 컴포?�트 (Components)
+   전체 컴포넌트 (Components)
    ======================================== */
 @layer components {
   img {
@@ -543,7 +543,7 @@
   }
 
   /* ========================================
-     🎨 아이콘 시스템 (JavaScript 연동)
+     ????댁? ??ㅽ (JavaScript ?곕)
      ======================================== */
      .icon {
       display: flex;
@@ -561,7 +561,8 @@
     }
 
   /* ========================================
-     ?�� 버튼 컴포?�트 ?�스??     ======================================== */
+     전체 버튼 컴포넌트 스타일
+     ======================================== */
   .button {
     background: none;
     border: none;
@@ -632,7 +633,7 @@
     outline-offset: 0;
   }
 /* ========================================
-   버튼 다양성 시작
+   踰???ㅼ????
    ======================================== */
   &.start {
     width: 285px;
@@ -681,6 +682,11 @@
     width: fit-content;
     min-width: 70px;
     padding: var(--spacing-sm);
+
+    /* 토글 상태 표시 아이콘은 버튼 스타일 생성기에서 자동 생성 */
+    & .content.icon.pressed {
+      position: absolute;
+    }
   }
 
   &.menu-item {
@@ -757,36 +763,30 @@
   &.accessibility-btn-confirm {
     width: 290px;
     height: 105px;
-}
-}
+  }
 }
 
 /* ========================================
-   ?�� ?�이?�웃 (Layout)
+   전체 레이아웃 (Layout)
    ======================================== */
 @layer layout {
   body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
     width: 1080px;
     height: 1920px;
     contain: layout size;
     background-color: #fafafa;
     font-size: var(--font-size-b1);
-  }
-
-  #root {
     flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
     min-height: 0;
   }
 
   /* ========================================
-     ?�� ?�레??구조
+     전체 프레임 구조
      ======================================== */
   .frame {
     display: flex;
@@ -863,7 +863,7 @@
   }
 
   /* ========================================
-     ?�� ?�이지 컨텐�??�역
+     전체 페이지 컨텐츠 영역
      ======================================== */
   .main {
     width: 100%;
@@ -1036,7 +1036,7 @@
   display: flex;
   height: 120px;
   align-items: center;
-  color: #8c8c8c; /* 기본 ?�색 */
+  color: #8c8c8c; /* 기본 색상 */
 }
 
 .header-black-circle {
@@ -1073,7 +1073,7 @@
   display: flex;
   width: 58px;
   height: 58px;
-  background-color: var(--layout-highlight-text-color); /* 주황??*/
+  background-color: var(--layout-highlight-text-color); /* 二쇳??*/
   background-image: var(--checked-icon-img);
   background-size: 22.5px 14.5px;
   background-repeat: no-repeat;
@@ -1294,16 +1294,16 @@
   padding: 0;
 }
 
-/* 메뉴 그리??*/
+/* 硫??洹몃━??*/
 .menu-grid {
   position: relative;
   width: fit-content;
   height: fit-content;
   grid-gap: 16px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4x4 배열 */
-  grid-template-rows: repeat(4, 1fr); /* 4x4 배열 강제 ?��? */
-  grid-auto-flow: row; /* ??방향?�로 ?�동 배치 */
+  grid-template-columns: repeat(4, 1fr); /* 4x4 諛곗?*/
+  grid-template-rows: repeat(4, 1fr); /* 4x4 배열 강제 설정 */
+  grid-auto-flow: row; /* 가로방향으로 자동 배치 */
   justify-items: center;
   align-items: center;
 }
@@ -1326,10 +1326,10 @@
   flex-direction: column;
   justify-content: flex-end;
   background: linear-gradient(
-    to bottom, /* ?�에???�래�?*/
-    transparent 0%, /* ?�작 ?�상 */
-    #F8F8F8 30%, /* 43% 지???�상 */
-    #EFEFEF 100% /* ???�상 */);
+    to bottom, /* 위에서 아래로*/
+    transparent 0%, /* 시작 색상 */
+    #F8F8F8 30%, /* 43% 지점 색상 */
+    #EFEFEF 100% /* 끝 색상 */);
     pointer-events: none;
 }
 
@@ -1344,20 +1344,20 @@
   flex-direction: column;
   justify-content:space-between;
   background: linear-gradient(
-    to bottom, /* ?�에???�래�?*/
-    transparent 0%, /* ?�작 ?�상 */
-    #F8F8F8 40%, /* 40% 지???�상 */
-    #EFEFEF 100% /* ???�상 */);
+    to bottom, /* 위에서 아래로*/
+    transparent 0%, /* 시작 색상 */
+    #F8F8F8 40%, /* 40% 지점 색상 */
+    #EFEFEF 100% /* 끝 색상 */);
     pointer-events: none;
 }
 
 .dark .menu-item .txt-box {
   color:#FFFFFF !important;
   background: linear-gradient(
-    to bottom, /* ?�에???�래�?*/
-    transparent 0%, /* ?�작 ?�상 */
-    black 25%, /* 25% 지???�상 */
-    black 100% /* ???�상 */) !important;
+    to bottom, /* 위에서 아래로*/
+    transparent 0%, /* 시작 색상 */
+    black 25%, /* 25% 지점 색상 */
+    black 100% /* 끝 색상 */) !important;
 }
 
 .menu-item img {
@@ -1597,7 +1597,7 @@
   height: 40px;;
 }
 
-/* ?�이지?�이??*/
+/* 페이지네이션*/
 .pagination2 {
   position: absolute;
   bottom: 45px;
@@ -1951,7 +1951,7 @@
 }
 
 /* ========================================
-   ?���??�틸리티 (Utilities)
+   전체 유틸리티 (Utilities)
    ======================================== */
 @layer utilities {
   .flex {
@@ -1976,7 +1976,7 @@
     }
   }
 
-  /* ?��? ?�디???�소 */
+  /* 숨김 오디오 요소 */
   .hidden-audio {
     width: 1px;
     height: 1px;
@@ -2078,7 +2078,6 @@
     }
   }
 
-
   /* ForthPage */
   .payment-amount-large {
     font-size: 8rem;
@@ -2099,5 +2098,6 @@
   .orange-line-margin {
     margin-top: 15px;
   }
+}
 }
 }

@@ -1,11 +1,16 @@
-/* ==============================
-  🎨 팔레트 관리자 (27 프로젝트 방식)
-  ============================== */
-
-import { CSSInjector } from './cssInjector';
+// ============================================================================
+// 팔레트 관리자 (27 프로젝트 방식)
+// ============================================================================
 
 export const PaletteManager = {
-  generateCSS() {
+  /**
+   * 훅 인스턴스 저장 (generateCSS에서 설정)
+   */
+  _injectCSS: null,
+
+  generateCSS(injectCSS) {
+    // 훅 인스턴스 저장
+    this._injectCSS = injectCSS;
     const buttons = document.querySelectorAll('.button');
     const discoveredPalettes = new Set();
     
@@ -106,7 +111,9 @@ ${darkThemeCSS ? `.dark {\n${darkThemeCSS}}` : ''}
 }
 `;
     
-    CSSInjector.inject('palette-system-styles', cssContent);
+    if (this._injectCSS) {
+      this._injectCSS('palette-system-styles', cssContent);
+    }
     return discoveredPalettes;
   }
 };

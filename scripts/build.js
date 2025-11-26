@@ -40,8 +40,8 @@ await build({
   external: ['/images/*', '/sound/*', '/fonts/*']
 });
 
-// 2. public 폴더 복사
-console.log('📁 Copying public folder...');
+// 2. public 폴더를 dist/public으로 복사
+console.log('📁 Copying public folder to dist/public...');
 cpSync('./public', './dist/public', { recursive: true });
 
 // 3. fonts.css 경로 수정 (BASE_PATH 반영)
@@ -53,19 +53,28 @@ if (basePath) {
   writeFileSync('./dist/public/fonts.css', fontsCss);
 }
 
-// 4. index.html 복사 및 경로 수정
-console.log('📄 Processing index.html...');
-let html = readFileSync('./index.html', 'utf8');
+// 4. index.html 빌드 시점에 생성
+console.log('📄 Generating index.html...');
+// dist 폴더 안에 있으므로 상대 경로 사용
+// public 폴더는 dist/public으로 복사되므로 ./public/fonts.css
+// index.css, index.js는 dist 루트에 있으므로 ./index.css, ./index.js
+const fontsPath = './public/fonts.css';
+const cssPath = './index.css';
+const jsPath = './index.js';
 
-// 경로를 BASE_PATH 포함하도록 수정
-// basePath가 비어있으면 "/" 유지, 있으면 "/coffee-kiosk" prefix 추가
-const publicPath = basePath ? `${basePath}/public/fonts.css` : '/public/fonts.css';
-const cssPath = basePath ? `${basePath}/index.css` : '/index.css';
-const jsPath = basePath ? `${basePath}/index.js` : '/index.js';
-
-html = html.replace('./public/fonts.css', publicPath);
-html = html.replace('./dist/index.css', cssPath);
-html = html.replace('./dist/index.js', jsPath);
+const html = `<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>coffee-kiosk</title>
+    <link rel="stylesheet" href="${fontsPath}" />
+    <link rel="stylesheet" href="${cssPath}" />
+  </head>
+  <body>
+    <script type="module" src="${jsPath}"></script>
+  </body>
+</html>`;
 
 writeFileSync('./dist/index.html', html);
 

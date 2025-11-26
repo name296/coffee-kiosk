@@ -1,9 +1,14 @@
-import React, { useEffect, useContext, useLayoutEffect, useMemo } from "react";
+// ============================================================================
+// 메인 애플리케이션 컴포넌트
+// ============================================================================
+
+import React, { useEffect, useContext, useLayoutEffect } from "react";
 import { useTextHandler } from "./assets/tts";
-import { updateTimer } from "./assets/timer";
 import { ButtonStyleGenerator } from "./utils/buttonStyleGenerator";
 import { SizeControlManager } from "./utils/sizeControlManager";
 import { useMultiModalButtonHandler } from "./hooks/useMultiModalButtonHandler";
+import { useCSSInjector } from "./hooks/useCSSInjector";
+import { useReactMount } from "./hooks/useReactMount";
 import { AppProvider, AppContext } from "./context";
 import { getAssetPath } from "./utils/pathUtils";
 import FirstPage from "./pages/FirstPage";
@@ -45,7 +50,6 @@ const AppContent = () => {
     setisLow(false);
   }, [totalMenuItems]); // totalMenuItems가 준비되면 실행
 
-
   return (
     <Layout>
       {currentPage === 'first' && <FirstPage />}
@@ -57,6 +61,10 @@ const AppContent = () => {
 };
 
 const App = () => {
+  // CSS 인젝터 훅 사용
+  const { inject: injectCSS, remove: removeCSS } = useCSSInjector();
+  const { mountComponent } = useReactMount();
+
   // tts api용 indexedDB 초기화
   const { initDB } = useTextHandler();
   useEffect(() => {
@@ -75,8 +83,8 @@ const App = () => {
   // 전역적으로 button click에 비프음 추가 (내부 요소에 pointer-events:none 추가하기)
   // useLayoutEffect를 사용하여 DOM이 업데이트된 직후에 실행 (버튼 렌더링 보장)
   useLayoutEffect(() => {
-    // 버튼 스타일 자동 생성 시스템 초기화
-    ButtonStyleGenerator.init();
+    // 버튼 스타일 자동 생성 시스템 초기화 (훅 전달)
+    ButtonStyleGenerator.init({ injectCSS, mountComponent });
     
     // 크기 조절 시스템 초기화
     SizeControlManager.init();
@@ -86,9 +94,9 @@ const App = () => {
     window.SizeControlManager = SizeControlManager;
     window.BUTTON_CONSTANTS = ButtonStyleGenerator.CONSTANTS;
 
-    // ========================================
+    // ============================================================================
     // 27 스타일 버튼 이벤트 처리 시스템
-    // ========================================
+    // ============================================================================
     // 버튼 이벤트 핸들러는 useMultiModalButtonHandler 훅으로 처리됨
     
     // 뷰포트에 맞춰 줌 배율 조절
@@ -138,33 +146,33 @@ const App = () => {
       resizeTimer = setTimeout(setZoom, SCREEN_CONFIG.ZOOM_RESIZE_DELAY);
     };
     
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);
     };
-  }, []);
+  }, [injectCSS, mountComponent]);
 
   return (
     <ErrorBoundary>
-    <AppProvider>
-      <audio
-        id="audioPlayer"
-        src=""
-        controls
-        className="hidden-audio"
-      ></audio>
-      <audio
-        id="beapSound"
-        src={getAssetPath("./public/sound/beap_sound2.mp3")}
-        controls
-        className="hidden-audio"
-      ></audio>
+      <AppProvider>
+        <audio
+          id="audioPlayer"
+          src=""
+          controls
+          className="hidden-audio"
+        />
+        <audio
+          id="beapSound"
+          src={getAssetPath("./public/sound/beap_sound2.mp3")}
+          controls
+          className="hidden-audio"
+        />
         <ErrorBoundary>
-      <AppContent />
+          <AppContent />
         </ErrorBoundary>
-    </AppProvider>
+      </AppProvider>
     </ErrorBoundary>
   );
 };

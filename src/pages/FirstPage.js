@@ -1,14 +1,17 @@
+// ============================================================================
+// 첫 번째 페이지 컴포넌트 (메인 화면)
+// ============================================================================
+
 import React, { useContext, useEffect, memo, useCallback } from "react";
 import { AppContext } from "../context";
-import TakeInIcon from "../components/icons/TakeInIcon";
-import TakeOutIcon from "../components/icons/TakeOutIcon";
 import Button from "../components/Button";
+import { TakeinIcon, TakeoutIcon } from "../components/icons";
 import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
+import { useSafeDocument } from "../hooks";
+import { useTimer } from "../hooks/useSingletonTimer";
 import { useTextHandler } from '../assets/tts';
-import { startIntroTimer } from "../assets/timer";
 import { commonScript } from "../constants/commonScript";
 import { FOCUS_SECTIONS, TIMER_CONFIG, PAGE_CONFIG, DEFAULT_SETTINGS } from "../config";
-import { useSafeDocument } from "../hooks";
 import { getAssetPath } from "../utils/pathUtils";
 
 const FirstPage = memo(() => {
@@ -22,6 +25,7 @@ const FirstPage = memo(() => {
     setisLow
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
+  const { startIntroTimer } = useTimer();
 
   const { blurActiveElement } = useSafeDocument();
 
@@ -51,7 +55,7 @@ const FirstPage = memo(() => {
     }, TIMER_CONFIG.ACTION_DELAY * 2);
 
     return () => clearTimeout(timer);
-  }, [handleText, handleIntroComplete, blurActiveElement]);
+  }, [handleText, handleIntroComplete, blurActiveElement, startIntroTimer]);
 
   return (
     <div
@@ -69,7 +73,7 @@ const FirstPage = memo(() => {
           <Button
             styleClass="button start"
             ttsText="포장하기"
-            icon={<TakeOutIcon />}
+            icon={<TakeoutIcon />}
             label="포장하기"
             onClick={(e) => {
               e.preventDefault();
@@ -79,7 +83,7 @@ const FirstPage = memo(() => {
           <Button
             styleClass="button start"
             ttsText="먹고가기"
-            icon={<TakeInIcon />}
+            icon={<TakeinIcon />}
             label="먹고가기"
             onClick={(e) => {
               e.preventDefault();

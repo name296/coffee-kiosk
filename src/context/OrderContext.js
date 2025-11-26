@@ -1,17 +1,20 @@
-/**
- * 주문 및 결제 프로세스 관련 Context
- * 서비스 프로세스의 핵심 비즈니스 로직 관리
- */
+// ============================================================================
+// 주문 및 결제 프로세스 관련 Context
+// ============================================================================
+
 import React, { useState, useMemo, useCallback, createContext } from "react";
-import { tabs, totalMenuItems, categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems } from "../utils/menuUtils";
+import { tabs, totalMenuItems, useMenuUtils } from "../hooks/useMenuUtils";
 import { convertToKoreanQuantity } from "../utils/numberUtils";
 
 export const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
+  // 메뉴 유틸리티 훅 사용
+  const { categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems } = useMenuUtils();
+
   // 메뉴 및 카테고리 상태
   const [selectedTab, setSelectedTab] = useState("전체메뉴");
-  const menuItems = useMemo(() => categorizeMenu(totalMenuItems, selectedTab), [selectedTab]);
+  const menuItems = useMemo(() => categorizeMenu(totalMenuItems, selectedTab), [selectedTab, categorizeMenu]);
 
   // 주문 수량 상태 (초기화는 App.js에서 totalMenuItems 로드 후 진행)
   const [quantities, setQuantities] = useState({});
@@ -32,8 +35,8 @@ export const OrderProvider = ({ children }) => {
   }, []);
 
   // 계산된 값들 (메모이제이션)
-  const totalCount = useMemo(() => calculateSum(quantities), [quantities]);
-  const totalSum = useMemo(() => calculateTotal(quantities, totalMenuItems), [quantities, totalMenuItems]);
+  const totalCount = useMemo(() => calculateSum(quantities), [quantities, calculateSum]);
+  const totalSum = useMemo(() => calculateTotal(quantities, totalMenuItems), [quantities, totalMenuItems, calculateTotal]);
 
   // Context value
   const value = useMemo(() => ({
@@ -71,6 +74,10 @@ export const OrderProvider = ({ children }) => {
     totalCount,
     totalSum,
     isCreditPayContent,
+    filterMenuItems,
+    createOrderItems,
+    calculateSum,
+    calculateTotal,
   ]);
 
   return (

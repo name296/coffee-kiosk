@@ -1,11 +1,14 @@
+// ============================================================================
+// 네 번째 페이지 컴포넌트 (결제 화면)
+// ============================================================================
+
 import React, { useContext, useState, useEffect, memo, useCallback, useMemo } from "react";
 import { AppContext } from "../context";
-// import { startReturnTimer, updateTimer } from "../assets/timer";
 import { useMultiModalButtonHandler } from "../hooks/useMultiModalButtonHandler";
-import { useTextHandler } from "../assets/tts";
-import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
-import { TIMER_CONFIG, PAYMENT_STEPS, WEBVIEW_COMMANDS, WEBVIEW_RESPONSE, STORAGE_KEYS, FOCUS_SECTIONS } from "../config/appConfig";
 import { useSafeDocument } from "../hooks";
+import { useTextHandler } from "../assets/tts";
+import { TIMER_CONFIG, PAYMENT_STEPS, WEBVIEW_COMMANDS, WEBVIEW_RESPONSE, STORAGE_KEYS, FOCUS_SECTIONS } from "../config/appConfig";
+import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
 import { getAssetPath } from "../utils/pathUtils";
 
 const ForthPage = memo(() => {
