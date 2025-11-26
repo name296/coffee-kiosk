@@ -140,6 +140,8 @@ const App = () => {
     setZoom();
     
     // 리사이즈 이벤트 처리
+    // SPA이므로 App 컴포넌트는 언마운트되지 않아 cleanup이 실행되지 않음
+    // 페이지가 닫힐 때 브라우저가 자동으로 이벤트 리스너를 정리함
     let resizeTimer;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -147,11 +149,6 @@ const App = () => {
     };
     
     window.addEventListener("resize", handleResize);
-    
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(resizeTimer);
-    };
   }, [injectCSS, mountComponent]);
 
   return (

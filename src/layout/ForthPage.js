@@ -249,8 +249,8 @@ const ForthPage = memo(() => {
               <Button
                 ttsText="신용카드,"
                 styleClass="pay"
-                actionType="payment"
-                actionMethod="card"
+              actionType="payment"
+              actionMethod="card"
                 icon={
                   <img
                     style={
@@ -267,8 +267,8 @@ const ForthPage = memo(() => {
               <Button
                 ttsText="모바일페이,"
                 styleClass="pay"
-                actionType="payment"
-                actionMethod="mobile"
+              actionType="payment"
+              actionMethod="mobile"
                 icon={
                   <img
                     style={
@@ -298,8 +298,8 @@ const ForthPage = memo(() => {
               <Button
                 ttsText="취소,"
                 styleClass="no"
-                actionType="cancel"
-                actionTarget="third"
+              actionType="cancel"
+              actionTarget="third"
                 label="취소"
               />
             </div>

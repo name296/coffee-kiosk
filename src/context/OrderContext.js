@@ -98,6 +98,19 @@ export const OrderProvider = ({ children }) => {
     setCallWebToApp(WEBVIEW_COMMANDS.CANCEL, "");
   }, [setCallWebToApp]);
 
+  // 탭 네비게이션 함수들
+  const handlePreviousTab = useCallback(() => {
+    const currentIndex = tabs.indexOf(selectedTab);
+    const previousIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    setSelectedTab(tabs[previousIndex]);
+  }, [tabs, selectedTab, setSelectedTab]);
+
+  const handleNextTab = useCallback(() => {
+    const currentIndex = tabs.indexOf(selectedTab);
+    const nextIndex = (currentIndex + 1) % tabs.length;
+    setSelectedTab(tabs[nextIndex]);
+  }, [tabs, selectedTab, setSelectedTab]);
+
   // Context value
   const value = useMemo(() => ({
     // 메뉴 관련
@@ -131,6 +144,10 @@ export const OrderProvider = ({ children }) => {
     sendPrintReceiptToApp,
     sendCancelPayment,
     updateOrderNumber,
+    
+    // 탭 네비게이션 함수들
+    handlePreviousTab,
+    handleNextTab,
   }), [
     menuItems,
     selectedTab,
@@ -149,6 +166,8 @@ export const OrderProvider = ({ children }) => {
     sendPrintReceiptToApp,
     sendCancelPayment,
     updateOrderNumber,
+    handlePreviousTab,
+    handleNextTab,
   ]);
 
   return (

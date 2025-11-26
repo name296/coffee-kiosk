@@ -4,7 +4,7 @@ import { useCallback } from 'react';
  * 토글 버튼 그룹 관리 훅
  * 같은 그룹 내에서 하나만 선택되도록 처리
  * 
- * @param {string} groupSelector - 그룹 선택자 (예: '.menu-tabs')
+ * @param {string} groupSelector - 그룹 선택자 (예: '.category')
  * @param {Function} onToggle - 토글 시 실행할 콜백 함수
  * @returns {Function} handleToggle - 토글 핸들러 함수
  */

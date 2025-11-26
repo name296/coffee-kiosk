@@ -20,8 +20,8 @@ import { AppContext } from '../context';
  * @param {ReactNode} props.icon - 아이콘 컴포넌트
  * @param {string} props.label - 버튼 텍스트
  * @param {Function} props.onPressed - 통합 입력 핸들러 (선택적, 커스텀 동작이 필요한 경우에만 사용)
- * @param {string} props.actionType - 액션 타입 ('navigate', 'payment', 'cancel', 'receipt', 'finish')
- * @param {string} props.actionTarget - 액션 타겟 (예: 'second', 'third', 'first', 'print', 'skip')
+ * @param {string} props.actionType - 액션 타입 ('navigate', 'payment', 'cancel', 'receipt', 'finish', 'selectTab', 'tabNav')
+ * @param {string} props.actionTarget - 액션 타겟 (예: 'second', 'third', 'first', 'print', 'skip', 'prev', 'next')
  * @param {string} props.actionMethod - 액션 메서드 (예: 'card', 'mobile')
  * @param {Function} props.onKeyDown - 키다운 핸들러 (선택적, 키보드 네비게이션 등)
  * @param {string} props.ttsText - TTS 음성 안내 텍스트 (data-tts-text에 설정됨)
@@ -50,7 +50,10 @@ const Button = memo(({
     setisCreditPayContent,
     sendOrderDataToApp,
     sendPrintReceiptToApp,
-    sendCancelPayment
+    sendCancelPayment,
+    setSelectedTab,
+    handlePreviousTab,
+    handleNextTab
   } = context || {};
 
   // prop 기반 자동 액션 처리
@@ -62,6 +65,9 @@ const Button = memo(({
 
     if (actionType === 'navigate' && actionTarget && setCurrentPage) {
       setCurrentPage(actionTarget);
+    } else if (actionType === 'selectTab' && actionTarget && setSelectedTab) {
+      // 탭 선택 처리
+      setSelectedTab(actionTarget);
     } else if (actionType === 'payment' && actionMethod) {
       // 결제 처리: 주문 데이터 전송 후 상태 변경
       if (sendOrderDataToApp) {
@@ -94,8 +100,14 @@ const Button = memo(({
       }
     } else if (actionType === 'finish' && setisCreditPayContent) {
       setisCreditPayContent(7);
+    } else if (actionType === 'tabNav' && actionTarget) {
+      if (actionTarget === 'prev' && handlePreviousTab) {
+        handlePreviousTab();
+      } else if (actionTarget === 'next' && handleNextTab) {
+        handleNextTab();
+      }
     }
-  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment]);
+  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, setSelectedTab, handlePreviousTab, handleNextTab]);
 
   // 통합 입력 핸들러: 모든 입력 이벤트(클릭, 터치, 키보드)를 하나의 핸들러로 처리
   const handlePressed = useCallback((e) => {

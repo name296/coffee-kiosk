@@ -280,8 +280,7 @@ const ThirdPage = memo(() => {
           ref={sections.bottom}
           data-tts-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
         >
-          <button data-tts-text=" 이전," className="button" onClick={(e) => handlePaginationPress(e, 'prev')}
->
+          <button data-tts-text=" 이전," className="button" onClick={(e) => handlePaginationPress(e, 'prev')}>
             <div className="background dynamic">
               <span className="content label">&lt;&nbsp; 이전</span>
             </div>
@@ -296,7 +295,7 @@ const ThirdPage = memo(() => {
             <span className="pagination-separator">{totalPages}</span>
           </span>
           <button data-tts-text=" 다음," className="button"
-          onClick={(e) => handlePaginationPress(e, 'next')}
+            onClick={(e) => handlePaginationPress(e, 'next')}
           >
             <div className="background dynamic">
               <span className="content label">다음 &nbsp;&gt;</span>

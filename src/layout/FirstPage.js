@@ -60,35 +60,33 @@ const FirstPage = memo(() => {
   }, [handleText, handleIntroComplete, blurActiveElement, startIntroTimer]);
 
   return (
-    <div
-      className="main first"
-    >
-        <img
-          src={getAssetPath("/images/poster.svg")}
-          alt="coffee"
+    <div className="main first">
+      <img
+        src={getAssetPath("/images/poster.svg")}
+        alt="coffee"
+      />
+      <div
+        className="task-manager"
+        data-tts-text="취식방식, 버튼 두개,"
+        ref={sections.middle}
+      >
+        <Button
+          styleClass="button start"
+          ttsText="포장하기"
+          icon={<TakeoutIcon />}
+          label="포장하기"
+          actionType="navigate"
+          actionTarget={PAGE_CONFIG.SECOND}
         />
-        <div 
-          className="task-manager"
-          data-tts-text="취식방식, 버튼 두개,"
-          ref={sections.middle}
-        >
-          <Button
-            styleClass="button start"
-            ttsText="포장하기"
-            icon={<TakeoutIcon />}
-            label="포장하기"
-            actionType="navigate"
-            actionTarget={PAGE_CONFIG.SECOND}
-          />
-          <Button
-            styleClass="button start"
-            ttsText="먹고가기"
-            icon={<TakeinIcon />}
-            label="먹고가기"
-            actionType="navigate"
-            actionTarget={PAGE_CONFIG.SECOND}
-          />
-        </div>
+        <Button
+          styleClass="button start"
+          ttsText="먹고가기"
+          icon={<TakeinIcon />}
+          label="먹고가기"
+          actionType="navigate"
+          actionTarget={PAGE_CONFIG.SECOND}
+        />
+      </div>
     </div>
   );
 });

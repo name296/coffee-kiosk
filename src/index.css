@@ -580,6 +580,7 @@
     cursor: pointer;
     will-change: transform;
     contain: layout style;
+    flex-shrink: 0;
    
     & .background.dynamic {
     position: relative;
@@ -1270,21 +1271,23 @@
   color: #8c532c;
 }
 
-.menu-tabs {
-  width: 726px;
-  row-gap: 16px;
-  column-gap: 8px;
+.category-full {
+  width: 1016px;
   height: fit-content;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
+  gap: 32px;
+  align-items: center;
 
-  .low & {
-    width: 988px;
-    max-width: 100%;
-    padding-left: 10px;
+  & .category {
+    flex: 1;
+    min-width: 0;
+    flex-flow: row wrap;
+    display: flex;
+    gap: 0px;
+    align-items: center;
   }
 }
-
 
 .secondpage-short-colline {
   width: 2px;
@@ -1294,24 +1297,30 @@
   padding: 0;
 }
 
-/* 硫??洹몃━??*/
-.menu-grid {
+.menu {
   position: relative;
   width: fit-content;
   height: fit-content;
   grid-gap: 16px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4x4 諛곗?*/
+  grid-template-columns: repeat(4, 1fr); /* 4x4 그리드*/
   grid-template-rows: repeat(4, 1fr); /* 4x4 배열 강제 설정 */
   grid-auto-flow: row; /* 가로방향으로 자동 배치 */
   justify-items: center;
   align-items: center;
-}
 
-.low .menu-grid {
-  display: flex;
-  gap:30px;
-  margin-top: 20px;
+&.low {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+  grid-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(1, 1fr); 
+  grid-auto-flow: row; /* 가로방향으로 자동 배치 */
+  justify-items: center;
+  align-items: center;
+  }
 }
 
 .menu-item .txt-box {
@@ -1406,14 +1415,6 @@
     }
   }
 }
-
-.low .tab-pagination {
-  color: #ffffff !important;
-}
-.dark.low .tab-pagination{
-  color: #8C8C8C !important;
-}
-
 
 .third-middle-content {
   width: 100%;
@@ -2085,13 +2086,6 @@
 
   .mobile-pay-label {
     margin-top: -50px;
-}
-
-  /* SecondPage tab button */
-  .tab-button-prev {
-    margin-left: -10px;
-    margin-right: 15px;
-    background: #252525;
 }
 
   /* Orange line margin */

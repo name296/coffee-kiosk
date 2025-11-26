@@ -4,23 +4,14 @@
 
 import { useCallback, useMemo } from 'react';
 import { getAssetPath } from '../utils/pathUtils';
+import menuData from '../../public/menu_data.json';
 
 // ============================================================================
 // 상수
 // ============================================================================
 
-export const MENU_TABS = [
-  "전체메뉴",
-  "커피",
-  "밀크티",
-  "스무디",
-  "차",
-  "주스",
-  "라떼",
-  "버블티",
-  "에이드",
-  "기타",
-];
+// JSON에서 카테고리 정보를 가져와서 탭 배열 생성
+export const MENU_TABS = menuData.categoryInfo.map(category => category.cate_name);
 
 export const DEFAULT_MENU_ITEMS = [
   {
