@@ -30,7 +30,7 @@ export const loadMenuData = async (path = '/data/menu-data.json') => {
  * @returns {Object} 기본 메뉴 데이터
  */
 const getDefaultMenuData = () => {
-  // 기존 menuUtils.js의 데이터를 여기로 이동 가능
+  // 기본 메뉴 데이터 (레거시 menuUtils.js는 제거됨, useMenuUtils 훅 사용)
   return {
     tabs: ["전체메뉴", "커피", "라떼"],
     menuItems: [],
@@ -40,7 +40,7 @@ const getDefaultMenuData = () => {
       id: 13,
       name: "추가예정",
       price: "0",
-      img: getAssetPath("/images/item-아메리카노.svg")
+      img: getAssetPath("/images/item-americano.svg")
     }
   };
 };

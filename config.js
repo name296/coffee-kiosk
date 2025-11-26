@@ -8,7 +8,7 @@ import { existsSync } from "fs";
 // 기본값 상수 정의
 const DEFAULTS = {
   PORT: "3000",
-  ENTRY_FILE: "./src/index.js",
+  ENTRY_FILE: "./src/App.js",
   HTML_ENTRY: "index.html",
   BUNDLE_PUBLIC_PATH: "/dist",
   BUNDLE_OUTPUT_DIR: "./dist",
@@ -87,7 +87,7 @@ export const config = {
   // 파일 경로
   entryFile: env.ENTRY_FILE,
   htmlEntry: env.HTML_ENTRY,
-  htmlPlaceholder: env.HTML_PLACEHOLDER || '<script type="module" src="/src/index.js"></script>',
+  htmlPlaceholder: env.HTML_PLACEHOLDER || '<script type="module" src="/src/App.js"></script>',
   
   // 정적 파일 설정
   staticPrefixes: env.STATIC_PREFIXES ? env.STATIC_PREFIXES.split(',') : ["/images/", "/sound/"],

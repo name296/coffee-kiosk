@@ -6,4 +6,5 @@ export { AppContext, AppProvider } from './AppContext';
 export { OrderContext, OrderProvider } from './OrderContext';
 export { UIContext, UIProvider } from './UIContext';
 export { AccessibilityContext, AccessibilityProvider } from './AccessibilityContext';
+export { ButtonConfigContext, ButtonConfigProvider, useButtonConfig } from './ButtonConfigContext';
 

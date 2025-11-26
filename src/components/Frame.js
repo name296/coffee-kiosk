@@ -3,9 +3,9 @@
 // ============================================================================
 
 import React, { useContext, useEffect, useState, useMemo, useCallback, memo } from "react";
-import { AppContext } from "../context";
-import { ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon } from "../components/icons";
-import { useTextHandler } from '../assets/tts';
+import { AppContext } from "../contexts";
+import { ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon } from "../components/Icon";
+import { useTextHandler } from '../utils/tts';
 import { PAGE_MESSAGES, PAYMENT_MESSAGES, PAYMENT_STEPS } from "../config";
 import { safeLocalStorage, safeParseInt, formatNumber } from "../utils/browserCompatibility";
 import { getAssetPath } from "../utils/pathUtils";

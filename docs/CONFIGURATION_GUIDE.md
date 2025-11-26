@@ -256,7 +256,7 @@ function MenuComponent() {
    ```
 
 3. **메뉴 데이터 마이그레이션**
-   - `menuUtils.js`의 하드코딩된 배열을 JSON 파일로 이동
+   - 메뉴 데이터는 JSON 파일로 관리 (레거시 `menuUtils.js`는 제거됨, `useMenuUtils` 훅 사용)
    - `loadMenuData()` 함수로 로드
 
 ### 체크리스트

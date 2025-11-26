@@ -4,7 +4,7 @@
 // ============================================================================
 
 import React, { memo, useContext, useCallback } from 'react';
-import { AppContext } from '../context';
+import { AppContext } from '../contexts';
 
 // ============================================================================
 // 컴포넌트
@@ -19,11 +19,9 @@ import { AppContext } from '../context';
  * @param {string} props.styleClass - 추가 클래스 (palette, size 등)
  * @param {ReactNode} props.icon - 아이콘 컴포넌트
  * @param {string} props.label - 버튼 텍스트
- * @param {Function} props.onPressed - 통합 입력 핸들러 (선택적, 커스텀 동작이 필요한 경우에만 사용)
- * @param {string} props.actionType - 액션 타입 ('navigate', 'payment', 'cancel', 'receipt', 'finish', 'selectTab', 'tabNav')
+ * @param {string} props.actionType - 액션 타입 ('navigate', 'payment', 'cancel', 'receipt', 'finish', 'selectTab', 'tabNav', 'categoryNav')
  * @param {string} props.actionTarget - 액션 타겟 (예: 'second', 'third', 'first', 'print', 'skip', 'prev', 'next')
  * @param {string} props.actionMethod - 액션 메서드 (예: 'card', 'mobile')
- * @param {Function} props.onKeyDown - 키다운 핸들러 (선택적, 키보드 네비게이션 등)
  * @param {string} props.ttsText - TTS 음성 안내 텍스트 (data-tts-text에 설정됨)
  * @param {boolean} props.disabled - 비활성 상태
  * @param {object} props.style - 인라인 스타일
@@ -32,11 +30,9 @@ const Button = memo(({
   styleClass = '',
   icon = null,
   label,
-  onPressed,
   actionType,
   actionTarget,
   actionMethod,
-  onKeyDown,
   ttsText,
   disabled = false,
   style = {},
@@ -53,7 +49,8 @@ const Button = memo(({
     sendCancelPayment,
     setSelectedTab,
     handlePreviousTab,
-    handleNextTab
+    handleNextTab,
+    handleCategoryPageNav
   } = context || {};
 
   // prop 기반 자동 액션 처리
@@ -106,48 +103,36 @@ const Button = memo(({
       } else if (actionTarget === 'next' && handleNextTab) {
         handleNextTab();
       }
+    } else if (actionType === 'categoryNav' && actionTarget) {
+      if (handleCategoryPageNav && typeof handleCategoryPageNav === 'function') {
+        handleCategoryPageNav(actionTarget);
+      }
     }
-  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, setSelectedTab, handlePreviousTab, handleNextTab]);
+  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, setSelectedTab, handlePreviousTab, handleNextTab, handleCategoryPageNav]);
 
   // 통합 입력 핸들러: 모든 입력 이벤트(클릭, 터치, 키보드)를 하나의 핸들러로 처리
-  const handlePressed = useCallback((e) => {
+  const onPressed = useCallback((e) => {
     if (disabled) return;
     
-    // 커스텀 onPressed가 있으면 우선 사용, 없으면 자동 액션 처리
-    if (onPressed) {
-      onPressed(e);
-    } else if (actionType) {
+    // React 이벤트 핸들러가 처리했음을 표시 (전역 핸들러가 중복 처리 방지)
+    const button = e.target.closest('.button');
+    if (button) {
+      button.setAttribute('data-react-handler', 'true');
+    }
+    
+    // actionType 기반 자동 액션 처리
+    if (actionType) {
       handleAutoAction(e);
     }
-  }, [disabled, onPressed, actionType, handleAutoAction]);
-
-  // 키보드 입력 핸들러: Enter, Space 키를 통합 핸들러로 전달
-  const handleKeyDown = (e) => {
-    if (disabled) return;
-    
-    // Enter 또는 Space 키인 경우 통합 핸들러 호출
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'NumpadEnter') {
-      e.preventDefault();
-      handlePressed(e);
-      return;
-    }
-    
-    // 다른 키는 기존 onKeyDown 핸들러로 전달
-    if (onKeyDown) {
-      onKeyDown(e);
-    }
-  };
-
-  // onPressed는 내부에서만 사용하므로 HTML button 태그로 전달하지 않음
-  // (onPressed는 이미 destructuring에서 추출되었으므로 rest에는 포함되지 않음)
+  }, [disabled, actionType, handleAutoAction]);
 
   return (
     <button
       className={buttonClasses}
       data-tts-text={ttsText}
-      onClick={handlePressed}
-      onTouchEnd={handlePressed}
-      onKeyDown={handleKeyDown}
+      onClick={onPressed}
+      onTouchEnd={onPressed}
+      onKeyDown={onPressed}
       disabled={disabled}
       aria-disabled={disabled}
       style={style}

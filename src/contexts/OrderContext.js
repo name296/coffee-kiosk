@@ -111,6 +111,9 @@ export const OrderProvider = ({ children }) => {
     setSelectedTab(tabs[nextIndex]);
   }, [tabs, selectedTab, setSelectedTab]);
 
+  // 카테고리 페이지네이션 핸들러 (SecondPage에서 설정)
+  const [handleCategoryPageNav, setHandleCategoryPageNav] = useState(null);
+
   // Context value
   const value = useMemo(() => ({
     // 메뉴 관련
@@ -148,6 +151,10 @@ export const OrderProvider = ({ children }) => {
     // 탭 네비게이션 함수들
     handlePreviousTab,
     handleNextTab,
+    
+    // 카테고리 페이지네이션
+    handleCategoryPageNav,
+    setHandleCategoryPageNav,
   }), [
     menuItems,
     selectedTab,
@@ -168,6 +175,7 @@ export const OrderProvider = ({ children }) => {
     updateOrderNumber,
     handlePreviousTab,
     handleNextTab,
+    handleCategoryPageNav,
   ]);
 
   return (

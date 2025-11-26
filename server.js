@@ -67,11 +67,11 @@ const setupDevDist = () => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>coffee-kiosk</title>
     <link rel="stylesheet" href="./public/fonts.css" />
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="./App.css" />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./index.js"></script>
+    <script type="module" src="./App.js"></script>
   </body>
 </html>`;
       writeFileSync("./dist/index.html", html);
@@ -188,11 +188,17 @@ startIconWatcher();
 // ============================================================================
 // 헬퍼 함수
 // ============================================================================
-const rewriteHtml = (rawHtml) =>
-  rawHtml.replace(
-    config.htmlPlaceholder,
-    `<script type="module" src="${config.bundlePublicPath}/index.js"></script>`
-  );
+const rewriteHtml = (rawHtml) => {
+  // placeholder가 있으면 치환
+  if (rawHtml.includes(config.htmlPlaceholder)) {
+    return rawHtml.replace(
+      config.htmlPlaceholder,
+      `<script type="module" src="${config.bundlePublicPath}/App.js"></script>`
+    );
+  }
+  // placeholder가 없으면 그대로 반환 (index.html에 이미 올바른 경로가 설정되어 있음)
+  return rawHtml;
+};
 
 const serveStatic = async (pathname) => {
   // public/ 디렉터리 (폰트, 이미지 등)

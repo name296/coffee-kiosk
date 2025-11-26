@@ -18,73 +18,73 @@ export const DEFAULT_MENU_ITEMS = [
     id: 1,
     name: "아메리카노 (아이스)",
     price: "2500",
-    img: getAssetPath("/images/item-아메리카노.svg"),
+    img: getAssetPath("/images/item-americano.svg"),
   },
   {
     id: 2,
     name: "바닐라라떼 (아이스)",
     price: "2500",
-    img: getAssetPath("/images/item-바닐라라떼.svg"),
+    img: getAssetPath("/images/item-vanilla-latte.svg"),
   },
   {
     id: 3,
     name: "콜드브루 디카페인",
     price: "2900",
-    img: getAssetPath("/images/item-콜드브루.svg"),
+    img: getAssetPath("/images/item-cold-brew.svg"),
   },
   { 
     id: 4, 
     name: "흑당라떼", 
     price: "2500", 
-    img: getAssetPath("/images/item-흑당라떼.svg") 
+    img: getAssetPath("/images/item-brown-sugar-latte.svg") 
   },
   { 
     id: 5, 
     name: "딸기라떼", 
     price: "2500", 
-    img: getAssetPath("/images/item-딸기라떼.svg") 
+    img: getAssetPath("/images/item-strawberry-latte.svg") 
   },
   {
     id: 6,
     name: "미숫가루 달고나라떼",
     price: "2500",
-    img: getAssetPath("/images/item-달고나라떼.svg"),
+    img: getAssetPath("/images/item-dalgona-latte.svg"),
   },
   {
     id: 7,
     name: "콜드브루 (아이스)",
     price: "2500",
-    img: getAssetPath("/images/item-콜드브루.svg"),
+    img: getAssetPath("/images/item-cold-brew.svg"),
   },
   {
     id: 8,
     name: "바닐라라떼 (아이스)",
     price: "2500",
-    img: getAssetPath("/images/item-바닐라라떼.svg"),
+    img: getAssetPath("/images/item-vanilla-latte.svg"),
   },
   {
     id: 9,
     name: "딸기라떼 (아이스)",
     price: "2500",
-    img: getAssetPath("/images/item-딸기라떼.svg"),
+    img: getAssetPath("/images/item-strawberry-latte.svg"),
   },
   {
     id: 10,
     name: "카라멜 마끼아또",
     price: "3000",
-    img: getAssetPath("/images/item-바닐라라떼.svg"),
+    img: getAssetPath("/images/item-vanilla-latte.svg"),
   },
   {
     id: 11,
     name: "녹차라떼",
     price: "2800",
-    img: getAssetPath("/images/item-달고나라떼.svg"),
+    img: getAssetPath("/images/item-dalgona-latte.svg"),
   },
   {
     id: 12,
     name: "헤이즐넛라떼",
     price: "2900",
-    img: getAssetPath("/images/item-콜드브루.svg"),
+    img: getAssetPath("/images/item-cold-brew.svg"),
   },
 ];
 
@@ -92,7 +92,7 @@ const PLACEHOLDER_MENU_ITEM = {
   id: 13,
   name: "추가예정",
   price: "0",
-  img: getAssetPath("/images/item-아메리카노.svg"),
+  img: getAssetPath("/images/item-americano.svg"),
 };
 
 // ============================================================================

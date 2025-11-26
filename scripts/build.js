@@ -28,7 +28,7 @@ mkdirSync('./dist', { recursive: true });
 // 1. JavaScript/CSS 빌드
 console.log('📦 Building JavaScript and CSS...');
 await build({
-  entrypoints: ['./src/index.js'],
+  entrypoints: ['./src/App.js'],
   outdir: './dist',
   target: 'browser',
   minify: true,
@@ -57,10 +57,10 @@ if (basePath) {
 console.log('📄 Generating index.html...');
 // dist 폴더 안에 있으므로 상대 경로 사용
 // public 폴더는 dist/public으로 복사되므로 ./public/fonts.css
-// index.css, index.js는 dist 루트에 있으므로 ./index.css, ./index.js
+// App.css, App.js는 dist 루트에 있으므로 ./App.css, ./App.js
 const fontsPath = './public/fonts.css';
-const cssPath = './index.css';
-const jsPath = './index.js';
+const cssPath = './App.css';
+const jsPath = './App.js';
 
 const html = `<!DOCTYPE html>
 <html lang="en" oncontextmenu="return false;">

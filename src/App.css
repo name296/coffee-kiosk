@@ -693,6 +693,12 @@
   &.menu-item {
     width: 242px;
     height: 280px;
+    
+    & .content.icon {
+      display: flex;
+      width: 96px;
+      height: 96px
+    }
   }
 
     &.qty-btn {
@@ -1281,11 +1287,11 @@
 
   & .category {
     flex: 1;
-    min-width: 0;
     flex-flow: row wrap;
     display: flex;
-    gap: 0px;
+    gap: 4px;
     align-items: center;
+    min-width: 0;
   }
 }
 

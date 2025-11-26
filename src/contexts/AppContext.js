@@ -3,12 +3,13 @@
  * 모든 하위 Context를 통합하고 공통 유틸리티 제공
  */
 import React, { useMemo, useCallback, createContext } from "react";
-import { useTextHandler } from "../assets/tts";
-import { commonScript } from "../constants/commonScript";
+import { useTextHandler } from "../utils/tts";
+import { commonScript } from "../config/messages";
 import { safeQuerySelector } from "../utils/browserCompatibility";
 import { OrderProvider, OrderContext } from "./OrderContext";
 import { UIProvider, UIContext } from "./UIContext";
 import { AccessibilityProvider, AccessibilityContext } from "./AccessibilityContext";
+import { ButtonConfigProvider, ButtonConfigContext } from "./ButtonConfigContext";
 
 export const AppContext = createContext();
 
@@ -21,7 +22,9 @@ export const AppProvider = ({ children }) => {
     <AccessibilityProvider>
       <OrderProvider>
         <UIProvider>
-          <AppContextProvider>{children}</AppContextProvider>
+          <ButtonConfigProvider>
+            <AppContextProvider>{children}</AppContextProvider>
+          </ButtonConfigProvider>
         </UIProvider>
       </OrderProvider>
     </AccessibilityProvider>
@@ -37,6 +40,7 @@ const AppContextProvider = ({ children }) => {
   const accessibilityContext = React.useContext(AccessibilityContext);
   const orderContext = React.useContext(OrderContext);
   const uiContext = React.useContext(UIContext);
+  const buttonConfigContext = React.useContext(ButtonConfigContext);
 
   // TTS 핸들러 (volume이 필요하므로 AccessibilityContext에서 가져옴)
   const { handleText } = useTextHandler(accessibilityContext.volume);
@@ -56,6 +60,7 @@ const AppContextProvider = ({ children }) => {
     ...accessibilityContext,
     ...orderContext,
     ...uiContext,
+    ...buttonConfigContext,
     
     // 공통 유틸리티
     commonScript,
@@ -64,6 +69,7 @@ const AppContextProvider = ({ children }) => {
     accessibilityContext,
     orderContext,
     uiContext,
+    buttonConfigContext,
     readCurrentPage,
   ]);
 
@@ -73,3 +79,4 @@ const AppContextProvider = ({ children }) => {
     </AppContext.Provider>
   );
 };
+

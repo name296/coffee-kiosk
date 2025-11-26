@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef, useContext, useState } from 'react';
-import { AppContext } from '../context';
-import { useTextHandler } from '../assets/tts';
+import { AppContext } from '../contexts';
+import { useTextHandler } from '../utils/tts';
 import { useButtonUtils } from './useButtonUtils';
 import { useTimer } from './useSingletonTimer';
 

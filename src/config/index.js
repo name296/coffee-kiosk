@@ -4,4 +4,5 @@
  */
 export * from './appConfig';
 export * from './messages';
+export * from './layoutConfig';
 

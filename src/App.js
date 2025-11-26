@@ -2,22 +2,110 @@
 // 메인 애플리케이션 컴포넌트
 // ============================================================================
 
-import React, { useEffect, useContext, useLayoutEffect } from "react";
-import { useTextHandler } from "./assets/tts";
+import React, { useEffect, useContext, useLayoutEffect, useMemo } from "react";
+import ReactDOM from "react-dom/client";
+import "./App.css";
+import { useTextHandler } from "./utils/tts";
 import { ButtonStyleGenerator } from "./utils/buttonStyleGenerator";
 import { SizeControlManager } from "./utils/sizeControlManager";
 import { useMultiModalButtonHandler } from "./hooks/useMultiModalButtonHandler";
 import { useCSSInjector } from "./hooks/useCSSInjector";
 import { useReactMount } from "./hooks/useReactMount";
-import { AppProvider, AppContext } from "./context";
+import { AppProvider, AppContext } from "./contexts";
 import { getAssetPath } from "./utils/pathUtils";
-import FirstPage from "./layout/FirstPage";
-import SecondPage from "./layout/SecondPage";
-import ThirdPage from "./layout/ThirdPage";
-import ForthPage from "./layout/ForthPage";
-import { Layout } from "./layout/Layouts";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { SCREEN_CONFIG, TIMER_CONFIG } from "./config/appConfig";
+import { setViewportZoom, setupViewportResize } from "./utils/viewportManager";
+import { setupGlobalUtils } from "./utils/globalUtils";
+import { FirstPage, SecondPage, ThirdPage, ForthPage } from "./components/Pages";
+import { Step, Summary, Bottom } from "./components/Frame";
+import { ReturnModal, AccessibilityModal, ResetModal, CallModal, DeleteModal, DeleteCheckModal } from "./components/Modals";
+import { LAYOUT_COMPONENTS, LAYOUT_ASSEMBLY_CONTEXT } from "./config";
+import ErrorBoundary from "./utils/ErrorBoundary";
+
+// 전역 모달 컴포넌트
+const GlobalModals = () => {
+  const {
+    isReturnModal,
+    isAccessibilityModal,
+    isResetModal,
+    isCallModal,
+    isDeleteModal,
+    isDeleteCheckModal,
+    quantities,
+    handleDecrease,
+    deleteItemId,
+    totalMenuItems,
+    filterMenuItems
+  } = useContext(AppContext);
+
+  // DeleteModal과 DeleteCheckModal에 필요한 currentItems 계산
+  const priceItems = filterMenuItems(totalMenuItems, quantities);
+  const currentItems = priceItems; // 전체 아이템 사용 (페이지네이션 제외)
+
+  return (
+    <>
+      {isReturnModal && <ReturnModal />}
+      {isResetModal && <ResetModal />}
+      {isAccessibilityModal && <AccessibilityModal />}
+      {isCallModal && <CallModal />}
+      {isDeleteModal && (
+        <DeleteModal
+          handleDecrease={handleDecrease}
+          id={deleteItemId}
+          quantities={quantities}
+          currentItems={currentItems}
+        />
+      )}
+      {isDeleteCheckModal && (
+        <DeleteCheckModal
+          handleDecrease={handleDecrease}
+          id={deleteItemId}
+          quantities={quantities}
+          currentItems={currentItems}
+        />
+      )}
+    </>
+  );
+};
+
+/**
+ * 메인 레이아웃 컴포넌트
+ * BOM과 조립 컨텍스트를 기반으로 컴포넌트를 조립
+ * 
+ * 조립 순서 (ASSEMBLY_ORDER):
+ * 1. Step - 진행 단계 표시
+ * 2. Content - 페이지 내용 (children)
+ * 3. Summary - 주문 요약 (조건부)
+ * 4. Bottom - 하단 네비게이션
+ * 5. Modals - 전역 모달들
+ */
+const Layout = ({ children }) => {
+  const context = useContext(AppContext);
+  
+  // 조립 컨텍스트 기반으로 렌더링 여부 결정
+  const shouldRender = useMemo(() => {
+    return {
+      [LAYOUT_COMPONENTS.STEP]: LAYOUT_ASSEMBLY_CONTEXT.conditions[LAYOUT_COMPONENTS.STEP](context),
+      [LAYOUT_COMPONENTS.CONTENT]: LAYOUT_ASSEMBLY_CONTEXT.conditions[LAYOUT_COMPONENTS.CONTENT](context),
+      [LAYOUT_COMPONENTS.SUMMARY]: LAYOUT_ASSEMBLY_CONTEXT.conditions[LAYOUT_COMPONENTS.SUMMARY](context),
+      [LAYOUT_COMPONENTS.BOTTOM]: LAYOUT_ASSEMBLY_CONTEXT.conditions[LAYOUT_COMPONENTS.BOTTOM](context),
+      [LAYOUT_COMPONENTS.MODALS]: LAYOUT_ASSEMBLY_CONTEXT.conditions[LAYOUT_COMPONENTS.MODALS](context),
+    };
+  }, [context.currentPage]); // currentPage 변경 시 재계산
+  
+  return (
+    <div className="frame">
+      <div className="black"></div>
+      <div className="top"></div>
+      
+      {/* 조립 순서에 따라 컴포넌트 렌더링 */}
+      {shouldRender[LAYOUT_COMPONENTS.STEP] && <Step />}
+      {shouldRender[LAYOUT_COMPONENTS.CONTENT] && children}
+      {shouldRender[LAYOUT_COMPONENTS.SUMMARY] && <Summary />}
+      {shouldRender[LAYOUT_COMPONENTS.BOTTOM] && <Bottom />}
+      {shouldRender[LAYOUT_COMPONENTS.MODALS] && <GlobalModals />}
+    </div>
+  );
+};
 
 // 페이지 렌더링 컴포넌트
 const AppContent = () => {
@@ -89,10 +177,8 @@ const App = () => {
     // 크기 조절 시스템 초기화
     SizeControlManager.init();
     
-    // 전역 접근 (Footer에서 사용)
-    window.ButtonStyleGenerator = ButtonStyleGenerator;
-    window.SizeControlManager = SizeControlManager;
-    window.BUTTON_CONSTANTS = ButtonStyleGenerator.CONSTANTS;
+    // 전역 유틸리티 설정 (Footer에서 사용)
+    setupGlobalUtils();
 
     // ============================================================================
     // 27 스타일 버튼 이벤트 처리 시스템
@@ -100,55 +186,8 @@ const App = () => {
     // 버튼 이벤트 핸들러는 useMultiModalButtonHandler 훅으로 처리됨
     
     // 뷰포트에 맞춰 줌 배율 조절
-    function setZoom() {
-      const { BASE_WIDTH: bodyWidth, BASE_HEIGHT: bodyHeight } = SCREEN_CONFIG;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      
-      // 가로 기준 줌 배율
-      const zoomByWidth = vw / bodyWidth;
-      // 세로 기준 줌 배율
-      const zoomByHeight = vh / bodyHeight;
-      
-      // 둘 중 작은 값을 선택 (뷰포트에 완전히 들어가도록)
-      const zoom = Math.min(zoomByWidth, zoomByHeight);
-      
-      const body = document.body;
-      
-      if (body) {
-        // body에 scale 적용
-        body.style.transform = `scale(${zoom})`;
-        body.style.transformOrigin = 'top left';
-        
-        // 스케일 후 실제 크기 계산
-        const scaledWidth = bodyWidth * zoom;
-        const scaledHeight = bodyHeight * zoom;
-        
-        // 중앙 정렬을 위한 위치 조정
-        const offsetX = (vw - scaledWidth) / 2;
-        const offsetY = (vh - scaledHeight) / 2;
-        
-        body.style.position = 'fixed';
-        body.style.top = `${offsetY}px`;
-        body.style.left = `${offsetX}px`;
-        body.style.width = `${bodyWidth}px`;
-        body.style.height = `${bodyHeight}px`;
-      }
-    }
-    
-    // 초기 줌 설정
-    setZoom();
-    
-    // 리사이즈 이벤트 처리
-    // SPA이므로 App 컴포넌트는 언마운트되지 않아 cleanup이 실행되지 않음
-    // 페이지가 닫힐 때 브라우저가 자동으로 이벤트 리스너를 정리함
-    let resizeTimer;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(setZoom, SCREEN_CONFIG.ZOOM_RESIZE_DELAY);
-    };
-    
-    window.addEventListener("resize", handleResize);
+    setViewportZoom();
+    setupViewportResize();
   }, [injectCSS, mountComponent]);
 
   return (
@@ -175,3 +214,9 @@ const App = () => {
 };
 
 export default App;
+
+// ============================================================================
+// 애플리케이션 마운트
+// body를 직접 root로 사용
+// ============================================================================
+ReactDOM.createRoot(document.body).render(React.createElement(App));

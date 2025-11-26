@@ -3,8 +3,296 @@
 // 27 프로젝트의 "강철 스타일" - 비례 기반 자동 스타일링
 // ============================================================================
 
-import { PaletteManager } from './paletteManager';
-import { getToggleButtonManager } from './toggleButtonManager';
+import { ToggleIcon } from '../components/Icon';
+
+// ============================================================================
+// 팔레트 관리자 (27 프로젝트 방식)
+// ============================================================================
+
+export const PaletteManager = {
+  /**
+   * 훅 인스턴스 저장 (generateCSS에서 설정)
+   */
+  _injectCSS: null,
+
+  /**
+   * 기본 팔레트 클래스 목록
+   * 27 프로젝트의 표준 팔레트들
+   */
+  DEFAULT_PALETTES: ['primary1', 'primary2', 'primary3', 'secondary1', 'secondary2', 'secondary3'],
+
+  /**
+   * 팔레트 클래스가 없는 버튼에 기본 팔레트 클래스 자동 할당
+   * 기본 팔레트는 primary2로 고정
+   * @param {NodeList|Array|string} targetButtons - 대상 버튼들 (선택자 문자열, NodeList, 또는 배열)
+   * @param {string} startPalette - 시작 팔레트 (무시됨, 항상 'primary2' 사용)
+   * @returns {number} 처리된 버튼 개수
+   */
+  assignDefaultPalettes(targetButtons = null, startPalette = 'primary2') {
+    // 기본 팔레트는 항상 primary2로 고정
+    const DEFAULT_PALETTE = 'primary2';
+    
+    // 대상 버튼 결정
+    let buttons;
+    if (!targetButtons) {
+      buttons = document.querySelectorAll('.button');
+    } else if (typeof targetButtons === 'string') {
+      buttons = document.querySelectorAll(targetButtons);
+    } else if (targetButtons instanceof NodeList || Array.isArray(targetButtons)) {
+      buttons = targetButtons;
+    } else {
+      console.warn('⚠️ [assignDefaultPalettes] Invalid targetButtons type');
+      return 0;
+    }
+
+    if (buttons.length === 0) {
+      console.log('ℹ️ [assignDefaultPalettes] No buttons found');
+      return 0;
+    }
+
+    // 팔레트 클래스가 아닌 클래스들 (제외 목록)
+    const excludedClasses = ['button', 'pressed', 'toggle', 'dynamic'];
+    let processedCount = 0;
+
+    buttons.forEach((button) => {
+      const classList = Array.from(button.classList);
+      
+      // 이미 팔레트 클래스가 있는지 확인
+      // DEFAULT_PALETTES 배열에 있는 클래스만 팔레트로 인식
+      const existingPalette = classList.find(cls => {
+        // 제외 목록에 있으면 스킵
+        if (excludedClasses.includes(cls)) return false;
+        // 기본 팔레트 목록에 있는 클래스만 팔레트로 인식
+        return this.DEFAULT_PALETTES.includes(cls) || cls === 'custom';
+      });
+      
+      // 팔레트 클래스가 없으면 primary2 할당
+      if (!existingPalette) {
+        button.classList.add(DEFAULT_PALETTE);
+        processedCount++;
+      }
+    });
+
+    console.log(`✅ [assignDefaultPalettes] Assigned '${DEFAULT_PALETTE}' to ${processedCount} buttons`);
+    return processedCount;
+  },
+
+  /**
+   * 버튼에 팔레트 클래스 적용
+   * 27 프로젝트 방식: 버튼에 팔레트 클래스를 동적으로 추가/제거
+   * @param {string} paletteName - 적용할 팔레트 이름 (예: 'primary1', 'custom')
+   * @param {NodeList|Array|string} targetButtons - 대상 버튼들 (선택자 문자열, NodeList, 또는 배열)
+   * @returns {number} 처리된 버튼 개수
+   */
+  applyPaletteClass(paletteName, targetButtons = null) {
+    if (!paletteName) {
+      console.warn('⚠️ [applyPaletteClass] paletteName is required');
+      return 0;
+    }
+
+    // 대상 버튼 결정
+    let buttons;
+    if (!targetButtons) {
+      // 모든 버튼에 적용
+      buttons = document.querySelectorAll('.button');
+    } else if (typeof targetButtons === 'string') {
+      // 선택자 문자열
+      buttons = document.querySelectorAll(targetButtons);
+    } else if (targetButtons instanceof NodeList || Array.isArray(targetButtons)) {
+      // NodeList 또는 배열
+      buttons = targetButtons;
+    } else {
+      console.warn('⚠️ [applyPaletteClass] Invalid targetButtons type');
+      return 0;
+    }
+
+    if (buttons.length === 0) {
+      console.log('ℹ️ [applyPaletteClass] No buttons found');
+      return 0;
+    }
+
+    const excludedClasses = ['button', 'pressed', 'toggle', 'dynamic'];
+    let processedCount = 0;
+
+    buttons.forEach(button => {
+      const classList = Array.from(button.classList);
+      
+      // 기존 팔레트 클래스 찾기 (DEFAULT_PALETTES 또는 custom만 팔레트로 인식)
+      const oldPalette = classList.find(cls => {
+        if (excludedClasses.includes(cls)) return false;
+        return this.DEFAULT_PALETTES.includes(cls) || cls === 'custom';
+      });
+      
+      // 기존 팔레트 클래스 제거 (다른 팔레트인 경우만)
+      if (oldPalette && oldPalette !== paletteName) {
+        button.classList.remove(oldPalette);
+      }
+      
+      // 새 팔레트 클래스 추가
+      if (!button.classList.contains(paletteName)) {
+        button.classList.add(paletteName);
+        processedCount++;
+      }
+    });
+
+    console.log(`✅ [applyPaletteClass] Applied '${paletteName}' to ${processedCount} buttons`);
+    return processedCount;
+  },
+
+  /**
+   * 버튼에서 팔레트 클래스 제거
+   * @param {NodeList|Array|string} targetButtons - 대상 버튼들
+   * @returns {number} 처리된 버튼 개수
+   */
+  removePaletteClass(targetButtons = null) {
+    const excludedClasses = ['button', 'pressed', 'toggle', 'dynamic'];
+    
+    // 대상 버튼 결정
+    let buttons;
+    if (!targetButtons) {
+      buttons = document.querySelectorAll('.button');
+    } else if (typeof targetButtons === 'string') {
+      buttons = document.querySelectorAll(targetButtons);
+    } else if (targetButtons instanceof NodeList || Array.isArray(targetButtons)) {
+      buttons = targetButtons;
+    } else {
+      console.warn('⚠️ [removePaletteClass] Invalid targetButtons type');
+      return 0;
+    }
+
+    let processedCount = 0;
+
+    buttons.forEach(button => {
+      const classList = Array.from(button.classList);
+      // DEFAULT_PALETTES 또는 custom만 팔레트로 인식
+      const palette = classList.find(cls => {
+        if (excludedClasses.includes(cls)) return false;
+        return this.DEFAULT_PALETTES.includes(cls) || cls === 'custom';
+      });
+      
+      if (palette) {
+        button.classList.remove(palette);
+        processedCount++;
+      }
+    });
+
+    console.log(`✅ [removePaletteClass] Removed palette classes from ${processedCount} buttons`);
+    return processedCount;
+  },
+
+  generateCSS(injectCSS) {
+    // 훅 인스턴스 저장
+    this._injectCSS = injectCSS;
+    const buttons = document.querySelectorAll('.button');
+    const discoveredPalettes = new Set();
+    
+    // 토글 버튼으로 처리할 클래스 목록 (팔레트로 인식하지 않음)
+    const toggleButtonClasses = ['toggle'];
+    
+    buttons.forEach(button => {
+      const classList = Array.from(button.classList);
+      const excludedClasses = ['button', 'pressed', 'dynamic', ...toggleButtonClasses];
+      // DEFAULT_PALETTES 또는 custom만 팔레트로 인식
+      const palette = classList.find(cls => {
+        if (excludedClasses.includes(cls)) return false;
+        return this.DEFAULT_PALETTES.includes(cls) || cls === 'custom';
+      });
+      if (palette) discoveredPalettes.add(palette);
+    });
+    
+    let lightThemeCSS = '', darkThemeCSS = '', selectorsCSS = '';
+    
+    discoveredPalettes.forEach(palette => {
+      const isExisting = ['primary1', 'primary2', 'primary3', 'secondary1', 'secondary2', 'secondary3', 'custom'].includes(palette);
+      
+      [
+        { name: 'default', selector: '', disabled: false },
+        { name: 'pressed', selector: '.pressed:not(.toggle)', disabled: false, isToggle: false },
+        { name: 'pressed', selector: '.pressed.toggle', disabled: false, isToggle: true },
+        { name: 'disabled', selector: '[aria-disabled="true"]', disabled: true, isToggle: false }
+      ].forEach(({name: state, selector: stateSelector, disabled, isToggle = false}) => {
+        const baseSelector = palette === 'primary1' && state === 'default' && !disabled ? `&${stateSelector}` : null;
+        const paletteSelector = `&.${palette}${stateSelector}`;
+        
+        if (baseSelector) {
+          selectorsCSS += `
+    ${baseSelector} {
+      & .background.dynamic {
+        background: var(--${palette}-background-color-${state});
+        outline-color: var(--${palette}-border-color-${state});
+        outline-style: var(--border-style-default);
+        
+        & .content {
+          color: var(--${palette}-content-color-${state});
+        }
+      }
+    }`;
+        }
+        
+        const backgroundProperty = (palette === 'primary3' || palette === 'secondary3') 
+          ? `var(--${palette}-background1-color-${state})` 
+          : `var(--${palette}-background-color-${state})`;
+        
+        selectorsCSS += `
+    ${paletteSelector} {
+      & .background.dynamic {
+        background: ${backgroundProperty};
+        outline-color: var(--${palette}-border-color-${state});
+        ${state === 'default' ? 'outline-style: var(--border-style-default);' : ''}
+        ${state === 'pressed' ? 'outline-style: var(--border-style-pressed); outline-width: var(--border-style-pressed);' : ''}
+        ${state === 'disabled' ? 'outline-style: var(--border-style-disabled);' : ''}
+        
+        & .content {
+          color: var(--${palette}-content-color-${state});
+        }
+      }
+      ${state === 'pressed' && isToggle ? '&.toggle { & .content.icon.pressed { display: var(--content-icon-display-pressed-toggle); } }' : ''}
+      ${disabled ? 'cursor: var(--button-cursor-disabled);' : ''}
+    }`;
+      });
+      
+      if (!isExisting) {
+        const customProperties = [
+          'content-color-default', 'content-color-pressed', 'content-color-disabled',
+          'background-color-default', 'background-color-pressed', 'background-color-disabled',
+          'border-color-default', 'border-color-pressed', 'border-color-disabled'
+        ];
+        
+        customProperties.forEach(property => {
+          lightThemeCSS += `  --${palette}-${property}: var(--custom-${property});\n`;
+          darkThemeCSS += `  --${palette}-${property}: var(--custom-${property});\n`;
+        });
+      }
+    });
+    
+    // 팔레트 클래스가 없어도 toggle 버튼은 작동해야 하므로 기본 toggle CSS 추가
+    const toggleCSS = `
+  /* toggle 버튼 기본 처리 (팔레트 클래스 없이도 작동) */
+  &.toggle.pressed {
+    & .content.icon.pressed {
+      display: var(--content-icon-display-pressed-toggle);
+    }
+  }
+`;
+    
+    const cssContent = `
+/* HTML 클래스 기반 수정자 시스템 - CSS 상속 활용 */
+${lightThemeCSS ? `:root {\n${lightThemeCSS}}` : ''}
+
+${darkThemeCSS ? `.dark {\n${darkThemeCSS}}` : ''}
+
+@layer components {
+  .button {${selectorsCSS}${toggleCSS}
+  }
+}
+`;
+    
+    if (this._injectCSS) {
+      this._injectCSS('palette-system-styles', cssContent);
+    }
+    return discoveredPalettes;
+  }
+};
 
 // ============================================================================
 // 버튼 시스템 상수 (27 프로젝트)
@@ -20,6 +308,222 @@ export const BUTTON_CONSTANTS = {
   get BUTTON_OUTLINE_OFFSET() { return -1 * this.BACKGROUND_OUTLINE_WIDTH; },
   get SELECTED_ICON_SIZE() { return 4 * this.BASE; }
 };
+
+// ============================================================================
+// 토글 버튼 관리자 클래스
+// ============================================================================
+
+class ToggleButtonManager {
+  /**
+   * 훅 인스턴스 저장
+   */
+  _mountComponent = null;
+
+  /**
+   * 초기화
+   * @param {Function} mountComponent - React 컴포넌트 마운트 함수
+   */
+  init(mountComponent) {
+    if (!mountComponent) {
+      console.warn('⚠️ [ToggleButtonManager] mountComponent is not provided');
+      return;
+    }
+    this._mountComponent = mountComponent;
+    console.log('✅ [ToggleButtonManager] Initialized');
+  }
+
+  /**
+   * ToggleIcon을 마운트하는 헬퍼 함수
+   * @param {HTMLElement} iconPressedSpan - 아이콘을 마운트할 span 요소
+   * @param {HTMLElement} button - 버튼 요소 (로깅용)
+   * @returns {boolean} 마운트 성공 여부
+   */
+  mountToggleIcon(iconPressedSpan, button) {
+    if (!this._mountComponent) {
+      console.warn('⚠️ [mountToggleIcon] mountComponent is not initialized');
+      return false;
+    }
+
+    if (iconPressedSpan._reactMounted) {
+      console.log('ℹ️ [mountToggleIcon] Already mounted, skipping:', button);
+      return true;
+    }
+    
+    try {
+      console.log('🔧 [mountToggleIcon] Attempting to mount ToggleIcon to:', iconPressedSpan);
+      const mountResult = this._mountComponent(ToggleIcon, iconPressedSpan);
+      
+      if (mountResult && mountResult.root) {
+        iconPressedSpan._reactMounted = true;
+        console.log('✅ [mountToggleIcon] ToggleIcon mounted successfully for button:', button);
+        return true;
+      } else {
+        console.warn('⚠️ [mountToggleIcon] mountComponent returned null or no root for button:', button);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ [mountToggleIcon] Failed to mount ToggleIcon:', error);
+      console.error('Error stack:', error.stack);
+      return false;
+    }
+  }
+
+  /**
+   * toggle 버튼에 체크 심볼 자동 주입
+   * React 컴포넌트를 사용하여 아이콘을 마운트
+   * @returns {number} 처리된 토글 버튼 개수
+   */
+  setupIconInjection() {
+    if (!this._mountComponent) {
+      console.warn('⚠️ [setupIconInjection] ToggleButtonManager is not initialized');
+      return 0;
+    }
+
+    const allButtons = document.querySelectorAll('.button.toggle');
+    if (allButtons.length === 0) {
+      console.log('ℹ️ [setupIconInjection] No toggle buttons found');
+      return 0;
+    }
+    
+    console.log(`🔍 [setupIconInjection] Found ${allButtons.length} toggle buttons`);
+    
+    let processedCount = 0;
+
+    for (const button of allButtons) {
+      const background = button.querySelector('.background.dynamic') || button.querySelector('.background');
+      if (!background) {
+        console.warn('⚠️ [setupIconInjection] No background found for button:', button);
+        continue;
+      }
+      
+      // .content.icon.pressed가 없으면 생성
+      let iconPressedSpan = background.querySelector('.content.icon.pressed');
+      
+      if (!iconPressedSpan) {
+        iconPressedSpan = document.createElement('span');
+        iconPressedSpan.className = 'content icon pressed';
+        iconPressedSpan.setAttribute('aria-hidden', 'true');
+        
+        // 기존 아이콘 앞에 삽입
+        const iconEl = background.querySelector('.content.icon:not(.pressed)');
+        if (iconEl && iconEl.parentNode) {
+          background.insertBefore(iconPressedSpan, iconEl);
+        } else {
+          // label 앞에 삽입
+          const labelEl = background.querySelector('.content.label');
+          if (labelEl && labelEl.parentNode) {
+            background.insertBefore(iconPressedSpan, labelEl);
+          } else {
+            background.insertBefore(iconPressedSpan, background.firstChild);
+          }
+        }
+      }
+      
+      // React 컴포넌트로 ToggleIcon 마운트
+      if (!iconPressedSpan._reactMounted) {
+        // DOM에 삽입된 후 마운트
+        requestAnimationFrame(() => {
+          try {
+            // DOM에 연결되어 있는지 다시 확인
+            if (!iconPressedSpan.isConnected) {
+              console.warn('⚠️ [setupIconInjection] iconPressedSpan not connected, retrying...');
+              setTimeout(() => {
+                if (iconPressedSpan.isConnected && !iconPressedSpan._reactMounted) {
+                  if (this.mountToggleIcon(iconPressedSpan, button)) {
+                    processedCount++;
+                  }
+                }
+              }, 16);
+              return;
+            }
+            
+            if (this.mountToggleIcon(iconPressedSpan, button)) {
+              processedCount++;
+            }
+          } catch (error) {
+            console.error('❌ [setupIconInjection] Failed to mount ToggleIcon:', error);
+            console.error('Error stack:', error.stack);
+          }
+        });
+      } else {
+        // 이미 마운트되어 있으면 확인만
+        // React 렌더링이 비동기이므로 약간의 지연 후 확인
+        requestAnimationFrame(() => {
+          const svg = iconPressedSpan.querySelector('svg');
+          if (!svg) {
+            // SVG가 없으면 다시 마운트 (React 렌더링이 완료되지 않았을 수 있음)
+            console.warn('⚠️ [setupIconInjection] ToggleIcon mounted but SVG not found, remounting...');
+            iconPressedSpan._reactMounted = false;
+            requestAnimationFrame(() => {
+              if (this.mountToggleIcon(iconPressedSpan, button)) {
+                processedCount++;
+              }
+            });
+          } else {
+            processedCount++;
+          }
+        });
+      }
+      
+      // data 속성 설정
+      button.dataset.isToggleButton = 'true';
+      const isInitiallyPressed = button.classList.contains('pressed');
+      button.setAttribute('aria-pressed', isInitiallyPressed ? 'true' : 'false');
+    }
+
+    console.log(`✅ [setupIconInjection] Processed ${processedCount} toggle buttons`);
+    return processedCount;
+  }
+
+  /**
+   * MutationObserver로 동적 버튼 감지
+   * 버튼이 추가되면 자동으로 토글 아이콘 주입
+   */
+  watchDynamicButtons() {
+    if (!this._mountComponent) {
+      console.warn('⚠️ [watchDynamicButtons] ToggleButtonManager is not initialized');
+      return;
+    }
+
+    // 초기 버튼 처리
+    const initialButtons = document.querySelectorAll('button');
+    if (initialButtons.length > 0) {
+      requestAnimationFrame(() => {
+        this.setupIconInjection();
+      });
+    }
+    
+    const observer = new MutationObserver((mutations) => {
+      let needsUpdate = false;
+      
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.tagName === 'BUTTON' || node.querySelector?.('button')) {
+            needsUpdate = true;
+          }
+        });
+      });
+
+      if (needsUpdate) {
+        requestAnimationFrame(() => {
+          // 새로 추가된 toggle 버튼에도 아이콘 주입
+          this.setupIconInjection();
+        });
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    console.log('👀 [watchDynamicButtons] Watching for dynamic toggle buttons');
+  }
+}
+
+// ============================================================================
+// 버튼 스타일 생성기
+// ============================================================================
 
 export const ButtonStyleGenerator = {
   /**
@@ -49,9 +553,25 @@ export const ButtonStyleGenerator = {
   _mountComponent: null,
 
   /**
-   * 토글 버튼 관리자
+   * 토글 버튼 관리자 인스턴스
    */
-  ToggleButtonManager: null,
+  _toggleButtonManager: null,
+
+  /**
+   * Observer 인스턴스 저장 (정리용)
+   */
+  _observers: null,
+  _intervalId: null,
+  
+  /**
+   * 토글 버튼 관리자 가져오기
+   */
+  get ToggleButtonManager() {
+    if (!this._toggleButtonManager) {
+      this._toggleButtonManager = new ToggleButtonManager();
+    }
+    return this._toggleButtonManager;
+  },
 
   /**
    * 27 프로젝트 방식: 동적 스타일 적용 (모든 버튼의 아이콘 배치 및 스케일링)
@@ -67,6 +587,12 @@ export const ButtonStyleGenerator = {
       if (!background) continue;
 
       const rect = button.getBoundingClientRect();
+      
+      // 버튼이 아직 렌더링되지 않았거나 크기가 0이면 스킵
+      if (rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+      
       const minSide = Math.min(rect.width, rect.height);
 
       const buttonPadding = minSide * this.CONSTANTS.BUTTON_PADDING;
@@ -287,7 +813,7 @@ export const ButtonStyleGenerator = {
       /* ========================================
          🎯 버튼 컴포넌트 시스템 (JavaScript 연동)
          ======================================== */
-      /* 기본 버튼 스타일은 index.css에 정의됨 (27 구조) */
+      /* 기본 버튼 스타일은 App.css에 정의됨 (27 구조) */
       /* 여기서는 동적 스타일만 추가 */
 
       /* 세로 배치 */
@@ -309,84 +835,208 @@ export const ButtonStyleGenerator = {
 
 
   /**
-   * ToggleIcon을 마운트하는 헬퍼 함수 (위임)
+   * ToggleIcon을 마운트하는 헬퍼 함수
    * @param {HTMLElement} iconPressedSpan - 아이콘을 마운트할 span 요소
    * @param {HTMLElement} button - 버튼 요소 (로깅용)
    */
   mountToggleIcon(iconPressedSpan, button) {
-    if (this.ToggleButtonManager) {
-      return this.ToggleButtonManager.mountToggleIcon(iconPressedSpan, button);
-    }
-    console.warn('⚠️ [mountToggleIcon] ToggleButtonManager is not initialized');
-    return false;
+    return this.ToggleButtonManager.mountToggleIcon(iconPressedSpan, button);
   },
 
   /**
-   * toggle 버튼에 체크 심볼 자동 주입 (위임)
+   * toggle 버튼에 체크 심볼 자동 주입
    */
   setupIconInjection() {
-    if (this.ToggleButtonManager) {
-      return this.ToggleButtonManager.setupIconInjection();
-          }
-    console.warn('⚠️ [setupIconInjection] ToggleButtonManager is not initialized');
-    return 0;
+    return this.ToggleButtonManager.setupIconInjection();
   },
 
   /**
    * MutationObserver로 동적 버튼 감지
    * 버튼이 추가되면 자동으로 토글 아이콘 주입 및 스타일 적용
    */
-  watchDynamicButtons() {
-    // 초기 버튼이 있으면 즉시 처리
-    const initialButtons = document.querySelectorAll('button');
-    if (initialButtons.length > 0) {
-      requestAnimationFrame(() => {
-        if (this.ToggleButtonManager) {
-          this.ToggleButtonManager.setupIconInjection();
-        }
-        this.calculateButtonSizes();
-        this.applyDynamicStyles();
-        // 초기 버튼이 있으면 팔레트 CSS도 생성
-        if (this._injectCSS) {
-          this.PaletteManager.generateCSS(this._injectCSS);
-        }
-      });
-    }
+  /**
+   * 버튼 스타일 강제 재적용 (더 견고한 방식)
+   * 여러 프레임에 걸쳐 레이아웃 완료를 보장
+   */
+  _forceApplyStyles(maxRetries = 3, delay = 100) {
+    let retryCount = 0;
     
-    const observer = new MutationObserver((mutations) => {
+    const apply = () => {
+      const buttons = document.querySelectorAll('.button');
+      if (buttons.length === 0) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(apply, delay);
+        }
+        return;
+      }
+
+      // 버튼이 실제로 렌더링되었는지 확인 (크기가 0이 아닌지)
+      const renderedButtons = Array.from(buttons).filter(btn => {
+        const rect = btn.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+
+      if (renderedButtons.length === 0 && retryCount < maxRetries) {
+        retryCount++;
+        setTimeout(apply, delay);
+        return;
+      }
+
+      // 여러 프레임에 걸쳐 적용하여 레이아웃 완료 보장
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // 1. 팔레트 클래스 자동 할당
+          this.PaletteManager.assignDefaultPalettes();
+          // 2. 토글 아이콘 주입
+          if (this.ToggleButtonManager && this._mountComponent) {
+            this.ToggleButtonManager.setupIconInjection();
+          }
+          // 3. 크기 계산 및 스타일 적용
+          this.calculateButtonSizes();
+          this.applyDynamicStyles();
+          // 4. 팔레트 CSS 생성
+          if (this._injectCSS) {
+            this.PaletteManager.generateCSS(this._injectCSS);
+          }
+        });
+      });
+    };
+
+    apply();
+  },
+
+  watchDynamicButtons() {
+    // 초기 버튼 처리 (더 견고한 방식)
+    this._forceApplyStyles();
+
+    // MutationObserver: DOM 변경 감지
+    const mutationObserver = new MutationObserver((mutations) => {
       let needsUpdate = false;
+      const newButtons = [];
       
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
-          if (node.tagName === 'BUTTON' || node.querySelector?.('button')) {
-            needsUpdate = true;
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // 직접 추가된 버튼
+            if (node.classList?.contains('button')) {
+              needsUpdate = true;
+              newButtons.push(node);
+            }
+            // 자식 요소 중 버튼
+            const childButtons = node.querySelectorAll?.('.button');
+            if (childButtons && childButtons.length > 0) {
+              needsUpdate = true;
+              childButtons.forEach(btn => newButtons.push(btn));
+            }
           }
         });
       });
 
       if (needsUpdate) {
+        // 여러 프레임에 걸쳐 적용
         requestAnimationFrame(() => {
-          // 새로 추가된 toggle 버튼에도 아이콘 주입
-          if (this.ToggleButtonManager) {
-          this.ToggleButtonManager.setupIconInjection();
-        }
-          // 새로 추가된 버튼의 크기 계산 및 스타일 적용
-          this.calculateButtonSizes();
-          this.applyDynamicStyles();
-          // 새로 추가된 버튼의 팔레트도 재생성
-          if (this._injectCSS) {
-            this.PaletteManager.generateCSS(this._injectCSS);
-          }
+          requestAnimationFrame(() => {
+            // 1. 새로 추가된 버튼에 팔레트 클래스 자동 할당
+            if (newButtons.length > 0) {
+              this.PaletteManager.assignDefaultPalettes(newButtons);
+            } else {
+              this.PaletteManager.assignDefaultPalettes();
+            }
+            // 2. 새로 추가된 toggle 버튼에도 아이콘 주입
+            if (this._mountComponent) {
+              this.ToggleButtonManager.setupIconInjection();
+            }
+            // 3. 새로 추가된 버튼의 크기 계산 및 스타일 적용
+            this.calculateButtonSizes();
+            this.applyDynamicStyles();
+            // 4. 새로 추가된 버튼의 팔레트 CSS 재생성
+            if (this._injectCSS) {
+              this.PaletteManager.generateCSS(this._injectCSS);
+            }
+          });
         });
       }
     });
 
-    observer.observe(document.body, {
+    mutationObserver.observe(document.body, {
       childList: true,
       subtree: true
     });
 
-    return observer;
+    // ResizeObserver: 버튼 크기 변경 감지 (이미지 로드 등으로 인한 크기 변경)
+    const resizeObserver = new ResizeObserver((entries) => {
+      let needsUpdate = false;
+      
+      entries.forEach((entry) => {
+        const target = entry.target;
+        if (target.classList?.contains('button') || target.closest?.('.button')) {
+          needsUpdate = true;
+        }
+      });
+
+      if (needsUpdate) {
+        requestAnimationFrame(() => {
+          this.calculateButtonSizes();
+          this.applyDynamicStyles();
+        });
+      }
+    });
+
+    // 모든 버튼 관찰
+    const observeButtons = () => {
+      const buttons = document.querySelectorAll('.button');
+      buttons.forEach(btn => {
+        resizeObserver.observe(btn);
+        // background.dynamic도 관찰 (내부 요소 크기 변경 감지)
+        const background = btn.querySelector('.background.dynamic');
+        if (background) {
+          resizeObserver.observe(background);
+        }
+      });
+    };
+
+    // 초기 관찰 설정
+    observeButtons();
+
+    // MutationObserver와 연동하여 새 버튼도 관찰
+    const buttonMutationObserver = new MutationObserver(() => {
+      observeButtons();
+    });
+
+    buttonMutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // 주기적 체크 (debounced, 최후의 수단)
+    let checkTimeout = null;
+    const periodicCheck = () => {
+      if (checkTimeout) clearTimeout(checkTimeout);
+      checkTimeout = setTimeout(() => {
+        const buttons = document.querySelectorAll('.button');
+        const unprocessedButtons = Array.from(buttons).filter(btn => {
+          const rect = btn.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 && !this._styleCache.has(btn);
+        });
+
+        if (unprocessedButtons.length > 0) {
+          console.log(`🔄 [watchDynamicButtons] Periodic check found ${unprocessedButtons.length} unprocessed buttons, reapplying styles`);
+          this._forceApplyStyles();
+        }
+      }, 1000); // 1초마다 체크
+    };
+
+    // 주기적 체크 시작
+    periodicCheck();
+    const intervalId = setInterval(periodicCheck, 2000); // 2초마다 체크
+
+    return {
+      mutationObserver,
+      resizeObserver,
+      buttonMutationObserver,
+      intervalId
+    };
   },
 
   /**
@@ -410,9 +1060,6 @@ export const ButtonStyleGenerator = {
     }
     
     // ToggleButtonManager 초기화
-    if (!this.ToggleButtonManager) {
-      this.ToggleButtonManager = getToggleButtonManager();
-    }
     if (this._mountComponent) {
       this.ToggleButtonManager.init(this._mountComponent);
     } else {
@@ -423,9 +1070,14 @@ export const ButtonStyleGenerator = {
     console.log('  ├─ 1단계: 버튼 템플릿 CSS 생성');
     this.generateButtonTemplate();
     
-    // 2단계: 팔레트 CSS 생성 (27 프로젝트: 3단계)
+    // 2단계: 팔레트 클래스 자동 할당 (버튼에 기본 팔레트 클래스 부여)
+    console.log('  ├─ 2단계: 팔레트 클래스 자동 할당');
+    const assignedCount = this.PaletteManager.assignDefaultPalettes();
+    console.log(`  ✅ 팔레트 클래스 할당 완료 (${assignedCount}개 버튼)`);
+    
+    // 3단계: 팔레트 CSS 생성 (27 프로젝트: 3단계)
     // 주의: 버튼이 없으면 빈 CSS가 생성되지만, watchDynamicButtons에서 다시 생성됨
-    console.log('  ├─ 2단계: 팔레트 CSS 생성');
+    console.log('  ├─ 3단계: 팔레트 CSS 생성');
     if (!this._injectCSS) {
       console.warn('⚠️ [init] injectCSS is not provided, skipping palette CSS generation');
     } else {
@@ -433,18 +1085,23 @@ export const ButtonStyleGenerator = {
     console.log(`  ✅ 팔레트 CSS 생성 완료 (${discoveredPalettes.size}개 팔레트 발견)`);
     }
     
-    // 3단계: 동적 스타일 적용 (27 프로젝트: 4단계)
-    console.log('  ├─ 3단계: 동적 스타일 적용');
-    this.applyDynamicStyles();
-    console.log('  ✅ 동적 스타일 적용 완료');
+    // 4단계: 동적 스타일 적용 (27 프로젝트: 4단계)
+    // 여러 프레임에 걸쳐 적용하여 레이아웃 완료 보장
+    console.log('  ├─ 4단계: 동적 스타일 적용');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.applyDynamicStyles();
+        console.log('  ✅ 동적 스타일 적용 완료');
+        
+        // 5단계: 버튼 크기 계산 (coffee-kiosk 전용 기능)
+        console.log('  ├─ 5단계: 버튼 크기 변수 계산');
+        this.calculateButtonSizes();
+        console.log('  ✅ 버튼 크기 계산 완료');
+      });
+    });
     
-    // 4단계: 버튼 크기 계산 (coffee-kiosk 전용 기능)
-    console.log('  ├─ 4단계: 버튼 크기 변수 계산');
-    this.calculateButtonSizes();
-    console.log('  ✅ 버튼 크기 계산 완료');
-    
-    // 5단계: 이벤트 리스너 및 자동 업데이트 설정
-    console.log('  ├─ 5단계: 이벤트 리스너 및 자동 업데이트 설정');
+    // 6단계: 이벤트 리스너 및 자동 업데이트 설정
+    console.log('  ├─ 6단계: 이벤트 리스너 및 자동 업데이트 설정');
     
     // 리사이즈 시 재계산 (쓰로틀링)
     let resizeScheduled = false;
@@ -460,15 +1117,36 @@ export const ButtonStyleGenerator = {
     
     // 동적 버튼 감지 (27 프로젝트: 5단계 setupUpdateManager와 유사)
     // 토글 버튼 아이콘 감지는 ToggleButtonManager에서 처리
-    if (this.ToggleButtonManager) {
+    if (this._mountComponent) {
       this.ToggleButtonManager.watchDynamicButtons();
     }
     // 일반 버튼 스타일링 감지는 여기서 처리
-    this.watchDynamicButtons();
+    this._observers = this.watchDynamicButtons();
     console.log('  ✅ 이벤트 리스너 및 자동 업데이트 설정 완료');
     
     const initEnd = performance.now();
     console.log(`🎉 [ButtonStyleGenerator] 강철 스타일 적용 완료 (총 ${(initEnd - initStart).toFixed(2)}ms)`);
+  },
+
+  /**
+   * Observer 및 리스너 정리
+   */
+  cleanup() {
+    if (this._observers) {
+      if (this._observers.mutationObserver) {
+        this._observers.mutationObserver.disconnect();
+      }
+      if (this._observers.resizeObserver) {
+        this._observers.resizeObserver.disconnect();
+      }
+      if (this._observers.buttonMutationObserver) {
+        this._observers.buttonMutationObserver.disconnect();
+      }
+      if (this._observers.intervalId) {
+        clearInterval(this._observers.intervalId);
+      }
+      this._observers = null;
+    }
   }
 };
 

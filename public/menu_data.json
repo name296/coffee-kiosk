@@ -22,34 +22,22 @@
         },
         {
             "cate_id": 5,
-            "cate_name": "차"
-        },
-        {
-            "cate_id": 6,
-            "cate_name": "차"
-        },
-        {
-            "cate_id": 7,
-            "cate_name": "차"
-        },
-        {
-            "cate_id": 8,
             "cate_name": "주스"
         },
         {
-            "cate_id": 9,
+            "cate_id": 6,
             "cate_name": "라떼"
         },
         {
-            "cate_id": 10,
+            "cate_id": 7,
             "cate_name": "버블티"
         },
         {
-            "cate_id": 11,
+            "cate_id": 8,
             "cate_name": "에이드"
         },
         {
-            "cate_id": 12,
+            "cate_id": 9,
             "cate_name": "기타"
         }
     ],

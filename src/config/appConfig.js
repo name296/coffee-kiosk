@@ -43,6 +43,7 @@ export const PAYMENT_STEPS = {
 export const PAGINATION_CONFIG = {
   ITEMS_PER_PAGE_NORMAL: 9,
   ITEMS_PER_PAGE_LOW: 3,
+  CATEGORY_ITEMS_PER_PAGE: 7, // 카테고리 버튼 페이지당 개수
 };
 
 // 웹뷰 명령어

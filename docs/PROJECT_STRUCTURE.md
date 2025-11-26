@@ -64,7 +64,6 @@ coffee-kiosk/
 │   ├── utils/                      # 유틸리티 함수
 │   │   ├── browserCompatibility.js # ✅ 브라우저 호환성 유틸
 │   │   ├── dataLoader.js           # ✅ 데이터 로딩 유틸
-│   │   ├── menuUtils.js            # 메뉴 관련 유틸
 │   │   ├── numberUtils.js          # 숫자 관련 유틸
 │   │   ├── pathUtils.js            # 경로 유틸
 │   │   ├── buttonStyleGenerator.js
@@ -74,7 +73,7 @@ coffee-kiosk/
 │   │
 │   ├── App.js                      # ✅ ErrorBoundary 추가
 │   ├── index.js                    # 진입점
-│   └── index.css                   # 스타일
+│   └── App.css                     # 스타일
 │
 └── 문서/
     ├── COMPATIBILITY_GUIDE.md      # 브라우저 호환성 가이드
