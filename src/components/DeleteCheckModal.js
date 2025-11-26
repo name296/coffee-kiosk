@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useCallback } from "react";
 import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS } from "../hooks";
@@ -20,7 +20,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
     // 모달이 열릴 때만 포커스된 요소의 TTS 재생
     useActiveElementTTS(handleText, 500, isDeleteCheckModal);
 
-    const handleTouchCheckDelete = (id)=>{
+    const handleTouchCheckDelete = useCallback((id) => {
         if (quantities[id] !== 1) {
             quantities[id] = 0;
         } else {
@@ -28,7 +28,20 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
         }
         setisDeleteCheckModal(false);
         setCurrentPage("third");
-    }
+    }, [quantities, handleDecrease, setisDeleteCheckModal, setCurrentPage]);
+
+    // 모달 버튼 핸들러들 (메모이제이션)
+    // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+    const handleCancelPress = useCallback((e) => {
+        e.preventDefault();
+        setisDeleteCheckModal(false);
+        readCurrentPage();
+    }, [setisDeleteCheckModal, readCurrentPage]);
+
+    const handleConfirmPress = useCallback((e) => {
+        e.preventDefault();
+        handleTouchCheckDelete(id);
+    }, [handleTouchCheckDelete, id]);
 
     if (isDeleteCheckModal) {
         return (
@@ -81,14 +94,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                     <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="return-modal-buttons">
                         <button data-tts-text="취소, "
                             className="button return-btn-cancel"
-                            onClick={(e) => { e.preventDefault(); setisDeleteCheckModal(false);readCurrentPage();}}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleText('실행, ', false);
-                                setTimeout(() => { setisDeleteCheckModal(false); readCurrentPage(); },300);
-                              }
-                            }}
+                            onClick={handleCancelPress}
                         >
                             <div className="background dynamic">
                               <span className="content label">취소</span>
@@ -96,14 +102,7 @@ const DeleteCheckModal = ({ handleDecrease, id, quantities, currentItems }) => {
                         </button>
                         <button data-tts-text="확인, "
                             className="button return-btn-confirm"
-                            onClick={(e) => { e.preventDefault(); handleTouchCheckDelete(id)}}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleText('실행, ', false);
-                                setTimeout(() => { handleTouchCheckDelete(id);},300);
-                                }
-                            }}
+                            onClick={handleConfirmPress}
                         >
                             <div className="background dynamic">
                               <span className="content label">확인</span>

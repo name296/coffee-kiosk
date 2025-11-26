@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useCallback } from "react";
 import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS } from "../hooks";
@@ -26,6 +26,20 @@ const ReturnModal = ({ }) => {
   
   // 모달이 열릴 때만 포커스된 요소의 TTS 재생
   useActiveElementTTS(handleText, 500, isReturnModal);
+
+  // 모달 버튼 핸들러들 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleCancelPress = useCallback((e) => {
+    e.preventDefault();
+    setisReturnModal(false);
+    readCurrentPage();
+  }, [setisReturnModal, readCurrentPage]);
+
+  const handleConfirmPress = useCallback((e) => {
+    e.preventDefault();
+    setCurrentPage("first");
+    setisReturnModal(false);
+  }, [setCurrentPage, setisReturnModal]);
 
   if (isReturnModal) {
     return (
@@ -75,19 +89,7 @@ const ReturnModal = ({ }) => {
           <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="return-modal-buttons">
             <button data-tts-text="취소, "
               className="button return-btn-cancel"
-              onClick={(e) => {
-                e.preventDefault();
-                setisReturnModal(false); readCurrentPage();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => {
-                    setisReturnModal(false); readCurrentPage();
-                  }, 300);
-                }
-              }}
+              onClick={handleCancelPress}
             >
               <div className="background dynamic">
                 <span className="content label">취소</span>
@@ -95,21 +97,7 @@ const ReturnModal = ({ }) => {
             </button>
             <button data-tts-text="확인, "
               className="button return-btn-confirm"
-              onClick={(e) => {
-                e.preventDefault();
-                setCurrentPage("first");
-                setisReturnModal(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => {
-                    setCurrentPage("first");
-                    setisReturnModal(false);
-                  }, 300);
-                }
-              }}
+              onClick={handleConfirmPress}
             >
               <div className="background dynamic">
                 <span className="content label">확인</span>

@@ -134,16 +134,45 @@ const SecondPage = memo(() => {
     handleTabToggle,
     '선택, '
   );
+
+  // 탭 네비게이션 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleTabNavPress = useCallback((e, direction) => {
+    e.preventDefault();
+    e.target.focus();
+    if (direction === 'prev') {
+      handlePrevious();
+    } else {
+      handleNext();
+    }
+  }, [handlePrevious, handleNext]);
+
+  // 페이지네이션 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handlePaginationPress = useCallback((e, direction) => {
+    e.preventDefault();
+    e.target.focus();
+    if (direction === 'prev') {
+      handlePrevPage();
+    } else {
+      handleNextPage();
+    }
+  }, [handlePrevPage, handleNextPage]);
+
+  // 메뉴 아이템 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleMenuItemPress = useCallback((e, id) => {
+    e.preventDefault();
+    e.target.focus();
+    handleTouchEndWrapper(e, id);
+  }, [handleTouchEndWrapper]);
   return (
     <div className="main second">
       <div className="menu-tabs" ref={sections.top} data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 버튼 ${isLow ? '일곱' : '열'} 개,`}>
             {isLow && (
               <button data-tts-text="이전"
                 className={`button toggle tab-pagination tab-button-prev`}
-                onClick={(e) => { 
-                  e.preventDefault();
-                  e.target.focus(); 
-                  handlePrevious(); }}
+                onClick={(e) => handleTabNavPress(e, 'prev')}
               >
                 <div className="background dynamic">
                   <span className="content label">&lt;&nbsp; 이전</span>
@@ -159,19 +188,7 @@ const SecondPage = memo(() => {
                     }`}
                   data-tts-text={`주스, ${selectedTab === "주스" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { 
-                    e.preventDefault();
-                    // 같은 그룹 내 다른 버튼의 pressed 제거
-                    const group = e.target.closest('.menu-tabs');
-                    if (group) {
-                      group.querySelectorAll('.button.toggle').forEach(btn => {
-                        if (btn !== e.target.closest('.button')) {
-                          btn.classList.remove('pressed');
-                        }
-                      });
-                    }
-                    setSelectedTab("주스");
-                  }}
+                  onClick={(e) => handleButtonClick(e, "주스")}
                 >
                   <div className="background dynamic">
                     <span className="content label">주스</span>
@@ -183,19 +200,7 @@ const SecondPage = memo(() => {
                     }`}
                   data-tts-text={`라떼, ${selectedTab === "라떼" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { 
-                    e.preventDefault();
-                    // 같은 그룹 내 다른 버튼의 pressed 제거
-                    const group = e.target.closest('.menu-tabs');
-                    if (group) {
-                      group.querySelectorAll('.button.toggle').forEach(btn => {
-                        if (btn !== e.target.closest('.button')) {
-                          btn.classList.remove('pressed');
-                        }
-                      });
-                    }
-                    setSelectedTab("라떼");
-                  }}
+                  onClick={(e) => handleButtonClick(e, "라떼")}
                 >
                   <div className="background dynamic">
                     <span className="content label">라떼</span>
@@ -207,19 +212,7 @@ const SecondPage = memo(() => {
                     }`}
                   data-tts-text={`버블티, ${selectedTab === "버블티" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { 
-                    e.preventDefault();
-                    // 같은 그룹 내 다른 버튼의 pressed 제거
-                    const group = e.target.closest('.menu-tabs');
-                    if (group) {
-                      group.querySelectorAll('.button.toggle').forEach(btn => {
-                        if (btn !== e.target.closest('.button')) {
-                          btn.classList.remove('pressed');
-                        }
-                      });
-                    }
-                    setSelectedTab("버블티");
-                  }}
+                  onClick={(e) => handleButtonClick(e, "버블티")}
                 >
                   <div className="background dynamic">
                     <span className="content label">버블티</span>
@@ -231,19 +224,7 @@ const SecondPage = memo(() => {
                     }`}
                   data-tts-text={`에이드, ${selectedTab === "에이드" ? "선택됨, " : "선택가능, "
                     }`}
-                  onClick={(e) => { 
-                    e.preventDefault();
-                    // 같은 그룹 내 다른 버튼의 pressed 제거
-                    const group = e.target.closest('.menu-tabs');
-                    if (group) {
-                      group.querySelectorAll('.button.toggle').forEach(btn => {
-                        if (btn !== e.target.closest('.button')) {
-                          btn.classList.remove('pressed');
-                        }
-                      });
-                    }
-                    setSelectedTab("에이드");
-                  }}
+                  onClick={(e) => handleButtonClick(e, "에이드")}
                 >
                   <div className="background dynamic">
                     <span className="content label">에이드</span>
@@ -329,7 +310,7 @@ const SecondPage = memo(() => {
             {isLow && (
               <button data-tts-text="다음"
                 className={`button toggle tab-pagination tab-button-prev`}
-                onClick={(e) => {e.preventDefault(); e.target.focus(); handleNext(); }}
+                onClick={(e) => handleTabNavPress(e, 'next')}
               >
                 <div className="background dynamic">
                   <span className="content label">다음 &nbsp;&gt;</span>
@@ -408,11 +389,7 @@ const SecondPage = memo(() => {
               data-tts-text={item.id === DISABLED_MENU_ID ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
               className={`button menu-item ${item.id === DISABLED_MENU_ID ? 'disabled' : ''}`}
               aria-disabled={item.id === DISABLED_MENU_ID}
-              onClick={(e) => {
-                e.preventDefault();
-                e.target.focus();
-                handleTouchEndWrapper(e, item.id);
-              }}
+              onClick={(e) => handleMenuItemPress(e, item.id)}
               key={item.id}
             >
               <div className="background dynamic">
@@ -436,7 +413,7 @@ const SecondPage = memo(() => {
         data-tts-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
       >
           <button data-tts-text="이전, " className="button"
-            onClick={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
+            onClick={(e) => handlePaginationPress(e, 'prev')}
           >
             <div className="background dynamic">
               <span className="content label">&lt;&nbsp; 이전</span>
@@ -453,7 +430,7 @@ const SecondPage = memo(() => {
               {totalPages === 0 ? 1 : totalPages}
             </span>
           </span>
-          <button data-tts-text="다음," className="button" onClick={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+          <button data-tts-text="다음," className="button" onClick={(e) => handlePaginationPress(e, 'next')}
           >
             <div className="background dynamic">
               <span className="content label">다음 &nbsp;&gt;</span>

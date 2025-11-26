@@ -11,11 +11,11 @@ import { useCSSInjector } from "./hooks/useCSSInjector";
 import { useReactMount } from "./hooks/useReactMount";
 import { AppProvider, AppContext } from "./context";
 import { getAssetPath } from "./utils/pathUtils";
-import FirstPage from "./pages/FirstPage";
-import SecondPage from "./pages/SecondPage";
-import ThirdPage from "./pages/ThirdPage";
-import ForthPage from "./pages/ForthPage";
-import { Layout } from "./layouts/Layouts";
+import FirstPage from "./layout/FirstPage";
+import SecondPage from "./layout/SecondPage";
+import ThirdPage from "./layout/ThirdPage";
+import ForthPage from "./layout/ForthPage";
+import { Layout } from "./layout/Layouts";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { SCREEN_CONFIG, TIMER_CONFIG } from "./config/appConfig";
 
@@ -156,23 +156,23 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <AppProvider>
-        <audio
-          id="audioPlayer"
-          src=""
-          controls
-          className="hidden-audio"
+    <AppProvider>
+      <audio
+        id="audioPlayer"
+        src=""
+        controls
+        className="hidden-audio"
         />
-        <audio
-          id="beapSound"
-          src={getAssetPath("./public/sound/beap_sound2.mp3")}
-          controls
-          className="hidden-audio"
+      <audio
+        id="beapSound"
+        src={getAssetPath("./public/sound/beap_sound2.mp3")}
+        controls
+        className="hidden-audio"
         />
         <ErrorBoundary>
-          <AppContent />
+      <AppContent />
         </ErrorBoundary>
-      </AppProvider>
+    </AppProvider>
     </ErrorBoundary>
   );
 };

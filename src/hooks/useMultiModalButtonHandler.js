@@ -192,8 +192,8 @@ export const useMultiModalButtonHandler = (
     const button = e.target.closest('.button');
     if (!button || isButtonDisabled(button)) {
       if (button && isButtonDisabled(button)) {
-        e.preventDefault();
-        e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       }
       return;
     }
@@ -210,7 +210,7 @@ export const useMultiModalButtonHandler = (
     // 비프음 재생 (마우스 또는 터치로 클릭된 경우만)
     if (!isKeyboardEvent) {
       playBeepSound();
-    }
+      }
     
     button.setAttribute('data-react-handler', 'true');
     
@@ -226,10 +226,10 @@ export const useMultiModalButtonHandler = (
     
     // 토글 버튼 처리 (React 이벤트에서 먼저 처리)
     if (isToggleButton(button)) {
-      // 토글 버튼 그룹 스위칭 처리
+    // 토글 버튼 그룹 스위칭 처리
       if (groupSelectorOpt) {
         const group = button.closest(groupSelectorOpt);
-        if (group) {
+      if (group) {
           // 같은 그룹 내 다른 버튼의 pressed 상태 제거
           clearOtherButtonsInGroup(button, group);
         }
@@ -269,7 +269,7 @@ export const useMultiModalButtonHandler = (
     const handleResize = () => {
       if (resizeScheduled) return;
       resizeScheduled = true;
-      requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
         if (window.ButtonStyleGenerator) {
           window.ButtonStyleGenerator.calculateButtonSizes();
         }
@@ -308,7 +308,7 @@ export const useMultiModalButtonHandler = (
         const target = event.target;
         if (target && (target.tagName === 'BUTTON' || target.getAttribute('role') === 'button') && event.detail !== 0) {
           playBeepSound();
-        }
+              }
         
         // TTS 재생 (모든 입력: 마우스, 터치, 키보드에 적용)
         // 버튼에 data-tts-text가 있으면 그 텍스트를 읽고, 없으면 "실행, "을 폴백값으로 사용
@@ -324,23 +324,25 @@ export const useMultiModalButtonHandler = (
           }
         });
         return;
-      }
-      
+    }
+    
       // React의 onClick이 실행되지 않은 경우 - 직접 입력 차단
       // React 이벤트 시스템을 거치지 않은 직접 입력은 무시
+      // 단, 터치 이벤트의 경우 브라우저가 자동으로 click 이벤트를 발생시키므로
+      // touchend는 무시하고 click 이벤트만 처리
       event.preventDefault();
       event.stopPropagation();
       console.warn('⚠️ [handleClick] Direct input detected without React handler. Event blocked.');
     };
     
     // bubble phase에서 실행하여 React의 onClick이 먼저 실행되도록 함
+    // 모바일에서 터치 이벤트는 브라우저가 자동으로 click 이벤트로 변환하므로
+    // touchend는 처리하지 않고 click만 처리
     document.addEventListener('click', handleClick, false);
-    document.addEventListener('touchend', handleClick, false);
     handlersRef.current.clickHandler = handleClick;
     
     return () => {
       document.removeEventListener('click', handleClick, false);
-      document.removeEventListener('touchend', handleClick, false);
     };
   }, [
     enableGlobalHandlers,
@@ -749,7 +751,7 @@ export const useMultiModalButtonHandler = (
           if (finalHandleText) finalHandleText('뒤로, ');
           if (currentPage === 'first' || currentPage === '') {
             return;
-          }
+    }
           setTimeout(() => {
             if (currentPage === 'forth' && [1, 2].includes(isCreditPayContent)) {
               if (setisCreditPayContent) setisCreditPayContent(0);
@@ -837,7 +839,7 @@ export const useMultiModalButtonHandler = (
     const handleMouseLeave = (event) => {
       if (event.target?.closest) {
         handlePressedState(event, 'remove');
-      }
+    }
     };
     const handleTouchStart = (event) => handlePressedState(event, 'add');
     const handleTouchEnd = (event) => {

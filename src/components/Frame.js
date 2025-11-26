@@ -2,7 +2,7 @@
 // 프레임 컴포넌트 (상단/하단 네비게이션)
 // ============================================================================
 
-import React, { useContext, useEffect, useState, useMemo, memo } from "react";
+import React, { useContext, useEffect, useState, useMemo, useCallback, memo } from "react";
 import { AppContext } from "../context";
 import { ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon } from "../components/icons";
 import { useTextHandler } from '../assets/tts';
@@ -221,6 +221,34 @@ export const Summary = memo(() => {
     else setisDisabledBtn(true);
   }, [totalCount]);
 
+  // 요약 버튼 핸들러들 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleResetPress = useCallback((e) => {
+    e.preventDefault();
+    setisResetModal(true);
+  }, [setisResetModal]);
+
+  const handleOrderPress = useCallback((e) => {
+    e.preventDefault();
+    e.target.focus();
+    if (totalCount > 0) {
+      setCurrentPage("third");
+    }
+  }, [totalCount, setCurrentPage]);
+
+  const handleAddPress = useCallback((e) => {
+    e.preventDefault();
+    setCurrentPage("second");
+  }, [setCurrentPage]);
+
+  const handlePayPress = useCallback((e) => {
+    e.preventDefault();
+    e.target.focus();
+    if (totalCount > 0) {
+      setCurrentPage("forth");
+    }
+  }, [totalCount, setCurrentPage]);
+
   if (path !== "second" && path !== "third") {
     return null;
   }
@@ -246,17 +274,7 @@ export const Summary = memo(() => {
               <button
                 data-tts-text="초기화,"
                 className="button summary-btn"
-                onClick={(e) => { 
-                  e.preventDefault();
-                  setisResetModal(true);
-                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {setisResetModal(true);}, 100);
-                  }
-                }}
+                onClick={handleResetPress}
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
@@ -271,27 +289,7 @@ export const Summary = memo(() => {
                   isDisabledBtn ? "disabled" : ""
                 }`}
                 aria-disabled={isDisabledBtn}
-                onClick={(e) => { 
-                  e.preventDefault();
-                  e.target.focus();
-                  if (totalCount > 0) {
-                    path === "second"
-                      ? setCurrentPage("third")
-                      : setCurrentPage("forth");
-                  }
-                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      if (totalCount > 0) {
-                      path === "second"
-                        ? setCurrentPage("third")
-                        : setCurrentPage("forth");
-                    }}, 300);
-                  }
-                }}
+                onClick={handleOrderPress}
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
@@ -308,17 +306,7 @@ export const Summary = memo(() => {
               <button
                 data-tts-text="추가하기 ,"
                 className="button summary-btn"
-                onClick={(e) => { 
-                  e.preventDefault();
-                  setCurrentPage("second");
-                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => { setCurrentPage("second");}, 300);
-                  }
-                }}
+                onClick={handleAddPress}
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
@@ -330,27 +318,7 @@ export const Summary = memo(() => {
               <button
                 data-tts-text="결제하기, "
                 className="button summary-btn"
-                onClick={(e) => { 
-                  e.preventDefault();
-                  e.target.focus();
-                  if (totalCount > 0) {
-                    path === "second"
-                      ? setCurrentPage("third")
-                      : setCurrentPage("forth");
-                  }
-                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      if (totalCount > 0) {
-                        path === "second"
-                          ? setCurrentPage("third")
-                          : setCurrentPage("forth");
-                      }}, 300);
-                  }
-                }}
+                onClick={handlePayPress}
               >
                 <div className="background dynamic">
                   <span className="content icon" aria-hidden="true">
@@ -381,6 +349,19 @@ export const Bottom = memo(() => {
   const path = currentPage;
   const { handleText } = useTextHandler(volume);
 
+  // 하단 버튼 핸들러들 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleHomePress = useCallback((e) => {
+    e.preventDefault();
+    setisReturnModal(true);
+    document.activeElement.blur();
+  }, [setisReturnModal]);
+
+  const handleAccessibilityPress = useCallback((e) => {
+    e.preventDefault();
+    setisAccessibilityModal(true);
+  }, [setisAccessibilityModal]);
+
   return (
     <div
       className="bottom"
@@ -395,21 +376,7 @@ export const Bottom = memo(() => {
           <button
             className="button down-footer-button btn-home"
             data-tts-text="처음으로,"
-            onClick={(e) => { 
-              e.preventDefault();
-              setisReturnModal(true);
-              document.activeElement.blur();
-             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleText('실행, ', false);
-                setTimeout(() => {
-                  setisReturnModal(true);
-                  document.activeElement.blur();
-                  }, 300);
-              }
-            }}
+            onClick={handleHomePress}
           >
             <div className="background dynamic">
               <span className="content icon" aria-hidden="true">
@@ -425,19 +392,7 @@ export const Bottom = memo(() => {
         <button 
           data-tts-text={path === "" ? "접근성," : "접근성,"}
           className="button down-footer-button"
-          onClick={(e) => { 
-            e.preventDefault();
-            setisAccessibilityModal(true)
-           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleText('실행, ', false);
-              setTimeout(() => {
-                setisAccessibilityModal(true)
-                }, 300);
-            }
-          }}
+          onClick={handleAccessibilityPress}
         >
           <div className="background dynamic">
             <span className="content icon" aria-hidden="true">

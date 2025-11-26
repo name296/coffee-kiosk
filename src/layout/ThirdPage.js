@@ -116,6 +116,38 @@ const ThirdPage = memo(() => {
     }
   }, [currentItems.length, setDeleteItemId, setisDeleteModal, setisDeleteCheckModal]);
 
+  // 수량 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleQuantityPress = useCallback((e, id, action) => {
+    e.preventDefault();
+    e.currentTarget.focus();
+    if (action === 'decrease') {
+      handleTouchDecrease(id);
+    } else {
+      handleIncrease(id);
+    }
+  }, [handleTouchDecrease, handleIncrease]);
+
+  // 삭제 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleDeletePress = useCallback((e, id) => {
+    e.preventDefault();
+    e.currentTarget.focus();
+    handleTouchDelete(id);
+  }, [handleTouchDelete]);
+
+  // 페이지네이션 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handlePaginationPress = useCallback((e, direction) => {
+    e.preventDefault();
+    e.target.focus();
+    if (direction === 'prev') {
+      handlePrevPage();
+    } else {
+      handleNextPage();
+    }
+  }, [handlePrevPage, handleNextPage]);
+
   // 페이지 변경 시 포커스 섹션 업데이트
   useEffect(() => {
     updateFocusableSections(focusableSections);
@@ -205,11 +237,7 @@ const ThirdPage = memo(() => {
                     <button
                       data-tts-text="수량 빼기"
                       className="button qty-btn"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.currentTarget.focus();
-                        handleTouchDecrease(item.id);
-                      }}
+                      onClick={(e) => handleQuantityPress(e, item.id, 'decrease')}
                     >
                       <div className="background dynamic">
                         <span className="content label">-</span>
@@ -219,11 +247,7 @@ const ThirdPage = memo(() => {
                     <button
                       data-tts-text="수량 더하기"
                       className="button qty-btn"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.currentTarget.focus();
-                        handleIncrease(item.id);
-                      }}
+                      onClick={(e) => handleQuantityPress(e, item.id, 'increase')}
                     >
                       <div className="background dynamic">
                         <span className="content label">+</span>
@@ -236,11 +260,7 @@ const ThirdPage = memo(() => {
                   <button
                     data-tts-text="삭제"
                     className="button delete-btn"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.currentTarget.focus();
-                      handleTouchDelete(item.id);
-                    }}
+                    onClick={(e) => handleDeletePress(e, item.id)}
                   >
                     <div className="background dynamic">
                       <span className="content icon" aria-hidden="true">
@@ -260,7 +280,7 @@ const ThirdPage = memo(() => {
           ref={sections.bottom}
           data-tts-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
         >
-          <button data-tts-text=" 이전," className="button" onClick={(e) => { e.preventDefault();e.target.focus(); handlePrevPage(); }}
+          <button data-tts-text=" 이전," className="button" onClick={(e) => handlePaginationPress(e, 'prev')}
 >
             <div className="background dynamic">
               <span className="content label">&lt;&nbsp; 이전</span>
@@ -276,7 +296,7 @@ const ThirdPage = memo(() => {
             <span className="pagination-separator">{totalPages}</span>
           </span>
           <button data-tts-text=" 다음," className="button"
-          onClick={(e) => { e.preventDefault();e.target.focus(); handleNextPage(); }}
+          onClick={(e) => handlePaginationPress(e, 'next')}
           >
             <div className="background dynamic">
               <span className="content label">다음 &nbsp;&gt;</span>

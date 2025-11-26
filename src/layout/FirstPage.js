@@ -46,6 +46,8 @@ const FirstPage = memo(() => {
     setisLow(DEFAULT_SETTINGS.IS_LOW);
   }, [setisDark, setVolume, setisLarge, setisLow]);
 
+  // 버튼 핸들러는 Button 컴포넌트의 actionType prop으로 자동 처리됨
+
   // FirstPage 진입 시 TTS 및 타이머 시작
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -75,20 +77,16 @@ const FirstPage = memo(() => {
             ttsText="포장하기"
             icon={<TakeoutIcon />}
             label="포장하기"
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentPage(PAGE_CONFIG.SECOND);
-            }}
+            actionType="navigate"
+            actionTarget={PAGE_CONFIG.SECOND}
           />
           <Button
             styleClass="button start"
             ttsText="먹고가기"
             icon={<TakeinIcon />}
             label="먹고가기"
-            onClick={(e) => {
-              e.preventDefault();
-              setCurrentPage(PAGE_CONFIG.SECOND);
-            }}
+            actionType="navigate"
+            actionTarget={PAGE_CONFIG.SECOND}
           />
         </div>
     </div>

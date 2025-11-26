@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useCallback } from "react";
 import { AppContext } from "../context";
 import { useTextHandler } from '../assets/tts';
 import { useActiveElementTTS } from "../hooks";
@@ -19,7 +19,7 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
   // 모달이 열릴 때만 포커스된 요소의 TTS 재생
   useActiveElementTTS(handleText, 500, isDeleteModal);
 
-  const handleTouchDeleteButton = (id)=>{
+  const handleTouchDeleteButton = useCallback((id) => {
     if (quantities[id] !== 1) {
       quantities[id] = 0;
     } else {
@@ -28,7 +28,20 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
 
     setisDeleteModal(false);
     readCurrentPage();
-  }
+  }, [quantities, handleDecrease, setisDeleteModal, readCurrentPage]);
+
+  // 모달 버튼 핸들러들 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleCancelPress = useCallback((e) => {
+    e.preventDefault();
+    setisDeleteModal(false);
+    readCurrentPage();
+  }, [setisDeleteModal, readCurrentPage]);
+
+  const handleConfirmPress = useCallback((e) => {
+    e.preventDefault();
+    handleTouchDeleteButton(id);
+  }, [handleTouchDeleteButton, id]);
 
   if (isDeleteModal) {
     return (
@@ -82,27 +95,13 @@ const DeleteModal = ({ handleDecrease, id, quantities, currentItems }) => {
             ref={sections.confirmSections} className="return-modal-buttons">
             <button data-tts-text="취소,"
               className="return-btn-cancel"
-              onClick={(e) => { e.preventDefault(); setisDeleteModal(false);readCurrentPage();}}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => { setisDeleteModal(false); readCurrentPage(); },300);
-                }
-              }}
+              onClick={handleCancelPress}
             >
               취소
             </button>
             <button data-tts-text="확인,"
               className="return-btn-confirm"
-              onClick={(e) => { e.preventDefault(); handleTouchDeleteButton(id)}}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleText('실행, ', false);
-                  setTimeout(() => { handleTouchDeleteButton(id);},300);
-                }
-              }}
+              onClick={handleConfirmPress}
             >
               확인
             </button>

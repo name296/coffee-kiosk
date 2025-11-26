@@ -327,7 +327,7 @@ export const ButtonStyleGenerator = {
   setupIconInjection() {
     if (this.ToggleButtonManager) {
       return this.ToggleButtonManager.setupIconInjection();
-    }
+          }
     console.warn('⚠️ [setupIconInjection] ToggleButtonManager is not initialized');
     return 0;
   },
@@ -430,7 +430,7 @@ export const ButtonStyleGenerator = {
       console.warn('⚠️ [init] injectCSS is not provided, skipping palette CSS generation');
     } else {
         const discoveredPalettes = this.PaletteManager.generateCSS(this._injectCSS);
-      console.log(`  ✅ 팔레트 CSS 생성 완료 (${discoveredPalettes.size}개 팔레트 발견)`);
+    console.log(`  ✅ 팔레트 CSS 생성 완료 (${discoveredPalettes.size}개 팔레트 발견)`);
     }
     
     // 3단계: 동적 스타일 적용 (27 프로젝트: 4단계)

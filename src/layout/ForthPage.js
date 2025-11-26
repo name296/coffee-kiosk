@@ -10,6 +10,7 @@ import { useTextHandler } from "../assets/tts";
 import { TIMER_CONFIG, PAYMENT_STEPS, WEBVIEW_COMMANDS, WEBVIEW_RESPONSE, STORAGE_KEYS, FOCUS_SECTIONS } from "../config/appConfig";
 import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
 import { getAssetPath } from "../utils/pathUtils";
+import Button from "../components/Button";
 
 const ForthPage = memo(() => {
   const {
@@ -165,49 +166,7 @@ const ForthPage = memo(() => {
     return tmpOrderNum;
   }, []);
 
-  // setCallWebToApp을 먼저 정의 (다른 함수들이 사용하므로)
-  const setCallWebToApp = useCallback((p_cmd, p_val) => {
-    var obj_cmd = {
-      Command: p_cmd,
-      arg: p_val,
-    };
-
-    console.log("obj_cmd: " + JSON.stringify(obj_cmd));
-
-    if (window.chrome?.webview) {
-      window.chrome.webview.postMessage(JSON.stringify(obj_cmd));
-    }
-  }, []);
-
-  // 애플리케이션에 주문정보 전달 (메모이제이션)
-  const sendOrderDataToApp = useCallback((paymentType) => {
-    var arr_order_data = [];
-    orderItems.forEach((item) => {
-      arr_order_data.push({
-        menuName: item.name,
-        quantity: item.quantity,
-        price: item.price * item.quantity,
-      });
-    });
-    const supplyPrice = (totalSum / 1.1).toFixed(2);
-    var cmd_val = {
-      orderData: arr_order_data,
-      totalPrice: totalSum,
-      supplyPrice: supplyPrice,
-      tax: (totalSum - supplyPrice).toFixed(2),
-      paymentType: paymentType,
-      orderNumber: updateOrderNumber(),
-    };
-    setCallWebToApp(WEBVIEW_COMMANDS.PAY, cmd_val);
-  }, [orderItems, totalSum, updateOrderNumber, setCallWebToApp]);
-
-  const sendPrintReceiptToApp = useCallback(() => {
-    setCallWebToApp(WEBVIEW_COMMANDS.PRINT, '');
-  }, [setCallWebToApp]);
-
-  const sendCancelPayment = useCallback(() => {
-    setCallWebToApp(WEBVIEW_COMMANDS.CANCEL, "");
-  }, [setCallWebToApp]);
+  // 결제 처리 함수들은 OrderContext에서 제공됨 (Button 컴포넌트가 자동으로 사용)
 
   // // 주문 번호 가져오기
   // const getOrderNumber = () => {
@@ -221,6 +180,8 @@ const ForthPage = memo(() => {
     enableGlobalHandlers: false,
     enableKeyboardNavigation: true
   });
+
+  // 버튼 핸들러들은 Button 컴포넌트의 actionType prop으로 자동 처리됨
 
   //isCreditPayContent
   // 0: 결제 방법 선택 페이지
@@ -285,56 +246,42 @@ const ForthPage = memo(() => {
             ref={sections.middle}
             data-tts-text="결제 선택. 버튼 두 개, "
           >
-              <button
-                data-tts-text="신용카드,"
-                className="button pay"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.target.focus();
-                  sendOrderDataToApp("card");
-                  setisCreditPayContent(1);
-                }}
-              >
-                <div className="background dynamic">
-                  <span className="content icon" aria-hidden="true">
-                    <img
-                      style={
-                        isLow
-                          ? { width: "100px", height: "65px" }
-                          : { width: "125px", height: "85px" }
-                      }
-                      src={getAssetPath("/images/payment-card.svg")}
-                      alt="card"
-                    />
-                  </span>
-                  <span className="content label">신용카드</span>
-                </div>
-              </button>
-              <button
-                className="button pay"
-                data-tts-text="모바일페이,"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.target.focus();
-                  sendOrderDataToApp("mobile");
-                  setisCreditPayContent(2);
-                }}
-              >
-                <div className="background dynamic">
-                  <span className="content icon" aria-hidden="true">
-                    <img
-                      style={
-                        isLow
-                          ? { width: "77px", height: "130px" }
-                          : { width: "110px", height: "200px" }
-                      }
-                      src={getAssetPath("/images/payment-mobile.svg")}
-                      alt="mobile"
-                    />
-                  </span>
-                  <span className="content label mobile-pay-label">모바일 페이</span>
-                </div>
-              </button>
+              <Button
+                ttsText="신용카드,"
+                styleClass="pay"
+                actionType="payment"
+                actionMethod="card"
+                icon={
+                  <img
+                    style={
+                      isLow
+                        ? { width: "100px", height: "65px" }
+                        : { width: "125px", height: "85px" }
+                    }
+                    src={getAssetPath("/images/payment-card.svg")}
+                    alt="card"
+                  />
+                }
+                label="신용카드"
+              />
+              <Button
+                ttsText="모바일페이,"
+                styleClass="pay"
+                actionType="payment"
+                actionMethod="mobile"
+                icon={
+                  <img
+                    style={
+                      isLow
+                        ? { width: "77px", height: "130px" }
+                        : { width: "110px", height: "200px" }
+                    }
+                    src={getAssetPath("/images/payment-mobile.svg")}
+                    alt="mobile"
+                  />
+                }
+                label="모바일 페이"
+              />
               {/* <div className="pay-type-div">
                 <img
                   src={getAssetPath("/images/img_QRpay.png")}
@@ -348,18 +295,13 @@ const ForthPage = memo(() => {
               className="task-manager"
               data-tts-text="작업관리. 버튼 한 개,"
             >
-              <button
-                data-tts-text="취소,"
-                className="button no"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCurrentPage("third");
-                }}
-              >
-                <div className="background dynamic">
-                  <span className="content label">취소</span>
-                </div>
-              </button>
+              <Button
+                ttsText="취소,"
+                styleClass="no"
+                actionType="cancel"
+                actionTarget="third"
+                label="취소"
+              />
             </div>
         </>
       ) : isCreditPayContent === 1 ? (
@@ -392,22 +334,12 @@ const ForthPage = memo(() => {
             className="credit-pay-image"
             src={getAssetPath("/images/device-cardReader-insert.svg")}
           ></img>
-          <button
-            data-tts-text="취소"
-            className="button forth-main-btn2"
-            onClick={(e) => {
-              e.preventDefault();
-              e.target.focus();
-              // setisCreditPayContent(3);
-              sendCancelPayment();
-              setisCreditPayContent(0);
-              // navigate("/third");
-            }}
-          >
-            <div className="background dynamic">
-              <span className="content label">취소</span>
-            </div>
-          </button>
+          <Button
+            ttsText="취소"
+            styleClass="forth-main-btn2"
+            actionType="cancel"
+            label="취소"
+          />
         </div>
       ) : isCreditPayContent === 2 ? (
         <div
@@ -440,22 +372,12 @@ const ForthPage = memo(() => {
             className="credit-pay-image"
             src={getAssetPath("/images/device-cardReader-mobile.svg")}
           ></img>
-          <button
-            data-tts-text="취소"
-            className="button forth-main-btn2"
-            onClick={(e) => {
-              e.preventDefault();
-              e.target.focus();
-              // setisCreditPayContent(4)
-              sendCancelPayment();
-              setisCreditPayContent(0);
-              // navigate("/third");
-            }}
-          >
-            <div className="background dynamic">
-              <span className="content label">취소</span>
-            </div>
-          </button>
+          <Button
+            ttsText="취소"
+            styleClass="forth-main-btn2"
+            actionType="cancel"
+            label="취소"
+          />
         </div>
       ) : isCreditPayContent === 3 ? (
         <div
@@ -531,33 +453,20 @@ const ForthPage = memo(() => {
             <span>100</span>
           </div>
           <div className="forth-main-two-btn">
-            <button
-              data-tts-text="영수증 출력,"
-              className="button forth-main-two-btn1"
-              onClick={(e) => {
-                e.preventDefault();
-                e.target.focus();
-                sendPrintReceiptToApp();
-                setisCreditPayContent(6);
-              }}
-            >
-              <div className="background dynamic">
-                <span className="content label">영수증 출력</span>
-              </div>
-            </button>
-            <button
-              data-tts-text="출력 안함,"
-              className="button forth-main-two-btn2"
-              onClick={(e) => {
-                e.preventDefault();
-                e.target.focus();
-                setisCreditPayContent(7)
-              }}
-            >
-              <div className="background dynamic">
-                <span className="content label">출력 안함{countdown}</span>
-              </div>
-            </button>
+            <Button
+              ttsText="영수증 출력,"
+              styleClass="forth-main-two-btn1"
+              actionType="receipt"
+              actionTarget="print"
+              label="영수증 출력"
+            />
+            <Button
+              ttsText="출력 안함,"
+              styleClass="forth-main-two-btn2"
+              actionType="receipt"
+              actionTarget="skip"
+              label={`출력 안함${countdown}`}
+            />
           </div>
         </div>
       ) : isCreditPayContent === 5 ? (  // 사용 안함
@@ -601,19 +510,12 @@ const ForthPage = memo(() => {
           <div className="order-num-txt">
             <span>{orderNum}</span>
           </div>
-          <button
-            data-tts-text="마무리하기"
-            className="button forth-main-btn2 btn-confirm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.target.focus();
-              setisCreditPayContent(7)
-            }}
-          >
-            <div className="background dynamic">
-              <span className="content label">마무리하기</span>
-            </div>
-          </button>
+          <Button
+            ttsText="마무리하기"
+            styleClass="forth-main-btn2 btn-confirm"
+            actionType="finish"
+            label="마무리하기"
+          />
         </div>
       ) : isCreditPayContent === 6 ? (
         <div
@@ -647,19 +549,12 @@ const ForthPage = memo(() => {
           {/* <div className="order-num-txt">
             <span>{orderNum}</span>
           </div> */}
-          <button
-            data-tts-text="마무리하기"
-            className="button forth-main-btn2 btn-confirm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.target.focus();
-              setisCreditPayContent(7)
-            }}
-          >
-            <div className="background dynamic">
-              <span className="content label">마무리{countdown}</span>
-            </div>
-          </button>
+          <Button
+            ttsText="마무리하기"
+            styleClass="forth-main-btn2 btn-confirm"
+            actionType="finish"
+            label={`마무리${countdown}`}
+          />
         </div>
       ) : isCreditPayContent === 7 ? (
         <div className="credit-pay-content">

@@ -46,7 +46,7 @@ const AccessibilityModal = ({ }) => {
     // }
   }
 
-  const handleTouchSetAccessibility = ()=>{
+  const handleTouchSetAccessibility = useCallback(() => {
     const volumeValue = {
       0: '0',
       1: '0.5',
@@ -63,7 +63,7 @@ const AccessibilityModal = ({ }) => {
     setAccessibility(prevAccessibility);
     setisAccessibilityModal(false);
     readCurrentPage(prevAccessibility.volume);
-  }
+  }, [prevAccessibility, setisDark, setVolume, setisLarge, setisLow, setAccessibility, setisAccessibilityModal, readCurrentPage]);
 
   // 모달이 열릴 때만 포커스된 요소의 TTS 재생
   useActiveElementTTS(handleText, 500, isAccessibilityModal);
@@ -75,6 +75,28 @@ const AccessibilityModal = ({ }) => {
     null,
     '선택, '
   );
+
+  // 초기설정 버튼 핸들러 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleInitialSettingsPress = useCallback((e) => {
+    e.preventDefault();
+    e.target.focus();
+    setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false });
+  }, []);
+
+  // 적용안함/적용하기 버튼 핸들러들 (메모이제이션)
+  // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
+  const handleCancelPress = useCallback((e) => {
+    e.preventDefault();
+    setAccessibility({ isHighContrast: isDark, volume: volume, isBigSize: isLarge, isLowScreen: isLow });
+    setisAccessibilityModal(false);
+    readCurrentPage();
+  }, [isDark, volume, isLarge, isLow, setAccessibility, setisAccessibilityModal, readCurrentPage]);
+
+  const handleApplyPress = useCallback((e) => {
+    e.preventDefault();
+    handleTouchSetAccessibility();
+  }, [handleTouchSetAccessibility]);
 
 
   if (isAccessibilityModal) {
@@ -125,16 +147,7 @@ const AccessibilityModal = ({ }) => {
               <p>초기 설정으로 일괄선택</p>
               <button data-tts-text="초기설정,"
                 className="button accessibility-down-content-div-btn"
-                onClick={(e) => { e.preventDefault(); e.target.focus(); setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false }); }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      setPrevAccessibility({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false });
-                    }, 100);
-                  }
-                }}
+                onClick={handleInitialSettingsPress}
               >
                 <div className="background dynamic">
                   <span className="content label">초기설정</span>
@@ -354,23 +367,7 @@ const AccessibilityModal = ({ }) => {
             >
               <button data-tts-text="적용안함, "
                 className="button accessibility-btn-cancel"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setAccessibility({ isHighContrast: isDark, volume: volume, isBigSize: isLarge, isLowScreen: isLow });
-                  setisAccessibilityModal(false);
-                  readCurrentPage();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      setAccessibility({ isHighContrast: isDark, volume: volume, isBigSize: isLarge, isLowScreen: isLow });
-                      setisAccessibilityModal(false);
-                      readCurrentPage();
-                    }, 300);
-                  }
-                }}
+                onClick={handleCancelPress}
               >
                 <div className="background dynamic">
                   <span className="content label">적용안함</span>
@@ -378,19 +375,7 @@ const AccessibilityModal = ({ }) => {
               </button>
               <button data-tts-text="적용하기, "
                 className="button accessibility-btn-confirm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleTouchSetAccessibility();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleText('실행, ', false);
-                    setTimeout(() => {
-                      handleTouchSetAccessibility();
-                    }, 300);
-                  }
-                }}
+                onClick={handleApplyPress}
               >
                 <div className="background dynamic">
                   <span className="content label">적용하기</span>

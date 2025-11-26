@@ -114,7 +114,7 @@ const bundleOnce = async (tag = "manual") => {
 };
 
 // 초기 번들링 실행
-await bundleOnce("initial");
+  await bundleOnce("initial");
 
 // ============================================================================
 // 파일 감시
@@ -145,27 +145,27 @@ const runIconIndexer = async () => {
   isUpdatingIcons = true;
 
   console.log("🎨 Regenerating icon index...");
-
+  
   // spawn으로 비동기 실행 (감시 블록 방지)
   const proc = Bun.spawn(["bun", "run", "scripts/update-icons.js"], {
     stdout: "inherit",
     stderr: "inherit",
   });
-
+  
   // 메인 흐름을 막지 않도록 별도로 처리
   proc.exited
     .then((exitCode) => {
-      if (exitCode === 0) {
-        console.log("✅ Icon index updated.");
-      } else {
-        console.error(`❌ Icon index script failed with code ${exitCode}.`);
-      }
-      isUpdatingIcons = false;
+    if (exitCode === 0) {
+      console.log("✅ Icon index updated.");
+    } else {
+      console.error(`❌ Icon index script failed with code ${exitCode}.`);
+    }
+    isUpdatingIcons = false;
     })
     .catch((error) => {
-      console.error("❌ Icon index script threw an error:", error);
-      isUpdatingIcons = false;
-    });
+    console.error("❌ Icon index script threw an error:", error);
+    isUpdatingIcons = false;
+  });
 };
 
 const startIconWatcher = () => {
@@ -202,7 +202,7 @@ const serveStatic = async (pathname) => {
       return new Response(file);
     }
   }
-
+  
   // /fonts/ → /public/fonts/ 매핑 (fonts.css에서 사용)
   if (pathname.startsWith("/fonts/")) {
     const file = Bun.file(`./public${pathname}`);
@@ -210,7 +210,7 @@ const serveStatic = async (pathname) => {
       return new Response(file);
     }
   }
-
+  
   // src/ 디렉터리 (아이콘 등)
   if (pathname.startsWith("/src/")) {
     const file = Bun.file(`.${pathname}`);
@@ -218,7 +218,7 @@ const serveStatic = async (pathname) => {
       return new Response(file);
     }
   }
-
+  
   // 기존 STATIC_PREFIXES, STATIC_FILES 처리
   if (
     config.staticFiles.includes(pathname) ||
@@ -229,7 +229,7 @@ const serveStatic = async (pathname) => {
       return new Response(file);
     }
   }
-
+  
   return null;
 };
 
@@ -269,7 +269,7 @@ const server = serve({
     const isHtmlRequest = pathname === "/" || pathname === "/index.html";
     const isBasePathRoot =
       basePath && (url.pathname === basePath || url.pathname === basePath + "/");
-
+    
     if (isHtmlRequest || isBasePathRoot) {
       const htmlFile = Bun.file(config.htmlEntry);
       if (!(await htmlFile.exists())) {
