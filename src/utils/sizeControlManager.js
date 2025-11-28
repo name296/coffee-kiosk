@@ -42,6 +42,7 @@ export const SizeControlManager = {
   
   /**
    * 모든 버튼의 실제 width/height CSS를 배율로 조절
+   * CSS 변수 기반으로 처리 (React가 자동 반응)
    */
   applyScaleToButtons() {
     // CSS 변수로 전역 배율 설정
@@ -49,13 +50,6 @@ export const SizeControlManager = {
     document.documentElement.style.setProperty('--button-height-scale', this.currentHeightScale);
     
     console.log(`📐 [SizeControlManager] 배율 적용: W ${this.currentWidthScale}x, H ${this.currentHeightScale}x`);
-    
-    // ButtonStyleGenerator의 크기 재계산 트리거
-    if (window.ButtonStyleGenerator) {
-      requestAnimationFrame(() => {
-        window.ButtonStyleGenerator.calculateButtonSizes();
-      });
-    }
   },
   
   /**

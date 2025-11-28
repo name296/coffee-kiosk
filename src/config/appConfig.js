@@ -7,7 +7,6 @@
 export const SCREEN_CONFIG = {
   BASE_WIDTH: 1080,
   BASE_HEIGHT: 1920,
-  ZOOM_RESIZE_DELAY: 100, // ms
 };
 
 // 타이머 설정
@@ -17,6 +16,7 @@ export const TIMER_CONFIG = {
   TTS_DELAY: 500, // ms - TTS 송출 후 실행 딜레이
   ACTION_DELAY: 100, // ms - 버튼 클릭 후 실행 딜레이
   INTERVAL_DELAY: 1000, // ms - setInterval 간격
+  IDLE_TIMEOUT: 5 * 60 * 1000, // ms - 5분 (비활성 시 첫 화면 이동)
 };
 
 // 페이지 설정

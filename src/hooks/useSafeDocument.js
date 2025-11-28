@@ -1,8 +1,9 @@
-import { useEffect, useCallback } from 'react';
-import { safeQuerySelector, safeAddEventListener } from '../utils/browserCompatibility';
+import { useCallback } from 'react';
+import { safeQuerySelector } from '../utils/browserCompatibility';
 
 /**
  * 안전한 document 조작을 위한 커스텀 훅
+ * 대원칙: 직접 DOM 조작 대신 이 훅을 통해 안전하게 접근
  */
 export const useSafeDocument = () => {
   /**
@@ -10,6 +11,14 @@ export const useSafeDocument = () => {
    */
   const querySelector = useCallback((selector) => {
     return safeQuerySelector(selector);
+  }, []);
+
+  /**
+   * 안전한 getElementById
+   */
+  const getElementById = useCallback((id) => {
+    if (typeof document === 'undefined') return null;
+    return document.getElementById(id);
   }, []);
 
   /**
@@ -44,11 +53,24 @@ export const useSafeDocument = () => {
     return null;
   }, []);
 
+  /**
+   * 오디오 요소 볼륨 설정
+   */
+  const setAudioVolume = useCallback((audioId, volume) => {
+    if (typeof document === 'undefined') return;
+    const audio = document.getElementById(audioId);
+    if (audio) {
+      audio.volume = volume;
+    }
+  }, []);
+
   return {
     querySelector,
+    getElementById,
     toggleBodyClass,
     blurActiveElement,
     getActiveElementText,
+    setAudioVolume,
   };
 };
 

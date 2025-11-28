@@ -1,98 +1,19 @@
 // ============================================================================
 // 메뉴 유틸리티 커스텀 훅
+// 메뉴 데이터는 useMenuData 훅에서 동적으로 로드
 // ============================================================================
 
-import { useCallback, useMemo } from 'react';
-import { getAssetPath } from '../utils/pathUtils';
-import menuData from '../../public/menu_data.json';
+import { useCallback } from 'react';
 
 // ============================================================================
 // 상수
 // ============================================================================
 
-// JSON에서 카테고리 정보를 가져와서 탭 배열 생성
-export const MENU_TABS = menuData.categoryInfo.map(category => category.cate_name);
-
-export const DEFAULT_MENU_ITEMS = [
-  {
-    id: 1,
-    name: "아메리카노 (아이스)",
-    price: "2500",
-    img: getAssetPath("/images/item-americano.svg"),
-  },
-  {
-    id: 2,
-    name: "바닐라라떼 (아이스)",
-    price: "2500",
-    img: getAssetPath("/images/item-vanilla-latte.svg"),
-  },
-  {
-    id: 3,
-    name: "콜드브루 디카페인",
-    price: "2900",
-    img: getAssetPath("/images/item-cold-brew.svg"),
-  },
-  { 
-    id: 4, 
-    name: "흑당라떼", 
-    price: "2500", 
-    img: getAssetPath("/images/item-brown-sugar-latte.svg") 
-  },
-  { 
-    id: 5, 
-    name: "딸기라떼", 
-    price: "2500", 
-    img: getAssetPath("/images/item-strawberry-latte.svg") 
-  },
-  {
-    id: 6,
-    name: "미숫가루 달고나라떼",
-    price: "2500",
-    img: getAssetPath("/images/item-dalgona-latte.svg"),
-  },
-  {
-    id: 7,
-    name: "콜드브루 (아이스)",
-    price: "2500",
-    img: getAssetPath("/images/item-cold-brew.svg"),
-  },
-  {
-    id: 8,
-    name: "바닐라라떼 (아이스)",
-    price: "2500",
-    img: getAssetPath("/images/item-vanilla-latte.svg"),
-  },
-  {
-    id: 9,
-    name: "딸기라떼 (아이스)",
-    price: "2500",
-    img: getAssetPath("/images/item-strawberry-latte.svg"),
-  },
-  {
-    id: 10,
-    name: "카라멜 마끼아또",
-    price: "3000",
-    img: getAssetPath("/images/item-vanilla-latte.svg"),
-  },
-  {
-    id: 11,
-    name: "녹차라떼",
-    price: "2800",
-    img: getAssetPath("/images/item-dalgona-latte.svg"),
-  },
-  {
-    id: 12,
-    name: "헤이즐넛라떼",
-    price: "2900",
-    img: getAssetPath("/images/item-cold-brew.svg"),
-  },
-];
-
 const PLACEHOLDER_MENU_ITEM = {
-  id: 13,
+  id: 0,
   name: "추가예정",
   price: "0",
-  img: getAssetPath("/images/item-americano.svg"),
+  img: "item-americano.png",
 };
 
 // ============================================================================
@@ -104,29 +25,30 @@ const PLACEHOLDER_MENU_ITEM = {
  */
 export const useMenuUtils = () => {
   /**
-   * 메뉴를 카테고리별로 분류
+   * 메뉴를 카테고리별로 분류 (JSON cate_id 기반)
+   * @param {Array} totalMenuItems - 전체 메뉴 아이템
+   * @param {string} selectedTab - 선택된 탭 이름
+   * @param {Array} categoryInfo - 카테고리 정보 배열
    */
-  const categorizeMenu = useCallback((totalMenuItems, selectedTab) => {
-    const categorizedMenu = {
-      전체메뉴: totalMenuItems,
-      커피: totalMenuItems.filter(
-        (item) =>
-          item.name.includes("아메리카노") ||
-          item.name.includes("콜드브루") ||
-          item.name.includes("마끼아또")
-      ),
-      라떼: totalMenuItems.filter((item) => item.name.includes("라떼")),
-    };
-
+  const categorizeMenu = useCallback((totalMenuItems, selectedTab, categoryInfo = []) => {
+    // 전체메뉴면 모든 메뉴 반환
     if (selectedTab === "전체메뉴") {
-      return categorizedMenu.전체메뉴;
-    } else if (selectedTab === "커피") {
-      return categorizedMenu.커피;
-    } else if (selectedTab === "라떼") {
-      return categorizedMenu.라떼;
-    } else {
+      return totalMenuItems;
+    }
+
+    // 선택된 탭의 cate_id 찾기
+    const category = categoryInfo.find(cat => cat.cate_name === selectedTab);
+    
+    if (!category) {
+      // 카테고리를 찾지 못하면 placeholder 반환
       return [PLACEHOLDER_MENU_ITEM];
     }
+
+    // cate_id로 메뉴 필터링
+    const filteredItems = totalMenuItems.filter(item => item.cate_id === category.cate_id);
+    
+    // 필터링된 메뉴가 없으면 placeholder 반환
+    return filteredItems.length > 0 ? filteredItems : [PLACEHOLDER_MENU_ITEM];
   }, []);
 
   /**
@@ -178,11 +100,4 @@ export const useMenuUtils = () => {
     createOrderItems,
   };
 };
-
-// ============================================================================
-// 상수 export
-// ============================================================================
-
-export const tabs = MENU_TABS;
-export const totalMenuItems = DEFAULT_MENU_ITEMS;
 

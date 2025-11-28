@@ -3,7 +3,8 @@
 // ============================================================================
 
 import React, { useState, useMemo, useCallback, createContext } from "react";
-import { tabs, totalMenuItems, useMenuUtils } from "../hooks/useMenuUtils";
+import { useMenuData } from "../hooks/useMenuData";
+import { useMenuUtils } from "../hooks/useMenuUtils";
 import { convertToKoreanQuantity } from "../utils/numberUtils";
 import { safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
 import { WEBVIEW_COMMANDS, STORAGE_KEYS } from "../config/appConfig";
@@ -11,12 +12,18 @@ import { WEBVIEW_COMMANDS, STORAGE_KEYS } from "../config/appConfig";
 export const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
+  // 메뉴 데이터 동적 로드
+  const { tabs, totalMenuItems, categoryInfo, isLoading: menuLoading } = useMenuData();
+  
   // 메뉴 유틸리티 훅 사용
   const { categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems } = useMenuUtils();
 
   // 메뉴 및 카테고리 상태
   const [selectedTab, setSelectedTab] = useState("전체메뉴");
-  const menuItems = useMemo(() => categorizeMenu(totalMenuItems, selectedTab), [selectedTab, categorizeMenu]);
+  const menuItems = useMemo(
+    () => categorizeMenu(totalMenuItems, selectedTab, categoryInfo), 
+    [totalMenuItems, selectedTab, categoryInfo, categorizeMenu]
+  );
 
   // 주문 수량 상태 (초기화는 App.js에서 totalMenuItems 로드 후 진행)
   const [quantities, setQuantities] = useState({});
@@ -111,7 +118,7 @@ export const OrderProvider = ({ children }) => {
     setSelectedTab(tabs[nextIndex]);
   }, [tabs, selectedTab, setSelectedTab]);
 
-  // 카테고리 페이지네이션 핸들러 (SecondPage에서 설정)
+  // 카테고리 페이지네이션 핸들러 (Process2에서 설정)
   const [handleCategoryPageNav, setHandleCategoryPageNav] = useState(null);
 
   // Context value
@@ -119,9 +126,11 @@ export const OrderProvider = ({ children }) => {
     // 메뉴 관련
     tabs,
     totalMenuItems,
+    categoryInfo,
     menuItems,
     selectedTab,
     setSelectedTab,
+    menuLoading,
     
     // 주문 관련
     quantities,
@@ -156,8 +165,12 @@ export const OrderProvider = ({ children }) => {
     handleCategoryPageNav,
     setHandleCategoryPageNav,
   }), [
+    tabs,
+    totalMenuItems,
+    categoryInfo,
     menuItems,
     selectedTab,
+    menuLoading,
     quantities,
     handleIncrease,
     handleDecrease,

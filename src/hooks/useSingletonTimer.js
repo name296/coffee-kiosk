@@ -1,74 +1,42 @@
 // ============================================================================
-// 타이머 싱글톤 훅
+// 인트로 타이머 싱글톤 훅
+// 첫 화면에서 일정 시간마다 인트로 TTS 반복
+// (홈 이동은 useIdleTimeout이 처리)
 // ============================================================================
 
-const INTRO_TTS_TIME = 180;
-const RETURN_HOME_TIME = 60;
+const INTRO_TTS_TIME = 180; // 3분마다 인트로 TTS 반복
 
 /**
- * 타이머 싱글톤 클래스
+ * 인트로 타이머 싱글톤 클래스
  */
-class TimerSingleton {
+class IntroTimerSingleton {
   #intervalId = null;
   #intervalTime = 0;
 
   /**
-   * 인트로 타이머 시작
+   * 인트로 타이머 시작 (3분마다 TTS 반복)
    */
   startIntroTimer(scriptText, handleText, onInitSetting) {
     this.cleanup();
 
     this.#intervalId = setInterval(() => {
-      if (this.#intervalTime === INTRO_TTS_TIME) {
-        handleText(scriptText); // 기준 시간 도달 시 텍스트 처리
-        this.updateTimer(); // 시간 초기화
-      }
-      if (
-        this.#intervalTime !== 0 &&
-        this.#intervalTime % RETURN_HOME_TIME === 0
-      ) {
-        onInitSetting();
-      }
       this.#intervalTime++;
-    }, 1000); // 1초마다 실행
-  }
-
-  /**
-   * 자동 초기화면 타이머 시작
-   */
-  startReturnTimer(scriptText, handleText, setCurrentPage) {
-    this.cleanup();
-
-    this.#intervalId = setInterval(() => {
-      if (this.#intervalTime === RETURN_HOME_TIME) {
-        // handleText(scriptText);
-        if (setCurrentPage) {
-          setCurrentPage("first");
+      
+      if (this.#intervalTime >= INTRO_TTS_TIME) {
+        handleText(scriptText);
+        this.#intervalTime = 0; // 리셋
+        if (onInitSetting) {
+          onInitSetting();
         }
       }
-      this.#intervalTime++;
-    }, 1000); // 1초마다 실행
+    }, 1000);
   }
 
   /**
-   * 타이머 시간 초기화
-   */
-  updateTimer() {
-    this.#intervalTime = 0;
-  }
-
-  /**
-   * 인트로 타이머 중지
+   * 타이머 중지
    */
   stopIntroTimer() {
     this.cleanup();
-  }
-
-  /**
-   * 현재 타이머 시간 가져오기
-   */
-  getIntervalTime() {
-    return this.#intervalTime;
   }
 
   /**
@@ -86,29 +54,25 @@ class TimerSingleton {
 // 싱글톤 인스턴스
 let timerInstance = null;
 
-/**
- * 타이머 싱글톤 인스턴스 가져오기 (내부 사용)
- */
 const getTimerSingleton = () => {
   if (!timerInstance) {
-    timerInstance = new TimerSingleton();
+    timerInstance = new IntroTimerSingleton();
   }
   return timerInstance;
 };
 
-// 리액트 훅 버전 (컴포넌트 내에서 사용)
+/**
+ * 인트로 타이머 훅
+ * - startIntroTimer: 인트로 TTS 반복 시작
+ * - stopIntroTimer: 타이머 중지
+ */
 export const useTimer = () => {
-  const timerSingleton = getTimerSingleton();
+  const timer = getTimerSingleton();
 
   return {
     startIntroTimer: (scriptText, handleText, onInitSetting) =>
-      timerSingleton.startIntroTimer(scriptText, handleText, onInitSetting),
-    startReturnTimer: (scriptText, handleText, setCurrentPage) =>
-      timerSingleton.startReturnTimer(scriptText, handleText, setCurrentPage),
-    updateTimer: () => timerSingleton.updateTimer(),
-    stopIntroTimer: () => timerSingleton.stopIntroTimer(),
-    getIntervalTime: () => timerSingleton.getIntervalTime(),
-    cleanup: () => timerSingleton.cleanup(),
+      timer.startIntroTimer(scriptText, handleText, onInitSetting),
+    stopIntroTimer: () => timer.stopIntroTimer(),
   };
 };
 

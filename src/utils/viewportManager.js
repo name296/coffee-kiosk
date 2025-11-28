@@ -46,15 +46,13 @@ export function setViewportZoom() {
 }
 
 /**
- * 리사이즈 이벤트 핸들러 생성 (쓰로틀링 적용)
+ * 리사이즈 이벤트 핸들러 생성 (간격 없이 즉시 적용)
  * @returns {Function} cleanup 함수
  */
 export function setupViewportResize() {
-  let resizeTimer;
-  
+  // 즉시 적용 (debounce 없음)
   const handleResize = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(setViewportZoom, SCREEN_CONFIG.ZOOM_RESIZE_DELAY);
+    setViewportZoom();
   };
   
   window.addEventListener("resize", handleResize);
@@ -62,9 +60,6 @@ export function setupViewportResize() {
   // cleanup 함수 반환
   return () => {
     window.removeEventListener("resize", handleResize);
-    if (resizeTimer) {
-      clearTimeout(resizeTimer);
-    }
   };
 }
 

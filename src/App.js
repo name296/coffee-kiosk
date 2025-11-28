@@ -2,37 +2,38 @@
 // 메인 애플리케이션 컴포넌트
 // ============================================================================
 
-import React, { useEffect, useContext, useLayoutEffect, useMemo } from "react";
+import React, { useContext, useLayoutEffect, useMemo, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 import "./App.css";
-import { useTextHandler } from "./utils/tts";
-import { ButtonStyleGenerator } from "./utils/buttonStyleGenerator";
-import { SizeControlManager } from "./utils/sizeControlManager";
-import { useMultiModalButtonHandler } from "./hooks/useMultiModalButtonHandler";
-import { useCSSInjector } from "./hooks/useCSSInjector";
-import { useReactMount } from "./hooks/useReactMount";
-import { AppProvider, AppContext } from "./contexts";
-import { getAssetPath } from "./utils/pathUtils";
-import { setViewportZoom, setupViewportResize } from "./utils/viewportManager";
-import { setupGlobalUtils } from "./utils/globalUtils";
-import { FirstPage, SecondPage, ThirdPage, ForthPage } from "./components/Pages";
-import { Step, Summary, Bottom } from "./components/Frame";
-import { ReturnModal, AccessibilityModal, ResetModal, CallModal, DeleteModal, DeleteCheckModal } from "./components/Modals";
+import { useAppIdleTimeout } from "./hooks";
+import { AppContext } from "./contexts";
+import { InitializationProvider } from "./contexts/InitializationContext";
+import { AccessibilityProvider } from "./contexts/AccessibilityContext";
+import { OrderProvider } from "./contexts/OrderContext";
+import { UIProvider } from "./contexts/UIContext";
+import { ModalProvider } from "./contexts/ModalContext";
+import { ButtonStyleProvider } from "./contexts/ButtonStyleContext";
+import { IdleTimeoutProvider } from "./contexts/IdleTimeoutContext";
+import { AppContextProvider } from "./contexts/AppContext";
+import { Process1, Process2, Process3, Process4 } from "./components/Pages";
+import { Step, Summary, Bottom } from "./components/Pages";
+import { ReturnModal, ResetModal, CallModal, DeleteModal, DeleteCheckModal } from "./components/CommonModals";
+import AccessibilityModal from "./components/AccessibilityModal";
 import { LAYOUT_COMPONENTS, LAYOUT_ASSEMBLY_CONTEXT } from "./config";
 import ErrorBoundary from "./utils/ErrorBoundary";
 
 // 전역 모달 컴포넌트
 const GlobalModals = () => {
   const {
-    isReturnModal,
-    isAccessibilityModal,
-    isResetModal,
-    isCallModal,
-    isDeleteModal,
-    isDeleteCheckModal,
+    ModalReturn,
+    ModalAccessibility,
+    ModalReset,
+    ModalCall,
+    ModalDelete,
+    ModalDeleteCheck,
+    ModalDeleteItemId,
     quantities,
     handleDecrease,
-    deleteItemId,
     totalMenuItems,
     filterMenuItems
   } = useContext(AppContext);
@@ -43,22 +44,22 @@ const GlobalModals = () => {
 
   return (
     <>
-      {isReturnModal && <ReturnModal />}
-      {isResetModal && <ResetModal />}
-      {isAccessibilityModal && <AccessibilityModal />}
-      {isCallModal && <CallModal />}
-      {isDeleteModal && (
+      {ModalReturn.isOpen && <ReturnModal />}
+      {ModalReset.isOpen && <ResetModal />}
+      {ModalAccessibility.isOpen && <AccessibilityModal />}
+      {ModalCall.isOpen && <CallModal />}
+      {ModalDelete.isOpen && (
         <DeleteModal
           handleDecrease={handleDecrease}
-          id={deleteItemId}
+          id={ModalDeleteItemId}
           quantities={quantities}
           currentItems={currentItems}
         />
       )}
-      {isDeleteCheckModal && (
+      {ModalDeleteCheck.isOpen && (
         <DeleteCheckModal
           handleDecrease={handleDecrease}
-          id={deleteItemId}
+          id={ModalDeleteItemId}
           quantities={quantities}
           currentItems={currentItems}
         />
@@ -93,7 +94,7 @@ const Layout = ({ children }) => {
   }, [context.currentPage]); // currentPage 변경 시 재계산
   
   return (
-    <div className="frame">
+    <>
       <div className="black"></div>
       <div className="top"></div>
       
@@ -103,7 +104,7 @@ const Layout = ({ children }) => {
       {shouldRender[LAYOUT_COMPONENTS.SUMMARY] && <Summary />}
       {shouldRender[LAYOUT_COMPONENTS.BOTTOM] && <Bottom />}
       {shouldRender[LAYOUT_COMPONENTS.MODALS] && <GlobalModals />}
-    </div>
+    </>
   );
 };
 
@@ -111,6 +112,7 @@ const Layout = ({ children }) => {
 const AppContent = () => {
   const { 
     currentPage,
+    setCurrentPage,
     totalMenuItems,
     setQuantities,
     setisDark,
@@ -119,11 +121,10 @@ const AppContent = () => {
     setisLow
   } = useContext(AppContext);
 
-  // 앱 초기화 (앱 시작 시 한 번만 실행)
-  useLayoutEffect(() => {
-    // totalMenuItems가 준비되었을 때만 실행
+  // 주문 초기화 함수
+  const resetOrder = useCallback(() => {
     if (!totalMenuItems || totalMenuItems.length === 0) return;
-
+    
     // 수량 초기화
     setQuantities(
       totalMenuItems.reduce(
@@ -136,79 +137,76 @@ const AppContent = () => {
     setVolume(1);
     setisLarge(false);
     setisLow(false);
+  }, [totalMenuItems, setQuantities, setisDark, setVolume, setisLarge, setisLow]);
+
+  // 전역 비활성 타임아웃 (5분)
+  const idleTimeout = useAppIdleTimeout(currentPage, setCurrentPage, resetOrder);
+
+  // 앱 초기화 (앱 시작 시 한 번만 실행)
+  useLayoutEffect(() => {
+    resetOrder();
   }, [totalMenuItems]); // totalMenuItems가 준비되면 실행
 
   return (
-    <Layout>
-      {currentPage === 'first' && <FirstPage />}
-      {currentPage === 'second' && <SecondPage />}
-      {currentPage === 'third' && <ThirdPage />}
-      {currentPage === 'forth' && <ForthPage />}
-    </Layout>
+    <IdleTimeoutProvider value={idleTimeout}>
+      <Layout>
+        {currentPage === 'first' && <Process1 />}
+        {currentPage === 'second' && <Process2 />}
+        {currentPage === 'third' && <Process3 />}
+        {currentPage === 'forth' && <Process4 />}
+      </Layout>
+    </IdleTimeoutProvider>
   );
 };
 
+/**
+ * 메인 App 컴포넌트
+ * 
+ * Provider 초기화 순서 (외부 → 내부):
+ * 1. ErrorBoundary - 에러 처리
+ * 2. InitializationProvider - 시스템 초기화 (버튼스타일, TTS, 뷰포트)
+ * 3. AccessibilityProvider - 접근성 설정 (볼륨, 다크모드)
+ * 4. OrderProvider - 주문 관리 (메뉴, 수량)
+ * 5. UIProvider - UI 상태 (페이지)
+ * 6. ModalProvider - 모달 상태
+ * 7. ButtonStyleProvider - 버튼 스타일
+ * 8. AppContextProvider - 통합 (모든 Context 합침)
+ */
 const App = () => {
-  // CSS 인젝터 훅 사용
-  const { inject: injectCSS, remove: removeCSS } = useCSSInjector();
-  const { mountComponent } = useReactMount();
-
-  // tts api용 indexedDB 초기화
-  const { initDB } = useTextHandler();
-  useEffect(() => {
-    const initializeDatabase = async () => {
-      await initDB();
-    };
-    initializeDatabase();
-  }, [initDB]);
-
-  // 전역 버튼 이벤트 핸들러 (React 훅으로 통합)
-  useMultiModalButtonHandler({
-    enableGlobalHandlers: true,
-    enableKeyboardNavigation: false
-  });
-
-  // 전역적으로 button click에 비프음 추가 (내부 요소에 pointer-events:none 추가하기)
-  // useLayoutEffect를 사용하여 DOM이 업데이트된 직후에 실행 (버튼 렌더링 보장)
-  useLayoutEffect(() => {
-    // 버튼 스타일 자동 생성 시스템 초기화 (훅 전달)
-    ButtonStyleGenerator.init({ injectCSS, mountComponent });
-    
-    // 크기 조절 시스템 초기화
-    SizeControlManager.init();
-    
-    // 전역 유틸리티 설정 (Footer에서 사용)
-    setupGlobalUtils();
-
-    // ============================================================================
-    // 27 스타일 버튼 이벤트 처리 시스템
-    // ============================================================================
-    // 버튼 이벤트 핸들러는 useMultiModalButtonHandler 훅으로 처리됨
-    
-    // 뷰포트에 맞춰 줌 배율 조절
-    setViewportZoom();
-    setupViewportResize();
-  }, [injectCSS, mountComponent]);
-
   return (
     <ErrorBoundary>
-    <AppProvider>
-      <audio
-        id="audioPlayer"
-        src=""
-        controls
-        className="hidden-audio"
-        />
-      <audio
-        id="beapSound"
-        src={getAssetPath("./public/sound/beap_sound2.mp3")}
-        controls
-        className="hidden-audio"
-        />
-        <ErrorBoundary>
-      <AppContent />
-        </ErrorBoundary>
-    </AppProvider>
+      {/* 1️⃣ 시스템 초기화 */}
+      <InitializationProvider>
+        {/* 2️⃣ 접근성 설정 */}
+        <AccessibilityProvider>
+          {/* 3️⃣ 주문 관리 */}
+          <OrderProvider>
+            {/* 4️⃣ UI 상태 (페이지) */}
+            <UIProvider>
+              {/* 5️⃣ 모달 상태 */}
+              <ModalProvider>
+                {/* 6️⃣ 버튼 스타일 */}
+                <ButtonStyleProvider>
+                  {/* 7️⃣ Context 통합 */}
+                  <AppContextProvider>
+                    {/* 오디오 요소 */}
+                    <audio
+                      id="audioPlayer"
+                      src=""
+                      controls
+                      className="hidden-audio"
+                    />
+                    {/* 앱 콘텐츠 */}
+                    <ErrorBoundary>
+                      <AppContent />
+                    </ErrorBoundary>
+                  </AppContextProvider>
+                </ButtonStyleProvider>
+              </ModalProvider>
+            </UIProvider>
+          </OrderProvider>
+        </AccessibilityProvider>
+      </InitializationProvider>
     </ErrorBoundary>
   );
 };

@@ -1,23 +1,13 @@
 /**
  * UI 상태 관리 Context
- * 모달, 페이지 네비게이션 등 UI 관련 상태 관리
+ * 페이지 네비게이션 등 UI 관련 상태 관리
+ * (모달은 ModalContext에서 관리)
  */
 import React, { useState, useRef, useMemo, useCallback, createContext } from "react";
 
 export const UIContext = createContext();
 
 export const UIProvider = ({ children }) => {
-  // 모달 상태
-  const [isReturnModal, setisReturnModal] = useState(false);
-  const [isAccessibilityModal, setisAccessibilityModal] = useState(false);
-  const [isResetModal, setisResetModal] = useState(false);
-  const [isDeleteModal, setisDeleteModal] = useState(false);
-  const [isDeleteCheckModal, setisDeleteCheckModal] = useState(false);
-  const [isCallModal, setisCallModal] = useState(false);
-
-  // 삭제 관련 상태
-  const [deleteItemId, setDeleteItemId] = useState(0);
-
   // 페이지 네비게이션 상태
   const [currentPage, setCurrentPageState] = useState('first');
   const [history, setHistory] = useState(['first']);
@@ -71,24 +61,6 @@ export const UIProvider = ({ children }) => {
 
   // Context value
   const value = useMemo(() => ({
-    // 모달 상태
-    isReturnModal,
-    setisReturnModal,
-    isAccessibilityModal,
-    setisAccessibilityModal,
-    isResetModal,
-    setisResetModal,
-    isDeleteModal,
-    setisDeleteModal,
-    isDeleteCheckModal,
-    setisDeleteCheckModal,
-    isCallModal,
-    setisCallModal,
-    
-    // 삭제 관련
-    deleteItemId,
-    setDeleteItemId,
-    
     // 페이지 네비게이션
     currentPage,
     setCurrentPage,
@@ -104,13 +76,6 @@ export const UIProvider = ({ children }) => {
     // DOM 참조
     sections,
   }), [
-    isReturnModal,
-    isAccessibilityModal,
-    isResetModal,
-    isDeleteModal,
-    isDeleteCheckModal,
-    isCallModal,
-    deleteItemId,
     currentPage,
     setCurrentPage,
     goBack,

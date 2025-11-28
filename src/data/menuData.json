@@ -1,0 +1,100 @@
+{
+    "categoryInfo": [
+        { "cate_id": 0, "cate_name": "전체메뉴" },
+        { "cate_id": 1, "cate_name": "커피" },
+        { "cate_id": 2, "cate_name": "밀크티" },
+        { "cate_id": 3, "cate_name": "스무디" },
+        { "cate_id": 4, "cate_name": "차" },
+        { "cate_id": 5, "cate_name": "주스" },
+        { "cate_id": 6, "cate_name": "라떼" },
+        { "cate_id": 7, "cate_name": "버블티" },
+        { "cate_id": 8, "cate_name": "에이드" },
+        { "cate_id": 9, "cate_name": "기타" }
+    ],
+    "menuList": [
+        {
+            "id": 1,
+            "cate_id": 1,
+            "name": "아메리카노 (아이스)",
+            "price": "2500",
+            "img": "item-americano.png"
+        },
+        {
+            "id": 2,
+            "cate_id": 6,
+            "name": "바닐라라떼 (아이스)",
+            "price": "2500",
+            "img": "item-vanilla-latte.png"
+        },
+        {
+            "id": 3,
+            "cate_id": 1,
+            "name": "콜드브루 디카페인",
+            "price": "2900",
+            "img": "item-cold-brew.png"
+        },
+        {
+            "id": 4,
+            "cate_id": 6,
+            "name": "흑당라떼",
+            "price": "2500",
+            "img": "item-brown-sugar-latte.png"
+        },
+        {
+            "id": 5,
+            "cate_id": 6,
+            "name": "딸기라떼",
+            "price": "2500",
+            "img": "item-strawberry-latte.png"
+        },
+        {
+            "id": 6,
+            "cate_id": 6,
+            "name": "미숫가루 달고나라떼",
+            "price": "2500",
+            "img": "item-dalgona-latte.png"
+        },
+        {
+            "id": 7,
+            "cate_id": 1,
+            "name": "콜드브루 (아이스)",
+            "price": "2500",
+            "img": "item-cold-brew.png"
+        },
+        {
+            "id": 8,
+            "cate_id": 6,
+            "name": "바닐라라떼 (아이스)",
+            "price": "2500",
+            "img": "item-vanilla-latte.png"
+        },
+        {
+            "id": 9,
+            "cate_id": 6,
+            "name": "딸기라떼 (아이스)",
+            "price": "2500",
+            "img": "item-strawberry-latte.png"
+        },
+        {
+            "id": 10,
+            "cate_id": 1,
+            "name": "카라멜 마끼아또",
+            "price": "3000",
+            "img": "item-vanilla-latte.png"
+        },
+        {
+            "id": 11,
+            "cate_id": 6,
+            "name": "녹차라떼",
+            "price": "2800",
+            "img": "item-dalgona-latte.png"
+        },
+        {
+            "id": 12,
+            "cate_id": 6,
+            "name": "헤이즐넛라떼",
+            "price": "2900",
+            "img": "item-cold-brew.png"
+        }
+    ]
+}

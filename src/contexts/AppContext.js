@@ -1,47 +1,37 @@
 /**
  * 통합 App Context
  * 모든 하위 Context를 통합하고 공통 유틸리티 제공
+ * 
+ * Provider 초기화 순서는 App.js에서 관리:
+ * 1. InitializationProvider - 시스템 초기화
+ * 2. AccessibilityProvider - 접근성 설정
+ * 3. OrderProvider - 주문 관리
+ * 4. UIProvider - UI 상태
+ * 5. ButtonStyleProvider - 버튼 스타일
+ * 6. AppContextProvider - 통합
  */
 import React, { useMemo, useCallback, createContext } from "react";
-import { useTextHandler } from "../utils/tts";
+import { useTextHandler } from "../hooks/useTTS";
 import { commonScript } from "../config/messages";
 import { safeQuerySelector } from "../utils/browserCompatibility";
-import { OrderProvider, OrderContext } from "./OrderContext";
-import { UIProvider, UIContext } from "./UIContext";
-import { AccessibilityProvider, AccessibilityContext } from "./AccessibilityContext";
-import { ButtonConfigProvider, ButtonConfigContext } from "./ButtonConfigContext";
+import { OrderContext } from "./OrderContext";
+import { UIContext } from "./UIContext";
+import { AccessibilityContext } from "./AccessibilityContext";
+import { ModalContext } from "./ModalContext";
 
 export const AppContext = createContext();
 
 /**
- * 통합 App Provider
- * 모든 하위 Context를 중첩하여 제공
+ * App Context Provider
+ * 모든 하위 Context 값들을 통합하여 단일 접근점 제공
  */
-export const AppProvider = ({ children }) => {
-  return (
-    <AccessibilityProvider>
-      <OrderProvider>
-        <UIProvider>
-          <ButtonConfigProvider>
-            <AppContextProvider>{children}</AppContextProvider>
-          </ButtonConfigProvider>
-        </UIProvider>
-      </OrderProvider>
-    </AccessibilityProvider>
-  );
-};
-
-/**
- * 내부 App Context Provider
- * 공통 유틸리티 및 하위 Context 값들을 통합
- */
-const AppContextProvider = ({ children }) => {
+export const AppContextProvider = ({ children }) => {
   // 하위 Context에서 필요한 값들 가져오기
   const accessibilityContext = React.useContext(AccessibilityContext);
   const orderContext = React.useContext(OrderContext);
   const uiContext = React.useContext(UIContext);
-  const buttonConfigContext = React.useContext(ButtonConfigContext);
-
+  const modalContext = React.useContext(ModalContext);
+  
   // TTS 핸들러 (volume이 필요하므로 AccessibilityContext에서 가져옴)
   const { handleText } = useTextHandler(accessibilityContext.volume);
 
@@ -60,7 +50,7 @@ const AppContextProvider = ({ children }) => {
     ...accessibilityContext,
     ...orderContext,
     ...uiContext,
-    ...buttonConfigContext,
+    ...modalContext,
     
     // 공통 유틸리티
     commonScript,
@@ -69,7 +59,7 @@ const AppContextProvider = ({ children }) => {
     accessibilityContext,
     orderContext,
     uiContext,
-    buttonConfigContext,
+    modalContext,
     readCurrentPage,
   ]);
 

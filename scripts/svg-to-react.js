@@ -1,6 +1,6 @@
 /* ==============================
   🎨 SVG → 통합 React 컴포넌트 자동 변환 스크립트
-  SVG 파일들을 하나의 Icon.jsx 컴포넌트로 통합 생성 (개별 파일 없음)
+  SVG 파일들을 하나의 Icon.js 컴포넌트로 통합 생성 (개별 파일 없음)
   ============================== */
 
 import fs from 'fs';
@@ -11,9 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 경로 설정
-const svgDir = path.join(__dirname, '../src/assets/icons/');
+const svgDir = path.join(__dirname, '../src/svg/');  // 모든 SVG
 const componentDir = path.join(__dirname, '../src/components/');
-const iconFile = path.join(componentDir, 'Icon.jsx');
+const iconFile = path.join(componentDir, 'Icon.js');
 
 // 컴포넌트 이름 변환 (kebab-case → PascalCase)
 function toPascalCase(str) {
@@ -60,9 +60,40 @@ function convertSvgToReactComponent(svgContent, componentName) {
   // React DOM 속성 변환 (kebab-case → camelCase)
   innerContent = innerContent.replace(/fill-rule=/gi, 'fillRule=');
   innerContent = innerContent.replace(/clip-rule=/gi, 'clipRule=');
+  innerContent = innerContent.replace(/clip-path=/gi, 'clipPath=');
   innerContent = innerContent.replace(/stroke-width=/gi, 'strokeWidth=');
   innerContent = innerContent.replace(/stroke-linecap=/gi, 'strokeLinecap=');
   innerContent = innerContent.replace(/stroke-linejoin=/gi, 'strokeLinejoin=');
+  innerContent = innerContent.replace(/stroke-dasharray=/gi, 'strokeDasharray=');
+  innerContent = innerContent.replace(/stroke-dashoffset=/gi, 'strokeDashoffset=');
+  innerContent = innerContent.replace(/stroke-miterlimit=/gi, 'strokeMiterlimit=');
+  innerContent = innerContent.replace(/stroke-opacity=/gi, 'strokeOpacity=');
+  innerContent = innerContent.replace(/fill-opacity=/gi, 'fillOpacity=');
+  innerContent = innerContent.replace(/stop-color=/gi, 'stopColor=');
+  innerContent = innerContent.replace(/stop-opacity=/gi, 'stopOpacity=');
+  innerContent = innerContent.replace(/font-family=/gi, 'fontFamily=');
+  innerContent = innerContent.replace(/font-size=/gi, 'fontSize=');
+  innerContent = innerContent.replace(/font-weight=/gi, 'fontWeight=');
+  innerContent = innerContent.replace(/text-anchor=/gi, 'textAnchor=');
+  innerContent = innerContent.replace(/dominant-baseline=/gi, 'dominantBaseline=');
+  innerContent = innerContent.replace(/alignment-baseline=/gi, 'alignmentBaseline=');
+  innerContent = innerContent.replace(/xlink:href=/gi, 'xlinkHref=');
+  innerContent = innerContent.replace(/xmlns:xlink=/gi, 'xmlnsXlink=');
+  
+  // style 문자열을 React 객체로 변환
+  // style="mask-type:alpha" → style={{maskType: "alpha"}}
+  innerContent = innerContent.replace(/style="([^"]+)"/gi, (match, styleString) => {
+    const styleObj = styleString.split(';')
+      .filter(s => s.trim())
+      .map(s => {
+        const [key, value] = s.split(':').map(p => p.trim());
+        // kebab-case를 camelCase로 변환
+        const camelKey = key.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+        return `${camelKey}: "${value}"`;
+      })
+      .join(', ');
+    return `style={{${styleObj}}}`;
+  });
 
   // path의 fill 속성을 currentColor로 변환
   let processedContent = innerContent
@@ -94,7 +125,7 @@ const ${componentName} = (props) => (
 );`;
 }
 
-// 모든 SVG 파일을 읽어서 통합 Icon.jsx 생성
+// 모든 SVG 파일을 읽어서 통합 Icon.js 생성
 function generateIconComponent() {
   console.log('🔍 SVG 파일 스캔 중...\n');
   
@@ -103,12 +134,14 @@ function generateIconComponent() {
     fs.mkdirSync(componentDir, { recursive: true });
   }
 
+  const iconComponents = [];
+  const iconMapEntries = [];
+  
   const files = fs.readdirSync(svgDir)
     .filter(f => f.endsWith('.svg'))
     .sort();
-
-  const iconComponents = [];
-  const iconMapEntries = [];
+  
+  console.log(`📁 ${svgDir} (${files.length}개)\n`);
   
   files.forEach(file => {
     const iconName = file.replace('.svg', '');
@@ -160,6 +193,11 @@ const Icon = ({ name, ...props }) => {
 
 export default Icon;`;
 
+  // named exports 생성
+  const namedExports = iconComponents
+    .map(({ componentName }) => componentName)
+    .join(',\n  ');
+
   const content = `import React from "react";
 
 /**
@@ -168,8 +206,11 @@ export default Icon;`;
  * 스크립트: bun run scripts/svg-to-react.js
  * 
  * 사용법:
- *   import Icon from './components/icons';
+ *   import Icon from './components/Icon';
  *   <Icon name="toggle" />
+ *   
+ *   // 또는 개별 아이콘 import
+ *   import { ToggleIcon } from './components/Icon';
  */
 
 // 모든 아이콘 컴포넌트 정의 (인라인)
@@ -178,10 +219,21 @@ ${componentDefinitions}
 ${iconMap}
 
 ${iconComponentCode}
+
+// Named exports (개별 아이콘)
+export {
+  ${namedExports}
+};
 `;
 
   fs.writeFileSync(iconFile, content, 'utf8');
-  console.log(`\n📝 Icon.jsx 생성 완료! (${iconComponents.length}개 아이콘)`);
+  console.log(`\n📝 Icon.js 생성 완료! (${iconComponents.length}개 아이콘)`);
+}
+
+// 전체 SVG 파일 수 계산
+function getTotalSvgCount() {
+  if (!fs.existsSync(svgDir)) return 0;
+  return fs.readdirSync(svgDir).filter(f => f.endsWith('.svg')).length;
 }
 
 // 감시 모드
@@ -193,12 +245,7 @@ function watchMode() {
 
   // 파일 감시 (간단한 polling 방식)
   setInterval(() => {
-    const files = fs.readdirSync(svgDir)
-      .filter(f => f.endsWith('.svg'))
-      .sort();
-    
-    // 파일 목록이 변경되었는지 확인
-    const currentCount = files.length;
+    const currentCount = getTotalSvgCount();
     const lastCount = watchMode.lastCount || 0;
     
     if (currentCount !== lastCount) {
@@ -219,5 +266,5 @@ if (isWatchMode) {
   watchMode();
 } else {
   generateIconComponent();
-  console.log(`\n✅ 총 ${fs.readdirSync(svgDir).filter(f => f.endsWith('.svg')).length}개 아이콘 처리 완료!`);
+  console.log(`\n✅ 총 ${getTotalSvgCount()}개 아이콘 처리 완료!`);
 }

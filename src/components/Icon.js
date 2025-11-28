@@ -8,9 +8,9 @@ import React from "react";
  * 사용법:
  *   import Icon from './components/Icon';
  *   <Icon name="toggle" />
- * 
- *   또는 개별 아이콘:
- *   import { ToggleIcon, AddIcon } from './components/Icon';
+ *   
+ *   // 또는 개별 아이콘 import
+ *   import { ToggleIcon } from './components/Icon';
  */
 
 // 모든 아이콘 컴포넌트 정의 (인라인)
@@ -622,39 +622,39 @@ const WarningIcon = (props) => (
 
 // 아이콘 맵
 const iconMap = {
-  'add': AddIcon,
-  'arrow-left': ArrowLeftIcon,
-  'arrow-right': ArrowRightIcon,
-  'cancel': CancelIcon,
-  'contrast': ContrastIcon,
-  'delete': DeleteIcon,
-  'done': DoneIcon,
-  'exit': ExitIcon,
-  'extention': ExtentionIcon,
-  'favicon': FaviconIcon,
-  'help': HelpIcon,
-  'home': HomeIcon,
-  'info': InfoIcon,
-  'large': LargeIcon,
-  'lowpos': LowposIcon,
-  'minus': MinusIcon,
-  'ok': OkIcon,
-  'order': OrderIcon,
-  'pay': PayIcon,
-  'placeholder': PlaceholderIcon,
-  'plus': PlusIcon,
-  'print': PrintIcon,
-  'reset': ResetIcon,
-  'restart': RestartIcon,
-  'soldout-large': SoldoutLargeIcon,
-  'soldout-small': SoldoutSmallIcon,
-  'step': StepIcon,
-  'takein': TakeinIcon,
-  'takeout': TakeoutIcon,
-  'time': TimeIcon,
-  'toggle': ToggleIcon,
-  'volume': VolumeIcon,
-  'warning': WarningIcon
+  'Add': AddIcon,
+  'ArrowLeft': ArrowLeftIcon,
+  'ArrowRight': ArrowRightIcon,
+  'Cancel': CancelIcon,
+  'Contrast': ContrastIcon,
+  'Delete': DeleteIcon,
+  'Done': DoneIcon,
+  'Exit': ExitIcon,
+  'Extention': ExtentionIcon,
+  'Favicon': FaviconIcon,
+  'Help': HelpIcon,
+  'Home': HomeIcon,
+  'Info': InfoIcon,
+  'Large': LargeIcon,
+  'Lowpos': LowposIcon,
+  'Minus': MinusIcon,
+  'Ok': OkIcon,
+  'Order': OrderIcon,
+  'Pay': PayIcon,
+  'Placeholder': PlaceholderIcon,
+  'Plus': PlusIcon,
+  'Print': PrintIcon,
+  'Reset': ResetIcon,
+  'Restart': RestartIcon,
+  'SoldoutLarge': SoldoutLargeIcon,
+  'SoldoutSmall': SoldoutSmallIcon,
+  'Step': StepIcon,
+  'Takein': TakeinIcon,
+  'Takeout': TakeoutIcon,
+  'Time': TimeIcon,
+  'Toggle': ToggleIcon,
+  'Volume': VolumeIcon,
+  'Warning': WarningIcon
 };
 
 // 통합 아이콘 컴포넌트
@@ -671,7 +671,7 @@ const Icon = ({ name, ...props }) => {
 
 export default Icon;
 
-// 개별 아이콘 컴포넌트도 export (하위 호환성)
+// Named exports (개별 아이콘)
 export {
   AddIcon,
   ArrowLeftIcon,

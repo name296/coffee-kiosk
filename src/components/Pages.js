@@ -1,17 +1,30 @@
 // ============================================================================
-// 페이지 컴포넌트 통합 파일
-// 모든 페이지 컴포넌트를 하나의 파일로 관리
+// 페이지 및 프레임 컴포넌트 통합 파일
+// 모든 페이지/프레임 컴포넌트를 하나의 파일로 관리
 // ============================================================================
 
-import React, { useContext, useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
-import FocusTrap from "focus-trap-react";
+import React, { useContext, useState, useEffect, useMemo, useCallback, memo } from "react";
 import { AppContext } from "../contexts";
+import { useIdleTimeoutContext } from "../contexts/IdleTimeoutContext";
 import Button from "./Button";
-import { TakeinIcon, TakeoutIcon, DeleteIcon } from "./Icon";
-import { usePagination, useSafeDocument, useMultiModalButtonHandler } from "../hooks";
+import Icon, { 
+  TakeinIcon, TakeoutIcon, DeleteIcon,
+  ResetIcon, OrderIcon, AddIcon, PayIcon, LowposIcon, HomeIcon, ExtentionIcon,
+  ArrowLeftIcon, ArrowRightIcon
+} from "./Icon";
+import { 
+  usePagination, 
+  useSafeDocument, 
+  useMultiModalButtonHandler,
+  useCategoryLayout,
+  usePaymentCountdown,
+  useWebViewMessage,
+  useOrderNumber,
+  usePageScript
+} from "../hooks";
 import { useTimer } from "../hooks/useSingletonTimer";
-import { useTextHandler } from '../utils/tts';
-import { commonScript } from "../config/messages";
+import { useTextHandler } from '../hooks/useTTS';
+import { commonScript, PAGE_MESSAGES, PAYMENT_MESSAGES } from "../config/messages";
 import { 
   PAGINATION_CONFIG, 
   FOCUS_SECTIONS, 
@@ -27,14 +40,13 @@ import {
   WEBVIEW_RESPONSE, 
   STORAGE_KEYS 
 } from "../config/appConfig";
-import { safeQuerySelector, formatNumber, safeLocalStorage, safeParseInt } from "../utils/browserCompatibility";
-import { getAssetPath } from "../utils/pathUtils";
+import { safeLocalStorage, safeParseInt, formatNumber } from "../utils/browserCompatibility";
 
 // ============================================================================
-// 첫 번째 페이지 컴포넌트 (메인 화면)
+// 프로세스 1 컴포넌트 (메인 화면)
 // ============================================================================
 
-const FirstPage = memo(() => {
+const Process1 = memo(() => {
   const {
     sections,
     setCurrentPage,
@@ -68,7 +80,7 @@ const FirstPage = memo(() => {
 
   // 버튼 핸들러는 Button 컴포넌트의 actionType prop으로 자동 처리됨
 
-  // FirstPage 진입 시 TTS 및 타이머 시작
+  // Process1 진입 시 TTS 및 타이머 시작
   useEffect(() => {
     const timer = setTimeout(() => {
       blurActiveElement();
@@ -81,10 +93,7 @@ const FirstPage = memo(() => {
 
   return (
     <div className="main first">
-      <img
-        src={getAssetPath("/images/poster.svg")}
-        alt="coffee"
-      />
+      <img src="./images/poster.png" className="poster" alt="" />
       <div
         className="task-manager"
         data-tts-text="취식방식, 버튼 두개,"
@@ -93,7 +102,7 @@ const FirstPage = memo(() => {
         <Button
           styleClass="button start"
           ttsText="포장하기"
-          icon={<TakeoutIcon />}
+          svg={<TakeoutIcon />}
           label="포장하기"
           actionType="navigate"
           actionTarget={PAGE_CONFIG.SECOND}
@@ -101,7 +110,7 @@ const FirstPage = memo(() => {
         <Button
           styleClass="button start"
           ttsText="먹고가기"
-          icon={<TakeinIcon />}
+          svg={<TakeinIcon />}
           label="먹고가기"
           actionType="navigate"
           actionTarget={PAGE_CONFIG.SECOND}
@@ -111,13 +120,13 @@ const FirstPage = memo(() => {
   );
 });
 
-FirstPage.displayName = 'FirstPage';
+Process1.displayName = 'Process1';
 
 // ============================================================================
-// 두 번째 페이지 컴포넌트 (메뉴 선택 화면)
+// 프로세스 2 컴포넌트 (메뉴 선택 화면)
 // ============================================================================
 
-const SecondPage = memo(() => {
+const Process2 = memo(() => {
   const {
     sections,
     isLow,
@@ -132,60 +141,41 @@ const SecondPage = memo(() => {
     quantities,
     convertToKoreanQuantity,
     setCurrentPage,
-    setHandleCategoryPageNav
+    setHandleCategoryPageNav,
+    categoryInfo  // Context에서 categoryInfo 가져오기
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
-  const { startReturnTimer, stopIntroTimer } = useTimer();
+  const { stopIntroTimer } = useTimer();
 
-  const { blurActiveElement } = useSafeDocument();
+  const { blurActiveElement, getActiveElementText } = useSafeDocument();
 
-  // menu_data.json 동적 로드
-  const [menuData, setMenuData] = useState({ categoryInfo: [] });
-  
+  // 초기 탭 설정 (마운트 시 한 번만)
   useEffect(() => {
-    const loadMenuData = async () => {
-      try {
-        const response = await fetch('/menu_data.json');
-        const data = await response.json();
-        setMenuData(data);
-      } catch (error) {
-        console.error('Failed to load menu_data.json:', error);
-      }
-    };
-    loadMenuData();
+    // setTimeout으로 다음 tick에서 실행하여 렌더링 충돌 방지
+    const timer = setTimeout(() => {
+      setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB);
+    }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 초기 탭 설정
-  useEffect(() => {
-    setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB);
-  }, [setSelectedTab]);
-
-  // 페이지 로드 시 TTS 및 타이머 시작
+  // 페이지 로드 시 TTS 시작 (타이머는 useAppIdleTimeout이 전역 처리)
   useEffect(() => {
     stopIntroTimer();
     blurActiveElement();
     
     const timer = setTimeout(() => {
-      if (typeof document !== 'undefined' && document.activeElement) {
-        const pageTTS = document.activeElement.dataset.ttsText;
-        if (pageTTS) {
-          setTimeout(() => {
-            handleText(pageTTS);
-          }, TIMER_CONFIG.TTS_DELAY);
-        }
-      }
-      startReturnTimer(commonScript.return, handleText, setCurrentPage);
-      
-      // 페이지 로드 후 toggle 버튼 아이콘 마운트 확인
-      if (window.ButtonStyleGenerator) {
+      // useSafeDocument 훅을 통한 안전한 DOM 접근
+      const pageTTS = getActiveElementText();
+      if (pageTTS) {
         setTimeout(() => {
-          window.ButtonStyleGenerator.setupIconInjection();
-        }, 100);
+          handleText(pageTTS);
+        }, TIMER_CONFIG.TTS_DELAY);
       }
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [handleText, setCurrentPage, blurActiveElement, startReturnTimer, stopIntroTimer]);
+  }, [handleText, blurActiveElement, getActiveElementText, stopIntroTimer]);
 
   // useKeyboardNavigation
   useMultiModalButtonHandler({
@@ -217,10 +207,14 @@ const SecondPage = memo(() => {
     isLow
   );
 
-  // selectedTab 변경 시 페이지 리셋
+  // selectedTab 변경 시 페이지 리셋 (렌더링 충돌 방지)
   useEffect(() => {
-    resetOnChange();
-  }, [selectedTab, resetOnChange]);
+    const timer = setTimeout(() => {
+      resetOnChange();
+    }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTab]);
 
   // 메뉴 아이템 클릭 핸들러 (메모이제이션)
   const handleTouchEndWrapper = useCallback((e, id) => {
@@ -254,80 +248,17 @@ const SecondPage = memo(() => {
     handleTouchEndWrapper(e, id);
   }, [handleTouchEndWrapper]);
 
-  // 모든 카테고리 탭 (JSON 데이터 기반) - cate_id와 cate_name을 함께 저장
+  // 모든 카테고리 탭 (Context에서 가져온 categoryInfo 사용)
   const allTabs = useMemo(() => 
-    menuData.categoryInfo.map(cat => ({
+    (categoryInfo || []).map(cat => ({
       id: cat.cate_id,
       name: cat.cate_name
     })),
-    [menuData.categoryInfo]
+    [categoryInfo]
   );
 
-  // 카테고리 컨테이너 및 버튼 크기 측정을 위한 ref
-  const categoryContainerRef = useRef(null);
-  const [categoryLayout, setCategoryLayout] = useState({
-    itemsPerRow: 7,
-    rowsPerPage: 1,
-    itemsPerPage: 7
-  });
-
-  // 카테고리 레이아웃 계산 (실시간) - 한 줄 기준으로 계산
-  useEffect(() => {
-    const calculateLayout = () => {
-      if (!categoryContainerRef.current) return;
-
-      const container = categoryContainerRef.current;
-      const firstButton = container.querySelector('.button');
-      
-      if (!firstButton) return;
-      
-      const containerWidth = container.clientWidth;
-      const buttonWidth = firstButton.offsetWidth;
-      const gap = 4; // gap: 4px
-      
-      // 한 줄에 들어갈 수 있는 버튼 개수 계산
-      const itemsPerRow = Math.max(1, Math.floor((containerWidth + gap) / (buttonWidth + gap)));
-      
-      // 한 줄만 표시하도록 설정
-      const rowsPerPage = 1;
-      const itemsPerPage = itemsPerRow * rowsPerPage;
-      
-      if (itemsPerRow > 0 && itemsPerPage > 0) {
-        setCategoryLayout(prev => {
-          // 한 줄 개수가 변경된 경우에만 업데이트 (순환 참조 방지)
-          if (prev.itemsPerRow !== itemsPerRow) {
-            return {
-              itemsPerRow,
-              rowsPerPage,
-              itemsPerPage
-            };
-          }
-          return prev;
-        });
-      }
-    };
-
-    // 초기 계산 (렌더링 완료 후)
-    const timer = setTimeout(calculateLayout, 100);
-
-    // ResizeObserver로 실시간 감지
-    const resizeObserver = new ResizeObserver(() => {
-      requestAnimationFrame(calculateLayout);
-    });
-
-    if (categoryContainerRef.current) {
-      resizeObserver.observe(categoryContainerRef.current);
-    }
-
-    // 윈도우 리사이즈도 감지
-    window.addEventListener('resize', calculateLayout);
-
-    return () => {
-      clearTimeout(timer);
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', calculateLayout);
-    };
-  }, [allTabs.length]);
+  // 카테고리 레이아웃 계산
+  const { categoryContainerRef, categoryLayout } = useCategoryLayout(allTabs.length);
 
 
   // 동적 페이지네이션 - 한 줄(row) 단위로 이동
@@ -337,7 +268,8 @@ const SecondPage = memo(() => {
     currentItems: currentCategoryItems,
     handlePrevPage: handlePrevCategoryPage,
     handleNextPage: handleNextCategoryPage,
-    resetOnChange: resetCategoryOnChange,
+    goToPage: goToCategoryPage,
+    resetPage: resetCategoryPage,
   } = usePagination(
     allTabs,
     categoryLayout.itemsPerRow, // 한 줄에 들어가는 개수만큼 이동
@@ -345,11 +277,24 @@ const SecondPage = memo(() => {
     false
   );
 
-  // selectedTab 또는 레이아웃 변경 시 카테고리 페이지 리셋
+  // 레이아웃 변경 시 selectedTab이 있는 페이지로 이동 (렌더링 충돌 방지)
   useEffect(() => {
-    resetCategoryOnChange();
+    // 레이아웃이 초기값(999)이면 스킵
+    if (categoryLayout.itemsPerRow >= 999) return;
+    if (!selectedTab || allTabs.length === 0) return;
+    
+    // 다음 렌더링 사이클에서 실행
+    const timer = setTimeout(() => {
+      const tabIndex = allTabs.findIndex(tab => tab.name === selectedTab);
+      if (tabIndex === -1) return;
+      
+      const targetPage = Math.floor(tabIndex / categoryLayout.itemsPerRow) + 1;
+      goToCategoryPage(targetPage);
+    }, 50); // 약간의 지연 추가
+    
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTab, categoryLayout.itemsPerRow]);
+  }, [categoryLayout.itemsPerRow]); // selectedTab 의존성 제거
 
   // 카테고리 페이지네이션 핸들러
   const handleCategoryPageNav = useCallback((direction) => {
@@ -360,17 +305,22 @@ const SecondPage = memo(() => {
     }
   }, [handlePrevCategoryPage, handleNextCategoryPage]);
 
-  // AppContext에 카테고리 페이지네이션 핸들러 등록
+  // AppContext에 카테고리 페이지네이션 핸들러 등록 (렌더링 충돌 방지)
   useEffect(() => {
-    if (setHandleCategoryPageNav) {
+    if (!setHandleCategoryPageNav) return;
+    
+    const timer = setTimeout(() => {
       setHandleCategoryPageNav(handleCategoryPageNav);
-    }
+    }, 0);
+    
     return () => {
+      clearTimeout(timer);
       if (setHandleCategoryPageNav) {
         setHandleCategoryPageNav(null);
       }
     };
-  }, [handleCategoryPageNav, setHandleCategoryPageNav]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleCategoryPageNav]);
 
   // 탭 버튼 렌더링 헬퍼 함수
   const renderTabButton = useCallback((tab, index, isLast) => (
@@ -415,25 +365,23 @@ const SecondPage = memo(() => {
                   </div>
       <div className="menu" ref={sections.middle} data-tts-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(currentItems.length)}개,`}>
           {currentItems?.map((item, index) => (
-            <button
-              data-tts-text={item.id === DISABLED_MENU_ID ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
-              className={`button menu-item ${item.id === DISABLED_MENU_ID ? 'disabled' : ''}`}
-              aria-disabled={item.id === DISABLED_MENU_ID}
-              onClick={(e) => handleMenuItemPress(e, item.id)}
+            <Button
               key={item.id}
+              styleClass={`menu-item ${item.id === DISABLED_MENU_ID ? 'disabled' : ''}`}
+              ttsText={item.id === DISABLED_MENU_ID ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
+              disabled={item.id === DISABLED_MENU_ID}
+              onClick={(e) => handleMenuItemPress(e, item.id)}
             >
-              <div className="background dynamic">
-                <span className="content icon" aria-hidden="true">
-                  <img src={item.img} alt={item.name} onError={(e) => { console.error('Image load error:', item.img, e.target.src); }} />
-                </span>
-                <span className="content label">
-                  <div className="txt-box">
-                    <p>{item.name}</p>
-                    <p>{Number(item.price).toLocaleString()}원</p>
-                  </div>
-                </span>
-              </div>
-            </button>
+              <span className="content icon" aria-hidden="true">
+                <img src={`/images/${item.img}`} alt={item.name} />
+              </span>
+              <span className="content label">
+                <div className="txt-box">
+                  <p>{item.name}</p>
+                  <p>{Number(item.price).toLocaleString()}원</p>
+                </div>
+              </span>
+            </Button>
           ))}
       </div>
 
@@ -442,47 +390,39 @@ const SecondPage = memo(() => {
         ref={sections.bottom}
         data-tts-text={`페이지네이션, 메뉴, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
       >
-        <button
-          data-tts-text="이전, "
-          className="button"
-            onClick={(e) => handlePaginationPress(e, 'prev')}
-          >
-            <div className="background dynamic">
-              <span className="content label">&lt;&nbsp; 이전</span>
-            </div>
-          </button>
-          <span className="pagination-page-number">
-            <span
-              className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}
-            >
-              {pageNumber}
-            </span>
-            <span className="pagination-separator">&nbsp;/&nbsp;</span>
-            <span className="pagination-separator">
-              {totalPages === 0 ? 1 : totalPages}
-            </span>
+        <Button
+          ttsText="이전, "
+          svg={<ArrowLeftIcon />}
+          label="이전"
+          onClick={(e) => handlePaginationPress(e, 'prev')}
+        />
+        <span className="pagination-page-number">
+          <span className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}>
+            {pageNumber}
           </span>
-        <button
-          data-tts-text="다음,"
-          className="button"
+          <span className="pagination-separator">&nbsp;/&nbsp;</span>
+          <span className="pagination-separator">
+            {totalPages === 0 ? 1 : totalPages}
+          </span>
+        </span>
+        <Button
+          ttsText="다음,"
+          svg={<ArrowRightIcon />}
+          label="다음"
           onClick={(e) => handlePaginationPress(e, 'next')}
-          >
-            <div className="background dynamic">
-              <span className="content label">다음 &nbsp;&gt;</span>
-            </div>
-          </button>
+        />
       </div>
     </div>
   );
 });
 
-SecondPage.displayName = 'SecondPage';
+Process2.displayName = 'Process2';
 
 // ============================================================================
-// 세 번째 페이지 컴포넌트 (주문 확인 화면)
+// 프로세스 3 컴포넌트 (주문 확인 화면)
 // ============================================================================
 
-const ThirdPage = memo(() => {
+const Process3 = memo(() => {
   const {
     sections,
     totalMenuItems,
@@ -492,11 +432,9 @@ const ThirdPage = memo(() => {
     handleIncrease,
     handleDecrease,
     filterMenuItems,
-    isDeleteModal,
-    setisDeleteModal,
-    isDeleteCheckModal,
-    setisDeleteCheckModal,
-    setDeleteItemId,
+    ModalDelete,
+    ModalDeleteCheck,
+    setModalDeleteItemId,
     commonScript,
     volume,
     convertToKoreanQuantity,
@@ -511,7 +449,7 @@ const ThirdPage = memo(() => {
     [totalMenuItems, quantities]
   );
 
-  // 페이지네이션 훅 사용 (ThirdPage는 다른 페이지 크기 사용)
+  // 페이지네이션 훅 사용 (Process3는 다른 페이지 크기 사용)
   const ITEMS_PER_PAGE_NORMAL = 6;
   const ITEMS_PER_PAGE_LOW = 3;
   const ITEMS_PER_PAGE = isLow ? ITEMS_PER_PAGE_LOW : ITEMS_PER_PAGE_NORMAL;
@@ -565,26 +503,26 @@ const ThirdPage = memo(() => {
   // 수량 감소 핸들러 (메모이제이션)
   const handleTouchDecrease = useCallback((id) => {
     if (quantities[id] === 1) {
-      setDeleteItemId(id);
+      setModalDeleteItemId(id);
       if (currentItems.length > 1) {
-        setisDeleteModal(true);
+        ModalDelete.open();
       } else {
-        setisDeleteCheckModal(true);
+        ModalDeleteCheck.open();
       }
     } else {
       handleDecrease(id);
     }
-  }, [quantities, currentItems.length, setDeleteItemId, setisDeleteModal, setisDeleteCheckModal, handleDecrease]);
+  }, [quantities, currentItems.length, setModalDeleteItemId, ModalDelete, ModalDeleteCheck, handleDecrease]);
 
   // 삭제 핸들러 (메모이제이션)
   const handleTouchDelete = useCallback((id) => {
-    setDeleteItemId(id);
+    setModalDeleteItemId(id);
     if (currentItems.length > 1) {
-      setisDeleteModal(true);
+      ModalDelete.open();
     } else {
-      setisDeleteCheckModal(true);
+      ModalDeleteCheck.open();
     }
-  }, [currentItems.length, setDeleteItemId, setisDeleteModal, setisDeleteCheckModal]);
+  }, [currentItems.length, setModalDeleteItemId, ModalDelete, ModalDeleteCheck]);
 
   // 수량 버튼 핸들러 (메모이제이션)
   // ttsText가 있으므로 전역 핸들러가 TTS를 자동 처리
@@ -623,12 +561,16 @@ const ThirdPage = memo(() => {
     updateFocusableSections(focusableSections);
   }, [pageNumber, focusableSections, updateFocusableSections]);
 
-  // 아이템이 없으면 이전 페이지로
+  // 아이템이 없으면 이전 페이지로 (렌더링 충돌 방지)
   useEffect(() => {
     if (currentItems.length === 0) {
-      setCurrentPage(PAGE_CONFIG.SECOND);
+      const timer = setTimeout(() => {
+        setCurrentPage(PAGE_CONFIG.SECOND);
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [currentItems.length, setCurrentPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentItems.length]);
 
   const { blurActiveElement, getActiveElementText } = useSafeDocument();
 
@@ -650,21 +592,14 @@ const ThirdPage = memo(() => {
 
 
   return (
-    <>
       <div className="main third">
         <div className="title">
-          <span
-            style={isDark ? { color: "#FFE101" } : { color: "#8C532C" }}
-          >
-            내역
-          </span>
-          을 확인하시고&nbsp;
-          <span
-            style={isDark ? { color: "#FFE101" } : { color: "#8C532C" }}
-          >
-            결제하기
-          </span>
-          &nbsp;버튼을 누르세요
+        <div className="sentence">
+          <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>내역</span>을 확인하시고&nbsp;
+        </div>
+        <div className="sentence">
+          <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>결제하기</span>&nbsp;버튼을 누르세요
+        </div>
         </div>
         <div className="third-middle-content">
           {isLow ? (
@@ -695,49 +630,34 @@ const ThirdPage = memo(() => {
                     className="order-image-div"
                   >
                     <div className="order-index">{globalIndex}</div>
-                    <img
-                      src={item.img}
-                      alt={item.name}
-                      className="order-image"
-                    />
+                    <img src={`/images/${item.img}`} alt={item.name} className="order-image" />
                   </div>
 
                   <p className="order-name">{item.name}</p>
                   <div className="order-quantity">
-                    <button
-                      data-tts-text="수량 빼기"
-                      className="button qty-btn"
+                    <Button
+                      styleClass="qty-btn"
+                      ttsText="수량 빼기"
+                      label="-"
                       onClick={(e) => handleQuantityPress(e, item.id, 'decrease')}
-                    >
-                      <div className="background dynamic">
-                        <span className="content label">-</span>
-                      </div>
-                    </button>
+                    />
                     <span className="qty">{quantities[item.id]}</span>
-                    <button
-                      data-tts-text="수량 더하기"
-                      className="button qty-btn"
+                    <Button
+                      styleClass="qty-btn"
+                      ttsText="수량 더하기"
+                      label="+"
                       onClick={(e) => handleQuantityPress(e, item.id, 'increase')}
-                    >
-                      <div className="background dynamic">
-                        <span className="content label">+</span>
-                      </div>
-                    </button>
+                    />
                   </div>
                   <span className="order-price">
                     {formatNumber(Number(item.price * quantities[item.id]))}원
                   </span>
-                  <button
-                    data-tts-text="삭제"
-                    className="button delete-btn"
+                  <Button
+                    styleClass="delete-btn"
+                    ttsText="삭제"
+                    svg={<DeleteIcon />}
                     onClick={(e) => handleDeletePress(e, item.id)}
-                  >
-                    <div className="background dynamic">
-                      <span className="content icon" aria-hidden="true">
-                        <DeleteIcon />
-                      </span>
-                    </div>
-                  </button>
+                  />
                 </div>
 
                 <div className="row-line"></div>
@@ -746,44 +666,41 @@ const ThirdPage = memo(() => {
           })}
         </div>
         <div
-          className="pagination2"
+          className="pagination"
           ref={sections.bottom}
           data-tts-text={`페이지네이션, 주문목록, ${totalPages}페이지 중 ${pageNumber}페이지, 버튼 두 개,`}
         >
-          <button data-tts-text=" 이전," className="button" onClick={(e) => handlePaginationPress(e, 'prev')}>
-            <div className="background dynamic">
-              <span className="content label">&lt;&nbsp; 이전</span>
-            </div>
-          </button>
+          <Button
+            ttsText="이전,"
+            svg={<ArrowLeftIcon />}
+            label="이전"
+            onClick={(e) => handlePaginationPress(e, 'prev')}
+          />
           <span className="pagination-page-number">
-            <span
-              className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}
-            >
+            <span className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}>
               {pageNumber}
             </span>
             <span className="pagination-separator">&nbsp;/&nbsp;</span>
             <span className="pagination-separator">{totalPages}</span>
           </span>
-          <button data-tts-text=" 다음," className="button"
+          <Button
+            ttsText="다음,"
+            svg={<ArrowRightIcon />}
+            label="다음"
             onClick={(e) => handlePaginationPress(e, 'next')}
-          >
-            <div className="background dynamic">
-              <span className="content label">다음 &nbsp;&gt;</span>
-            </div>
-          </button>
+          />
         </div>
       </div>
-    </>
   );
 });
 
-ThirdPage.displayName = 'ThirdPage';
+Process3.displayName = 'Process3';
 
 // ============================================================================
-// 네 번째 페이지 컴포넌트 (결제 화면)
+// 프로세스 4 컴포넌트 (결제 화면)
 // ============================================================================
 
-const ForthPage = memo(() => {
+const Process4 = memo(() => {
   const {
     sections,
     totalSum,
@@ -802,8 +719,8 @@ const ForthPage = memo(() => {
     setVolume,
     isLarge,
     setisLarge,
-    setisReturnModal,
-    setisAccessibilityModal,
+    ModalReturn,
+    ModalAccessibility,
     setCurrentPage
   } = useContext(AppContext);
   // orderItems 메모이제이션
@@ -812,13 +729,32 @@ const ForthPage = memo(() => {
     [totalMenuItems, quantities, createOrderItems]
   );
   const { handleText } = useTextHandler(volume);
-  const [countdown, setCountdown] = useState(60);
-  const [orderNum, setOrderNum] = useState(0);
+  
+  // 주문 번호 관리
+  const { orderNum, updateOrderNumber } = useOrderNumber();
 
+  // 결제 카운트다운
+  const countdown = usePaymentCountdown({
+    isCreditPayContent,
+    setisCreditPayContent,
+    ModalReturn,
+    ModalAccessibility,
+    setQuantities,
+    totalMenuItems,
+    setisDark,
+    setVolume,
+    setisLarge,
+    setisLow,
+    setCurrentPage
+  });
+
+  // 웹뷰 메시지 리스너
+  useWebViewMessage(setisCreditPayContent);
+
+  // Process4 마운트 시 결제 단계 초기화 (한 번만 실행)
   useEffect(() => {
-    if (isCreditPayContent !== PAYMENT_STEPS.SELECT_METHOD) {
       setisCreditPayContent(PAYMENT_STEPS.SELECT_METHOD);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { querySelector, getActiveElementText } = useSafeDocument();
@@ -834,108 +770,7 @@ const ForthPage = memo(() => {
         }, TIMER_CONFIG.TTS_DELAY);
       }
     }
-    // startReturnTimer(commonScript.return, handleText, navigate);
-
-    // 타이머 설정 : 영수증 미출력 시 자동 마무리 단계
-    if (isCreditPayContent === PAYMENT_STEPS.PRINT_SELECT || isCreditPayContent === PAYMENT_STEPS.RECEIPT_PRINT) {
-      const resetCountdown = () => setCountdown(TIMER_CONFIG.AUTO_FINISH_DELAY); // 카운트다운 초기화 함수
-
-      // 카운트다운 설정
-      setCountdown(TIMER_CONFIG.AUTO_FINISH_DELAY);
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev === 0) {
-            clearInterval(timer);
-            setTimeout(() => {
-              setisCreditPayContent(PAYMENT_STEPS.FINISH);
-            }, 0);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, TIMER_CONFIG.INTERVAL_DELAY);
-
-      // keydown 및 click 이벤트 추가
-      const handleReset = () => resetCountdown();
-      window.addEventListener('keydown', handleReset);
-      window.addEventListener('click', handleReset);
-
-      return () => {
-        // 이벤트 리스너 제거 및 타이머 정리
-        window.removeEventListener('keydown', handleReset);
-        window.removeEventListener('click', handleReset);
-        clearInterval(timer);
-      };
-    }
-
-    // 타이머 설정 : 마무리 단계 후 첫화면으로 이동
-
-    if (isCreditPayContent === PAYMENT_STEPS.FINISH) {
-      setCountdown(TIMER_CONFIG.FINAL_PAGE_DELAY);
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev === 0) {
-            clearInterval(timer);
-            setTimeout(() => {
-              // 모달창 끄기
-              setisReturnModal(false);
-              setisAccessibilityModal(false);
-              setQuantities(
-                totalMenuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {})
-              );
-
-              // 초기설정
-              setisDark(false);
-              setVolume(1);
-              setisLarge(false);
-              setisLow(false);
-              setCurrentPage("first");
-              return 0;
-            }, 0);
-          }
-          return prev - 1;
-        });
-        }, TIMER_CONFIG.INTERVAL_DELAY);
-
-      return () => clearInterval(timer);
-    }
-    // 버튼 스타일은 ButtonStyleGenerator.calculateButtonSizes()가 처리
-    if (window.ButtonStyleGenerator) {
-      window.ButtonStyleGenerator.calculateButtonSizes();
-    }
-  }, [isCreditPayContent]);
-
-  useEffect(() => {
-    if (window.chrome?.webview) {
-      window.chrome.webview.addEventListener("message", (event) => {
-        let resData = event.data;
-        // 결과값 받으면
-        // 카드 :  뽑기-> 영수증 출력 여부 : setisCreditPayContent(3) -> setisCreditPayContent(4)
-        // 모바일 : 영수증 출력 여부 : setisCreditPayContent(4)
-        if (resData.arg.result === WEBVIEW_RESPONSE.SUCCESS) {
-          if (resData.Command === WEBVIEW_COMMANDS.PAY) {
-            setisCreditPayContent(PAYMENT_STEPS.CARD_REMOVE); // 카드 뽑는 화면 넘어가기
-          }
-          if (resData.Command === WEBVIEW_COMMANDS.PRINT) {
-            setisCreditPayContent(PAYMENT_STEPS.PRINT_SELECT); // 주문번호 출력 페이지
-          }
-        } else {
-          console.log(resData.arg.errorMessage);
-        }
-      });
-    }
-  });
-
-  // 주문 정보 전달할 때 업데이트 (메모이제이션) - 먼저 정의
-  const updateOrderNumber = useCallback(() => {
-    const currentNum = safeParseInt(safeLocalStorage.getItem(STORAGE_KEYS.ORDER_NUM), 0);
-    const tmpOrderNum = currentNum + 1;
-
-    safeLocalStorage.setItem(STORAGE_KEYS.ORDER_NUM, tmpOrderNum);
-    setOrderNum(tmpOrderNum);
-
-    return tmpOrderNum;
-  }, []);
+  }, [isCreditPayContent, querySelector, getActiveElementText, handleText]);
 
   // 결제 처리 함수들은 OrderContext에서 제공됨 (Button 컴포넌트가 자동으로 사용)
 
@@ -959,39 +794,17 @@ const ForthPage = memo(() => {
   // 6: 영수증 출력
   // 7: 마지막 멘트
 
-  const getPageScript = () => {
-    if (isCreditPayContent === 0) {
-      return `작업 안내, 결제 선택 단계. 결제 금액, ${totalSum.toLocaleString(
-        "ko-KR"
-      )}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ` + commonScript.replay;
-    } else if (isCreditPayContent === 1) {
-      return `작업안내, 신용카드 삽입, 가운데 아래에 있는 카드리더기에 신용카드를 끝까지 넣습니다, 취소 버튼으로 이전 단계, 결제선택으로 이동 할 수 있습니다, ` + commonScript.replay;
-    } else if (isCreditPayContent === 2) {
-      return `작업 안내, 모바일페이 단계, 가운데 아래에 있는 카드리더기에 휴대전화의 모바일페이를 켜고 접근시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ` + commonScript.replay;
-    } else if (isCreditPayContent === 3) {
-      return `작업 안내, 신용카드 제거, 신용카드를 뽑습니다, 정상적으로 결제되고 나서 카드가 제거되면, 자동으로 다음 작업, 인쇄 선택으로 이동합니다, 확인 버튼을 눌러 결제 상황을 확인합니다, ` + commonScript.replay;
-    } else if (isCreditPayContent === 4) {
-      return `작업 안내, 인쇄 선택, 결제되었습니다, 주문번호 ${orderNum}번, 왼쪽 아래의 프린터에서 주문표를 받으시고, 영수증 출력 여부를 선택합니다, 육십초 동안 조작이 없을 경우, 출력 안함으로 자동 선택됩니다, 화면 터치 또는 키패드 입력이 확인되면 사용 시간이 다시 육십초로 연장됩니다,` + commonScript.replay;
-    } else if (isCreditPayContent === 5) {
-      return `작업 안내, 주문표단계, 주문번호, ${orderNum}, 왼쪽 아래의 프린터에서 주문표가 출력됩니다. 인쇄가 완전히 끝나고 받습니다. 마무리하기 버튼으로 서비스 이용을 종료할 수 있습니다. ` + commonScript.replay;
-    } else if (isCreditPayContent === 6) {
-      return `작업 안내, 영수증 출력, 왼쪽 아래의 프린터에서 영수증을 받습니다, 마무리하기 버튼으로 사용을 종료할 수 있습니다, 육십초 동안 조작이 없을 경우, 마무리하기로 자동 선택됩니다, 화면 터치 또는 키패드 입력이 확인되면 사용 시간이 다시 육십초로 연장됩니다,` + commonScript.replay;
-    } else if (isCreditPayContent === 7) {
-      return `작업안내, 사용종료, 이용해주셔서 감사합니다,`;
-    } else {
-      return "";
-    }
-  };
+  // 페이지 스크립트 생성
+  const pageScript = usePageScript(isCreditPayContent, totalSum, orderNum);
 
   return (
     <div className="main forth">
       {isCreditPayContent === 0 ? (
         <>
           <div className="title">
-            <span className="highlight-text">
-              결제방법
-            </span>
-            을 선택하세요
+            <div className="sentence">
+              <span className="highlight-text"> 결제방법</span>&nbsp;을 선택하세요
+            </div>
           </div>
           <div
             className="forth-middle-content"
@@ -1015,37 +828,19 @@ const ForthPage = memo(() => {
               <Button
                 ttsText="신용카드,"
                 styleClass="pay"
-              actionType="payment"
-              actionMethod="card"
-                icon={
-                  <img
-                    style={
-                      isLow
-                        ? { width: "100px", height: "65px" }
-                        : { width: "125px", height: "85px" }
-                    }
-                    src={getAssetPath("/images/payment-card.svg")}
-                    alt="card"
-                  />
-                }
+                actionType="payment"
+                actionMethod="card"
+                img="/images/payment-card.png"
+                imgAlt="card"
                 label="신용카드"
               />
               <Button
                 ttsText="모바일페이,"
                 styleClass="pay"
-              actionType="payment"
-              actionMethod="mobile"
-                icon={
-                  <img
-                    style={
-                      isLow
-                        ? { width: "77px", height: "130px" }
-                        : { width: "110px", height: "200px" }
-                    }
-                    src={getAssetPath("/images/payment-mobile.svg")}
-                    alt="mobile"
-                  />
-                }
+                actionType="payment"
+                actionMethod="mobile"
+                img="/images/payment-mobile.png"
+                imgAlt="mobile"
                 label="모바일 페이"
               />
             </div>
@@ -1069,7 +864,7 @@ const ForthPage = memo(() => {
           ref={sections.bottom}
           className="credit-pay-content"
         >
-          <div className="credit-pay-text">
+          <div className="title">
             <div>
               가운데 아래에 있는{" "}
               <span className="highlight-text">카드리{isLow && isLarge ? <br /> : ''}더기</span>
@@ -1089,10 +884,12 @@ const ForthPage = memo(() => {
               를 끝까지 넣으세요
             </div>
           </div>
-          <img onClick={() => setisCreditPayContent(3)}
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-cardReader-insert.svg")}
-          ></img>
+          <img 
+            src="./images/device-cardReader-insert.png"
+            alt=""
+            className="credit-pay-image" 
+            onClick={() => setisCreditPayContent(3)}
+          />
           <Button
             ttsText="취소"
             styleClass="forth-main-btn2"
@@ -1100,13 +897,14 @@ const ForthPage = memo(() => {
             label="취소"
           />
         </div>
+        
       ) : isCreditPayContent === 2 ? (
         <div
           data-tts-text="작업 관리, 버튼 한 개,"
           ref={sections.bottom}
           className="credit-pay-content"
         >
-          <div className="credit-pay-text">
+          <div className="title">
             <div>
               가운데 아래에 있는{" "}
               <span className="highlight-text">카드리{isLow && isLarge ? <br /> : ''}더기</span>
@@ -1127,10 +925,12 @@ const ForthPage = memo(() => {
               를{isLow && isLarge ? <br /> : ''} 켜고 {isLow && !isLarge ? <><br></br><div className="flex center">접근시키세요</div> </> : "접근시키세요"}
             </div>
           </div>
-          <img onClick={() => setisCreditPayContent(4)}
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-cardReader-mobile.svg")}
-          ></img>
+          <img 
+            src="./images/device-cardReader-mobile.png"
+            alt=""
+            className="credit-pay-image" 
+            onClick={() => setisCreditPayContent(4)}
+          />
           <Button
             ttsText="취소"
             styleClass="forth-main-btn2"
@@ -1144,7 +944,7 @@ const ForthPage = memo(() => {
           ref={sections.bottom}
           className="credit-pay-content"
         >
-          <div className="credit-pay-text">
+          <div className="title">
             <div>
               <span className="highlight-text">
                 신용카드
@@ -1152,10 +952,12 @@ const ForthPage = memo(() => {
               를 뽑으세요.
             </div>
           </div>
-          <img onClick={() => setisCreditPayContent(4)}
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-cardReader-remove.svg")}
-          ></img>
+          <img 
+            src="./images/device-cardReader-remove.png"
+            alt=""
+            className="credit-pay-image" 
+            onClick={() => setisCreditPayContent(4)}
+          />
         </div>
       ) : isCreditPayContent === 4 ? (
         <div
@@ -1163,8 +965,8 @@ const ForthPage = memo(() => {
           ref={sections.bottom}
           className="credit-pay-content"
         >
-          <div className="credit-pay-text">
-            <div>
+          <div className="title">
+            <div className="sentence">
               <span className="highlight-text">
                 결제되었습니다
               </span>
@@ -1177,34 +979,27 @@ const ForthPage = memo(() => {
               {isLow && !isLarge ? <br /> : ""}를 받으시고
             </div>
             <div>
-              <span
-                style={
-                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
-                }
-              >
+              <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>
                 영수증 출력
               </span>
               을 선택하세요
             </div>
           </div>
-          <img
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-printer-order.svg")}
-          ></img>
+          <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
           <div className="order-num-txt">
             <span>100</span>
           </div>
-          <div className="forth-main-two-btn">
+          <div className="task-manager">
             <Button
               ttsText="영수증 출력,"
-              styleClass="forth-main-two-btn1"
+              styleClass=""
               actionType="receipt"
               actionTarget="print"
               label="영수증 출력"
             />
             <Button
               ttsText="출력 안함,"
-              styleClass="forth-main-two-btn2"
+              styleClass=""
               actionType="receipt"
               actionTarget="skip"
               label={`출력 안함${countdown}`}
@@ -1217,14 +1012,10 @@ const ForthPage = memo(() => {
           ref={sections.bottom}
           className="credit-pay-content"
         >
-          <div className="credit-pay-text">
+          <div className="title">
             <div>
               왼쪽 아래의{" "}
-              <span
-                style={
-                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
-                }
-              >
+              <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>
                 프린터
               </span>
               에서{" "}
@@ -1235,20 +1026,13 @@ const ForthPage = memo(() => {
             </div>
             <div>
               인쇄가 완전히{" "}
-              <span
-                style={
-                  isDark ? { color: "#FFE101" } : { color: "#8C532C" }
-                }
-              >
+              <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>
                 끝나고
               </span>
               &nbsp;받으세요
             </div>
           </div>
-          <img
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-printer-order.svg")}
-          ></img>
+          <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
           <div className="order-num-txt">
             <span>{orderNum}</span>
           </div>
@@ -1265,7 +1049,7 @@ const ForthPage = memo(() => {
           className="credit-pay-content"
           ref={sections.bottom}
         >
-          <div className="credit-pay-text">
+          <div className="title">
             <div>
               왼쪽 아래의{" "}
               <span className="highlight-text">
@@ -1284,10 +1068,7 @@ const ForthPage = memo(() => {
               &nbsp;버튼을 누르세{isLow && isLarge ? <br /> : ''}요.
             </div>
           </div>
-          <img
-            className="credit-pay-image"
-            src={getAssetPath("/images/device-printer-receipt.svg")}
-          ></img>
+          <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
           <Button
             ttsText="마무리하기"
             styleClass="forth-main-btn2 btn-confirm"
@@ -1297,19 +1078,11 @@ const ForthPage = memo(() => {
         </div>
       ) : isCreditPayContent === 7 ? (
         <div className="credit-pay-content">
-          <div className="credit-pay-text2">
-            <div>이용해 주셔서 감사합니다</div>
+          <div className="title">
+            이용해 주셔서 감사합니다
           </div>
-          <img
-            className="end-checked-image"
-            src={
-              isDark
-                ? getAssetPath("/images/contrast_ico_end.png")
-                : getAssetPath("/images/ico_end.png")
-            }
-          ></img>
-          <div className="return-num-txt">
-            <span>{countdown <= 0 ? '✓' : countdown}</span>
+          <div className="end-checked-image">
+            <span className="return-num-txt">{countdown <= 0 ? '✓' : countdown}</span>
           </div>
         </div>
       ) : (
@@ -1319,12 +1092,346 @@ const ForthPage = memo(() => {
   );
 });
 
-ForthPage.displayName = 'ForthPage';
+Process4.displayName = 'Process4';
+
+// ============================================================================
+// 프레임 컴포넌트 (상단/하단 네비게이션)
+// ============================================================================
+
+export const Top = memo(() => {
+  const {
+    isDark,
+    setisDark,
+    isLow,
+    setisLow,
+    isCreditPayContent,
+    currentPage,
+    sections,
+    totalSum
+  } = useContext(AppContext);
+  
+  const path = currentPage;
+
+  // getPageText 함수를 useMemo로 메모이제이션
+  const pageText = useMemo(() => {
+    switch (currentPage) {
+      case 'first':
+        return PAGE_MESSAGES.FIRST.FULL();
+      case 'second':
+        return PAGE_MESSAGES.SECOND.FULL();
+      case 'third':
+        return PAGE_MESSAGES.THIRD.FULL();
+      case 'forth': {
+        // Process4는 isCreditPayContent에 따라 다른 텍스트
+        const orderNum = safeParseInt(safeLocalStorage.getItem("ordernum"), 0);
+        switch (isCreditPayContent) {
+          case PAYMENT_STEPS.SELECT_METHOD:
+            return PAYMENT_MESSAGES.SELECT_METHOD(totalSum, formatNumber);
+          case PAYMENT_STEPS.CARD_INSERT:
+            return PAYMENT_MESSAGES.CARD_INSERT;
+          case PAYMENT_STEPS.MOBILE_PAY:
+            return PAYMENT_MESSAGES.MOBILE_PAY;
+          case PAYMENT_STEPS.CARD_REMOVE:
+            return PAYMENT_MESSAGES.CARD_REMOVE;
+          case PAYMENT_STEPS.PRINT_SELECT:
+            return PAYMENT_MESSAGES.PRINT_SELECT(orderNum);
+          case PAYMENT_STEPS.ORDER_PRINT:
+            return PAYMENT_MESSAGES.ORDER_PRINT(orderNum);
+          case PAYMENT_STEPS.RECEIPT_PRINT:
+            return PAYMENT_MESSAGES.RECEIPT_PRINT;
+          case PAYMENT_STEPS.FINISH:
+            return PAYMENT_MESSAGES.FINISH;
+          default:
+          return "";
+        }
+        }
+      default:
+        return "";
+    }
+  }, [currentPage, isCreditPayContent, totalSum]);
+
+  const getPageText = () => pageText;
+
+  return (
+    <div className="top">
+      <div className="hidden-div" ref={sections.page}>
+        <button
+          type="hidden"
+          className="hidden-btn page-btn"
+          autoFocus={currentPage !== 'first'}
+          data-tts-text={getPageText()}
+        />
+      </div>
+    </div>
+  );
+});
+
+Top.displayName = 'Top';
+
+export const Step = memo(() => {
+  const {
+    isCreditPayContent,
+    currentPage
+  } = useContext(AppContext);
+  
+  const path = currentPage;
+
+  return (
+    <>
+      {path === "second" && (
+        <div className="step">
+          <ol className="step-progress">
+            <li className="step">
+              <div className="border-circle">1</div>
+              <span className="">메뉴선택</span>
+              <span className="active step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="header-black-circle">2</div>
+              <span className="">내역확인</span>
+              <span className="step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="header-black-circle">3</div>
+              <span className="">결제</span>
+              <span className="step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="header-black-circle">4</div>
+              <span className="">완료</span>
+            </li>
+          </ol>
+        </div>
+      )}
+      {path === "third" && (
+        <div className="step">
+          <ol className="step-progress">
+            <li className="step">
+              <div className="checked-circle"></div>
+              <span className="">메뉴선택</span>
+              <span className="active step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="border-circle">2</div>
+              <span className="">내역확인</span>
+              <span className="step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="header-black-circle">3</div>
+              <span className="">결제</span>
+              <span className="step-separator">›</span>
+            </li>
+            <li className="step">
+              <div className="header-black-circle">4</div>
+              <span className="">완료</span>
+            </li>
+          </ol>
+        </div>
+      )}
+      {path === "forth" &&
+        (isCreditPayContent < 3 ? (
+          <div className="step">
+            <ol className="step-progress">
+              <li className="step">
+                <div className="checked-circle"></div>
+                <span className="">메뉴선택</span>
+                <span className="active step-separator">›</span>
+              </li>
+              <li className="step">
+                <div className="checked-circle"></div>
+                <span className="">내역확인</span>
+                <span className="step-separator">›</span>
+              </li>
+              <li className="step">
+                <div className="border-circle">3</div>
+                <span className="">결제</span>
+                <span className="step-separator">›</span>
+              </li>
+              <li className="step">
+                <div className="header-black-circle">4</div>
+                <span className="">완료</span>
+              </li>
+            </ol>
+          </div>
+        ) : (
+          <div className="step">
+            <ol className="step-progress">
+              <li className="step">
+                <div className="checked-circle"></div>
+                <span className="">메뉴선택</span>
+                <span className="active step-separator">›</span>
+              </li>
+              <li className="step">
+                <div className="checked-circle"></div>
+                <span className="">내역확인</span>
+                <span className="step-separator">›</span>
+              </li>
+              <li className="step">
+                <div className="checked-circle"></div>
+                <span className="">결제</span>
+                <span className="step-separator">›</span>
+              </li>
+              {isCreditPayContent !== 7 ? (
+                <li className="step">
+                  <div className="border-circle">4</div>
+                  <span className="">완료</span>
+                </li>
+              ) : (
+                <li className="step">
+                  <div className="checked-circle"></div>
+                  <span className="">완료</span>
+                </li>
+              )}
+            </ol>
+          </div>
+        ))}
+    </>
+  );
+});
+
+Step.displayName = 'Step';
+
+export const Summary = memo(() => {
+  const {
+    sections,
+    totalCount,
+    totalSum,
+    convertToKoreanQuantity,
+    currentPage
+  } = useContext(AppContext);
+  const path = currentPage;
+  const [isDisabledBtn, setisDisabledBtn] = useState(true);
+
+  useEffect(() => {
+    if (totalCount > 0) setisDisabledBtn(false);
+    else setisDisabledBtn(true);
+  }, [totalCount]);
+
+
+  if (path !== "second" && path !== "third") {
+    return null;
+  }
+
+  return (
+    <div className="summary">
+        <div className="task-manager">
+          <p className="summary-label">수량</p>
+          <p className="summary-text">{totalCount}개</p>
+          <div className="short-colline"></div>
+          <p className="summary-label">금액</p>
+          <p className="summary-text">
+            {formatNumber(totalSum)}원
+          </p>
+        </div>
+        <div
+          className="flex"
+          ref={sections.footer}
+          data-tts-text={`주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`}
+        >
+          {path === "second" && (
+            <>
+              <Button
+                styleClass="summary-btn"
+                ttsText="초기화,"
+                svg={<ResetIcon className="summary-btn-icon" />}
+                label="초기화"
+                actionType="modal"
+                actionTarget="Reset"
+              />
+              <Button
+                styleClass={`summary-btn ${isDisabledBtn ? "disabled" : ""}`}
+                ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`}
+                svg={<OrderIcon className="summary-btn-icon" />}
+                label="주문"
+                disabled={isDisabledBtn}
+                actionType="navigate"
+                actionTarget="third"
+              />
+            </>
+          )}
+
+          {path === "third" && (
+            <>
+              <Button
+                styleClass="summary-btn"
+                ttsText="추가하기,"
+                svg={<AddIcon className="summary-btn-icon" />}
+                label="추가"
+                actionType="navigate"
+                actionTarget="second"
+              />
+              <Button
+                styleClass="summary-btn"
+                ttsText="결제하기,"
+                svg={<PayIcon className="summary-btn-icon" />}
+                label="결제"
+                actionType="navigate"
+                actionTarget="forth"
+              />
+            </>
+          )}
+        </div>
+      </div>
+  );
+});
+
+Summary.displayName = 'Summary';
+
+export const Bottom = memo(() => {
+  const {
+    sections,
+    isCreditPayContent,
+    currentPage
+  } = useContext(AppContext);
+  const { remainingTimeFormatted, isActive } = useIdleTimeoutContext();
+  const path = currentPage;
+
+  return (
+    <div
+      className="bottom"
+        data-tts-text={
+          path === "" || (path === "forth" &&  [1,2,3].includes(isCreditPayContent)) ? "시스템 설정, 버튼 한개," : "시스템 설정, 버튼 두 개,"
+        }
+        ref={sections.bottomfooter}
+      >
+        {path === "" || (path === "forth" &&  [1,2,3].includes(isCreditPayContent)) ? (
+          <div className="footer-coffeelogo"></div>
+        ) : (
+          <Button
+            styleClass="down-footer-button btn-home"
+            ttsText="처음으로,"
+            svg={<HomeIcon />}
+            label="처음으로"
+            actionType="modal"
+            actionTarget="Return"
+          />
+        )}
+
+        {/* 타임아웃 카운트다운 표시 */}
+        {isActive && (
+          <div className="countdown">
+            <span>{remainingTimeFormatted}</span>
+          </div>
+        )}
+
+        <Button
+          styleClass="down-footer-button"
+          ttsText={path === "" ? "접근성," : "접근성,"}
+          svg={<ExtentionIcon />}
+          label="접근성"
+          actionType="modal"
+          actionTarget="Accessibility"
+        />
+      </div>
+  );
+});
+
+Bottom.displayName = 'Bottom';
 
 // ============================================================================
 // Export
 // ============================================================================
 
-export default FirstPage;
-export { FirstPage, SecondPage, ThirdPage, ForthPage };
+export default Process1;
+export { Process1, Process2, Process3, Process4 };
 

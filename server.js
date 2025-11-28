@@ -1,21 +1,13 @@
 import { build, serve } from "bun";
-import { watch, existsSync, cpSync, mkdirSync, writeFileSync } from "fs";
+import { watch, existsSync, cpSync, mkdirSync, rmSync } from "fs";
 import { config } from "./config.js";
 
 // ============================================================================
 // 서버 모드 설정
 // ============================================================================
-// 항상 개발 모드 (실시간 번들링 + 파일 감시)
-// BASE_PATH가 있어도 번들링은 계속 실행
 console.log(`🚀 Starting Bun development server`);
 console.log(`⚙️  Bundler + watcher active`);
-if (config.basename) {
-  console.log(`📍 BASE_PATH: ${config.basename}`);
-  console.log(`   Access at: http://localhost:${config.port}${config.basename}/`);
-} else {
-  console.log(`📍 BASE_PATH: (none)`);
-  console.log(`   Access at: http://localhost:${config.port}/`);
-}
+console.log(`   Access at: http://localhost:${config.port}/`);
 
 // ============================================================================
 // 자동 의존성 설치
@@ -45,38 +37,29 @@ const ensureDependencies = async () => {
 await ensureDependencies();
 
 // ============================================================================
-// 개발 환경 초기 설정 (public 복사, dist/index.html 생성)
+// 개발 환경 초기 설정 (dist 폴더 생성 + 정적 파일 복사)
 // ============================================================================
 const setupDevDist = () => {
   try {
-    // dist 폴더가 없으면 생성
     mkdirSync("./dist", { recursive: true });
-
-    // public 폴더를 dist/public으로 복사 (없으면 생성)
-    if (existsSync("./public") && !existsSync("./dist/public")) {
-      cpSync("./public", "./dist/public", { recursive: true });
-      console.log("📁 Copied public folder to dist/public");
+    
+    // 정적 파일들 복사 (images, fonts, sounds)
+    if (existsSync("./src/images")) {
+      cpSync("./src/images", "./dist/images", { recursive: true });
     }
-
-    // dist/index.html 생성 (개발용, 상대 경로 사용)
-    if (!existsSync("./dist/index.html")) {
-      const html = `<!DOCTYPE html>
-<html lang="en" oncontextmenu="return false;">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>coffee-kiosk</title>
-    <link rel="stylesheet" href="./public/fonts.css" />
-    <link rel="stylesheet" href="./App.css" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./App.js"></script>
-  </body>
-</html>`;
-      writeFileSync("./dist/index.html", html);
-      console.log("📄 Created dist/index.html for development");
+    if (existsSync("./src/fonts")) {
+      cpSync("./src/fonts", "./dist/fonts", { recursive: true });
     }
+    if (existsSync("./src/sounds")) {
+      cpSync("./src/sounds", "./dist/sounds", { recursive: true });
+    }
+    
+    // index.html 복사
+    if (existsSync("./src/index.html")) {
+      cpSync("./src/index.html", "./dist/index.html");
+    }
+    
+    console.log("📁 Static files copied to dist/");
   } catch (error) {
     console.error("⚠️  Failed to setup dev dist:", error);
   }
@@ -89,12 +72,40 @@ setupDevDist();
 // ============================================================================
 let isBuilding = false;
 
+// dist 폴더 삭제 확인 대기
+const waitForDelete = async (path, maxRetries = 10) => {
+  for (let i = 0; i < maxRetries; i++) {
+    if (!existsSync(path)) {
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  return !existsSync(path);
+};
+
 const bundleOnce = async (tag = "manual") => {
   if (isBuilding) return;
   isBuilding = true;
 
   console.log(`📦 Bundling with Bun (${tag})...`);
   try {
+    // 빌드 전 dist 폴더 정리
+    if (existsSync("./dist")) {
+      console.log("🗑️  Cleaning dist folder...");
+      rmSync("./dist", { recursive: true, force: true });
+      
+      // 삭제 완료 확인
+      const deleted = await waitForDelete("./dist");
+      if (deleted) {
+        console.log("✅ dist folder cleaned");
+      } else {
+        console.warn("⚠️  dist folder may not be fully deleted");
+      }
+    }
+    
+    // 정적 파일 복사
+    setupDevDist();
+    
     const result = await build({
       entrypoints: [config.entryFile],
       outdir: config.bundleOutputDir,
@@ -114,7 +125,7 @@ const bundleOnce = async (tag = "manual") => {
 };
 
 // 초기 번들링 실행
-  await bundleOnce("initial");
+await bundleOnce("initial");
 
 // ============================================================================
 // 파일 감시
@@ -146,26 +157,24 @@ const runIconIndexer = async () => {
 
   console.log("🎨 Regenerating icon index...");
   
-  // spawn으로 비동기 실행 (감시 블록 방지)
-  const proc = Bun.spawn(["bun", "run", "scripts/update-icons.js"], {
+  const proc = Bun.spawn(["bun", "run", "scripts/svg-to-react.js"], {
     stdout: "inherit",
     stderr: "inherit",
   });
   
-  // 메인 흐름을 막지 않도록 별도로 처리
   proc.exited
     .then((exitCode) => {
-    if (exitCode === 0) {
-      console.log("✅ Icon index updated.");
-    } else {
-      console.error(`❌ Icon index script failed with code ${exitCode}.`);
-    }
-    isUpdatingIcons = false;
+      if (exitCode === 0) {
+        console.log("✅ Icon index updated.");
+      } else {
+        console.error(`❌ Icon index script failed with code ${exitCode}.`);
+      }
+      isUpdatingIcons = false;
     })
     .catch((error) => {
-    console.error("❌ Icon index script threw an error:", error);
-    isUpdatingIcons = false;
-  });
+      console.error("❌ Icon index script threw an error:", error);
+      isUpdatingIcons = false;
+    });
 };
 
 const startIconWatcher = () => {
@@ -188,71 +197,13 @@ startIconWatcher();
 // ============================================================================
 // 헬퍼 함수
 // ============================================================================
-const rewriteHtml = (rawHtml) => {
-  // placeholder가 있으면 치환
-  if (rawHtml.includes(config.htmlPlaceholder)) {
-    return rawHtml.replace(
-      config.htmlPlaceholder,
-      `<script type="module" src="${config.bundlePublicPath}/App.js"></script>`
-    );
-  }
-  // placeholder가 없으면 그대로 반환 (index.html에 이미 올바른 경로가 설정되어 있음)
-  return rawHtml;
-};
-
 const serveStatic = async (pathname) => {
-  // public/ 디렉터리 (폰트, 이미지 등)
-  if (pathname.startsWith("/public/")) {
-    const file = Bun.file(`.${pathname}`);
-    if (await file.exists()) {
-      return new Response(file);
-    }
+  // dist/ 폴더에서 정적 파일 서빙 (Bun이 MIME 타입 자동 감지)
+  const file = Bun.file(`./dist${pathname}`);
+  if (await file.exists()) {
+    return new Response(file);
   }
-  
-  // /fonts/ → /public/fonts/ 매핑 (fonts.css에서 사용)
-  if (pathname.startsWith("/fonts/")) {
-    const file = Bun.file(`./public${pathname}`);
-    if (await file.exists()) {
-      return new Response(file);
-    }
-  }
-  
-  // src/ 디렉터리 (아이콘 등)
-  if (pathname.startsWith("/src/")) {
-    const file = Bun.file(`.${pathname}`);
-    if (await file.exists()) {
-      return new Response(file);
-    }
-  }
-  
-  // 기존 STATIC_PREFIXES, STATIC_FILES 처리
-  if (
-    config.staticFiles.includes(pathname) ||
-    config.staticPrefixes.some((prefix) => pathname.startsWith(prefix))
-  ) {
-    const file = Bun.file(`public${pathname}`);
-    if (await file.exists()) {
-      return new Response(file);
-    }
-  }
-  
   return null;
-};
-
-const serveBundleAsset = async (pathname) => {
-  if (!pathname.startsWith(`${config.bundlePublicPath}/`)) return null;
-
-  const filePath = pathname.slice(1); // remove leading slash
-  const file = Bun.file(filePath);
-  if (!(await file.exists())) {
-    return new Response("Not Found", { status: 404 });
-  }
-
-  const headers = {};
-  if (filePath.endsWith(".css")) headers["Content-Type"] = "text/css";
-  if (filePath.endsWith(".js")) headers["Content-Type"] = "application/javascript";
-
-  return new Response(file, { headers });
 };
 
 // ============================================================================
@@ -262,43 +213,27 @@ const server = serve({
   port: config.port,
   async fetch(req) {
     const url = new URL(req.url);
-    let { pathname } = url;
-
-    // BASE_PATH 처리 (예: /coffee-kiosk/second → /second)
-    const basePath = config.basename || "";
-    if (basePath && pathname.startsWith(basePath)) {
-      pathname = pathname.slice(basePath.length) || "/";
-    }
+    const { pathname } = url;
 
     // HTML 서빙: / 또는 /index.html
-    // BASE_PATH가 있으면 /coffee-kiosk/, /coffee-kiosk/index.html, /coffee-kiosk도 허용
-    const isHtmlRequest = pathname === "/" || pathname === "/index.html";
-    const isBasePathRoot =
-      basePath && (url.pathname === basePath || url.pathname === basePath + "/");
-    
-    if (isHtmlRequest || isBasePathRoot) {
+    if (pathname === "/" || pathname === "/index.html") {
       const htmlFile = Bun.file(config.htmlEntry);
       if (!(await htmlFile.exists())) {
         return new Response("index.html not found", { status: 500 });
       }
-      const html = await htmlFile.text();
-      return new Response(rewriteHtml(html), {
+      return new Response(htmlFile, {
         headers: { "Content-Type": "text/html" },
       });
     }
 
+    // 정적 파일 서빙
     const staticResponse = await serveStatic(pathname);
     if (staticResponse) return staticResponse;
 
-    const bundleResponse = await serveBundleAsset(pathname);
-    if (bundleResponse) return bundleResponse;
-
     // SPA Fallback: 다른 모든 경로는 index.html로 (클라이언트 라우팅)
-    // /first, /second, /third, /forth 등 React Router가 처리
     const htmlFile = Bun.file(config.htmlEntry);
     if (await htmlFile.exists()) {
-      const html = await htmlFile.text();
-      return new Response(rewriteHtml(html), {
+      return new Response(htmlFile, {
         headers: { "Content-Type": "text/html" },
       });
     }
