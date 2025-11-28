@@ -136,11 +136,11 @@ function generateIconComponent() {
 
   const iconComponents = [];
   const iconMapEntries = [];
-  
+
   const files = fs.readdirSync(svgDir)
     .filter(f => f.endsWith('.svg'))
     .sort();
-  
+
   console.log(`📁 ${svgDir} (${files.length}개)\n`);
   
   files.forEach(file => {
@@ -162,11 +162,11 @@ function generateIconComponent() {
       });
       
       iconMapEntries.push(`  '${iconName}': ${componentName}`);
-      
+  
       console.log(`✅ ${file} → ${componentName}`);
     } catch (error) {
       console.error(`❌ ${file} 변환 실패:`, error.message);
-    }
+}
   });
 
   // Icon.jsx 파일 생성 (모든 컴포넌트를 인라인으로 정의)

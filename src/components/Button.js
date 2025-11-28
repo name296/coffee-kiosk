@@ -4,9 +4,7 @@
 // ============================================================================
 
 import React, { memo, useContext, useCallback, useMemo, useRef, useLayoutEffect, useState } from 'react';
-import { AppContext, useButtonStyle } from '../contexts';
-import { useModal } from '../contexts/ModalContext';
-import { applyButtonDynamicStyles } from '../hooks/useButtonStyleSystem';
+import { AppContext, useButtonStyle, useModal, applyButtonMinSide } from '../App';
 import { ToggleIcon } from './Icon';
 
 
@@ -21,54 +19,56 @@ import { ToggleIcon } from './Icon';
  * 대원칙: DOM 직접 조작 금지 - props/state 기반으로 ReactDOM 조작
  * 
  * @param {object} props
- * @param {string} props.styleClass - 추가 클래스 (palette, size 등)
+ * @param {string} props.className - 추가 CSS 클래스 (React 표준)
+ * @param {object} props.style - 인라인 스타일 객체 (React 표준)
  * @param {ReactNode} props.svg - SVG 아이콘 컴포넌트 (JSX)
  * @param {string} props.img - 이미지 경로 (PNG 등)
  * @param {string} props.imgAlt - 이미지 alt 텍스트
- * @param {string} props.imgClass - 이미지 클래스
+ * @param {string} props.imgStyle - 이미지 인라인 스타일
  * @param {string} props.label - 버튼 텍스트
  * @param {string} props.actionType - 액션 타입 ('navigate', 'payment', 'cancel', 'receipt', 'finish', 'selectTab', 'tabNav', 'categoryNav')
  * @param {string} props.actionTarget - 액션 타겟 (예: 'second', 'third', 'first', 'print', 'skip', 'prev', 'next')
  * @param {string} props.actionMethod - 액션 메서드 (예: 'card', 'mobile')
  * @param {string} props.ttsText - TTS 음성 안내 텍스트 (data-tts-text에 설정됨)
  * @param {boolean} props.disabled - 비활성 상태
- * @param {number|string} props.width - 버튼 너비 (px)
- * @param {number|string} props.height - 버튼 높이 (px)
- * @param {object} props.style - 인라인 스타일
+ * @param {boolean} props.pressed - 눌린 상태 (토글 버튼용)
+ * @param {boolean} props.toggle - 토글 버튼 여부
  */
 const Button = memo(({
-  styleClass = '',
+  // React 표준 props
+  className = '',
+  style = {},
+  // 콘텐츠 props
   svg = null,
   img,
   imgAlt = '',
-  imgClass = '',
+  imgStyle = {},
   label,
+  children,
+  // 상태 props
+  disabled = false,
+  pressed = false,
+  toggle = false,
+  // 액션 props
   actionType,
   actionTarget,
   actionMethod,
+  onClick,
+  // 접근성 props
   ttsText,
-  disabled = false,
-  width,
-  height,
-  style = {},
-  children,
   ...rest
 }) => {
   // Context에서 필요한 값들 가져오기
   const context = useContext(AppContext);
-  const { playBeepSound } = useButtonStyle();
+  const { playOnPressedSound } = useButtonStyle();
   const modalContext = useModal();
   const buttonRef = useRef(null);
   
   // Pressed 상태 (입력 중일 때 pressed 스타일 적용)
   const [isPressing, setIsPressing] = useState(false);
   
-  // 버튼 마운트 시 동적 스타일 적용
-  useLayoutEffect(() => {
-    if (buttonRef.current) {
-      applyButtonDynamicStyles(buttonRef.current);
-    }
-  }, []);
+  // 마운트 시 --min-side 설정 (한 번만, offsetWidth/Height 사용 → scale 영향 없음)
+  useLayoutEffect(() => { if (buttonRef.current) applyButtonMinSide(buttonRef.current); }, []);
   
   const { 
     setCurrentPage, 
@@ -82,40 +82,40 @@ const Button = memo(({
     handleNextTab,
     handleCategoryPageNav
   } = context || {};
-
-  // pressed 상태는 styleClass props에서 파생 (DOM 조작 없이)
-  const isPressed = useMemo(() => styleClass.includes('pressed'), [styleClass]);
-  const isToggle = useMemo(() => styleClass.includes('toggle'), [styleClass]);
   
   // 팔레트 클래스 확인 (primary/secondary가 없으면 기본값 primary2 사용)
   const hasPalette = useMemo(() => 
-    /primary[123]|secondary[123]/.test(styleClass), 
-    [styleClass]
+    /primary[123]|secondary[123]/.test(className), 
+    [className]
   );
   
   // 최종 className 계산 (React가 관리)
   const buttonClasses = useMemo(() => {
-    const palette = hasPalette ? '' : 'primary2';
-    // 토글 버튼이 아닐 때만 입력 중 pressed 추가
-    const pressClass = (isPressing && !isToggle) ? 'pressed' : '';
-    return `button ${palette} ${styleClass} ${pressClass}`.trim().replace(/\s+/g, ' ');
-  }, [styleClass, hasPalette, isPressing, isToggle]);
+    const classes = ['button'];
+    
+    // 팔레트 기본값
+    if (!hasPalette) classes.push('primary2');
+    
+    // 토글 버튼
+    if (toggle) classes.push('toggle');
+    
+    // pressed 상태: props로 받은 pressed 또는 입력 중 상태
+    if (pressed || (isPressing && !toggle)) classes.push('pressed');
+    
+    // 사용자 지정 클래스
+    if (className) classes.push(className);
+    
+    return classes.filter(Boolean).join(' ');
+  }, [className, hasPalette, toggle, pressed, isPressing]);
 
-  // width/height props를 style에 병합
-  const buttonStyle = useMemo(() => ({
-    ...style,
-    ...(width && { width: typeof width === 'number' ? `${width}px` : width }),
-    ...(height && { height: typeof height === 'number' ? `${height}px` : height }),
-  }), [style, width, height]);
+  // 사용자 style props만 사용 (기본 스타일은 CSS에서 처리)
+  const buttonStyle = useMemo(() => style, [style]);
 
   // prop 기반 자동 액션 처리
   const handleAutoAction = useCallback((e) => {
     if (disabled) return;
     
     e.preventDefault();
-    
-    // 비프음 재생 (Context 기반)
-    playBeepSound();
 
     if (actionType === 'navigate' && actionTarget && setCurrentPage) {
       setCurrentPage(actionTarget);
@@ -173,14 +173,14 @@ const Button = memo(({
         modalContext[modalKey].open();
       }
     }
-  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, setSelectedTab, selectedTab, handlePreviousTab, handleNextTab, handleCategoryPageNav, modalContext, playBeepSound]);
+  }, [disabled, actionType, actionTarget, actionMethod, setCurrentPage, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, setSelectedTab, selectedTab, handlePreviousTab, handleNextTab, handleCategoryPageNav, modalContext]);
 
   // 키보드 유효성 검사
   const isValidKey = useCallback((e) => {
     return e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
   }, []);
 
-  // 입력 시작 핸들러: pressed 스타일 적용
+  // 입력 시작 핸들러: pressed 스타일 + 사운드 재생
   const onPressStart = useCallback((e) => {
     if (disabled) return;
     
@@ -190,11 +190,14 @@ const Button = memo(({
       e.preventDefault();
     }
     
+    // 사운드 재생
+    playOnPressedSound();
+    
     // 토글 버튼이 아닐 때만 pressed 스타일 적용
-    if (!isToggle) {
+    if (!toggle) {
       setIsPressing(true);
     }
-  }, [disabled, isToggle, isValidKey]);
+  }, [disabled, toggle, isValidKey, playOnPressedSound]);
 
   // 입력 종료 핸들러: 기능 실행 + pressed 스타일 제거
   const onPressEnd = useCallback((e) => {
@@ -212,15 +215,17 @@ const Button = memo(({
     }
     
     // pressed 스타일 제거
-    if (!isToggle) {
+    if (!toggle) {
       setIsPressing(false);
     }
     
-    // 기능 실행
+    // 기능 실행: actionType 우선, 없으면 onClick 콜백
     if (actionType) {
       handleAutoAction(e);
+    } else if (onClick) {
+      onClick(e);
     }
-  }, [disabled, actionType, handleAutoAction, isToggle, isValidKey]);
+  }, [disabled, actionType, handleAutoAction, toggle, isValidKey, onClick]);
 
   return (
     <button
@@ -237,14 +242,14 @@ const Button = memo(({
       onKeyUp={onPressEnd}
       disabled={disabled}
       aria-disabled={disabled}
-      aria-pressed={isToggle ? isPressed : undefined}
+      aria-pressed={toggle ? pressed : undefined}
       style={buttonStyle}
       {...rest}
     >
       <div className="background dynamic">
         {(svg || img) && (
           <span className="content icon" aria-hidden="true">
-            {svg || <img src={img} alt={imgAlt} className={imgClass} />}
+            {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
           </span>
         )}
         {label && (
@@ -252,7 +257,7 @@ const Button = memo(({
         )}
         {children}
         {/* 토글 버튼 pressed 상태 아이콘 */}
-        {isToggle && (
+        {toggle && (
           <span className="content icon pressed" aria-hidden="true">
             <ToggleIcon />
           </span>

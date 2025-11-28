@@ -4,9 +4,7 @@
 // ============================================================================
 
 import React, { useContext, useCallback } from "react";
-import { AppContext } from "../contexts";
-import { useTextHandler } from '../hooks/useTTS';
-import { useActiveElementTTS, useAccessibilitySettings, useSafeDocument, useFocusTrap, VOLUME_MAP, VOLUME_VALUES } from "../hooks";
+import { AppContext, useTextHandler, useActiveElementTTS, useAccessibilitySettings, useSafeDocument, useFocusTrap, VOLUME_MAP, VOLUME_VALUES } from "../App";
 import Button from "./Button";
 import Icon from "./Icon";
 import { ModalToggleButton } from "./CommonModals";
@@ -115,7 +113,7 @@ const AccessibilityModal = () => {
           <div className="accessibility-down-content-div1" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
             <p>초기 설정으로 일괄선택</p>
             <Button
-              styleClass="accessibility-down-content-div-btn"
+              className="accessibility-down-content-div-btn"
               label="초기설정"
               ttsText="초기설정,"
               onClick={handleInitialSettingsPress}
@@ -136,14 +134,14 @@ const AccessibilityModal = () => {
                 ttsText={`끔, ${prevAccessibility.isHighContrast ? '선택가능, ' : '선택됨, '}`}
                 isPressed={!prevAccessibility.isHighContrast}
                 onClick={() => setHighContrast(false)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
               <ModalToggleButton
                 label="켬"
                 ttsText={`켬, ${prevAccessibility.isHighContrast ? '선택됨, ' : '선택가능, '}`}
                 isPressed={prevAccessibility.isHighContrast}
                 onClick={() => setHighContrast(true)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
             </div>
           </div>
@@ -164,7 +162,7 @@ const AccessibilityModal = () => {
                   ttsText={`${VOLUME_MAP[vol]}, ${prevAccessibility.volume === vol ? '선택됨, ' : '선택가능, '}`}
                   isPressed={prevAccessibility.volume === vol}
                   onClick={() => setPrevVolume(vol)}
-                  styleClass="accessibility-down-content-div-btn2"
+                  className="accessibility-down-content-div-btn2"
                 />
               ))}
             </div>
@@ -184,14 +182,14 @@ const AccessibilityModal = () => {
                 ttsText={`끔, ${prevAccessibility.isBigSize ? '선택가능, ' : '선택됨, '}`}
                 isPressed={!prevAccessibility.isBigSize}
                 onClick={() => setBigSize(false)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
               <ModalToggleButton
                 label="켬"
                 ttsText={`켬, ${prevAccessibility.isBigSize ? '선택됨, ' : '선택가능, '}`}
                 isPressed={prevAccessibility.isBigSize}
                 onClick={() => setBigSize(true)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
             </div>
           </div>
@@ -210,14 +208,14 @@ const AccessibilityModal = () => {
                 ttsText={`끔, ${prevAccessibility.isLowScreen ? '선택가능, ' : '선택됨, '}`}
                 isPressed={!prevAccessibility.isLowScreen}
                 onClick={() => setLowScreen(false)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
               <ModalToggleButton
                 label="켬"
                 ttsText={`켬, ${prevAccessibility.isLowScreen ? '선택됨, ' : '선택가능, '}`}
                 isPressed={prevAccessibility.isLowScreen}
                 onClick={() => setLowScreen(true)}
-                styleClass="accessibility-down-content-div-btn1"
+                className="accessibility-down-content-div-btn1"
               />
             </div>
           </div>
@@ -225,13 +223,13 @@ const AccessibilityModal = () => {
           {/* 적용 버튼들 */}
           <div className="accessibility-modal-buttons" ref={sections.AccessibilitySections6} data-tts-text="작업 관리, 버튼 두 개, ">
             <Button
-              styleClass="accessibility-btn-cancel"
+              className="accessibility-btn-cancel"
               label="적용안함"
               ttsText="적용안함, "
               onClick={handleCancelPress}
             />
             <Button
-              styleClass="accessibility-btn-confirm"
+              className="accessibility-btn-confirm"
               label="적용하기"
               ttsText="적용하기, "
               onClick={handleApplyPress}
