@@ -185,7 +185,7 @@ export const useOrderNumber = () => { const [orderNum, setOrderNum] = useState(0
 export const useSound = () => { const audioRefs = useRef({}); const volumeRef = useRef(0.5); const play = useCallback((name) => { const src = CFG.SOUNDS[name]; if (!src) return; if (!audioRefs.current[name]) audioRefs.current[name] = new Audio(src); const a = audioRefs.current[name]; a.volume = volumeRef.current; a.currentTime = 0; a.play().catch(() => {}); }, []); const setVolume = useCallback((v) => { volumeRef.current = Math.max(0, Math.min(1, v)); }, []); return { play, setVolume }; };
 
 let db; const dbName = 'TTSDatabase'; const storeName = 'TTSStore'; let isPlaying = false; let replayText = '';
-export function useTextHandler(volume) { const initDB = () => new Promise((res, rej) => { const r = indexedDB.open(dbName, 1); r.onerror = (e) => rej(e.target.errorCode); r.onsuccess = (e) => { db = e.target.result; res(db); }; r.onupgradeneeded = (e) => { db = e.target.result; db.createObjectStore(storeName, { keyPath: 'key' }); }; }); const handleText = (txt, flag = true, newVol = -1) => { if (!txt) return; if (flag) replayText = txt; const v = newVol !== -1 ? VOLUME_VALUES[newVol] : VOLUME_VALUES[volume]; playText(txt, 1, v); }; const handleReplayText = () => { if (replayText) handleText(replayText, false); }; return { initDB, handleText, handleReplayText }; }
+export function useTextHandler(volume) { const initDB = useCallback(() => new Promise((res, rej) => { const r = indexedDB.open(dbName, 1); r.onerror = (e) => rej(e.target.errorCode); r.onsuccess = (e) => { db = e.target.result; res(db); }; r.onupgradeneeded = (e) => { db = e.target.result; db.createObjectStore(storeName, { keyPath: 'key' }); }; }), []); const handleText = useCallback((txt, flag = true, newVol = -1) => { if (!txt) return; if (flag) replayText = txt; const v = newVol !== -1 ? VOLUME_VALUES[newVol] : VOLUME_VALUES[volume]; playText(txt, 1, v); }, [volume]); const handleReplayText = useCallback(() => { if (replayText) handleText(replayText, false); }, [handleText]); return { initDB, handleText, handleReplayText }; }
 async function playText(text, speed, vol) { const ap = document.getElementById('audioPlayer'); if (!ap) return; const k = `audio_${text}`; const s = await getFromDB(k); if (s) { ap.src = s; ap.playbackRate = speed; ap.volume = vol; ap.play().catch(() => {}); return; } if (isPlaying) return; isPlaying = true; try { const r = await fetch('http://gtts.tovair.com:5000/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }); if (r.status === 201) { const d = await r.json(); const fr = await fetch(`http://gtts.tovair.com:5000/api/download/${d.filename}`); const b = await fr.blob(); const u = URL.createObjectURL(b); ap.src = u; ap.playbackRate = speed; ap.volume = vol; ap.play(); const rd = new FileReader(); rd.readAsDataURL(b); rd.onloadend = async () => { await saveToDB(k, rd.result); isPlaying = false; }; } else { useBrowserTTS(text, speed, vol); isPlaying = false; } } catch { useBrowserTTS(text, speed, vol); isPlaying = false; } }
 function useBrowserTTS(t, s, v) { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'ko-KR'; u.rate = s; u.volume = v; window.speechSynthesis.speak(u); } }
 async function getFromDB(k) { const d = await getDB(); return new Promise((r) => { const t = d.transaction([storeName], 'readonly'); const req = t.objectStore(storeName).get(k); req.onsuccess = (e) => r(e.target.result?.data || null); req.onerror = () => r(null); }); }
@@ -200,10 +200,10 @@ export const useAppIdleTimeout = (currentPage, setCurrentPage, resetOrder) => { 
 
 export const usePaymentCountdown = ({ isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage }) => { const [countdown, setCountdown] = useState(60); useEffect(() => { if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) { const rc = () => setCountdown(CFG.TIME.AUTO_FINISH); setCountdown(CFG.TIME.AUTO_FINISH); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => setisCreditPayContent(PAY.FINISH), 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); const h = () => rc(); window.addEventListener('keydown', h); window.addEventListener('click', h); return () => { window.removeEventListener('keydown', h); window.removeEventListener('click', h); clearInterval(t); }; } if (isCreditPayContent === PAY.FINISH) { setCountdown(CFG.TIME.FINAL_PAGE); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => { ModalReturn.close(); ModalAccessibility.close(); setQuantities(totalMenuItems.reduce((a, i) => ({ ...a, [i.id]: 0 }), {})); setisDark(false); setVolume(1); setisLarge(false); setisLow(false); setCurrentPage(CFG.PAGE_FIRST); }, 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); return () => clearInterval(t); } }, [isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage]); return countdown; };
 
-// 카테고리 레이아웃 동적 계산 (컨테이너 너비 기반, 한 줄씩 표시)
-export const useCategoryLayout = () => {
+// 카테고리 레이아웃 동적 계산 (컨테이너 크기 기반, 여러 줄 표시)
+export const useCategoryLayout = (maxRows = 2) => {
   const containerRef = useRef(null);
-  const [itemsPerRow, setItemsPerRow] = useState(999);
+  const [itemsPerPage, setItemsPerPage] = useState(999);
   
   useEffect(() => {
     const calculate = () => {
@@ -213,16 +213,21 @@ export const useCategoryLayout = () => {
       if (!btn) return;
       const containerWidth = container.clientWidth;
       const btnWidth = btn.offsetWidth;
-      const gap = 8;
-      const perRow = Math.max(1, Math.floor((containerWidth + gap) / (btnWidth + gap)));
-      setItemsPerRow(perRow);
+      const btnHeight = btn.offsetHeight;
+      const gapX = 8;
+      const gapY = 8;
+      const perRow = Math.max(1, Math.floor((containerWidth + gapX) / (btnWidth + gapX)));
+      const containerHeight = container.clientHeight || (btnHeight * maxRows + gapY * (maxRows - 1));
+      const rows = Math.max(1, Math.floor((containerHeight + gapY) / (btnHeight + gapY)));
+      const actualRows = Math.min(rows, maxRows);
+      setItemsPerPage(perRow * actualRows);
     };
     const t = setTimeout(calculate, 100);
     window.addEventListener('resize', calculate);
     return () => { clearTimeout(t); window.removeEventListener('resize', calculate); };
-  }, []);
+  }, [maxRows]);
   
-  return { containerRef, itemsPerRow };
+  return { containerRef, itemsPerPage };
 };
 
 export const useFocusTrap = (isActive, options = {}) => { const { autoFocus = true, restoreFocus = true } = options; const containerRef = useRef(null); const previousActiveElement = useRef(null); const getFocusableElements = useCallback(() => { if (!containerRef.current) return []; return Array.from(containerRef.current.querySelectorAll(CFG.FOCUSABLE)).filter(el => { const st = window.getComputedStyle(el); return st.display !== 'none' && st.visibility !== 'hidden'; }); }, []); const focusFirst = useCallback(() => { const els = getFocusableElements(); if (els.length > 0) els[0].focus(); }, [getFocusableElements]); const focusLast = useCallback(() => { const els = getFocusableElements(); if (els.length > 0) els[els.length - 1].focus(); }, [getFocusableElements]); useEffect(() => { if (!isActive) return; const hkd = (e) => { if (e.key !== 'Tab') return; const els = getFocusableElements(); if (els.length === 0) return; const first = els[0], last = els[els.length - 1], active = document.activeElement; if (e.shiftKey) { if (active === first || !containerRef.current?.contains(active)) { e.preventDefault(); focusLast(); } } else { if (active === last || !containerRef.current?.contains(active)) { e.preventDefault(); focusFirst(); } } }; const hesc = (e) => { if (e.key === 'Escape' && containerRef.current?.contains(document.activeElement)) focusFirst(); }; document.addEventListener('keydown', hkd); document.addEventListener('keydown', hesc); return () => { document.removeEventListener('keydown', hkd); document.removeEventListener('keydown', hesc); }; }, [isActive, getFocusableElements, focusFirst, focusLast]); useEffect(() => { if (isActive) { previousActiveElement.current = document.activeElement; if (autoFocus) { const t = setTimeout(() => focusFirst(), 50); return () => clearTimeout(t); } } else { if (restoreFocus && previousActiveElement.current) { previousActiveElement.current.focus(); previousActiveElement.current = null; } } }, [isActive, autoFocus, restoreFocus, focusFirst]); useEffect(() => { if (!isActive) return; const hfo = (e) => { if (containerRef.current && !containerRef.current.contains(e.relatedTarget) && e.relatedTarget !== null) { e.preventDefault(); focusFirst(); } }; containerRef.current?.addEventListener('focusout', hfo); return () => containerRef.current?.removeEventListener('focusout', hfo); }, [isActive, focusFirst]); return { containerRef, focusFirst, focusLast, getFocusableElements }; };
@@ -304,12 +309,10 @@ const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '',
 
   return (
     <button ref={btnRef} className={cls} style={style} data-tts-text={ttsText} data-react-handler="true" disabled={disabled} aria-disabled={disabled} aria-pressed={toggle ? pressed : undefined} onMouseDown={onStart} onMouseUp={onEnd} onMouseLeave={() => setIsPressing(false)} onTouchStart={onStart} onTouchEnd={onEnd} onKeyDown={onStart} onKeyUp={onEnd} {...rest}>
-      <div className="background dynamic">
-        {(svg || img) && <span className="content icon" aria-hidden="true">{svg || <img src={img} alt={imgAlt} style={imgStyle} />}</span>}
-        {label && <span className="content label">{label}</span>}
-        {children}
-        {toggle && <span className="content icon pressed" aria-hidden="true"><ToggleIcon /></span>}
-      </div>
+      {(svg || img) && <span className="content icon" aria-hidden="true">{svg || <img src={img} alt={imgAlt} style={imgStyle} />}</span>}
+      {label && <span className="content label">{label}</span>}
+      {children}
+      {toggle && <span className="content icon pressed" aria-hidden="true"><ToggleIcon /></span>}
     </button>
   );
 });
@@ -345,9 +348,9 @@ const BaseModal = memo(({ isOpen, ttsKey, icon = "GraphicWarning", onCancel, onC
       <div className="return-modal-content" ref={containerRef}>
         <Icon name={icon} className="return-modal-image" />
         <div className="return-modal-message">{children}</div>
-        <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="return-modal-buttons">
-          <Button className="w242h090 return-btn-cancel" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
-          <Button className="w242h090 return-btn-confirm" svg={<Icon name="Ok" />} label={confirmLabel} ttsText={`${confirmLabel},`} onClick={onConfirm} />
+        <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="task-manager">
+          <Button className="w242h090" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
+          <Button className="w242h090" svg={<Icon name="Ok" />} label={confirmLabel} ttsText={`${confirmLabel},`} onClick={onConfirm} />
         </div>
       </div>
     </>
@@ -496,18 +499,16 @@ export const LAYOUT_ASSEMBLY_CONTEXT = { conditions: LAYOUT_COND };
 // ============================================================================
 
 // 카테고리 탭 버튼
-const CategoryTab = memo(({ tab, isSelected, isLast }) => (
-  <>
-    <Button 
-      toggle 
-      pressed={isSelected} 
-      ttsText={`${tab.name}, ${isSelected ? "선택됨, " : "선택가능, "}`} 
-      actionType="selectTab" 
-      actionTarget={tab.name} 
-      label={tab.name} 
-    />
-    {!isLast && <div className="secondpage-short-colline" />}
-  </>
+const CategoryTab = memo(({ tab, isSelected }) => (
+  <Button 
+    className="w-auto"
+    toggle 
+    pressed={isSelected} 
+    ttsText={`${tab.name}, ${isSelected ? "선택됨, " : "선택가능, "}`} 
+    actionType="selectTab" 
+    actionTarget={tab.name} 
+    label={tab.name} 
+  />
 ));
 CategoryTab.displayName = 'CategoryTab';
 
@@ -522,12 +523,11 @@ const CategoryNav = memo(({ categories, selectedTab, pagination, containerRef, s
     >
       <Button toggle ttsText="이전" label="◀" disabled={catPage === 1} actionType="categoryNav" actionTarget="prev" />
       <div className="category" ref={containerRef}>
-        {catItems.map((tab, i) => (
+        {catItems.map((tab) => (
           <CategoryTab 
             key={tab.id} 
             tab={tab} 
             isSelected={selectedTab === tab.name} 
-            isLast={i === catItems.length - 1} 
           />
         ))}
       </div>
@@ -540,13 +540,13 @@ CategoryNav.displayName = 'CategoryNav';
 // 메뉴 아이템
 const MenuItem = memo(({ item, disabled, onPress }) => (
   <Button 
-    className="menu-item" 
+    className="w242h280" 
     ttsText={disabled ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`} 
     disabled={disabled} 
     onClick={onPress}
   >
     <span className="content icon" aria-hidden="true">
-      <img src={`/images/${item.img}`} alt={item.name} />
+      <img src={`./images/${item.img}`} alt={item.name} />
     </span>
     <span className="content label">
       <div className="txt-box">
@@ -602,16 +602,16 @@ const OrderItem = memo(({ item, index, quantity, onDecrease, onIncrease, onDelet
       >
         <div className="order-image-div">
           <div className="order-index">{index}</div>
-          <img src={`/images/${item.img}`} alt={item.name} className="order-image" />
+          <img src={`./images/${item.img}`} alt={item.name} className="order-image" />
         </div>
         <p className="order-name">{item.name}</p>
         <div className="order-quantity">
-          <Button className="qty-btn" ttsText="수량 빼기" label="-" onClick={onDecrease} />
+          <Button className="w080h076" ttsText="수량 빼기" label="-" onClick={onDecrease} />
           <span className="qty">{quantity}</span>
-          <Button className="qty-btn" ttsText="수량 더하기" label="+" onClick={onIncrease} />
+          <Button className="w080h076" ttsText="수량 더하기" label="+" onClick={onIncrease} />
         </div>
         <span className="order-price">{formatNumber(totalPrice)}원</span>
-        <Button className="delete-btn" ttsText="삭제" svg={<DeleteIcon />} onClick={onDelete} />
+        <Button className="w070h070" ttsText="삭제" svg={<DeleteIcon />} onClick={onDelete} />
       </div>
       <div className="row-line" />
     </>
@@ -693,8 +693,8 @@ const Process1 = memo(() => {
     <div className="main first">
       <img src="./images/poster.png" className="poster" alt="" />
       <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>
-        <Button className="start" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
-        <Button className="start" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
+        <Button className="w285h285" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
+        <Button className="w285h285" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
       </div>
     </div>
   );
@@ -739,8 +739,8 @@ const Process2 = memo(() => {
   const handleMenuItemPress = useCallback((e, id) => { e.preventDefault(); e.target.focus(); handleTouchEndWrapper(e, id); }, [handleTouchEndWrapper]);
 
   const allTabs = useMemo(() => (categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [categoryInfo]);
-  const { containerRef: catContainerRef, itemsPerRow: catItemsPerRow } = useCategoryLayout();
-  const { pageNumber: catPage, totalPages: catTotal, currentItems: catItems, handlePrevPage: catPrev, handleNextPage: catNext } = usePagination(allTabs, catItemsPerRow, catItemsPerRow, false);
+  const { containerRef: catContainerRef, itemsPerPage: catItemsPerPage } = useCategoryLayout(2);
+  const { pageNumber: catPage, totalPages: catTotal, currentItems: catItems, handlePrevPage: catPrev, handleNextPage: catNext } = usePagination(allTabs, catItemsPerPage, catItemsPerPage, false);
 
   // 카테고리 페이지 네비게이션 핸들러 등록
   const localCategoryPageNav = useCallback((dir) => { dir === 'prev' ? catPrev() : catNext(); }, [catPrev, catNext]);
@@ -875,8 +875,8 @@ const Process4 = memo(() => {
             <span>결제금액</span><span className="payment-amount-large">{totalSum.toLocaleString("ko-KR")}원</span>
           </div>
           <div className="task-manager" ref={sections.middle} data-tts-text="결제 선택. 버튼 두 개, ">
-            <Button ttsText="신용카드," className="pay" actionType="payment" actionMethod="card" img="/images/payment-card.png" imgAlt="card" label="신용카드" />
-            <Button ttsText="모바일페이," className="pay" actionType="payment" actionMethod="mobile" img="/images/payment-mobile.png" imgAlt="mobile" label="모바일 페이" />
+            <Button ttsText="신용카드," className="w328h460" actionType="payment" actionMethod="card" img="/images/payment-card.png" imgAlt="card" label="신용카드" />
+            <Button ttsText="모바일페이," className="w328h460" actionType="payment" actionMethod="mobile" img="/images/payment-mobile.png" imgAlt="mobile" label="모바일 페이" />
           </div>
           <div ref={sections.bottom} className="task-manager" data-tts-text="작업관리. 버튼 한 개,">
             <Button ttsText="취소," className="w500h120" actionType="cancel" actionTarget={PAGE_CONFIG.THIRD} label="취소" />
@@ -1019,8 +1019,8 @@ const Summary = memo(() => {
     <div className="summary">
       <div className="task-manager"><p className="summary-label">수량</p><p className="summary-text">{totalCount}개</p><div className="short-colline"></div><p className="summary-label">금액</p><p className="summary-text">{formatNumber(totalSum)}원</p></div>
       <div className="task-manager" ref={sections.footer} data-tts-text={`주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`}>
-        {currentPage === PAGE_CONFIG.SECOND && (<><Button className="summary-btn" ttsText="초기화," svg={<ResetIcon className="summary-btn-icon" />} label="초기화" actionType="modal" actionTarget="Reset" /><Button className="summary-btn" ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`} svg={<OrderIcon className="summary-btn-icon" />} label="주문" disabled={isDisabledBtn} actionType="navigate" actionTarget={PAGE_CONFIG.THIRD} /></>)}
-        {currentPage === PAGE_CONFIG.THIRD && (<><Button className="summary-btn" ttsText="추가하기," svg={<AddIcon className="summary-btn-icon" />} label="추가" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} /><Button className="summary-btn" ttsText="결제하기," svg={<PayIcon className="summary-btn-icon" />} label="결제" actionType="navigate" actionTarget={PAGE_CONFIG.FOURTH} /></>)}
+        {currentPage === PAGE_CONFIG.SECOND && (<><Button className="w199h090" ttsText="초기화," svg={<ResetIcon className="summary-btn-icon" />} label="초기화" actionType="modal" actionTarget="Reset" /><Button className="w199h090" ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`} svg={<OrderIcon className="summary-btn-icon" />} label="주문" disabled={isDisabledBtn} actionType="navigate" actionTarget={PAGE_CONFIG.THIRD} /></>)}
+        {currentPage === PAGE_CONFIG.THIRD && (<><Button className="w199h090" ttsText="추가하기," svg={<AddIcon className="summary-btn-icon" />} label="추가" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} /><Button className="w199h090" ttsText="결제하기," svg={<PayIcon className="summary-btn-icon" />} label="결제" actionType="navigate" actionTarget={PAGE_CONFIG.FOURTH} /></>)}
       </div>
     </div>
   );
@@ -1121,7 +1121,7 @@ const AccessibilityModal = memo(() => {
           <div className="accessibility-down-content-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
             <span className="accessibility-down-content-label">초기설정으로 일괄선택</span>
             <div className="accessibility-down-content-buttons">
-              <Button className="acc-btn acc-btn-reset" svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
+              <Button className="w200h064" svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
             </div>
           </div>
           <hr className="accessibility-down-content-line" />
@@ -1129,8 +1129,8 @@ const AccessibilityModal = memo(() => {
           <div className="accessibility-down-content-row">
             <span className="accessibility-down-content-label"><Icon name="Contrast" />고대비화면</span>
             <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections2} data-tts-text={`고대비 화면, 선택상태, ${getStatusText.highContrast}, 버튼 두 개,`}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isHighContrast ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isHighContrast} onClick={() => handleHighContrastChange(false)} className="acc-btn" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isHighContrast ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isHighContrast} onClick={() => handleHighContrastChange(true)} className="acc-btn" />
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isHighContrast ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isHighContrast} onClick={() => handleHighContrastChange(false)} className="w150h064" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isHighContrast ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isHighContrast} onClick={() => handleHighContrastChange(true)} className="w150h064" />
             </div>
           </div>
           <hr className="accessibility-down-content-line" />
@@ -1139,7 +1139,7 @@ const AccessibilityModal = memo(() => {
             <span className="accessibility-down-content-label"><Icon name="Volume" />소리크기</span>
             <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections3} data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
               {[0, 1, 2, 3].map((vol) => (
-                <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="acc-btn acc-btn-volume" />
+                <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="w076h064" />
               ))}
             </div>
           </div>
@@ -1148,8 +1148,8 @@ const AccessibilityModal = memo(() => {
           <div className="accessibility-down-content-row">
             <span className="accessibility-down-content-label"><Icon name="Large" />큰글씨화면</span>
             <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections4} data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.bigSize}, 버튼 두 개, `}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isBigSize ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isBigSize} onClick={() => handleBigSizeChange(false)} className="acc-btn" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isBigSize ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isBigSize} onClick={() => handleBigSizeChange(true)} className="acc-btn" />
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isBigSize ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isBigSize} onClick={() => handleBigSizeChange(false)} className="w150h064" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isBigSize ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isBigSize} onClick={() => handleBigSizeChange(true)} className="w150h064" />
             </div>
           </div>
           <hr className="accessibility-down-content-line" />
@@ -1157,14 +1157,14 @@ const AccessibilityModal = memo(() => {
           <div className="accessibility-down-content-row">
             <span className="accessibility-down-content-label"><Icon name="Lowpos" />낮은화면</span>
             <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections5} data-tts-text={`낮은 화면, 선택상태, ${getStatusText.lowScreen}, 버튼 두 개, `}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLowScreen ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLowScreen} onClick={() => handleLowScreenChange(false)} className="acc-btn" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLowScreen ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLowScreen} onClick={() => handleLowScreenChange(true)} className="acc-btn" />
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLowScreen ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLowScreen} onClick={() => handleLowScreenChange(false)} className="w150h064" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLowScreen ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLowScreen} onClick={() => handleLowScreenChange(true)} className="w150h064" />
             </div>
           </div>
           {/* 적용 버튼들 */}
           <div className="accessibility-modal-buttons" ref={sections.AccessibilitySections6} data-tts-text="작업 관리, 버튼 두 개, ">
-            <Button className="acc-btn acc-btn-action" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
-            <Button className="acc-btn acc-btn-action" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
+            <Button className="w200h072" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
+            <Button className="w200h072" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
           </div>
         </div>
       </div>
