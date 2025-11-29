@@ -35,25 +35,141 @@ import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIco
 // ============================================================================
 
 export const safeLocalStorage = {
-  getItem: (key, defaultValue = null) => { try { if (typeof window === 'undefined' || !window.localStorage) return defaultValue; const v = window.localStorage.getItem(key); return v !== null ? v : defaultValue; } catch { return defaultValue; } },
-  setItem: (key, value) => { try { if (typeof window === 'undefined' || !window.localStorage) return false; window.localStorage.setItem(key, String(value)); return true; } catch { return false; } },
-  removeItem: (key) => { try { if (typeof window === 'undefined' || !window.localStorage) return false; window.localStorage.removeItem(key); return true; } catch { return false; } }
+  getItem: (key, defaultValue = null) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return defaultValue;
+      const v = window.localStorage.getItem(key);
+      return v !== null ? v : defaultValue;
+    } catch { return defaultValue; }
+  },
+  setItem: (key, value) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return false;
+      window.localStorage.setItem(key, String(value));
+      return true;
+    } catch { return false; }
+  },
+  removeItem: (key) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return false;
+      window.localStorage.removeItem(key);
+      return true;
+    } catch { return false; }
+  }
 };
-export const safeParseInt = (v, d = 0) => { if (v == null || v === '') return d; const p = parseInt(v, 10); return isNaN(p) ? d : p; };
-export const safeParseFloat = (v, d = 0) => { if (v == null || v === '') return d; const p = parseFloat(v); return isNaN(p) ? d : p; };
-export const formatNumber = (n, l = 'ko-KR', o = {}) => { if (n == null || isNaN(n)) return '0'; const num = typeof n === 'string' ? parseFloat(n) : n; if (isNaN(num)) return '0'; try { return num.toLocaleString(l, { minimumFractionDigits: 0, maximumFractionDigits: 0, ...o }); } catch { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); } };
-export const safeQuerySelector = (s, c = null) => { try { if (typeof document === 'undefined') return null; return (c || document).querySelector(s); } catch { return null; } };
+export const safeParseInt = (v, d = 0) => {
+  if (v == null || v === '') return d;
+  const p = parseInt(v, 10);
+  return isNaN(p) ? d : p;
+};
+
+export const safeParseFloat = (v, d = 0) => {
+  if (v == null || v === '') return d;
+  const p = parseFloat(v);
+  return isNaN(p) ? d : p;
+};
+
+export const formatNumber = (n, l = 'ko-KR', o = {}) => {
+  if (n == null || isNaN(n)) return '0';
+  const num = typeof n === 'string' ? parseFloat(n) : n;
+  if (isNaN(num)) return '0';
+  try {
+    return num.toLocaleString(l, { minimumFractionDigits: 0, maximumFractionDigits: 0, ...o });
+  } catch {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+};
+
+export const safeQuerySelector = (s, c = null) => {
+  try {
+    if (typeof document === 'undefined') return null;
+    return (c || document).querySelector(s);
+  } catch { return null; }
+};
 
 const UNITS = ["", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉"];
 const TENS = ["", "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"];
 const HUNDREDS = ["", "백", "이백", "삼백", "사백", "오백", "육백", "칠백", "팔백", "구백"];
-export const convertToKoreanQuantity = (num) => { const n = typeof num === 'string' ? parseInt(num, 10) : Math.floor(Number(num)); if (isNaN(n) || n < 1 || n > 999) return n; if (n <= 9) return UNITS[n]; const h = Math.floor(n / 100), t = Math.floor((n % 100) / 10), o = n % 10; let r = ''; if (h > 0) r += HUNDREDS[h]; if (t > 0) r += TENS[t]; if (o > 0) r += UNITS[o]; return r || n; };
+export const convertToKoreanQuantity = (num) => {
+  const n = typeof num === 'string' ? parseInt(num, 10) : Math.floor(Number(num));
+  if (isNaN(n) || n < 1 || n > 999) return n;
+  if (n <= 9) return UNITS[n];
+  const h = Math.floor(n / 100);
+  const t = Math.floor((n % 100) / 10);
+  const o = n % 10;
+  let r = '';
+  if (h > 0) r += HUNDREDS[h];
+  if (t > 0) r += TENS[t];
+  if (o > 0) r += UNITS[o];
+  return r || n;
+};
 
-export const SizeControlManager = { DEFAULT_WIDTH_SCALE: 1.0, DEFAULT_HEIGHT_SCALE: 1.0, MIN_SCALE: 0.5, MAX_SCALE: 2.0, currentWidthScale: 1.0, currentHeightScale: 1.0, init() { this.currentWidthScale = this.DEFAULT_WIDTH_SCALE; this.currentHeightScale = this.DEFAULT_HEIGHT_SCALE; this.applyScaleToButtons(); }, setWidthScale(s) { this.currentWidthScale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, s)); this.applyScaleToButtons(); }, setHeightScale(s) { this.currentHeightScale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, s)); this.applyScaleToButtons(); }, applyScaleToButtons() { document.documentElement.style.setProperty('--button-width-scale', this.currentWidthScale); document.documentElement.style.setProperty('--button-height-scale', this.currentHeightScale); }, reset() { this.setWidthScale(this.DEFAULT_WIDTH_SCALE); this.setHeightScale(this.DEFAULT_HEIGHT_SCALE); }, getScales() { return { width: this.currentWidthScale, height: this.currentHeightScale }; } };
+export const SizeControlManager = {
+  DEFAULT_WIDTH_SCALE: 1.0,
+  DEFAULT_HEIGHT_SCALE: 1.0,
+  MIN_SCALE: 0.5,
+  MAX_SCALE: 2.0,
+  currentWidthScale: 1.0,
+  currentHeightScale: 1.0,
+  
+  init() {
+    this.currentWidthScale = this.DEFAULT_WIDTH_SCALE;
+    this.currentHeightScale = this.DEFAULT_HEIGHT_SCALE;
+    this.applyScaleToButtons();
+  },
+  
+  setWidthScale(s) {
+    this.currentWidthScale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, s));
+    this.applyScaleToButtons();
+  },
+  
+  setHeightScale(s) {
+    this.currentHeightScale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, s));
+    this.applyScaleToButtons();
+  },
+  
+  applyScaleToButtons() {
+    document.documentElement.style.setProperty('--button-width-scale', this.currentWidthScale);
+    document.documentElement.style.setProperty('--button-height-scale', this.currentHeightScale);
+  },
+  
+  reset() {
+    this.setWidthScale(this.DEFAULT_WIDTH_SCALE);
+    this.setHeightScale(this.DEFAULT_HEIGHT_SCALE);
+  },
+  
+  getScales() {
+    return { width: this.currentWidthScale, height: this.currentHeightScale };
+  }
+};
 
 const SCREEN = { WIDTH: 1080, HEIGHT: 1920 };
-export function setViewportZoom() { const { WIDTH: bw, HEIGHT: bh } = SCREEN; const vw = window.innerWidth, vh = window.innerHeight; const zoom = Math.min(vw / bw, vh / bh); const html = document.documentElement; if (html) { html.style.transform = `scale(${zoom})`; html.style.transformOrigin = 'top left'; const sw = bw * zoom, sh = bh * zoom; html.style.position = 'fixed'; html.style.top = `${(vh - sh) / 2}px`; html.style.left = `${(vw - sw) / 2}px`; html.style.width = `${bw}px`; html.style.height = `${bh}px`; } }
-export function setupViewportResize() { const h = () => setViewportZoom(); window.addEventListener("resize", h); return () => window.removeEventListener("resize", h); }
+
+export function setViewportZoom() {
+  const { WIDTH: bw, HEIGHT: bh } = SCREEN;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const zoom = Math.min(vw / bw, vh / bh);
+  const html = document.documentElement;
+  
+  if (html) {
+    html.style.transform = `scale(${zoom})`;
+    html.style.transformOrigin = 'top left';
+    const sw = bw * zoom;
+    const sh = bh * zoom;
+    html.style.position = 'fixed';
+    html.style.top = `${(vh - sh) / 2}px`;
+    html.style.left = `${(vw - sw) / 2}px`;
+    html.style.width = `${bw}px`;
+    html.style.height = `${bh}px`;
+  }
+}
+
+export function setupViewportResize() {
+  const h = () => setViewportZoom();
+  window.addEventListener("resize", h);
+  return () => window.removeEventListener("resize", h);
+}
 
 // ============================================================================
 // 내부 상수 (Hooks/Contexts용)
@@ -103,11 +219,80 @@ export const TTS = {
 // Hooks
 // ============================================================================
 
-export const useBodyClass = (className, condition) => { useEffect(() => { if (typeof document === 'undefined') return; if (condition) document.body.classList.add(className); else document.body.classList.remove(className); return () => document.body.classList.remove(className); }, [className, condition]); };
+export const useBodyClass = (className, condition) => {
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (condition) document.body.classList.add(className);
+    else document.body.classList.remove(className);
+    return () => document.body.classList.remove(className);
+  }, [className, condition]);
+};
 
-export const usePagination = (items, itemsPerPageNormal, itemsPerPageLow, isLow) => { const itemsPerPage = isLow ? itemsPerPageLow : itemsPerPageNormal; const [pageNumber, setPageNumber] = useState(1); const totalPages = useMemo(() => (!items || items.length === 0) ? 1 : Math.ceil(items.length / itemsPerPage), [items, itemsPerPage]); const currentItems = useMemo(() => { if (!items || items.length === 0) return []; const s = (pageNumber - 1) * itemsPerPage; return items.slice(s, s + itemsPerPage); }, [items, pageNumber, itemsPerPage]); const handlePrevPage = useCallback(() => setPageNumber(p => p > 1 ? p - 1 : p), []); const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : p), [totalPages]); const goToPage = useCallback((p) => { if (p >= 1 && p <= totalPages) setPageNumber(p); }, [totalPages]); const resetPage = useCallback(() => setPageNumber(1), []); const resetOnChange = useCallback(() => setPageNumber(1), []); return { pageNumber, totalPages, currentItems, itemsPerPage, handlePrevPage, handleNextPage, goToPage, resetPage, resetOnChange, setPageNumber }; };
+export const usePagination = (items, itemsPerPageNormal, itemsPerPageLow, isLow) => {
+  const itemsPerPage = isLow ? itemsPerPageLow : itemsPerPageNormal;
+  const [pageNumber, setPageNumber] = useState(1);
+  
+  const totalPages = useMemo(() => 
+    (!items || items.length === 0) ? 1 : Math.ceil(items.length / itemsPerPage),
+    [items, itemsPerPage]
+  );
+  
+  const currentItems = useMemo(() => {
+    if (!items || items.length === 0) return [];
+    const s = (pageNumber - 1) * itemsPerPage;
+    return items.slice(s, s + itemsPerPage);
+  }, [items, pageNumber, itemsPerPage]);
+  
+  const handlePrevPage = useCallback(() => setPageNumber(p => p > 1 ? p - 1 : p), []);
+  const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : p), [totalPages]);
+  const goToPage = useCallback((p) => { if (p >= 1 && p <= totalPages) setPageNumber(p); }, [totalPages]);
+  const resetPage = useCallback(() => setPageNumber(1), []);
+  const resetOnChange = useCallback(() => setPageNumber(1), []);
+  
+  return {
+    pageNumber, totalPages, currentItems, itemsPerPage,
+    handlePrevPage, handleNextPage, goToPage, resetPage, resetOnChange, setPageNumber
+  };
+};
 
-export const useSafeDocument = () => { const querySelector = useCallback((s) => safeQuerySelector(s), []); const getElementById = useCallback((id) => typeof document !== 'undefined' ? document.getElementById(id) : null, []); const toggleBodyClass = useCallback((c, cond) => { if (typeof document === 'undefined') return; if (cond) document.body.classList.add(c); else document.body.classList.remove(c); }, []); const blurActiveElement = useCallback(() => { if (typeof document !== 'undefined' && document.activeElement) document.activeElement.blur(); }, []); const getActiveElementText = useCallback(() => typeof document !== 'undefined' && document.activeElement ? document.activeElement.dataset.ttsText || null : null, []); const setAudioVolume = useCallback((audioId, vol) => { if (typeof document === 'undefined') return; const a = document.getElementById(audioId); if (a) a.volume = vol; }, []); return { querySelector, getElementById, toggleBodyClass, blurActiveElement, getActiveElementText, setAudioVolume }; };
+export const useSafeDocument = () => {
+  const querySelector = useCallback((s) => safeQuerySelector(s), []);
+  
+  const getElementById = useCallback((id) => 
+    typeof document !== 'undefined' ? document.getElementById(id) : null, 
+    []
+  );
+  
+  const toggleBodyClass = useCallback((c, cond) => {
+    if (typeof document === 'undefined') return;
+    if (cond) document.body.classList.add(c);
+    else document.body.classList.remove(c);
+  }, []);
+  
+  const blurActiveElement = useCallback(() => {
+    if (typeof document !== 'undefined' && document.activeElement) {
+      document.activeElement.blur();
+    }
+  }, []);
+  
+  const getActiveElementText = useCallback(() => 
+    typeof document !== 'undefined' && document.activeElement 
+      ? document.activeElement.dataset.ttsText || null 
+      : null,
+    []
+  );
+  
+  const setAudioVolume = useCallback((audioId, vol) => {
+    if (typeof document === 'undefined') return;
+    const a = document.getElementById(audioId);
+    if (a) a.volume = vol;
+  }, []);
+  
+  return {
+    querySelector, getElementById, toggleBodyClass,
+    blurActiveElement, getActiveElementText, setAudioVolume
+  };
+};
 
 // 메뉴 데이터 훅 - 네스티드 구조 기반
 export const useMenuData = () => {
@@ -180,23 +365,261 @@ export const useMenuUtils = () => {
   return { categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems };
 };
 
-export const useOrderNumber = () => { const [orderNum, setOrderNum] = useState(0); const updateOrderNumber = useCallback(() => { const c = safeParseInt(safeLocalStorage.getItem('ordernum'), 0); const n = c + 1; safeLocalStorage.setItem('ordernum', n); setOrderNum(n); return n; }, []); return { orderNum, updateOrderNumber }; };
+export const useOrderNumber = () => {
+  const [orderNum, setOrderNum] = useState(0);
+  
+  const updateOrderNumber = useCallback(() => {
+    const c = safeParseInt(safeLocalStorage.getItem('ordernum'), 0);
+    const n = c + 1;
+    safeLocalStorage.setItem('ordernum', n);
+    setOrderNum(n);
+    return n;
+  }, []);
+  
+  return { orderNum, updateOrderNumber };
+};
 
-export const useSound = () => { const audioRefs = useRef({}); const volumeRef = useRef(0.5); const play = useCallback((name) => { const src = CFG.SOUNDS[name]; if (!src) return; if (!audioRefs.current[name]) audioRefs.current[name] = new Audio(src); const a = audioRefs.current[name]; a.volume = volumeRef.current; a.currentTime = 0; a.play().catch(() => {}); }, []); const setVolume = useCallback((v) => { volumeRef.current = Math.max(0, Math.min(1, v)); }, []); return { play, setVolume }; };
+export const useSound = () => {
+  const audioRefs = useRef({});
+  const volumeRef = useRef(0.5);
+  
+  const play = useCallback((name) => {
+    const src = CFG.SOUNDS[name];
+    if (!src) return;
+    if (!audioRefs.current[name]) {
+      audioRefs.current[name] = new Audio(src);
+    }
+    const a = audioRefs.current[name];
+    a.volume = volumeRef.current;
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  }, []);
+  
+  const setVolume = useCallback((v) => {
+    volumeRef.current = Math.max(0, Math.min(1, v));
+  }, []);
+  
+  return { play, setVolume };
+};
 
-let db; const dbName = 'TTSDatabase'; const storeName = 'TTSStore'; let isPlaying = false; let replayText = '';
-export function useTextHandler(volume) { const initDB = useCallback(() => new Promise((res, rej) => { const r = indexedDB.open(dbName, 1); r.onerror = (e) => rej(e.target.errorCode); r.onsuccess = (e) => { db = e.target.result; res(db); }; r.onupgradeneeded = (e) => { db = e.target.result; db.createObjectStore(storeName, { keyPath: 'key' }); }; }), []); const handleText = useCallback((txt, flag = true, newVol = -1) => { if (!txt) return; if (flag) replayText = txt; const v = newVol !== -1 ? VOLUME_VALUES[newVol] : VOLUME_VALUES[volume]; playText(txt, 1, v); }, [volume]); const handleReplayText = useCallback(() => { if (replayText) handleText(replayText, false); }, [handleText]); return { initDB, handleText, handleReplayText }; }
-async function playText(text, speed, vol) { const ap = document.getElementById('audioPlayer'); if (!ap) return; const k = `audio_${text}`; const s = await getFromDB(k); if (s) { ap.src = s; ap.playbackRate = speed; ap.volume = vol; ap.play().catch(() => {}); return; } if (isPlaying) return; isPlaying = true; try { const r = await fetch('http://gtts.tovair.com:5000/api/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }); if (r.status === 201) { const d = await r.json(); const fr = await fetch(`http://gtts.tovair.com:5000/api/download/${d.filename}`); const b = await fr.blob(); const u = URL.createObjectURL(b); ap.src = u; ap.playbackRate = speed; ap.volume = vol; ap.play(); const rd = new FileReader(); rd.readAsDataURL(b); rd.onloadend = async () => { await saveToDB(k, rd.result); isPlaying = false; }; } else { useBrowserTTS(text, speed, vol); isPlaying = false; } } catch { useBrowserTTS(text, speed, vol); isPlaying = false; } }
-function useBrowserTTS(t, s, v) { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'ko-KR'; u.rate = s; u.volume = v; window.speechSynthesis.speak(u); } }
-async function getFromDB(k) { const d = await getDB(); return new Promise((r) => { const t = d.transaction([storeName], 'readonly'); const req = t.objectStore(storeName).get(k); req.onsuccess = (e) => r(e.target.result?.data || null); req.onerror = () => r(null); }); }
-async function saveToDB(k, d) { const db2 = await getDB(); return new Promise((r) => { const t = db2.transaction([storeName], 'readwrite'); t.objectStore(storeName).put({ key: k, data: d }); t.oncomplete = r; }); }
-async function getDB() { if (!db) { await new Promise((r) => { const req = indexedDB.open(dbName, 1); req.onsuccess = () => { db = req.result; r(); }; req.onupgradeneeded = (e) => { db = e.target.result; db.createObjectStore(storeName, { keyPath: 'key' }); }; }); } return db; }
+let db;
+const dbName = 'TTSDatabase';
+const storeName = 'TTSStore';
+let isPlaying = false;
+let replayText = '';
 
-export const useActiveElementTTS = (handleText, delay = CFG.TTS_DELAY, condition = true, shouldBlur = false) => { useEffect(() => { if (!condition) return; if (shouldBlur && typeof document !== 'undefined' && document.activeElement?.blur) document.activeElement.blur(); const t = setTimeout(() => { if (typeof document !== 'undefined' && document.activeElement?.dataset?.ttsText) handleText(document.activeElement.dataset.ttsText); }, delay); return () => clearTimeout(t); }, [handleText, delay, condition, shouldBlur]); };
+export function useTextHandler(volume) {
+  const initDB = useCallback(() => new Promise((res, rej) => {
+    const r = indexedDB.open(dbName, 1);
+    r.onerror = (e) => rej(e.target.errorCode);
+    r.onsuccess = (e) => { db = e.target.result; res(db); };
+    r.onupgradeneeded = (e) => {
+      db = e.target.result;
+      db.createObjectStore(storeName, { keyPath: 'key' });
+    };
+  }), []);
+  
+  const handleText = useCallback((txt, flag = true, newVol = -1) => {
+    if (!txt) return;
+    if (flag) replayText = txt;
+    const v = newVol !== -1 ? VOLUME_VALUES[newVol] : VOLUME_VALUES[volume];
+    playText(txt, 1, v);
+  }, [volume]);
+  
+  const handleReplayText = useCallback(() => {
+    if (replayText) handleText(replayText, false);
+  }, [handleText]);
+  
+  return { initDB, handleText, handleReplayText };
+}
+async function playText(text, speed, vol) {
+  const ap = document.getElementById('audioPlayer');
+  if (!ap) return;
+  
+  const k = `audio_${text}`;
+  const s = await getFromDB(k);
+  
+  if (s) {
+    ap.src = s;
+    ap.playbackRate = speed;
+    ap.volume = vol;
+    ap.play().catch(() => {});
+    return;
+  }
+  
+  if (isPlaying) return;
+  isPlaying = true;
+  
+  try {
+    const r = await fetch('http://gtts.tovair.com:5000/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    
+    if (r.status === 201) {
+      const d = await r.json();
+      const fr = await fetch(`http://gtts.tovair.com:5000/api/download/${d.filename}`);
+      const b = await fr.blob();
+      const u = URL.createObjectURL(b);
+      ap.src = u;
+      ap.playbackRate = speed;
+      ap.volume = vol;
+      ap.play();
+      
+      const rd = new FileReader();
+      rd.readAsDataURL(b);
+      rd.onloadend = async () => {
+        await saveToDB(k, rd.result);
+        isPlaying = false;
+      };
+    } else {
+      useBrowserTTS(text, speed, vol);
+      isPlaying = false;
+    }
+  } catch {
+    useBrowserTTS(text, speed, vol);
+    isPlaying = false;
+  }
+}
 
-export const formatRemainingTime = (ms) => { if (ms <= 0) return "00:00"; const s = Math.ceil(ms / 1000); const m = Math.floor(s / 60); const sec = s % 60; return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; };
-export const useIdleTimeout = (onTimeout, timeout = CFG.IDLE_TIMEOUT, enabled = true) => { const timerRef = useRef(null); const intervalRef = useRef(null); const lastActivityRef = useRef(Date.now()); const onTimeoutRef = useRef(onTimeout); const timeoutRef = useRef(timeout); const [remainingTime, setRemainingTime] = useState(timeout); useEffect(() => { onTimeoutRef.current = onTimeout; timeoutRef.current = timeout; }, [onTimeout, timeout]); const resetTimer = useCallback(() => { lastActivityRef.current = Date.now(); setRemainingTime(timeoutRef.current); if (timerRef.current) clearTimeout(timerRef.current); timerRef.current = setTimeout(() => { if (onTimeoutRef.current) onTimeoutRef.current(); }, timeoutRef.current); }, []); useEffect(() => { if (!enabled) { setRemainingTime(timeout); return; } intervalRef.current = setInterval(() => { setRemainingTime(Math.max(0, timeout - (Date.now() - lastActivityRef.current))); }, 1000); return () => { if (intervalRef.current) clearInterval(intervalRef.current); }; }, [enabled, timeout]); useEffect(() => { if (!enabled) { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; } return; } const events = ['mousedown', 'keydown', 'touchstart', 'click']; events.forEach(e => document.addEventListener(e, resetTimer, { passive: true })); resetTimer(); return () => { if (timerRef.current) clearTimeout(timerRef.current); events.forEach(e => document.removeEventListener(e, resetTimer)); }; }, [enabled, resetTimer]); return { resetTimer, remainingTime, remainingTimeFormatted: formatRemainingTime(remainingTime) }; };
-export const useAppIdleTimeout = (currentPage, setCurrentPage, resetOrder) => { const handleTimeout = useCallback(() => { if (resetOrder) resetOrder(); setCurrentPage(CFG.PAGE_FIRST); }, [setCurrentPage, resetOrder]); const { remainingTime, remainingTimeFormatted, resetTimer } = useIdleTimeout(handleTimeout, CFG.IDLE_TIMEOUT, true); return { remainingTime, remainingTimeFormatted, isActive: true, resetTimer }; };
+function useBrowserTTS(t, s, v) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'ko-KR';
+    u.rate = s;
+    u.volume = v;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+async function getFromDB(k) {
+  const d = await getDB();
+  return new Promise((r) => {
+    const t = d.transaction([storeName], 'readonly');
+    const req = t.objectStore(storeName).get(k);
+    req.onsuccess = (e) => r(e.target.result?.data || null);
+    req.onerror = () => r(null);
+  });
+}
+
+async function saveToDB(k, d) {
+  const db2 = await getDB();
+  return new Promise((r) => {
+    const t = db2.transaction([storeName], 'readwrite');
+    t.objectStore(storeName).put({ key: k, data: d });
+    t.oncomplete = r;
+  });
+}
+
+async function getDB() {
+  if (!db) {
+    await new Promise((r) => {
+      const req = indexedDB.open(dbName, 1);
+      req.onsuccess = () => { db = req.result; r(); };
+      req.onupgradeneeded = (e) => {
+        db = e.target.result;
+        db.createObjectStore(storeName, { keyPath: 'key' });
+      };
+    });
+  }
+  return db;
+}
+
+export const useActiveElementTTS = (handleText, delay = CFG.TTS_DELAY, condition = true, shouldBlur = false) => {
+  useEffect(() => {
+    if (!condition) return;
+    
+    if (shouldBlur && typeof document !== 'undefined' && document.activeElement?.blur) {
+      document.activeElement.blur();
+    }
+    
+    const t = setTimeout(() => {
+      if (typeof document !== 'undefined' && document.activeElement?.dataset?.ttsText) {
+        handleText(document.activeElement.dataset.ttsText);
+      }
+    }, delay);
+    
+    return () => clearTimeout(t);
+  }, [handleText, delay, condition, shouldBlur]);
+};
+
+export const formatRemainingTime = (ms) => {
+  if (ms <= 0) return "00:00";
+  const s = Math.ceil(ms / 1000);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+};
+
+export const useIdleTimeout = (onTimeout, timeout = CFG.IDLE_TIMEOUT, enabled = true) => {
+  const timerRef = useRef(null);
+  const intervalRef = useRef(null);
+  const lastActivityRef = useRef(Date.now());
+  const onTimeoutRef = useRef(onTimeout);
+  const timeoutRef = useRef(timeout);
+  const [remainingTime, setRemainingTime] = useState(timeout);
+  
+  useEffect(() => {
+    onTimeoutRef.current = onTimeout;
+    timeoutRef.current = timeout;
+  }, [onTimeout, timeout]);
+  
+  const resetTimer = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    setRemainingTime(timeoutRef.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      if (onTimeoutRef.current) onTimeoutRef.current();
+    }, timeoutRef.current);
+  }, []);
+  
+  useEffect(() => {
+    if (!enabled) {
+      setRemainingTime(timeout);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setRemainingTime(Math.max(0, timeout - (Date.now() - lastActivityRef.current)));
+    }, 1000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [enabled, timeout]);
+  
+  useEffect(() => {
+    if (!enabled) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+    const events = ['mousedown', 'keydown', 'touchstart', 'click'];
+    events.forEach(e => document.addEventListener(e, resetTimer, { passive: true }));
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      events.forEach(e => document.removeEventListener(e, resetTimer));
+    };
+  }, [enabled, resetTimer]);
+  
+  return { resetTimer, remainingTime, remainingTimeFormatted: formatRemainingTime(remainingTime) };
+};
+
+export const useAppIdleTimeout = (currentPage, setCurrentPage, resetOrder) => {
+  const handleTimeout = useCallback(() => {
+    if (resetOrder) resetOrder();
+    setCurrentPage(CFG.PAGE_FIRST);
+  }, [setCurrentPage, resetOrder]);
+  
+  const { remainingTime, remainingTimeFormatted, resetTimer } = useIdleTimeout(
+    handleTimeout, CFG.IDLE_TIMEOUT, true
+  );
+  
+  return { remainingTime, remainingTimeFormatted, isActive: true, resetTimer };
+};
 
 export const usePaymentCountdown = ({ isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage }) => { const [countdown, setCountdown] = useState(60); useEffect(() => { if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) { const rc = () => setCountdown(CFG.TIME.AUTO_FINISH); setCountdown(CFG.TIME.AUTO_FINISH); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => setisCreditPayContent(PAY.FINISH), 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); const h = () => rc(); window.addEventListener('keydown', h); window.addEventListener('click', h); return () => { window.removeEventListener('keydown', h); window.removeEventListener('click', h); clearInterval(t); }; } if (isCreditPayContent === PAY.FINISH) { setCountdown(CFG.TIME.FINAL_PAGE); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => { ModalReturn.close(); ModalAccessibility.close(); setQuantities(totalMenuItems.reduce((a, i) => ({ ...a, [i.id]: 0 }), {})); setisDark(false); setVolume(1); setisLarge(false); setisLow(false); setCurrentPage(CFG.PAGE_FIRST); }, 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); return () => clearInterval(t); } }, [isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage]); return countdown; };
 
@@ -230,13 +653,171 @@ export const useCategoryLayout = (maxRows = 2) => {
   return { containerRef, itemsPerPage };
 };
 
-export const useFocusTrap = (isActive, options = {}) => { const { autoFocus = true, restoreFocus = true } = options; const containerRef = useRef(null); const previousActiveElement = useRef(null); const getFocusableElements = useCallback(() => { if (!containerRef.current) return []; return Array.from(containerRef.current.querySelectorAll(CFG.FOCUSABLE)).filter(el => { const st = window.getComputedStyle(el); return st.display !== 'none' && st.visibility !== 'hidden'; }); }, []); const focusFirst = useCallback(() => { const els = getFocusableElements(); if (els.length > 0) els[0].focus(); }, [getFocusableElements]); const focusLast = useCallback(() => { const els = getFocusableElements(); if (els.length > 0) els[els.length - 1].focus(); }, [getFocusableElements]); useEffect(() => { if (!isActive) return; const hkd = (e) => { if (e.key !== 'Tab') return; const els = getFocusableElements(); if (els.length === 0) return; const first = els[0], last = els[els.length - 1], active = document.activeElement; if (e.shiftKey) { if (active === first || !containerRef.current?.contains(active)) { e.preventDefault(); focusLast(); } } else { if (active === last || !containerRef.current?.contains(active)) { e.preventDefault(); focusFirst(); } } }; const hesc = (e) => { if (e.key === 'Escape' && containerRef.current?.contains(document.activeElement)) focusFirst(); }; document.addEventListener('keydown', hkd); document.addEventListener('keydown', hesc); return () => { document.removeEventListener('keydown', hkd); document.removeEventListener('keydown', hesc); }; }, [isActive, getFocusableElements, focusFirst, focusLast]); useEffect(() => { if (isActive) { previousActiveElement.current = document.activeElement; if (autoFocus) { const t = setTimeout(() => focusFirst(), 50); return () => clearTimeout(t); } } else { if (restoreFocus && previousActiveElement.current) { previousActiveElement.current.focus(); previousActiveElement.current = null; } } }, [isActive, autoFocus, restoreFocus, focusFirst]); useEffect(() => { if (!isActive) return; const hfo = (e) => { if (containerRef.current && !containerRef.current.contains(e.relatedTarget) && e.relatedTarget !== null) { e.preventDefault(); focusFirst(); } }; containerRef.current?.addEventListener('focusout', hfo); return () => containerRef.current?.removeEventListener('focusout', hfo); }, [isActive, focusFirst]); return { containerRef, focusFirst, focusLast, getFocusableElements }; };
+export const useFocusTrap = (isActive, options = {}) => {
+  const { autoFocus = true, restoreFocus = true } = options;
+  const containerRef = useRef(null);
+  const previousActiveElement = useRef(null);
+  
+  const getFocusableElements = useCallback(() => {
+    if (!containerRef.current) return [];
+    return Array.from(containerRef.current.querySelectorAll(CFG.FOCUSABLE))
+      .filter(el => {
+        const st = window.getComputedStyle(el);
+        return st.display !== 'none' && st.visibility !== 'hidden';
+      });
+  }, []);
+  
+  const focusFirst = useCallback(() => {
+    const els = getFocusableElements();
+    if (els.length > 0) els[0].focus();
+  }, [getFocusableElements]);
+  
+  const focusLast = useCallback(() => {
+    const els = getFocusableElements();
+    if (els.length > 0) els[els.length - 1].focus();
+  }, [getFocusableElements]);
+  
+  // Tab 키 트래핑
+  useEffect(() => {
+    if (!isActive) return;
+    
+    const hkd = (e) => {
+      if (e.key !== 'Tab') return;
+      const els = getFocusableElements();
+      if (els.length === 0) return;
+      
+      const first = els[0];
+      const last = els[els.length - 1];
+      const active = document.activeElement;
+      
+      if (e.shiftKey) {
+        if (active === first || !containerRef.current?.contains(active)) {
+          e.preventDefault();
+          focusLast();
+        }
+      } else {
+        if (active === last || !containerRef.current?.contains(active)) {
+          e.preventDefault();
+          focusFirst();
+        }
+      }
+    };
+    
+    const hesc = (e) => {
+      if (e.key === 'Escape' && containerRef.current?.contains(document.activeElement)) {
+        focusFirst();
+      }
+    };
+    
+    document.addEventListener('keydown', hkd);
+    document.addEventListener('keydown', hesc);
+    return () => {
+      document.removeEventListener('keydown', hkd);
+      document.removeEventListener('keydown', hesc);
+    };
+  }, [isActive, getFocusableElements, focusFirst, focusLast]);
+  
+  // 포커스 저장/복원
+  useEffect(() => {
+    if (isActive) {
+      previousActiveElement.current = document.activeElement;
+      if (autoFocus) {
+        const t = setTimeout(() => focusFirst(), 50);
+        return () => clearTimeout(t);
+      }
+    } else {
+      if (restoreFocus && previousActiveElement.current) {
+        previousActiveElement.current.focus();
+        previousActiveElement.current = null;
+      }
+    }
+  }, [isActive, autoFocus, restoreFocus, focusFirst]);
+  
+  // 포커스 이탈 방지
+  useEffect(() => {
+    if (!isActive) return;
+    
+    const hfo = (e) => {
+      if (containerRef.current && 
+          !containerRef.current.contains(e.relatedTarget) && 
+          e.relatedTarget !== null) {
+        e.preventDefault();
+        focusFirst();
+      }
+    };
+    
+    containerRef.current?.addEventListener('focusout', hfo);
+    return () => containerRef.current?.removeEventListener('focusout', hfo);
+  }, [isActive, focusFirst]);
+  
+  return { containerRef, focusFirst, focusLast, getFocusableElements };
+};
 
-export const useAccessibilitySettings = (initialSettings = DEFAULT_ACCESSIBILITY) => { const [settings, setSettings] = useState(initialSettings); const setHighContrast = useCallback((v) => setSettings(p => ({ ...p, isHighContrast: v })), []); const setLowScreen = useCallback((v) => setSettings(p => ({ ...p, isLowScreen: v })), []); const setBigSize = useCallback((v) => setSettings(p => ({ ...p, isBigSize: v })), []); const setVolumeVal = useCallback((v) => setSettings(p => ({ ...p, volume: v })), []); const resetToDefault = useCallback(() => setSettings(DEFAULT_ACCESSIBILITY), []); const updateAll = useCallback((ns) => setSettings(ns), []); const getStatusText = useMemo(() => ({ highContrast: settings.isHighContrast ? '켬' : '끔', lowScreen: settings.isLowScreen ? '켬' : '끔', bigSize: settings.isBigSize ? '켬' : '끔', volume: VOLUME_MAP[settings.volume] }), [settings]); return { settings, setHighContrast, setLowScreen, setBigSize, setVolume: setVolumeVal, resetToDefault, updateAll, getStatusText }; };
+export const useAccessibilitySettings = (initialSettings = DEFAULT_ACCESSIBILITY) => {
+  const [settings, setSettings] = useState(initialSettings);
+  
+  const setHighContrast = useCallback((v) => setSettings(p => ({ ...p, isHighContrast: v })), []);
+  const setLowScreen = useCallback((v) => setSettings(p => ({ ...p, isLowScreen: v })), []);
+  const setBigSize = useCallback((v) => setSettings(p => ({ ...p, isBigSize: v })), []);
+  const setVolumeVal = useCallback((v) => setSettings(p => ({ ...p, volume: v })), []);
+  const resetToDefault = useCallback(() => setSettings(DEFAULT_ACCESSIBILITY), []);
+  const updateAll = useCallback((ns) => setSettings(ns), []);
+  
+  const getStatusText = useMemo(() => ({
+    highContrast: settings.isHighContrast ? '켬' : '끔',
+    lowScreen: settings.isLowScreen ? '켬' : '끔',
+    bigSize: settings.isBigSize ? '켬' : '끔',
+    volume: VOLUME_MAP[settings.volume]
+  }), [settings]);
+  
+  return {
+    settings, setHighContrast, setLowScreen, setBigSize,
+    setVolume: setVolumeVal, resetToDefault, updateAll, getStatusText
+  };
+};
 
-class IntroTimerSingleton { #intervalId = null; #intervalTime = 0; startIntroTimer(scriptText, handleText, onInitSetting) { this.cleanup(); this.#intervalId = setInterval(() => { this.#intervalTime++; if (this.#intervalTime >= CFG.INTRO_TTS_TIME) { handleText(scriptText); this.#intervalTime = 0; if (onInitSetting) onInitSetting(); } }, 1000); } stopIntroTimer() { this.cleanup(); } cleanup() { if (this.#intervalId) { clearInterval(this.#intervalId); this.#intervalId = null; } this.#intervalTime = 0; } }
-let timerInstance = null; const getTimerSingleton = () => { if (!timerInstance) timerInstance = new IntroTimerSingleton(); return timerInstance; };
-export const useTimer = () => { const t = getTimerSingleton(); return { startIntroTimer: (s, h, o) => t.startIntroTimer(s, h, o), stopIntroTimer: () => t.stopIntroTimer() }; };
+class IntroTimerSingleton {
+  #intervalId = null;
+  #intervalTime = 0;
+  
+  startIntroTimer(scriptText, handleText, onInitSetting) {
+    this.cleanup();
+    this.#intervalId = setInterval(() => {
+      this.#intervalTime++;
+      if (this.#intervalTime >= CFG.INTRO_TTS_TIME) {
+        handleText(scriptText);
+        this.#intervalTime = 0;
+        if (onInitSetting) onInitSetting();
+      }
+    }, 1000);
+  }
+  
+  stopIntroTimer() {
+    this.cleanup();
+  }
+  
+  cleanup() {
+    if (this.#intervalId) {
+      clearInterval(this.#intervalId);
+      this.#intervalId = null;
+    }
+    this.#intervalTime = 0;
+  }
+}
+
+let timerInstance = null;
+const getTimerSingleton = () => {
+  if (!timerInstance) timerInstance = new IntroTimerSingleton();
+  return timerInstance;
+};
+
+export const useTimer = () => {
+  const t = getTimerSingleton();
+  return {
+    startIntroTimer: (s, h, o) => t.startIntroTimer(s, h, o),
+    stopIntroTimer: () => t.stopIntroTimer()
+  };
+};
 
 export const applyButtonMinSide = (btn) => { const w = btn.offsetWidth, h = btn.offsetHeight, m = Math.min(w, h); if (m > 0) btn.style.setProperty('--min-side', `${m}px`); };
 const isButtonDisabled = (b) => b.classList.contains('disabled') || b.getAttribute('aria-disabled') === 'true' || b.disabled === true;
@@ -407,39 +988,445 @@ const CallModal = () => {
 
 export const useMultiModalButtonHandler = (options = {}) => { const { initFocusableSections = [], initFirstButtonSection = null, enableGlobalHandlers = true, handleTextOpt = null, prefixOpt = '', enableKeyboardNavigation = false } = options; const [, setFocusableSections] = useState(initFocusableSections); const handlersRef = useRef({}); const keyboardNavState = useRef({ currentSectionIndex: 0, currentButtonIndex: 0, sections: initFocusableSections, firstButtonSection: initFirstButtonSection }); const updateFocusableSections = useCallback((ns) => { setFocusableSections(ns); keyboardNavState.current.sections = ns; }, []); const finalHandleText = useCallback((t) => { if (handleTextOpt && typeof handleTextOpt === 'function') handleTextOpt(t); }, [handleTextOpt]); const handleButtonClick = useCallback((e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b)) return; if (b.dataset.reactHandler === 'true') return; const tts = b.dataset.ttsText; if (tts && finalHandleText) finalHandleText(prefixOpt ? `${prefixOpt}${tts}` : tts); }, [finalHandleText, prefixOpt]); useEffect(() => { if (!enableGlobalHandlers) return; const htc = (e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || !isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; }; document.addEventListener('click', htc, false); handlersRef.current.toggleClickHandler = htc; return () => document.removeEventListener('click', htc, false); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers) return; const bdb = (e) => { const b = e.target?.closest?.('.button'); if (b && isButtonDisabled(b)) { e.preventDefault(); e.stopPropagation(); } }; document.addEventListener('click', bdb, true); return () => document.removeEventListener('click', bdb, true); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers || !enableKeyboardNavigation) return; const hkd = (e) => { const { key } = e; if ([KEYBOARD.ARROW_UP, KEYBOARD.ARROW_DOWN, KEYBOARD.ARROW_LEFT, KEYBOARD.ARROW_RIGHT].includes(key)) { e.preventDefault(); const ae = document.activeElement; if (!ae) return; const cs = ae.closest('[data-tts-text]'); if (!cs) return; const btns = cs.querySelectorAll('.button:not([aria-disabled="true"])'); const ci = Array.from(btns).indexOf(ae); let ni = ci; if (key === KEYBOARD.ARROW_RIGHT || key === KEYBOARD.ARROW_DOWN) ni = (ci + 1) % btns.length; else if (key === KEYBOARD.ARROW_LEFT || key === KEYBOARD.ARROW_UP) ni = (ci - 1 + btns.length) % btns.length; if (btns[ni]) btns[ni].focus(); } if (key === KEYBOARD.TAB) { const secs = keyboardNavState.current.sections; if (secs.length === 0) return; e.preventDefault(); const csi = keyboardNavState.current.currentSectionIndex; const nsi = e.shiftKey ? (csi - 1 + secs.length) % secs.length : (csi + 1) % secs.length; const ns = secs[nsi]?.current; if (ns) { const fb = ns.querySelector('.button:not([aria-disabled="true"])'); if (fb) { fb.focus(); keyboardNavState.current.currentSectionIndex = nsi; } } } if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) { const ae = document.activeElement; if (ae?.classList?.contains('button')) { e.preventDefault(); ae.click(); } } }; document.addEventListener('keydown', hkd, true); return () => document.removeEventListener('keydown', hkd, true); }, [enableGlobalHandlers, enableKeyboardNavigation]); useEffect(() => { if (!enableGlobalHandlers) return; const hps = (e, a) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; if (a === 'add') b.classList.add('pressed'); else if (a === 'remove' && b.classList.contains('pressed')) { b.classList.remove('pressed'); requestAnimationFrame(() => { if (b instanceof HTMLElement && document.activeElement !== b) b.focus(); }); } }; const hmd = (e) => hps(e, 'add'); const hmu = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const hml = (e) => e.target?.closest && hps(e, 'remove'); const hts = (e) => hps(e, 'add'); const hte = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const htc = (e) => hps(e, 'remove'); document.addEventListener('mousedown', hmd, true); document.addEventListener('mouseup', hmu, true); document.addEventListener('mouseleave', hml, true); document.addEventListener('touchstart', hts, { passive: true }); document.addEventListener('touchend', hte, { passive: true }); document.addEventListener('touchcancel', htc, { passive: true }); return () => { document.removeEventListener('mousedown', hmd, true); document.removeEventListener('mouseup', hmu, true); document.removeEventListener('mouseleave', hml, true); document.removeEventListener('touchstart', hts); document.removeEventListener('touchend', hte); document.removeEventListener('touchcancel', htc); }; }, [enableGlobalHandlers]); return enableKeyboardNavigation ? { handleButtonClick, updateFocusableSections } : { handleButtonClick }; };
 
-export const useWebViewMessage = (setisCreditPayContent) => { useEffect(() => { if (window.chrome?.webview) { const hm = (e) => { let d = e.data; if (d.arg.result === CFG.WEBVIEW_SUCCESS) { if (d.Command === 'PAY') setisCreditPayContent(PAY.CARD_OUT); if (d.Command === 'PRINT') setisCreditPayContent(PAY.PRINT_SELECT); } else { console.log(d.arg.errorMessage); } }; window.chrome.webview.addEventListener("message", hm); return () => { if (window.chrome?.webview) window.chrome.webview.removeEventListener("message", hm); }; } }, [setisCreditPayContent]); };
+export const useWebViewMessage = (setisCreditPayContent) => {
+  useEffect(() => {
+    if (!window.chrome?.webview) return;
+    
+    const hm = (e) => {
+      let d = e.data;
+      if (d.arg.result === CFG.WEBVIEW_SUCCESS) {
+        if (d.Command === 'PAY') setisCreditPayContent(PAY.CARD_OUT);
+        if (d.Command === 'PRINT') setisCreditPayContent(PAY.PRINT_SELECT);
+      } else {
+        console.log(d.arg.errorMessage);
+      }
+    };
+    
+    window.chrome.webview.addEventListener("message", hm);
+    return () => {
+      if (window.chrome?.webview) {
+        window.chrome.webview.removeEventListener("message", hm);
+      }
+    };
+  }, [setisCreditPayContent]);
+};
 
 // ============================================================================
 // Contexts
 // ============================================================================
 
 export const AccessibilityContext = createContext();
-export const AccessibilityProvider = ({ children }) => { const [isDark, setisDark] = useState(false); const [isLow, setisLow] = useState(false); const [isLarge, setisLarge] = useState(false); const [volume, setVolume] = useState(1); useBodyClass('dark', isDark); useBodyClass('large', isLarge); useBodyClass('low', isLow); const accessibility = useMemo(() => ({ isHighContrast: isDark, isLowScreen: isLow, isBigSize: isLarge, volume }), [isDark, isLow, isLarge, volume]); const [accessibilityState, setAccessibilityState] = useState(accessibility); useEffect(() => { setAccessibilityState(accessibility); }, [accessibility]); const value = useMemo(() => ({ isDark, setisDark, isLow, setisLow, isLarge, setisLarge, volume, setVolume, accessibility, setAccessibility: setAccessibilityState }), [isDark, isLow, isLarge, volume, accessibility]); return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>; };
+
+export const AccessibilityProvider = ({ children }) => {
+  const [isDark, setisDark] = useState(false);
+  const [isLow, setisLow] = useState(false);
+  const [isLarge, setisLarge] = useState(false);
+  const [volume, setVolume] = useState(1);
+  
+  useBodyClass('dark', isDark);
+  useBodyClass('large', isLarge);
+  useBodyClass('low', isLow);
+  
+  const accessibility = useMemo(() => ({
+    isHighContrast: isDark,
+    isLowScreen: isLow,
+    isBigSize: isLarge,
+    volume
+  }), [isDark, isLow, isLarge, volume]);
+  
+  const [accessibilityState, setAccessibilityState] = useState(accessibility);
+  
+  useEffect(() => {
+    setAccessibilityState(accessibility);
+  }, [accessibility]);
+  
+  const value = useMemo(() => ({
+    isDark, setisDark,
+    isLow, setisLow,
+    isLarge, setisLarge,
+    volume, setVolume,
+    accessibility,
+    setAccessibility: setAccessibilityState
+  }), [isDark, isLow, isLarge, volume, accessibility]);
+  
+  return (
+    <AccessibilityContext.Provider value={value}>
+      {children}
+    </AccessibilityContext.Provider>
+  );
+};
 
 export const UIContext = createContext();
-export const UIProvider = ({ children }) => { const [currentPage, setCurrentPageState] = useState('process1'); const [history, setHistory] = useState(['process1']); const setCurrentPage = useCallback((p) => { if (p !== currentPage) { setHistory(pr => [...pr, currentPage]); setCurrentPageState(p); } }, [currentPage]); const goBack = useCallback(() => { if (history.length > 1) { const nh = [...history]; nh.pop(); setHistory(nh); setCurrentPageState(nh[nh.length - 1]); } }, [history]); const [intervalTime, setintervalTime] = useState(0); const [introFlag, setintroFlag] = useState(true); const sections = { top: useRef(null), row1: useRef(null), row2: useRef(null), row3: useRef(null), row4: useRef(null), row5: useRef(null), row6: useRef(null), page: useRef(null), modalPage: useRef(null), middle: useRef(null), bottom: useRef(null), footer: useRef(null), bottomfooter: useRef(null), confirmSections: useRef(null), AccessibilitySections1: useRef(null), AccessibilitySections2: useRef(null), AccessibilitySections3: useRef(null), AccessibilitySections4: useRef(null), AccessibilitySections5: useRef(null), AccessibilitySections6: useRef(null) }; const value = useMemo(() => ({ currentPage, setCurrentPage, goBack, history, intervalTime, setintervalTime, introFlag, setintroFlag, sections }), [currentPage, setCurrentPage, goBack, history, intervalTime, introFlag, sections]); return <UIContext.Provider value={value}>{children}</UIContext.Provider>; };
+
+export const UIProvider = ({ children }) => {
+  const [currentPage, setCurrentPageState] = useState('process1');
+  const [history, setHistory] = useState(['process1']);
+  const [intervalTime, setintervalTime] = useState(0);
+  const [introFlag, setintroFlag] = useState(true);
+  
+  const setCurrentPage = useCallback((p) => {
+    if (p !== currentPage) {
+      setHistory(pr => [...pr, currentPage]);
+      setCurrentPageState(p);
+    }
+  }, [currentPage]);
+  
+  const goBack = useCallback(() => {
+    if (history.length > 1) {
+      const nh = [...history];
+      nh.pop();
+      setHistory(nh);
+      setCurrentPageState(nh[nh.length - 1]);
+    }
+  }, [history]);
+  
+  const sections = {
+    top: useRef(null),
+    row1: useRef(null),
+    row2: useRef(null),
+    row3: useRef(null),
+    row4: useRef(null),
+    row5: useRef(null),
+    row6: useRef(null),
+    page: useRef(null),
+    modalPage: useRef(null),
+    middle: useRef(null),
+    bottom: useRef(null),
+    footer: useRef(null),
+    bottomfooter: useRef(null),
+    confirmSections: useRef(null),
+    AccessibilitySections1: useRef(null),
+    AccessibilitySections2: useRef(null),
+    AccessibilitySections3: useRef(null),
+    AccessibilitySections4: useRef(null),
+    AccessibilitySections5: useRef(null),
+    AccessibilitySections6: useRef(null)
+  };
+  
+  const value = useMemo(() => ({
+    currentPage, setCurrentPage, goBack, history,
+    intervalTime, setintervalTime,
+    introFlag, setintroFlag,
+    sections
+  }), [currentPage, setCurrentPage, goBack, history, intervalTime, introFlag, sections]);
+  
+  return (
+    <UIContext.Provider value={value}>
+      {children}
+    </UIContext.Provider>
+  );
+};
 
 export const ModalContext = createContext();
 export const useModal = () => useContext(ModalContext);
-export const ModalProvider = ({ children }) => { const [ModalReturnOpen, setModalReturnOpen] = useState(false); const [ModalAccessibilityOpen, setModalAccessibilityOpen] = useState(false); const [ModalResetOpen, setModalResetOpen] = useState(false); const [ModalDeleteOpen, setModalDeleteOpen] = useState(false); const [ModalDeleteCheckOpen, setModalDeleteCheckOpen] = useState(false); const [ModalCallOpen, setModalCallOpen] = useState(false); const [ModalDeleteItemId, setModalDeleteItemId] = useState(0); const createModalHandlers = useCallback((isOpen, setIsOpen) => ({ isOpen, open: () => setIsOpen(true), close: () => setIsOpen(false), toggle: () => setIsOpen(p => !p) }), []); const value = useMemo(() => ({ ModalReturn: createModalHandlers(ModalReturnOpen, setModalReturnOpen), ModalAccessibility: createModalHandlers(ModalAccessibilityOpen, setModalAccessibilityOpen), ModalReset: createModalHandlers(ModalResetOpen, setModalResetOpen), ModalDelete: createModalHandlers(ModalDeleteOpen, setModalDeleteOpen), ModalDeleteCheck: createModalHandlers(ModalDeleteCheckOpen, setModalDeleteCheckOpen), ModalCall: createModalHandlers(ModalCallOpen, setModalCallOpen), ModalDeleteItemId, setModalDeleteItemId }), [ModalReturnOpen, ModalAccessibilityOpen, ModalResetOpen, ModalDeleteOpen, ModalDeleteCheckOpen, ModalCallOpen, ModalDeleteItemId, createModalHandlers]); return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>; };
+
+export const ModalProvider = ({ children }) => {
+  const [ModalReturnOpen, setModalReturnOpen] = useState(false);
+  const [ModalAccessibilityOpen, setModalAccessibilityOpen] = useState(false);
+  const [ModalResetOpen, setModalResetOpen] = useState(false);
+  const [ModalDeleteOpen, setModalDeleteOpen] = useState(false);
+  const [ModalDeleteCheckOpen, setModalDeleteCheckOpen] = useState(false);
+  const [ModalCallOpen, setModalCallOpen] = useState(false);
+  const [ModalDeleteItemId, setModalDeleteItemId] = useState(0);
+  
+  const createModalHandlers = useCallback((isOpen, setIsOpen) => ({
+    isOpen,
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(false),
+    toggle: () => setIsOpen(p => !p)
+  }), []);
+  
+  const value = useMemo(() => ({
+    ModalReturn: createModalHandlers(ModalReturnOpen, setModalReturnOpen),
+    ModalAccessibility: createModalHandlers(ModalAccessibilityOpen, setModalAccessibilityOpen),
+    ModalReset: createModalHandlers(ModalResetOpen, setModalResetOpen),
+    ModalDelete: createModalHandlers(ModalDeleteOpen, setModalDeleteOpen),
+    ModalDeleteCheck: createModalHandlers(ModalDeleteCheckOpen, setModalDeleteCheckOpen),
+    ModalCall: createModalHandlers(ModalCallOpen, setModalCallOpen),
+    ModalDeleteItemId,
+    setModalDeleteItemId
+  }), [
+    ModalReturnOpen, ModalAccessibilityOpen, ModalResetOpen,
+    ModalDeleteOpen, ModalDeleteCheckOpen, ModalCallOpen,
+    ModalDeleteItemId, createModalHandlers
+  ]);
+  
+  return (
+    <ModalContext.Provider value={value}>
+      {children}
+    </ModalContext.Provider>
+  );
+};
 
 export const OrderContext = createContext();
-export const OrderProvider = ({ children }) => { const { tabs, totalMenuItems, categoryInfo, isLoading: menuLoading } = useMenuData(); const { categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems } = useMenuUtils(); const [selectedTab, setSelectedTab] = useState("전체메뉴"); const menuItems = useMemo(() => categorizeMenu(totalMenuItems, selectedTab, categoryInfo), [totalMenuItems, selectedTab, categoryInfo, categorizeMenu]); const [quantities, setQuantities] = useState({}); const [isCreditPayContent, setisCreditPayContent] = useState(0); const handleIncrease = useCallback((id) => { setQuantities(p => ({ ...p, [id]: (p[id] || 0) + 1 })); }, []); const handleDecrease = useCallback((id) => { setQuantities(p => ({ ...p, [id]: p[id] > 0 ? p[id] - 1 : 0 })); }, []); const totalCount = useMemo(() => calculateSum(quantities), [quantities, calculateSum]); const totalSum = useMemo(() => calculateTotal(quantities, totalMenuItems), [quantities, totalMenuItems, calculateTotal]); const orderItems = useMemo(() => createOrderItems(totalMenuItems, quantities), [totalMenuItems, quantities, createOrderItems]); const updateOrderNumber = useCallback(() => { const c = safeParseInt(safeLocalStorage.getItem(STORAGE.ORDER_NUM), 0); const n = c + 1; safeLocalStorage.setItem(STORAGE.ORDER_NUM, n); return n; }, []); const setCallWebToApp = useCallback((cmd, val) => { const o = { Command: cmd, arg: val }; console.log("obj_cmd: " + JSON.stringify(o)); if (window.chrome?.webview) window.chrome.webview.postMessage(JSON.stringify(o)); }, []); const sendOrderDataToApp = useCallback((paymentType) => { const arr = orderItems.map(i => ({ menuName: i.name, quantity: i.quantity, price: i.price * i.quantity })); const sp = (totalSum / 1.1).toFixed(2); setCallWebToApp(WEBVIEW.PAY, { orderData: arr, totalPrice: totalSum, supplyPrice: sp, tax: (totalSum - sp).toFixed(2), paymentType, orderNumber: updateOrderNumber() }); }, [orderItems, totalSum, updateOrderNumber, setCallWebToApp]); const sendPrintReceiptToApp = useCallback(() => setCallWebToApp(WEBVIEW.PRINT, ''), [setCallWebToApp]); const sendCancelPayment = useCallback(() => setCallWebToApp(WEBVIEW.CANCEL, ''), [setCallWebToApp]); const handlePreviousTab = useCallback(() => { const i = (tabs.indexOf(selectedTab) - 1 + tabs.length) % tabs.length; setSelectedTab(tabs[i]); }, [tabs, selectedTab]); const handleNextTab = useCallback(() => { const i = (tabs.indexOf(selectedTab) + 1) % tabs.length; setSelectedTab(tabs[i]); }, [tabs, selectedTab]); const categoryPageNavRef = useRef(null); const handleCategoryPageNav = useCallback((dir) => { if (categoryPageNavRef.current) categoryPageNavRef.current(dir); }, []); const setHandleCategoryPageNav = useCallback((fn) => { categoryPageNavRef.current = fn; }, []); const value = useMemo(() => ({ tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, setSelectedTab, menuLoading, quantities, setQuantities, handleIncrease, handleDecrease, totalCount, totalSum, filterMenuItems, createOrderItems, convertToKoreanQuantity, calculateSum, calculateTotal, isCreditPayContent, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, updateOrderNumber, handlePreviousTab, handleNextTab, handleCategoryPageNav, setHandleCategoryPageNav }), [tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, menuLoading, quantities, setQuantities, handleIncrease, handleDecrease, totalCount, totalSum, filterMenuItems, createOrderItems, calculateSum, calculateTotal, orderItems, isCreditPayContent, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, updateOrderNumber, handlePreviousTab, handleNextTab, handleCategoryPageNav, setHandleCategoryPageNav]); return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>; };
+
+export const OrderProvider = ({ children }) => {
+  // 메뉴 데이터
+  const { tabs, totalMenuItems, categoryInfo, isLoading: menuLoading } = useMenuData();
+  const { categorizeMenu, calculateSum, calculateTotal, filterMenuItems, createOrderItems } = useMenuUtils();
+  
+  // 상태
+  const [selectedTab, setSelectedTab] = useState("전체메뉴");
+  const [quantities, setQuantities] = useState({});
+  const [isCreditPayContent, setisCreditPayContent] = useState(0);
+  
+  // 메모이즈된 값
+  const menuItems = useMemo(() => 
+    categorizeMenu(totalMenuItems, selectedTab, categoryInfo),
+    [totalMenuItems, selectedTab, categoryInfo, categorizeMenu]
+  );
+  const totalCount = useMemo(() => calculateSum(quantities), [quantities, calculateSum]);
+  const totalSum = useMemo(() => calculateTotal(quantities, totalMenuItems), [quantities, totalMenuItems, calculateTotal]);
+  const orderItems = useMemo(() => createOrderItems(totalMenuItems, quantities), [totalMenuItems, quantities, createOrderItems]);
+  
+  // 수량 핸들러
+  const handleIncrease = useCallback((id) => {
+    setQuantities(p => ({ ...p, [id]: (p[id] || 0) + 1 }));
+  }, []);
+  
+  const handleDecrease = useCallback((id) => {
+    setQuantities(p => ({ ...p, [id]: p[id] > 0 ? p[id] - 1 : 0 }));
+  }, []);
+  
+  // 주문번호
+  const updateOrderNumber = useCallback(() => {
+    const c = safeParseInt(safeLocalStorage.getItem(STORAGE.ORDER_NUM), 0);
+    const n = c + 1;
+    safeLocalStorage.setItem(STORAGE.ORDER_NUM, n);
+    return n;
+  }, []);
+  
+  // WebView 통신
+  const setCallWebToApp = useCallback((cmd, val) => {
+    const o = { Command: cmd, arg: val };
+    console.log("obj_cmd: " + JSON.stringify(o));
+    if (window.chrome?.webview) window.chrome.webview.postMessage(JSON.stringify(o));
+  }, []);
+  
+  const sendOrderDataToApp = useCallback((paymentType) => {
+    const arr = orderItems.map(i => ({
+      menuName: i.name,
+      quantity: i.quantity,
+      price: i.price * i.quantity
+    }));
+    const sp = (totalSum / 1.1).toFixed(2);
+    setCallWebToApp(WEBVIEW.PAY, {
+      orderData: arr,
+      totalPrice: totalSum,
+      supplyPrice: sp,
+      tax: (totalSum - sp).toFixed(2),
+      paymentType,
+      orderNumber: updateOrderNumber()
+    });
+  }, [orderItems, totalSum, updateOrderNumber, setCallWebToApp]);
+  
+  const sendPrintReceiptToApp = useCallback(() => setCallWebToApp(WEBVIEW.PRINT, ''), [setCallWebToApp]);
+  const sendCancelPayment = useCallback(() => setCallWebToApp(WEBVIEW.CANCEL, ''), [setCallWebToApp]);
+  
+  // 탭 네비게이션
+  const handlePreviousTab = useCallback(() => {
+    const i = (tabs.indexOf(selectedTab) - 1 + tabs.length) % tabs.length;
+    setSelectedTab(tabs[i]);
+  }, [tabs, selectedTab]);
+  
+  const handleNextTab = useCallback(() => {
+    const i = (tabs.indexOf(selectedTab) + 1) % tabs.length;
+    setSelectedTab(tabs[i]);
+  }, [tabs, selectedTab]);
+  
+  // 카테고리 페이지 네비게이션
+  const categoryPageNavRef = useRef(null);
+  const handleCategoryPageNav = useCallback((dir) => {
+    if (categoryPageNavRef.current) categoryPageNavRef.current(dir);
+  }, []);
+  const setHandleCategoryPageNav = useCallback((fn) => {
+    categoryPageNavRef.current = fn;
+  }, []);
+  
+  // Context value
+  const value = useMemo(() => ({
+    // 메뉴 데이터
+    tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, setSelectedTab, menuLoading,
+    // 주문 상태
+    quantities, setQuantities, handleIncrease, handleDecrease,
+    totalCount, totalSum, filterMenuItems, createOrderItems,
+    convertToKoreanQuantity, calculateSum, calculateTotal,
+    // 결제
+    isCreditPayContent, setisCreditPayContent,
+    sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, updateOrderNumber,
+    // 네비게이션
+    handlePreviousTab, handleNextTab, handleCategoryPageNav, setHandleCategoryPageNav
+  }), [
+    tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, menuLoading,
+    quantities, setQuantities, handleIncrease, handleDecrease, totalCount, totalSum,
+    filterMenuItems, createOrderItems, calculateSum, calculateTotal, orderItems,
+    isCreditPayContent, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp,
+    sendCancelPayment, updateOrderNumber, handlePreviousTab, handleNextTab,
+    handleCategoryPageNav, setHandleCategoryPageNav
+  ]);
+  
+  return (
+    <OrderContext.Provider value={value}>
+      {children}
+    </OrderContext.Provider>
+  );
+};
 
 export const ButtonStyleContext = createContext(null);
-export const ButtonStyleProvider = ({ children }) => { const [groupStates, setGroupStates] = useState({}); const [buttonStates, setButtonStates] = useState({}); const { play: playSound } = useSound(); const playOnPressedSound = useCallback(() => playSound('onPressed'), [playSound]); const setButtonPressed = useCallback((id, p) => { setButtonStates(pr => ({ ...pr, [id]: p })); }, []); const toggleButtonPressed = useCallback((id) => { let ns; setButtonStates(p => { ns = !p[id]; return { ...p, [id]: ns }; }); return ns; }, []); const isButtonPressed = useCallback((id) => buttonStates[id] || false, [buttonStates]); const selectInGroup = useCallback((gid, bid) => { setGroupStates(p => ({ ...p, [gid]: bid })); }, []); const getSelectedInGroup = useCallback((gid) => groupStates[gid] || null, [groupStates]); const isSelectedInGroup = useCallback((gid, bid) => groupStates[gid] === bid, [groupStates]); const clearGroupSelection = useCallback((gid) => { setGroupStates(p => { const s = { ...p }; delete s[gid]; return s; }); }, []); const contextValue = useMemo(() => ({ playOnPressedSound, setButtonPressed, toggleButtonPressed, isButtonPressed, buttonStates, selectInGroup, getSelectedInGroup, isSelectedInGroup, clearGroupSelection, groupStates }), [playOnPressedSound, setButtonPressed, toggleButtonPressed, isButtonPressed, buttonStates, selectInGroup, getSelectedInGroup, isSelectedInGroup, clearGroupSelection, groupStates]); return <ButtonStyleContext.Provider value={contextValue}>{children}</ButtonStyleContext.Provider>; };
-export const useButtonStyle = () => { const c = useContext(ButtonStyleContext); if (!c) return { playOnPressedSound: () => {}, setButtonPressed: () => {}, toggleButtonPressed: () => false, isButtonPressed: () => false, buttonStates: {}, selectInGroup: () => {}, getSelectedInGroup: () => null, isSelectedInGroup: () => false, clearGroupSelection: () => {}, groupStates: {} }; return c; };
+
+export const ButtonStyleProvider = ({ children }) => {
+  const [groupStates, setGroupStates] = useState({});
+  const [buttonStates, setButtonStates] = useState({});
+  const { play: playSound } = useSound();
+  
+  const playOnPressedSound = useCallback(() => playSound('onPressed'), [playSound]);
+  
+  const setButtonPressed = useCallback((id, p) => {
+    setButtonStates(pr => ({ ...pr, [id]: p }));
+  }, []);
+  
+  const toggleButtonPressed = useCallback((id) => {
+    let ns;
+    setButtonStates(p => { ns = !p[id]; return { ...p, [id]: ns }; });
+    return ns;
+  }, []);
+  
+  const isButtonPressed = useCallback((id) => buttonStates[id] || false, [buttonStates]);
+  
+  const selectInGroup = useCallback((gid, bid) => {
+    setGroupStates(p => ({ ...p, [gid]: bid }));
+  }, []);
+  
+  const getSelectedInGroup = useCallback((gid) => groupStates[gid] || null, [groupStates]);
+  const isSelectedInGroup = useCallback((gid, bid) => groupStates[gid] === bid, [groupStates]);
+  
+  const clearGroupSelection = useCallback((gid) => {
+    setGroupStates(p => { const s = { ...p }; delete s[gid]; return s; });
+  }, []);
+  
+  const contextValue = useMemo(() => ({
+    playOnPressedSound, setButtonPressed, toggleButtonPressed,
+    isButtonPressed, buttonStates,
+    selectInGroup, getSelectedInGroup, isSelectedInGroup,
+    clearGroupSelection, groupStates
+  }), [
+    playOnPressedSound, setButtonPressed, toggleButtonPressed,
+    isButtonPressed, buttonStates,
+    selectInGroup, getSelectedInGroup, isSelectedInGroup,
+    clearGroupSelection, groupStates
+  ]);
+  
+  return (
+    <ButtonStyleContext.Provider value={contextValue}>
+      {children}
+    </ButtonStyleContext.Provider>
+  );
+};
+
+export const useButtonStyle = () => {
+  const c = useContext(ButtonStyleContext);
+  if (!c) return {
+    playOnPressedSound: () => {},
+    setButtonPressed: () => {},
+    toggleButtonPressed: () => false,
+    isButtonPressed: () => false,
+    buttonStates: {},
+    selectInGroup: () => {},
+    getSelectedInGroup: () => null,
+    isSelectedInGroup: () => false,
+    clearGroupSelection: () => {},
+    groupStates: {}
+  };
+  return c;
+};
 
 export const InitializationContext = createContext({ isInitialized: false, initializationSteps: {} });
 export const useInitialization = () => useContext(InitializationContext);
-export const InitializationProvider = ({ children }) => { const [initializationSteps, setInitializationSteps] = useState({ ttsDatabase: false, buttonHandler: false, sizeControl: false, viewport: false }); const { initDB } = useTextHandler(); useEffect(() => { const init = async () => { await initDB(); setInitializationSteps(p => ({ ...p, ttsDatabase: true })); }; init(); }, [initDB]); useMultiModalButtonHandler({ enableGlobalHandlers: true, enableKeyboardNavigation: false }); useEffect(() => { setInitializationSteps(p => ({ ...p, buttonHandler: true })); }, []); useLayoutEffect(() => { SizeControlManager.init(); setInitializationSteps(p => ({ ...p, sizeControl: true })); setViewportZoom(); setupViewportResize(); setInitializationSteps(p => ({ ...p, viewport: true })); }, []); const isInitialized = Object.values(initializationSteps).every(Boolean); const value = { isInitialized, initializationSteps }; return <InitializationContext.Provider value={value}>{children}</InitializationContext.Provider>; };
 
-export const IdleTimeoutContext = createContext({ remainingTime: 0, remainingTimeFormatted: "00:00", isActive: false });
+export const InitializationProvider = ({ children }) => {
+  const [initializationSteps, setInitializationSteps] = useState({
+    ttsDatabase: false,
+    buttonHandler: false,
+    sizeControl: false,
+    viewport: false
+  });
+  
+  const { initDB } = useTextHandler();
+  
+  useEffect(() => {
+    const init = async () => {
+      await initDB();
+      setInitializationSteps(p => ({ ...p, ttsDatabase: true }));
+    };
+    init();
+  }, [initDB]);
+  
+  useMultiModalButtonHandler({ enableGlobalHandlers: true, enableKeyboardNavigation: false });
+  
+  useEffect(() => {
+    setInitializationSteps(p => ({ ...p, buttonHandler: true }));
+  }, []);
+  
+  useLayoutEffect(() => {
+    SizeControlManager.init();
+    setInitializationSteps(p => ({ ...p, sizeControl: true }));
+    setViewportZoom();
+    setupViewportResize();
+    setInitializationSteps(p => ({ ...p, viewport: true }));
+  }, []);
+  
+  const isInitialized = Object.values(initializationSteps).every(Boolean);
+  const value = { isInitialized, initializationSteps };
+  
+  return (
+    <InitializationContext.Provider value={value}>
+      {children}
+    </InitializationContext.Provider>
+  );
+};
+
+export const IdleTimeoutContext = createContext({
+  remainingTime: 0,
+  remainingTimeFormatted: "00:00",
+  isActive: false
+});
 export const useIdleTimeoutContext = () => useContext(IdleTimeoutContext);
-export const IdleTimeoutProvider = ({ value, children }) => (<IdleTimeoutContext.Provider value={value}>{children}</IdleTimeoutContext.Provider>);
+export const IdleTimeoutProvider = ({ value, children }) => (
+  <IdleTimeoutContext.Provider value={value}>
+    {children}
+  </IdleTimeoutContext.Provider>
+);
 
 export const AppContext = createContext();
-export const AppContextProvider = ({ children }) => { const accessibilityContext = useContext(AccessibilityContext); const orderContext = useContext(OrderContext); const uiContext = useContext(UIContext); const modalContext = useContext(ModalContext); const { handleText } = useTextHandler(accessibilityContext.volume); const readCurrentPage = useCallback((newVolume) => { const el = safeQuerySelector('.hidden-btn.page-btn'); const p = el?.dataset.ttsText; if (p) handleText(p, true, newVolume); }, [handleText]); const contextValue = useMemo(() => ({ ...accessibilityContext, ...orderContext, ...uiContext, ...modalContext, commonScript: TTS, readCurrentPage }), [accessibilityContext, orderContext, uiContext, modalContext, readCurrentPage]); return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>; };
+
+export const AppContextProvider = ({ children }) => {
+  const accessibilityContext = useContext(AccessibilityContext);
+  const orderContext = useContext(OrderContext);
+  const uiContext = useContext(UIContext);
+  const modalContext = useContext(ModalContext);
+  const { handleText } = useTextHandler(accessibilityContext.volume);
+  
+  const readCurrentPage = useCallback((newVolume) => {
+    const el = safeQuerySelector('.hidden-btn.page-btn');
+    const p = el?.dataset.ttsText;
+    if (p) handleText(p, true, newVolume);
+  }, [handleText]);
+  
+  const contextValue = useMemo(() => ({
+    ...accessibilityContext,
+    ...orderContext,
+    ...uiContext,
+    ...modalContext,
+    commonScript: TTS,
+    readCurrentPage
+  }), [accessibilityContext, orderContext, uiContext, modalContext, readCurrentPage]);
+  
+  return (
+    <AppContext.Provider value={contextValue}>
+      {children}
+    </AppContext.Provider>
+  );
+};
 
 // ============================================================================
 // 상수 정의 (App용)

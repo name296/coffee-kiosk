@@ -495,6 +495,11 @@
         color: #FFFFFFFF;
         font-weight: var(--font-weight-semibold);
       }
+      
+      & .summary-text {
+        color: #FFFFFFFF;
+        font-weight: var(--font-weight-semibold);
+      }
     }
 
     & .return-modal-content {
@@ -705,6 +710,19 @@
     border-top: 1px solid gray;
 
     & .task-manager { width: 560px; justify-content: space-between; }
+    
+    & .summary-label {
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    & .summary-text {
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    & .summary-btn-icon {
+      width: 1.5em;
+      height: 1.5em;
+    }
   }
 
   .bottom {
@@ -717,6 +735,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
+    & .footer-coffeelogo {
+      width: 163px;
+      height: 45px;
+      /* 로고 이미지가 없으면 빈 공간으로 유지 */
+    }
   }
 
   .countdown {
