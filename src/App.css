@@ -652,7 +652,7 @@
       font-size: var(--font-size-b1);
       padding-top: var(--height-title);
       padding-bottom: 182px;
-      &.card-remove { padding-bottom: 454px; }
+      &.card-remove { padding-bottom: 489px; }
       
       & .payment { width: 100%; height: 100%; flex-grow: 1; }
       & .task-manager { width: fit-content; height: fit-content; }
