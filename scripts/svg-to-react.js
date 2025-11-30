@@ -158,7 +158,7 @@ function generateIconComponent() {
       console.log(`✅ ${file} → ${componentName}`);
     } catch (error) {
       console.error(`❌ ${file} 변환 실패:`, error.message);
-    }
+}
   });
 
 

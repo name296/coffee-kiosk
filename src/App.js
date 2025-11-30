@@ -205,7 +205,7 @@ export const TTS = {
   page1: () => `안내, 시작 단계, 음식을 포장할지 먹고갈지 선택합니다.${REPLAY}`,
   page2: () => `안내, 선택 단계, 카테고리에서 메뉴종류를 선택하시고, 메뉴에서 상품을 선택합니다, 초기화 버튼으로 상품을 다시 선택할 수 있습니다, 주문하기 버튼으로 다음 단계, 내역확인으로 이동 할 수 있습니다, ${REPLAY}`,
   page3: () => `안내, 내역 확인, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, 메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,${REPLAY}`,
-  paySelect: (sum, fmt) => `작업 안내, 결제 단계. 결제 금액, ${fmt(sum)}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ${REPLAY}`,
+  paySelect: (sum, fmt) => `작업 안내, 결제 단계, 결제 금액, ${fmt(sum)}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ${REPLAY}`,
   cardIn: `안내, 신용카드 삽입, 가운데 아래에 있는 카드리더기에 신용카드를 끝까지 넣습니다, 취소 버튼으로 이전 단계, 결제선택으로 이동 할 수 있습니다, ${REPLAY}`,
   mobile: `안내, 모바일페이, 가운데 아래에 있는 카드리더기에 휴대전화의 모바일페이를 켜고 접근시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${REPLAY}`,
   cardOut: `안내, 신용카드 제거, 신용카드를 뽑습니다, 정상적으로 결제되고 나서 카드가 제거되면, 자동으로 다음 작업, 인쇄 선택으로 이동합니다, 확인 버튼을 눌러 결제 상황을 확인합니다, ${REPLAY}`,
@@ -450,9 +450,14 @@ export function useTextHandler(volume) {
   
   return { initDB, handleText, handleReplayText };
 }
+
+// TTS 재생 (외부 서버 우선, 폴백으로 브라우저 내장)
 async function playText(text, speed, vol) {
   const ap = document.getElementById('audioPlayer');
-  if (!ap) return;
+  if (!ap) {
+    useBrowserTTS(text, speed, vol);
+    return;
+  }
   
   const k = `audio_${text}`;
   const s = await getFromDB(k);
@@ -461,7 +466,7 @@ async function playText(text, speed, vol) {
     ap.src = s;
     ap.playbackRate = speed;
     ap.volume = vol;
-    ap.play().catch(() => {});
+    ap.play().catch(() => useBrowserTTS(text, speed, vol));
     return;
   }
   
@@ -501,6 +506,7 @@ async function playText(text, speed, vol) {
   }
 }
 
+// 브라우저 내장 TTS (폴백)
 function useBrowserTTS(t, s, v) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -1210,6 +1216,7 @@ const Button = memo(({
     if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
     if (toggle) c.push('toggle');
     if (pressed || (isPressing && !toggle)) c.push('pressed');
+    if (isPressing) c.push('pressing'); // 누르는 순간에만 적용
     if (pointed) c.push('pointed');
     if (className) c.push(className);
     return c.join(' ');
@@ -1219,15 +1226,15 @@ const Button = memo(({
     if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
     if (e.type === 'keydown') e.preventDefault();
     playOnPressedSound();
-    if (!toggle) setIsPressing(true);
-  }, [disabled, toggle, playOnPressedSound]);
+    setIsPressing(true); // 모든 버튼에 적용
+  }, [disabled, playOnPressedSound]);
 
   const onEnd = useCallback((e) => {
     if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
     if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
-    if (!toggle) setIsPressing(false);
+    setIsPressing(false); // 모든 버튼에 적용
     actionType ? handleAction(e) : onClick?.(e);
-  }, [disabled, toggle, actionType, handleAction, onClick]);
+  }, [disabled, actionType, handleAction, onClick]);
 
   return (
     <button
@@ -1275,35 +1282,35 @@ H.displayName = 'H';
 // 모달 설정 (컨텍스트 기반 생성)
 const MODAL_CONFIG = {
   deleteCheck: {
-    tts: "오버레이, 알림, 내역이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 확인 버튼을 누릅니다, ",
+    tts: "알림, 내역이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 확인 버튼을 누릅니다, ",
     icon: "GraphicWarning",
     title: "확인",
     confirmLabel: "확인",
     message: (H) => <><p>내역이 없으면 <H>메뉴선택</H>으로 돌아갑니다</p><p>계속 진행하시려면 <H>확인</H> 버튼을 누르세요</p></>,
   },
   delete: {
-    tts: "오버레이, 알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
+    tts: "알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
     icon: "GraphicTrash",
     title: "삭제",
     confirmLabel: "삭제",
     message: (H) => <><p>주문 상품을 <H>삭제</H>합니다</p><p>계속 진행하시려면 <H>삭제</H> 버튼을 누릅니다</p></>,
   },
   reset: {
-    tts: "오버레이, 알림, 초기화, 주문 내역을 초기화합니다, 계속 진행하시려면 초기화 버튼을 누릅니다, ",
+    tts: "알림, 초기화, 주문 내역을 초기화합니다, 계속 진행하시려면 초기화 버튼을 누릅니다, ",
     icon: "GraphicReset",
     title: "초기화",
     confirmLabel: "초기화",
     message: (H) => <><p>주문 내역을 <H>초기화</H>합니다</p><p>계속 진행하시려면 <H>초기화</H> 버튼을 누릅니다</p></>,
   },
   return: {
-    tts: "오버레이, 알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
+    tts: "알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
     icon: "GraphicHome",
     title: "시작화면",
     confirmLabel: "시작화면",
     message: (H) => <><p><H>시작화면</H>으로 이동합니다</p><p>계속 진행하시려면 <H>시작화면</H> 버튼을 누릅니다</p></>,
   },
   call: {
-    tts: "오버레이, 알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
+    tts: "알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
     icon: "GraphicBell",
     title: "호출",
     confirmLabel: "호출",
@@ -1343,8 +1350,8 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel = "취�
           <div className="down-content">
             <div className="modal-message">{config.message(H)}</div>
             <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="task-manager">
-              <Button className="w242h090" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
-              <Button className="w242h090" svg={<Icon name="Ok" />} label={config.confirmLabel} ttsText={`${config.confirmLabel},`} onClick={onConfirm} />
+              <Button className="w285h090" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
+              <Button className="w285h090" svg={<Icon name="Ok" />} label={config.confirmLabel} ttsText={`${config.confirmLabel},`} onClick={onConfirm} />
             </div>
           </div>
         </div>
@@ -2068,8 +2075,9 @@ export const SECTION = { PAGE: 'page', TOP: 'top', MIDDLE: 'middle', BOTTOM: 'bo
 // 기본값
 export const DEFAULT = { VOLUME: 1, IS_DARK: false, IS_LARGE: false, IS_LOW: false, SELECTED_TAB: '전체메뉴' };
 
-// 비활성 메뉴 ID
+// 비활성 메뉴 ID (추가예정: 0, 기타: 13)
 export const DISABLED_MENU_ID = 13;
+export const isMenuDisabled = (id) => id === 0 || id === DISABLED_MENU_ID;
 
 // 에러 메시지
 export const ERROR = { NO_PRODUCT: '없는 상품입니다.' };
@@ -2190,14 +2198,14 @@ const MenuItem = memo(({ item, disabled, onPress }) => (
 MenuItem.displayName = 'MenuItem';
 
 // 메뉴 그리드
-const MenuGrid = memo(({ items, disabledId, onItemPress, sections, selectedTab, convertToKoreanQuantity }) => {
+const MenuGrid = memo(({ items, onItemPress, sections, selectedTab, convertToKoreanQuantity }) => {
   return (
     <div className="menu" ref={sections.middle} data-tts-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(items.length)}개,`}>
       {items.map(item => (
         <MenuItem 
           key={item.id} 
           item={item} 
-          disabled={item.id === disabledId} 
+          disabled={isMenuDisabled(item.id)} 
           onPress={(e) => onItemPress(e, item.id)} 
         />
       ))}
@@ -2211,9 +2219,9 @@ const Pagination = memo(({ pageNumber, totalPages, onPrev, onNext, isDark, ttsPr
   <div className="pagination" ref={sectionRef} data-tts-text={`페이지네이션, ${ttsPrefix}, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}>
     <Button ttsText="이전," label="이전" onClick={onPrev} />
     <span className="pagination-page-number">
-      <span className={isDark ? "pagination-page-number-highlight" : "pagination-page-number-default"}>{pageNumber}</span>
+      <span className="pagination-page-current">{pageNumber}</span>
       <span className="pagination-separator">&nbsp;/&nbsp;</span>
-      <span className="pagination-separator">{totalPages || 1}</span>
+      <span className="pagination-page-total">{totalPages || 1}</span>
     </span>
     <Button ttsText="다음," label="다음" onClick={onNext} />
   </div>
@@ -2242,7 +2250,7 @@ const OrderItem = memo(({ item, index, quantity, onDecrease, onIncrease, onDelet
           <Button className="w080h076" ttsText="수량 더하기" label="+" onClick={onIncrease} />
         </div>
         <span className="order-price">{formatNumber(totalPrice)}원</span>
-        <Button className="w070h070" ttsText="삭제" svg={<DeleteIcon />} onClick={onDelete} />
+        <Button className="w070h070 delete-item" ttsText="삭제" svg={<DeleteIcon />} onClick={onDelete} />
       </div>
       <div className="row-line" />
     </>
@@ -2340,7 +2348,7 @@ const Process2 = memo(() => {
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { stopIntroTimer } = useTimer();
-  const { blurActiveElement } = useSafeDocument();
+  const { blurActiveElement, getActiveElementText } = useSafeDocument();
 
   // 기본 탭 설정
   useEffect(() => {
@@ -2352,9 +2360,12 @@ const Process2 = memo(() => {
   useEffect(() => {
     stopIntroTimer();
     blurActiveElement();
-    const t = setTimeout(() => handleText(PAGE_MESSAGES.SECOND.FULL()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => {
+      const p = getActiveElementText();
+      if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY);
+    }, 0);
     return () => clearTimeout(t);
-  }, []); // eslint-disable-line
+  }, [handleText, blurActiveElement, getActiveElementText, stopIntroTimer]);
 
   useMultiModalButtonHandler({
     initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.TOP, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.FOOTER, FOCUS_SECTIONS.BOTTOM_FOOTER],
@@ -2378,7 +2389,7 @@ const Process2 = memo(() => {
   }, [selectedTab]); // eslint-disable-line
 
   const handleTouchEndWrapper = useCallback((e, id) => {
-    if (id !== DISABLED_MENU_ID) {
+    if (!isMenuDisabled(id)) {
       handleIncrease(id);
       handleText('담기, ');
     } else {
@@ -2438,7 +2449,6 @@ const Process2 = memo(() => {
       />
       <MenuGrid 
         items={currentItems} 
-        disabledId={DISABLED_MENU_ID} 
         onItemPress={handleMenuItemPress}
         sections={sections}
         selectedTab={selectedTab}
@@ -2552,11 +2562,15 @@ const Process3 = memo(() => {
   const { blurActiveElement } = useSafeDocument();
   
   // 페이지 진입 시 TTS 안내
+  const { getActiveElementText } = useSafeDocument();
   useEffect(() => {
     blurActiveElement();
-    const t = setTimeout(() => handleText(PAGE_MESSAGES.THIRD.FULL()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => {
+      const p = getActiveElementText();
+      if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY);
+    }, 0);
     return () => clearTimeout(t);
-  }, []); // eslint-disable-line
+  }, [handleText, blurActiveElement, getActiveElementText]);
 
   return (
     <div className="main third">
@@ -2665,7 +2679,7 @@ const Process4 = memo(() => {
     switch (isCreditPayContent) {
       case 0: return (
         <div className="main forth">
-          <PageTitle><span className={highlight}>결제방법</span>을 선택하세요</PageTitle>
+          <PageTitle><span><span className={highlight}>결제방법</span>을 선택하세요</span></PageTitle>
           <div className="banner price" onClick={(e) => { e.preventDefault(); e.target.focus(); updateOrderNumber(); setIsCreditPayContent(4); }}>
             <span>결제금액</span><span className="payment-amount-large">{totalSum.toLocaleString("ko-KR")}원</span>
           </div>
@@ -2700,7 +2714,7 @@ const Process4 = memo(() => {
       );
       case 3: return (
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <PageTitle><span className={highlight}>신용카드</span>를 뽑으세요.</PageTitle>
+          <PageTitle><span><span className={highlight}>신용카드</span>를 뽑으세요.</span></PageTitle>
           <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(4)} />
         </div>
       );
@@ -3128,7 +3142,7 @@ const AccessibilityModal = memo(() => {
         <div className="down-content">
           {/* 초기설정 */}
           <div className="setting-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
-            <span className="modal-message">초기설정으로 일괄선택</span>
+            <span className="setting-name">초기설정으로 일괄선택</span>
             <div className="task-manager">
               <Button svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
             </div>
@@ -3136,7 +3150,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 고대비화면 */}
           <div className="setting-row">
-            <span className="modal-message"><Icon name="Contrast" />고대비화면</span>
+            <span className="setting-name"><Icon name="Contrast" />고대비화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections2} data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark}, 버튼 두 개,`}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isDark ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isDark} onClick={() => handleDarkChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isDark ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isDark} onClick={() => handleDarkChange(true)} className="w113h076" />
@@ -3145,7 +3159,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 소리크기 */}
           <div className="setting-row">
-            <span className="modal-message"><Icon name="Volume" />소리크기</span>
+            <span className="setting-name"><Icon name="Volume" />소리크기</span>
             <div className="task-manager" ref={sections.AccessibilitySections3} data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
               {[0, 1, 2, 3].map((vol) => (
                 <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="w070h076" />
@@ -3155,7 +3169,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 큰글씨화면 */}
           <div className="setting-row">
-            <span className="modal-message"><Icon name="Large" />큰글씨화면</span>
+            <span className="setting-name"><Icon name="Large" />큰글씨화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections4} data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large}, 버튼 두 개, `}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLarge ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLarge} onClick={() => handleLargeChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLarge ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLarge} onClick={() => handleLargeChange(true)} className="w113h076" />
@@ -3164,7 +3178,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 낮은화면 */}
           <div className="setting-row">
-            <span className="modal-message"><Icon name="Wheelchair" />낮은화면</span>
+            <span className="setting-name"><Icon name="Wheelchair" />낮은화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections5} data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low}, 버튼 두 개, `}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLow ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLow} onClick={() => handleLowChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLow ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLow} onClick={() => handleLowChange(true)} className="w113h076" />
@@ -3172,8 +3186,8 @@ const AccessibilityModal = memo(() => {
           </div>
           {/* 적용 버튼들 */}
           <div className="task-manager" ref={sections.AccessibilitySections6} data-tts-text="작업 관리, 버튼 두 개, ">
-            <Button className="w242h090" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
-            <Button className="w242h090" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
+            <Button className="w285h090" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
+            <Button className="w285h090" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
           </div>
         </div>
       </div>
