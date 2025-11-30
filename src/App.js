@@ -28,7 +28,7 @@ import "./App.css";
 import menuData from "./menuData";
 
 // Components
-import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIcon, PayIcon, HomeIcon, LowposIcon, ToggleIcon } from "./Icon";
+import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon } from "./Icon";
 
 // ============================================================================
 // 유틸리티
@@ -179,7 +179,7 @@ export function setupViewportResize() {
 const REPLAY = "키패드 사용법 안내는 키패드의 별 버튼을, 직전 안내 다시 듣기는 샵 버튼을 누릅니다,";
 export const VOLUME_MAP = { 0: '끔', 1: '약', 2: '중', 3: '강' };
 export const VOLUME_VALUES = { 0: 0, 1: 0.5, 2: 0.75, 3: 1 };
-export const DEFAULT_ACCESSIBILITY = { isHighContrast: false, isLowScreen: false, isBigSize: false, volume: 1 };
+export const DEFAULT_ACCESSIBILITY = { isDark: false, isLow: false, isLarge: false, volume: 1 };
 
 const CFG = {
   TTS_DELAY: 500,
@@ -204,7 +204,7 @@ export const TTS = {
   return: "초기화면으로 돌아갑니다.",
   page1: () => `안내, 시작 단계, 음식을 포장할지 먹고갈지 선택합니다.${REPLAY}`,
   page2: () => `안내, 선택 단계, 카테고리에서 메뉴종류를 선택하시고, 메뉴에서 상품을 선택합니다, 초기화 버튼으로 상품을 다시 선택할 수 있습니다, 주문하기 버튼으로 다음 단계, 내역확인으로 이동 할 수 있습니다, ${REPLAY}`,
-  page3: () => `안내, 내역확인 단계, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, 메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,${REPLAY}`,
+  page3: () => `안내, 내역 확인, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, 메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,${REPLAY}`,
   paySelect: (sum, fmt) => `작업 안내, 결제 단계. 결제 금액, ${fmt(sum)}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ${REPLAY}`,
   cardIn: `안내, 신용카드 삽입, 가운데 아래에 있는 카드리더기에 신용카드를 끝까지 넣습니다, 취소 버튼으로 이전 단계, 결제선택으로 이동 할 수 있습니다, ${REPLAY}`,
   mobile: `안내, 모바일페이, 가운데 아래에 있는 카드리더기에 휴대전화의 모바일페이를 켜고 접근시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${REPLAY}`,
@@ -225,6 +225,30 @@ export const useBodyClass = (className, condition) => {
     if (condition) document.body.classList.add(className);
     else document.body.classList.remove(className);
     return () => document.body.classList.remove(className);
+  }, [className, condition]);
+};
+
+// HTML 요소에 클래스 + font-size 직접 적용 (font-size 스케일링용)
+export const useHtmlClass = (className, condition) => {
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return;
+    const html = document.documentElement;
+    console.log(`🎨 useHtmlClass: ${className} = ${condition}`);
+    if (condition) {
+      html.classList.add(className);
+      html.style.fontSize = '12px'; // 직접 px로 설정
+    } else {
+      html.classList.remove(className);
+      html.style.fontSize = '10px'; // 직접 px로 설정
+    }
+    // 강제 reflow - 스타일 변경 즉시 적용
+    void html.offsetHeight;
+    console.log(`🎨 html font-size 적용됨: ${getComputedStyle(html).fontSize}`);
+    
+    return () => {
+      html.classList.remove(className);
+      html.style.fontSize = '';
+    };
   }, [className, condition]);
 };
 
@@ -621,36 +645,244 @@ export const useAppIdleTimeout = (currentPage, setCurrentPage, resetOrder) => {
   return { remainingTime, remainingTimeFormatted, isActive: true, resetTimer };
 };
 
-export const usePaymentCountdown = ({ isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage }) => { const [countdown, setCountdown] = useState(60); useEffect(() => { if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) { const rc = () => setCountdown(CFG.TIME.AUTO_FINISH); setCountdown(CFG.TIME.AUTO_FINISH); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => setisCreditPayContent(PAY.FINISH), 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); const h = () => rc(); window.addEventListener('keydown', h); window.addEventListener('click', h); return () => { window.removeEventListener('keydown', h); window.removeEventListener('click', h); clearInterval(t); }; } if (isCreditPayContent === PAY.FINISH) { setCountdown(CFG.TIME.FINAL_PAGE); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => { ModalReturn.close(); ModalAccessibility.close(); setQuantities(totalMenuItems.reduce((a, i) => ({ ...a, [i.id]: 0 }), {})); setisDark(false); setVolume(1); setisLarge(false); setisLow(false); setCurrentPage(CFG.PAGE_FIRST); }, 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); return () => clearInterval(t); } }, [isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage]); return countdown; };
+export const usePaymentCountdown = ({ isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage }) => { const [countdown, setCountdown] = useState(60); useEffect(() => { if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) { const rc = () => setCountdown(CFG.TIME.AUTO_FINISH); setCountdown(CFG.TIME.AUTO_FINISH); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => setIsCreditPayContent(PAY.FINISH), 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); const h = () => rc(); window.addEventListener('keydown', h); window.addEventListener('click', h); return () => { window.removeEventListener('keydown', h); window.removeEventListener('click', h); clearInterval(t); }; } if (isCreditPayContent === PAY.FINISH) { setCountdown(CFG.TIME.FINAL_PAGE); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => { ModalReturn.close(); ModalAccessibility.close(); setQuantities(totalMenuItems.reduce((a, i) => ({ ...a, [i.id]: 0 }), {})); setIsDark(false); setVolume(1); setIsLarge(false); setIsLow(false); setCurrentPage(CFG.PAGE_FIRST); }, 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); return () => clearInterval(t); } }, [isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage]); return countdown; };
 
-// 카테고리 레이아웃 동적 계산 (컨테이너 크기 기반, 여러 줄 표시)
-export const useCategoryLayout = (maxRows = 2) => {
-  const containerRef = useRef(null);
-  const [itemsPerPage, setItemsPerPage] = useState(999);
+// ============================================================================
+// 카테고리 페이지네이션 (가변 너비 버튼, 페이지별 시작 인덱스 저장)
+// ============================================================================
+// 
+// [중요] 이 훅은 가변 너비 버튼의 페이지네이션을 처리합니다.
+// 
+// 문제: 카테고리 탭 버튼은 텍스트 길이에 따라 너비가 다름 (fit-content)
+//       단순히 "페이지당 N개"로는 정확한 페이지 분할이 불가능
+// 
+// 해결: 각 줄(페이지)별 시작 인덱스를 계산하여 저장
+// 
+// 계산 과정:
+//   1줄: 인덱스 0부터 시작, 배열 가능한 아이템 갯수 계산 → N개
+//        breakpoints[0] = 0 (1줄 시작)
+//   
+//   2줄: 시작 인덱스 = 1줄 아이템 갯수 (N)
+//        인덱스 N부터 배열 가능한 아이템 갯수 계산 → M개
+//        breakpoints[1] = N (2줄 시작)
+//   
+//   3줄: 시작 인덱스 = N + M
+//        breakpoints[2] = N + M (3줄 시작)
+//   
+//   ... 모든 아이템이 배치될 때까지 반복
+// 
+// 예시: 아이템 10개, 1줄에 4개, 2줄에 3개, 3줄에 3개 들어갈 때
+//       breakpoints = [0, 4, 7]
+//       → 1줄: items[0~3] (4개)
+//       → 2줄: items[4~6] (3개)  
+//       → 3줄: items[7~9] (3개)
+// 
+// 이전/다음:
+//   - "다음" 클릭 → currentPage++ → breakpoints[currentPage]부터 표시
+//   - "이전" 클릭 → currentPage-- → breakpoints[currentPage]부터 표시
+// 
+// 구조:
+//   - measureRef: 숨겨진 측정용 컨테이너 (모든 버튼 렌더링해서 너비 측정)
+//   - containerRef: 실제 표시 컨테이너 (현재 페이지 버튼만 표시)
+//   - pageBreakpoints: 각 페이지의 시작 인덱스 배열 [0, N, N+M, ...]
+// 
+// ============================================================================
+const ACTUAL_GAP_THRESHOLD = 36; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
+
+export const useCategoryPagination = (items, isLarge = false) => {
+  const containerRef = useRef(null);  // 실제 표시 컨테이너
+  const measureRef = useRef(null);    // 숨겨진 측정용 컨테이너
+  const [pageBreakpoints, setPageBreakpoints] = useState([0]); // 페이지별 시작 인덱스
+  const [currentPage, setCurrentPage] = useState(0);
+  const [calcTrigger, setCalcTrigger] = useState(0); // 재계산 트리거
+  const [isCompact, setIsCompact] = useState(false); // compact 모드
+  const [isReady, setIsReady] = useState(false); // 최종 표시 준비
+  const measurePhaseRef = useRef(0); // 0: 초기, 1: 측정중, 2: 완료
   
-  useEffect(() => {
+  // 재계산 함수
+  const recalculate = useCallback(() => {
+    setCalcTrigger(t => t + 1);
+  }, []);
+  
+  // isLarge 변경 추적 (페이지 리셋용)
+  const prevIsLargeRef = useRef(isLarge);
+  
+  // 1단계: 브레이크포인트 계산 (측정용 컨테이너 사용)
+  // useLayoutEffect 사용: useHtmlClass 직후 동기 실행 → 스타일 적용 보장
+  useLayoutEffect(() => {
+    const isLargeChanged = prevIsLargeRef.current !== isLarge;
+    prevIsLargeRef.current = isLarge;
+    
     const calculate = () => {
-      if (!containerRef.current) return;
-      const container = containerRef.current;
-      const btn = container.querySelector('.button');
-      if (!btn) return;
-      const containerWidth = container.clientWidth;
-      const btnWidth = btn.offsetWidth;
-      const btnHeight = btn.offsetHeight;
-      const gapX = 8;
-      const gapY = 8;
-      const perRow = Math.max(1, Math.floor((containerWidth + gapX) / (btnWidth + gapX)));
-      const containerHeight = container.clientHeight || (btnHeight * maxRows + gapY * (maxRows - 1));
-      const rows = Math.max(1, Math.floor((containerHeight + gapY) / (btnHeight + gapY)));
-      const actualRows = Math.min(rows, maxRows);
-      setItemsPerPage(perRow * actualRows);
+      if (!measureRef.current || !containerRef.current) return;
+      
+      // 새 계산 시작 - 숨기고 compact 리셋
+      setIsReady(false);
+      setIsCompact(false);
+      measurePhaseRef.current = 1; // 측정 단계
+      
+      const containerWidth = containerRef.current.clientWidth;
+      const gap = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
+      
+      // 측정용 컨테이너의 버튼 font-size 확인
+      const measureButtons = measureRef.current.querySelectorAll('.button');
+      if (measureButtons.length > 0) {
+        const btnFontSize = getComputedStyle(measureButtons[0]).fontSize;
+        console.log(`🔤 측정 버튼 font-size: ${btnFontSize}`);
+      }
+      
+      const buttons = measureRef.current.querySelectorAll('.button');
+      if (!buttons.length) return;
+      
+      const separator = measureRef.current.querySelector('.category-separator');
+      const separatorWidth = separator ? separator.offsetWidth : 0;
+      
+      const breakpoints = [0];
+      let accumulatedWidth = 0;
+      let lineButtonCount = 0;
+      
+      const btnWidths = [];
+      for (let i = 0; i < buttons.length; i++) {
+        const btnWidth = buttons[i].offsetWidth;
+        btnWidths.push(btnWidth);
+        const isLast = i === buttons.length - 1;
+        const toNextBtnStart = isLast ? btnWidth : btnWidth + gap + separatorWidth + gap;
+        const willOverflow = accumulatedWidth + toNextBtnStart > containerWidth && lineButtonCount > 0;
+        
+        if (willOverflow) {
+          breakpoints.push(i);
+          accumulatedWidth = toNextBtnStart;
+          lineButtonCount = 1;
+        } else {
+          accumulatedWidth += toNextBtnStart;
+          lineButtonCount++;
+        }
+      }
+      
+      console.log(`📊 카테고리폭=${containerWidth}px, 버튼폭=${btnWidths.slice(0,3).join(',')}... → ${breakpoints.length}페이지`, breakpoints);
+      
+      setPageBreakpoints(breakpoints);
+      // isLarge 변경 시 페이지 리셋, 아니면 현재 페이지 유지 (범위 내)
+      if (isLargeChanged) {
+        setCurrentPage(0);
+      } else {
+        setCurrentPage(p => Math.min(p, breakpoints.length - 1));
+      }
     };
-    const t = setTimeout(calculate, 100);
+    
+    // 자식 컴포넌트가 먼저 실행되므로 여기서 직접 font-size 적용
+    const html = document.documentElement;
+    const targetFontSize = isLarge ? '12px' : '10px';
+    html.style.fontSize = targetFontSize;
+    if (isLarge) {
+      html.classList.add('large');
+    } else {
+      html.classList.remove('large');
+    }
+    void html.offsetHeight; // 강제 reflow
+    const htmlFontSize = getComputedStyle(html).fontSize;
+    console.log(`🔤 html font-size: ${htmlFontSize} (isLarge: ${isLarge}, 목표: ${targetFontSize})`);
+    
+    if (measureRef.current) {
+      void measureRef.current.offsetHeight;
+    }
+    
+    calculate();
+    
     window.addEventListener('resize', calculate);
-    return () => { clearTimeout(t); window.removeEventListener('resize', calculate); };
-  }, [maxRows]);
+    return () => window.removeEventListener('resize', calculate);
+  }, [items, calcTrigger, isLarge]);  // isLarge 변경 시 재계산
   
-  return { containerRef, itemsPerPage };
+  // 2단계: 렌더링된 실제 간격 측정 → compact 결정
+  useEffect(() => {
+    if (measurePhaseRef.current !== 1) return; // 측정 단계가 아니면 스킵
+    
+    // 1차 렌더 후 측정 (rAF 2번)
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!containerRef.current) return;
+      
+      const renderedButtons = containerRef.current.querySelectorAll('.button');
+      if (renderedButtons.length <= 1) {
+        // 아이템 1개 이하면 compact 불필요, 바로 표시
+        measurePhaseRef.current = 2;
+        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
+        return;
+      }
+      
+      // 실제 간격 측정
+      let maxGap = 0;
+      for (let i = 0; i < renderedButtons.length - 1; i++) {
+        const rect1 = renderedButtons[i].getBoundingClientRect();
+        const rect2 = renderedButtons[i + 1].getBoundingClientRect();
+        const actualGap = rect2.left - rect1.right;
+        maxGap = Math.max(maxGap, actualGap);
+      }
+      
+      console.log(`📐 실제 간격: ${Math.round(maxGap)}px (기준: ${ACTUAL_GAP_THRESHOLD}px)`);
+      
+      const shouldCompact = maxGap > ACTUAL_GAP_THRESHOLD;
+      measurePhaseRef.current = 2; // 완료
+      
+      if (shouldCompact) {
+        console.log(`🔄 compact 적용`);
+        setIsCompact(true);
+        // 3차 렌더(compact 적용) 후 → 4차 렌더에서 표시
+        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
+      } else {
+        // compact 불필요 → 2프레임 후 표시
+        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
+      }
+    }));
+  }, [pageBreakpoints, currentPage]);
+  
+  // ---------------------------------------------------------------
+  // 페이지별 아이템 슬라이싱 (pagedItems)
+  // pagedItems[n] = n번째 페이지에 표시될 아이템 배열
+  // ---------------------------------------------------------------
+  const totalPages = pageBreakpoints.length;
+  const pagedItems = useMemo(() => {
+    return pageBreakpoints.map((start, idx) => {
+      const end = pageBreakpoints[idx + 1] ?? items.length;
+      return items.slice(start, end);
+    });
+  }, [pageBreakpoints, items]);
+  
+  // 현재 페이지 아이템
+  const currentItems = pagedItems[currentPage] ?? [];
+  const startIdx = pageBreakpoints[currentPage] ?? 0;
+  const endIdx = pageBreakpoints[currentPage + 1] ?? items.length;
+  
+  // 페이지 변경 + 측정 리셋
+  const prevPage = useCallback(() => {
+    measurePhaseRef.current = 1; // 측정 단계로
+    setIsReady(false);
+    setIsCompact(false);
+    setCurrentPage(p => Math.max(0, p - 1));
+  }, []);
+  
+  const nextPage = useCallback(() => {
+    measurePhaseRef.current = 1; // 측정 단계로
+    setIsReady(false);
+    setIsCompact(false);
+    setCurrentPage(p => Math.min(totalPages - 1, p + 1));
+  }, [totalPages]);
+  
+  return {
+    containerRef,
+    measureRef,
+    currentPage: currentPage + 1, // 1-based (UI 표시용)
+    totalPages,
+    currentItems,        // 현재 페이지 아이템
+    pagedItems,          // 모든 페이지별 아이템 배열
+    pageBreakpoints,     // 페이지별 시작 인덱스
+    hasPrev: currentPage > 0,
+    hasNext: currentPage < totalPages - 1,
+    prevPage,
+    nextPage,
+    recalculate,
+    isCompact,           // compact 모드 여부
+    isReady              // 계산 완료 후 표시 준비됨
+  };
 };
 
 export const useFocusTrap = (isActive, options = {}) => {
@@ -756,22 +988,22 @@ export const useFocusTrap = (isActive, options = {}) => {
 export const useAccessibilitySettings = (initialSettings = DEFAULT_ACCESSIBILITY) => {
   const [settings, setSettings] = useState(initialSettings);
   
-  const setHighContrast = useCallback((v) => setSettings(p => ({ ...p, isHighContrast: v })), []);
-  const setLowScreen = useCallback((v) => setSettings(p => ({ ...p, isLowScreen: v })), []);
-  const setBigSize = useCallback((v) => setSettings(p => ({ ...p, isBigSize: v })), []);
+  const setDark = useCallback((v) => setSettings(p => ({ ...p, isDark: v })), []);
+  const setLow = useCallback((v) => setSettings(p => ({ ...p, isLow: v })), []);
+  const setLarge = useCallback((v) => setSettings(p => ({ ...p, isLarge: v })), []);
   const setVolumeVal = useCallback((v) => setSettings(p => ({ ...p, volume: v })), []);
   const resetToDefault = useCallback(() => setSettings(DEFAULT_ACCESSIBILITY), []);
   const updateAll = useCallback((ns) => setSettings(ns), []);
   
   const getStatusText = useMemo(() => ({
-    highContrast: settings.isHighContrast ? '켬' : '끔',
-    lowScreen: settings.isLowScreen ? '켬' : '끔',
-    bigSize: settings.isBigSize ? '켬' : '끔',
+    dark: settings.isDark ? '켬' : '끔',
+    low: settings.isLow ? '켬' : '끔',
+    large: settings.isLarge ? '켬' : '끔',
     volume: VOLUME_MAP[settings.volume]
   }), [settings]);
   
   return {
-    settings, setHighContrast, setLowScreen, setBigSize,
+    settings, setDark, setLow, setLarge,
     setVolume: setVolumeVal, resetToDefault, updateAll, getStatusText
   };
 };
@@ -842,10 +1074,10 @@ const useButtonAction = (actionType, actionTarget, actionMethod, disabled) => {
     const actions = {
       navigate: () => actionTarget && c.setCurrentPage?.(actionTarget),
       selectTab: () => actionTarget && c.selectedTab !== actionTarget && c.setSelectedTab?.(actionTarget),
-      payment: () => actionMethod && (c.sendOrderDataToApp?.(actionMethod), c.setisCreditPayContent?.(actionMethod === "card" ? 1 : 2)),
-      cancel: () => actionTarget ? c.setCurrentPage?.(actionTarget) : (c.sendCancelPayment?.(), c.setisCreditPayContent?.(0)),
-      receipt: () => actionTarget === 'print' ? (c.sendPrintReceiptToApp?.(), c.setisCreditPayContent?.(6)) : c.setisCreditPayContent?.(7),
-      finish: () => c.setisCreditPayContent?.(7),
+      payment: () => actionMethod && (c.sendOrderDataToApp?.(actionMethod), c.setIsCreditPayContent?.(actionMethod === "card" ? 1 : 2)),
+      cancel: () => actionTarget ? c.setCurrentPage?.(actionTarget) : (c.sendCancelPayment?.(), c.setIsCreditPayContent?.(0)),
+      receipt: () => actionTarget === 'print' ? (c.sendPrintReceiptToApp?.(), c.setIsCreditPayContent?.(6)) : c.setIsCreditPayContent?.(7),
+      finish: () => c.setIsCreditPayContent?.(7),
       tabNav: () => actionTarget === 'prev' ? c.handlePreviousTab?.() : c.handleNextTab?.(),
       categoryNav: () => typeof c.handleCategoryPageNav === 'function' && c.handleCategoryPageNav(actionTarget),
       modal: () => actionTarget && m?.[`Modal${actionTarget}`]?.open?.(),
@@ -857,7 +1089,7 @@ const useButtonAction = (actionType, actionTarget, actionMethod, disabled) => {
 // 키 검증 유틸
 const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
-const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '', imgStyle = {}, label, children, disabled = false, pressed = false, toggle = false, actionType, actionTarget, actionMethod, onClick, ttsText, ...rest }) => {
+const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '', imgStyle = {}, label, children, disabled = false, pressed = false, pointed = false, toggle = false, actionType, actionTarget, actionMethod, onClick, ttsText, ...rest }) => {
   const btnRef = useRef(null);
   const [isPressing, setIsPressing] = useState(false);
   const { playOnPressedSound } = useButtonStyle();
@@ -865,14 +1097,17 @@ const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '',
 
   useLayoutEffect(() => { if (btnRef.current) applyButtonMinSide(btnRef.current); }, []);
 
+  // pressed: 눌린/선택된 상태 (토글 ON)
+  // pointed: 포커스/호버 상태 (강조 테두리) - 동시 적용 가능
   const cls = useMemo(() => {
     const c = ['button'];
     if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
     if (toggle) c.push('toggle');
     if (pressed || (isPressing && !toggle)) c.push('pressed');
+    if (pointed) c.push('pointed');
     if (className) c.push(className);
     return c.join(' ');
-  }, [className, toggle, pressed, isPressing]);
+  }, [className, toggle, pressed, pointed, isPressing]);
 
   const onStart = useCallback((e) => {
     if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
@@ -890,10 +1125,10 @@ const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '',
 
   return (
     <button ref={btnRef} className={cls} style={style} data-tts-text={ttsText} data-react-handler="true" disabled={disabled} aria-disabled={disabled} aria-pressed={toggle ? pressed : undefined} onMouseDown={onStart} onMouseUp={onEnd} onMouseLeave={() => setIsPressing(false)} onTouchStart={onStart} onTouchEnd={onEnd} onKeyDown={onStart} onKeyUp={onEnd} {...rest}>
-      {(svg || img) && <span className="content icon" aria-hidden="true">{svg || <img src={img} alt={imgAlt} style={imgStyle} />}</span>}
-      {label && <span className="content label">{label}</span>}
+      {(svg || img) && <span className="icon" aria-hidden="true">{svg || <img src={img} alt={imgAlt} style={imgStyle} />}</span>}
+      {label}
       {children}
-      {toggle && <span className="content icon pressed" aria-hidden="true"><ToggleIcon /></span>}
+      {toggle && <span className="icon pressed" aria-hidden="true"><ToggleIcon /></span>}
     </button>
   );
 });
@@ -903,35 +1138,76 @@ Button.displayName = 'Button';
 // Modal 컴포넌트 (최적화 - 팩토리 패턴)
 // ============================================================================
 
-const H = memo(({ children }) => <span className="return-highlight">{children}</span>); // ModalHighlight 축약
+const H = memo(({ children }) => <span className="highlight">{children}</span>); // ModalHighlight 축약
 H.displayName = 'H';
 
-// 공통 모달 TTS/설정
-const MODAL_TTS = {
-  deleteCheck: "오버레이, 알림, 내역이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 확인 버튼을 누릅니다, ",
-  delete: "오버레이, 알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
-  reset: "오버레이, 알림, 초기화, 주문 내역을 초기화합니다, 계속 진행하시려면 초기화 버튼을 누릅니다, ",
-  return: "오버레이, 알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
-  call: "오버레이, 알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
+// 모달 설정 (컨텍스트 기반 생성)
+const MODAL_CONFIG = {
+  deleteCheck: {
+    tts: "오버레이, 알림, 내역이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 확인 버튼을 누릅니다, ",
+    icon: "GraphicWarning",
+    title: "확인",
+    confirmLabel: "확인",
+    message: (H) => <><p>내역이 없으면 <H>메뉴선택</H>으로 돌아갑니다</p><p>계속 진행하시려면 <H>확인</H> 버튼을 누르세요</p></>,
+  },
+  delete: {
+    tts: "오버레이, 알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
+    icon: "GraphicTrash",
+    title: "삭제",
+    confirmLabel: "삭제",
+    message: (H) => <><p>주문 상품을 <H>삭제</H>합니다</p><p>계속 진행하시려면 <H>삭제</H> 버튼을 누릅니다</p></>,
+  },
+  reset: {
+    tts: "오버레이, 알림, 초기화, 주문 내역을 초기화합니다, 계속 진행하시려면 초기화 버튼을 누릅니다, ",
+    icon: "GraphicReset",
+    title: "초기화",
+    confirmLabel: "초기화",
+    message: (H) => <><p>주문 내역을 <H>초기화</H>합니다</p><p>계속 진행하시려면 <H>초기화</H> 버튼을 누릅니다</p></>,
+  },
+  return: {
+    tts: "오버레이, 알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
+    icon: "GraphicHome",
+    title: "시작화면",
+    confirmLabel: "시작화면",
+    message: (H) => <><p><H>시작화면</H>으로 이동합니다</p><p>계속 진행하시려면 <H>시작화면</H> 버튼을 누릅니다</p></>,
+  },
+  call: {
+    tts: "오버레이, 알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
+    icon: "GraphicBell",
+    title: "호출",
+    confirmLabel: "호출",
+    message: (H) => <><p>직원을 <H>호출</H>합니다</p><p>계속 진행하시려면 <H>호출</H> 버튼을 누릅니다</p></>,
+  },
 };
 
-// 공통 모달 베이스
-const BaseModal = memo(({ isOpen, ttsKey, icon = "GraphicWarning", onCancel, onConfirm, children, cancelLabel = "취소", confirmLabel = "확인" }) => {
+// 공통 모달 베이스 (컨텍스트 기반)
+const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel = "취소" }) => {
   const { sections, volume, commonScript } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { containerRef } = useFocusTrap(isOpen);
   useActiveElementTTS(handleText, 500, isOpen);
-  if (!isOpen) return null;
+  
+  const config = MODAL_CONFIG[type];
+  if (!isOpen || !config) return null;
+  
   return (
     <>
-      <div className="hidden-div" ref={sections.modalPage}><button type="hidden" autoFocus className="hidden-btn" data-tts-text={MODAL_TTS[ttsKey] + commonScript.replay} /></div>
-      <div className="return-modal-overlay" />
-      <div className="return-modal-content" ref={containerRef}>
-        <Icon name={icon} className="return-modal-image" />
-        <div className="return-modal-message">{children}</div>
-        <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="task-manager">
-          <Button className="w242h090" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
-          <Button className="w242h090" svg={<Icon name="Ok" />} label={confirmLabel} ttsText={`${confirmLabel},`} onClick={onConfirm} />
+      <div className="hidden-div" ref={sections.modalPage}>
+        <button type="hidden" autoFocus className="hidden-btn" data-tts-text={config.tts + commonScript.replay} />
+      </div>
+      <div className="modal-overlay">
+        <div className="modal-content" ref={containerRef}>
+          <div className="up-content">
+            <Icon name={config.icon} className="modal-image" />
+            <div className="modal-title">{config.title}</div>
+          </div>
+          <div className="down-content">
+            <div className="modal-message">{config.message(H)}</div>
+            <div data-tts-text="작업관리, 버튼 두 개," ref={sections.confirmSections} className="task-manager">
+              <Button className="w242h090" svg={<Icon name="Cancel" />} label={cancelLabel} ttsText={`${cancelLabel},`} onClick={onCancel} />
+              <Button className="w242h090" svg={<Icon name="Ok" />} label={config.confirmLabel} ttsText={`${config.confirmLabel},`} onClick={onConfirm} />
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -949,19 +1225,19 @@ const useResetQuantities = () => {
   }, [totalMenuItems, setQuantities]);
 };
 
-// 개별 모달들
-const DeleteCheckModal = ({ handleDecrease, id, quantities }) => {
+// 개별 모달들 (컨텍스트 기반 생성)
+const DeleteCheckModal = ({ handleDelete, id }) => {
   const { ModalDeleteCheck, readCurrentPage, setCurrentPage } = useContext(AppContext);
   const close = useCallback(() => { ModalDeleteCheck.close(); readCurrentPage(); }, [ModalDeleteCheck, readCurrentPage]);
-  const confirm = useCallback(() => { quantities[id] !== 1 ? (quantities[id] = 0) : handleDecrease(id); ModalDeleteCheck.close(); setCurrentPage('process3'); }, [quantities, id, handleDecrease, ModalDeleteCheck, setCurrentPage]);
-  return <BaseModal isOpen={ModalDeleteCheck.isOpen} ttsKey="deleteCheck" icon="GraphicWarning" onCancel={close} onConfirm={confirm}><p>내역이 없으면 <H>메뉴선택</H>으로 돌아갑니다</p><p>계속 진행하시려면 <H>확인</H> 버튼을 누르세요</p></BaseModal>;
+  const confirm = useCallback(() => { handleDelete(id); ModalDeleteCheck.close(); setCurrentPage('process3'); }, [id, handleDelete, ModalDeleteCheck, setCurrentPage]);
+  return <BaseModal isOpen={ModalDeleteCheck.isOpen} type="deleteCheck" onCancel={close} onConfirm={confirm} />;
 };
 
-const DeleteModal = ({ handleDecrease, id, quantities }) => {
+const DeleteModal = ({ handleDelete, id }) => {
   const { ModalDelete, readCurrentPage } = useContext(AppContext);
   const close = useCallback(() => { ModalDelete.close(); readCurrentPage(); }, [ModalDelete, readCurrentPage]);
-  const confirm = useCallback(() => { quantities[id] !== 1 ? (quantities[id] = 0) : handleDecrease(id); ModalDelete.close(); readCurrentPage(); }, [quantities, id, handleDecrease, ModalDelete, readCurrentPage]);
-  return <BaseModal isOpen={ModalDelete.isOpen} ttsKey="delete" icon="GraphicTrash" onCancel={close} onConfirm={confirm} confirmLabel="삭제"><p>주문 상품을 <H>삭제</H>합니다</p><p>계속 진행하시려면 <H>삭제</H> 버튼을 누릅니다</p></BaseModal>;
+  const confirm = useCallback(() => { handleDelete(id); ModalDelete.close(); readCurrentPage(); }, [id, handleDelete, ModalDelete, readCurrentPage]);
+  return <BaseModal isOpen={ModalDelete.isOpen} type="delete" onCancel={close} onConfirm={confirm} />;
 };
 
 const ResetModal = () => {
@@ -969,7 +1245,7 @@ const ResetModal = () => {
   const resetQty = useResetQuantities();
   const close = useCallback(() => { ModalReset.close(); readCurrentPage(); }, [ModalReset, readCurrentPage]);
   const confirm = useCallback(() => { resetQty(); ModalReset.close(); setCurrentPage('process2'); readCurrentPage(); }, [resetQty, ModalReset, setCurrentPage, readCurrentPage]);
-  return <BaseModal isOpen={ModalReset.isOpen} ttsKey="reset" icon="GraphicReset" onCancel={close} onConfirm={confirm} confirmLabel="초기화"><p>주문 내역을 <H>초기화</H>합니다</p><p>계속 진행하시려면 <H>초기화</H> 버튼을 누릅니다</p></BaseModal>;
+  return <BaseModal isOpen={ModalReset.isOpen} type="reset" onCancel={close} onConfirm={confirm} />;
 };
 
 const ReturnModal = () => {
@@ -977,26 +1253,26 @@ const ReturnModal = () => {
   const resetQty = useResetQuantities();
   const close = useCallback(() => { ModalReturn.close(); readCurrentPage(); }, [ModalReturn, readCurrentPage]);
   const confirm = useCallback(() => { resetQty(); ModalReturn.close(); setCurrentPage('process1'); }, [resetQty, ModalReturn, setCurrentPage]);
-  return <BaseModal isOpen={ModalReturn.isOpen} ttsKey="return" icon="GraphicHome" onCancel={close} onConfirm={confirm} confirmLabel="시작화면"><p><H>시작화면</H>으로 이동합니다</p><p>계속 진행하시려면 <H>시작화면</H> 버튼을 누릅니다</p></BaseModal>;
+  return <BaseModal isOpen={ModalReturn.isOpen} type="return" onCancel={close} onConfirm={confirm} />;
 };
 
 const CallModal = () => {
   const { ModalCall, readCurrentPage } = useContext(AppContext);
   const close = useCallback(() => { ModalCall.close(); readCurrentPage(); }, [ModalCall, readCurrentPage]);
-  return <BaseModal isOpen={ModalCall.isOpen} ttsKey="call" icon="GraphicBell" onCancel={close} onConfirm={close} confirmLabel="호출"><p>직원을 <H>호출</H>합니다</p><p>계속 진행하시려면 <H>호출</H> 버튼을 누릅니다</p></BaseModal>;
+  return <BaseModal isOpen={ModalCall.isOpen} type="call" onCancel={close} onConfirm={close} />;
 };
 
 export const useMultiModalButtonHandler = (options = {}) => { const { initFocusableSections = [], initFirstButtonSection = null, enableGlobalHandlers = true, handleTextOpt = null, prefixOpt = '', enableKeyboardNavigation = false } = options; const [, setFocusableSections] = useState(initFocusableSections); const handlersRef = useRef({}); const keyboardNavState = useRef({ currentSectionIndex: 0, currentButtonIndex: 0, sections: initFocusableSections, firstButtonSection: initFirstButtonSection }); const updateFocusableSections = useCallback((ns) => { setFocusableSections(ns); keyboardNavState.current.sections = ns; }, []); const finalHandleText = useCallback((t) => { if (handleTextOpt && typeof handleTextOpt === 'function') handleTextOpt(t); }, [handleTextOpt]); const handleButtonClick = useCallback((e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b)) return; if (b.dataset.reactHandler === 'true') return; const tts = b.dataset.ttsText; if (tts && finalHandleText) finalHandleText(prefixOpt ? `${prefixOpt}${tts}` : tts); }, [finalHandleText, prefixOpt]); useEffect(() => { if (!enableGlobalHandlers) return; const htc = (e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || !isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; }; document.addEventListener('click', htc, false); handlersRef.current.toggleClickHandler = htc; return () => document.removeEventListener('click', htc, false); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers) return; const bdb = (e) => { const b = e.target?.closest?.('.button'); if (b && isButtonDisabled(b)) { e.preventDefault(); e.stopPropagation(); } }; document.addEventListener('click', bdb, true); return () => document.removeEventListener('click', bdb, true); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers || !enableKeyboardNavigation) return; const hkd = (e) => { const { key } = e; if ([KEYBOARD.ARROW_UP, KEYBOARD.ARROW_DOWN, KEYBOARD.ARROW_LEFT, KEYBOARD.ARROW_RIGHT].includes(key)) { e.preventDefault(); const ae = document.activeElement; if (!ae) return; const cs = ae.closest('[data-tts-text]'); if (!cs) return; const btns = cs.querySelectorAll('.button:not([aria-disabled="true"])'); const ci = Array.from(btns).indexOf(ae); let ni = ci; if (key === KEYBOARD.ARROW_RIGHT || key === KEYBOARD.ARROW_DOWN) ni = (ci + 1) % btns.length; else if (key === KEYBOARD.ARROW_LEFT || key === KEYBOARD.ARROW_UP) ni = (ci - 1 + btns.length) % btns.length; if (btns[ni]) btns[ni].focus(); } if (key === KEYBOARD.TAB) { const secs = keyboardNavState.current.sections; if (secs.length === 0) return; e.preventDefault(); const csi = keyboardNavState.current.currentSectionIndex; const nsi = e.shiftKey ? (csi - 1 + secs.length) % secs.length : (csi + 1) % secs.length; const ns = secs[nsi]?.current; if (ns) { const fb = ns.querySelector('.button:not([aria-disabled="true"])'); if (fb) { fb.focus(); keyboardNavState.current.currentSectionIndex = nsi; } } } if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) { const ae = document.activeElement; if (ae?.classList?.contains('button')) { e.preventDefault(); ae.click(); } } }; document.addEventListener('keydown', hkd, true); return () => document.removeEventListener('keydown', hkd, true); }, [enableGlobalHandlers, enableKeyboardNavigation]); useEffect(() => { if (!enableGlobalHandlers) return; const hps = (e, a) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; if (a === 'add') b.classList.add('pressed'); else if (a === 'remove' && b.classList.contains('pressed')) { b.classList.remove('pressed'); requestAnimationFrame(() => { if (b instanceof HTMLElement && document.activeElement !== b) b.focus(); }); } }; const hmd = (e) => hps(e, 'add'); const hmu = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const hml = (e) => e.target?.closest && hps(e, 'remove'); const hts = (e) => hps(e, 'add'); const hte = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const htc = (e) => hps(e, 'remove'); document.addEventListener('mousedown', hmd, true); document.addEventListener('mouseup', hmu, true); document.addEventListener('mouseleave', hml, true); document.addEventListener('touchstart', hts, { passive: true }); document.addEventListener('touchend', hte, { passive: true }); document.addEventListener('touchcancel', htc, { passive: true }); return () => { document.removeEventListener('mousedown', hmd, true); document.removeEventListener('mouseup', hmu, true); document.removeEventListener('mouseleave', hml, true); document.removeEventListener('touchstart', hts); document.removeEventListener('touchend', hte); document.removeEventListener('touchcancel', htc); }; }, [enableGlobalHandlers]); return enableKeyboardNavigation ? { handleButtonClick, updateFocusableSections } : { handleButtonClick }; };
 
-export const useWebViewMessage = (setisCreditPayContent) => {
+export const useWebViewMessage = (setIsCreditPayContent) => {
   useEffect(() => {
     if (!window.chrome?.webview) return;
     
     const hm = (e) => {
       let d = e.data;
       if (d.arg.result === CFG.WEBVIEW_SUCCESS) {
-        if (d.Command === 'PAY') setisCreditPayContent(PAY.CARD_OUT);
-        if (d.Command === 'PRINT') setisCreditPayContent(PAY.PRINT_SELECT);
+        if (d.Command === 'PAY') setIsCreditPayContent(PAY.CARD_OUT);
+        if (d.Command === 'PRINT') setIsCreditPayContent(PAY.PRINT_SELECT);
       } else {
         console.log(d.arg.errorMessage);
       }
@@ -1008,7 +1284,7 @@ export const useWebViewMessage = (setisCreditPayContent) => {
         window.chrome.webview.removeEventListener("message", hm);
       }
     };
-  }, [setisCreditPayContent]);
+  }, [setIsCreditPayContent]);
 };
 
 // ============================================================================
@@ -1018,19 +1294,19 @@ export const useWebViewMessage = (setisCreditPayContent) => {
 export const AccessibilityContext = createContext();
 
 export const AccessibilityProvider = ({ children }) => {
-  const [isDark, setisDark] = useState(false);
-  const [isLow, setisLow] = useState(false);
-  const [isLarge, setisLarge] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [isLow, setIsLow] = useState(false);
+  const [isLarge, setIsLarge] = useState(false);
   const [volume, setVolume] = useState(1);
   
   useBodyClass('dark', isDark);
-  useBodyClass('large', isLarge);
+  useHtmlClass('large', isLarge);  // html에 적용 (font-size 스케일링)
   useBodyClass('low', isLow);
   
   const accessibility = useMemo(() => ({
-    isHighContrast: isDark,
-    isLowScreen: isLow,
-    isBigSize: isLarge,
+    isDark,
+    isLow,
+    isLarge,
     volume
   }), [isDark, isLow, isLarge, volume]);
   
@@ -1041,9 +1317,9 @@ export const AccessibilityProvider = ({ children }) => {
   }, [accessibility]);
   
   const value = useMemo(() => ({
-    isDark, setisDark,
-    isLow, setisLow,
-    isLarge, setisLarge,
+    isDark, setIsDark,
+    isLow, setIsLow,
+    isLarge, setIsLarge,
     volume, setVolume,
     accessibility,
     setAccessibility: setAccessibilityState
@@ -1061,8 +1337,8 @@ export const UIContext = createContext();
 export const UIProvider = ({ children }) => {
   const [currentPage, setCurrentPageState] = useState('process1');
   const [history, setHistory] = useState(['process1']);
-  const [intervalTime, setintervalTime] = useState(0);
-  const [introFlag, setintroFlag] = useState(true);
+  const [intervalTime, setIntervalTime] = useState(0);
+  const [introFlag, setIntroFlag] = useState(true);
   
   const setCurrentPage = useCallback((p) => {
     if (p !== currentPage) {
@@ -1105,8 +1381,8 @@ export const UIProvider = ({ children }) => {
   
   const value = useMemo(() => ({
     currentPage, setCurrentPage, goBack, history,
-    intervalTime, setintervalTime,
-    introFlag, setintroFlag,
+    intervalTime, setIntervalTime,
+    introFlag, setIntroFlag,
     sections
   }), [currentPage, setCurrentPage, goBack, history, intervalTime, introFlag, sections]);
   
@@ -1121,35 +1397,33 @@ export const ModalContext = createContext();
 export const useModal = () => useContext(ModalContext);
 
 export const ModalProvider = ({ children }) => {
-  const [ModalReturnOpen, setModalReturnOpen] = useState(false);
-  const [ModalAccessibilityOpen, setModalAccessibilityOpen] = useState(false);
-  const [ModalResetOpen, setModalResetOpen] = useState(false);
-  const [ModalDeleteOpen, setModalDeleteOpen] = useState(false);
-  const [ModalDeleteCheckOpen, setModalDeleteCheckOpen] = useState(false);
-  const [ModalCallOpen, setModalCallOpen] = useState(false);
-  const [ModalDeleteItemId, setModalDeleteItemId] = useState(0);
+  const [modals, setModals] = useState({
+    return: false,
+    accessibility: false,
+    reset: false,
+    delete: false,
+    deleteCheck: false,
+    call: false
+  });
+  const [deleteItemId, setDeleteItemId] = useState(0);
   
-  const createModalHandlers = useCallback((isOpen, setIsOpen) => ({
-    isOpen,
-    open: () => setIsOpen(true),
-    close: () => setIsOpen(false),
-    toggle: () => setIsOpen(p => !p)
-  }), []);
+  const createModalHandlers = useCallback((key) => ({
+    isOpen: modals[key],
+    open: () => setModals(p => ({ ...p, [key]: true })),
+    close: () => setModals(p => ({ ...p, [key]: false })),
+    toggle: () => setModals(p => ({ ...p, [key]: !p[key] }))
+  }), [modals]);
   
   const value = useMemo(() => ({
-    ModalReturn: createModalHandlers(ModalReturnOpen, setModalReturnOpen),
-    ModalAccessibility: createModalHandlers(ModalAccessibilityOpen, setModalAccessibilityOpen),
-    ModalReset: createModalHandlers(ModalResetOpen, setModalResetOpen),
-    ModalDelete: createModalHandlers(ModalDeleteOpen, setModalDeleteOpen),
-    ModalDeleteCheck: createModalHandlers(ModalDeleteCheckOpen, setModalDeleteCheckOpen),
-    ModalCall: createModalHandlers(ModalCallOpen, setModalCallOpen),
-    ModalDeleteItemId,
-    setModalDeleteItemId
-  }), [
-    ModalReturnOpen, ModalAccessibilityOpen, ModalResetOpen,
-    ModalDeleteOpen, ModalDeleteCheckOpen, ModalCallOpen,
-    ModalDeleteItemId, createModalHandlers
-  ]);
+    ModalReturn: createModalHandlers('return'),
+    ModalAccessibility: createModalHandlers('accessibility'),
+    ModalReset: createModalHandlers('reset'),
+    ModalDelete: createModalHandlers('delete'),
+    ModalDeleteCheck: createModalHandlers('deleteCheck'),
+    ModalCall: createModalHandlers('call'),
+    ModalDeleteItemId: deleteItemId,
+    setModalDeleteItemId: setDeleteItemId
+  }), [modals, deleteItemId, createModalHandlers]);
   
   return (
     <ModalContext.Provider value={value}>
@@ -1168,7 +1442,7 @@ export const OrderProvider = ({ children }) => {
   // 상태
   const [selectedTab, setSelectedTab] = useState("전체메뉴");
   const [quantities, setQuantities] = useState({});
-  const [isCreditPayContent, setisCreditPayContent] = useState(0);
+  const [isCreditPayContent, setIsCreditPayContent] = useState(0);
   
   // 메모이즈된 값
   const menuItems = useMemo(() => 
@@ -1186,6 +1460,11 @@ export const OrderProvider = ({ children }) => {
   
   const handleDecrease = useCallback((id) => {
     setQuantities(p => ({ ...p, [id]: p[id] > 0 ? p[id] - 1 : 0 }));
+  }, []);
+  
+  // 삭제 (수량을 0으로 설정 - 빼기 버튼 qty=1일 때와 동일한 결과)
+  const handleDelete = useCallback((id) => {
+    setQuantities(p => ({ ...p, [id]: 0 }));
   }, []);
   
   // 주문번호
@@ -1248,19 +1527,19 @@ export const OrderProvider = ({ children }) => {
     // 메뉴 데이터
     tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, setSelectedTab, menuLoading,
     // 주문 상태
-    quantities, setQuantities, handleIncrease, handleDecrease,
+    quantities, setQuantities, handleIncrease, handleDecrease, handleDelete,
     totalCount, totalSum, filterMenuItems, createOrderItems,
     convertToKoreanQuantity, calculateSum, calculateTotal,
     // 결제
-    isCreditPayContent, setisCreditPayContent,
+    isCreditPayContent, setIsCreditPayContent,
     sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, updateOrderNumber,
     // 네비게이션
     handlePreviousTab, handleNextTab, handleCategoryPageNav, setHandleCategoryPageNav
   }), [
     tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, menuLoading,
-    quantities, setQuantities, handleIncrease, handleDecrease, totalCount, totalSum,
+    quantities, setQuantities, handleIncrease, handleDecrease, handleDelete, totalCount, totalSum,
     filterMenuItems, createOrderItems, calculateSum, calculateTotal, orderItems,
-    isCreditPayContent, setisCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp,
+    isCreditPayContent, setIsCreditPayContent, sendOrderDataToApp, sendPrintReceiptToApp,
     sendCancelPayment, updateOrderNumber, handlePreviousTab, handleNextTab,
     handleCategoryPageNav, setHandleCategoryPageNav
   ]);
@@ -1457,13 +1736,15 @@ export const DISABLED_MENU_ID = 13;
 export const ERROR = { NO_PRODUCT: '없는 상품입니다.' };
 
 // 레이아웃 컴포넌트
-const LAYOUT = { STEP: 'Step', CONTENT: 'Content', SUMMARY: 'Summary', BOTTOM: 'Bottom', MODALS: 'Modals' };
+const LAYOUT = { BLACK: 'Black', TOP: 'Top', STEP: 'Step', MAIN: 'Main', SUMMARY: 'Summary', BOTTOM: 'Bottom', GLOBAL_MODALS: 'GlobalModals' };
 const LAYOUT_COND = {
+  [LAYOUT.BLACK]: () => true,
+  [LAYOUT.TOP]: () => true,
   [LAYOUT.STEP]: () => true,
-  [LAYOUT.CONTENT]: () => true,
+  [LAYOUT.MAIN]: () => true,
   [LAYOUT.SUMMARY]: (ctx) => [PAGE.SECOND, PAGE.THIRD].includes(ctx.currentPage),
   [LAYOUT.BOTTOM]: () => true,
-  [LAYOUT.MODALS]: () => true,
+  [LAYOUT.GLOBAL_MODALS]: () => true,
 };
 
 // 호환성 alias (다른 파일에서 사용)
@@ -1488,7 +1769,6 @@ export const LAYOUT_ASSEMBLY_CONTEXT = { conditions: LAYOUT_COND };
 // 카테고리 탭 버튼
 const CategoryTab = memo(({ tab, isSelected }) => (
   <Button 
-    className="w-auto"
     toggle 
     pressed={isSelected} 
     ttsText={`${tab.name}, ${isSelected ? "선택됨, " : "선택가능, "}`} 
@@ -1500,25 +1780,39 @@ const CategoryTab = memo(({ tab, isSelected }) => (
 CategoryTab.displayName = 'CategoryTab';
 
 // 카테고리 네비게이션
-const CategoryNav = memo(({ categories, selectedTab, pagination, containerRef, sections, convertToKoreanQuantity }) => {
-  const { catPage, catTotal, catItems } = pagination;
+const CategorySeparator = () => <span className="category-separator" aria-hidden="true" />;
+
+const CategoryNav = memo(({ categories, selectedTab, pagination, containerRef, measureRef, sections, convertToKoreanQuantity }) => {
+  const { catPage, catTotal, catItems, catHasPrev, catHasNext, isCompact, isReady } = pagination;
   return (
     <div 
       className="category-full" 
       ref={sections.top} 
       data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 총 버튼 ${convertToKoreanQuantity(catItems.length)}개,`}
     >
-      <Button toggle ttsText="이전" label="◀" disabled={catPage === 1} actionType="categoryNav" actionTarget="prev" />
-      <div className="category" ref={containerRef}>
-        {catItems.map((tab) => (
-          <CategoryTab 
-            key={tab.id} 
-            tab={tab} 
-            isSelected={selectedTab === tab.name} 
-          />
+      {/* 숨겨진 측정용 컨테이너 (실제 구조와 동일하게 구분선 포함) */}
+      <div ref={measureRef} className="category measure" aria-hidden="true" inert="true">
+        {categories.map((tab, idx) => (
+          <React.Fragment key={tab.id}>
+            <Button toggle label={tab.name} tabIndex={-1} />
+            {idx < categories.length - 1 && <CategorySeparator />}
+          </React.Fragment>
         ))}
       </div>
-      <Button toggle ttsText="다음" label="▶" disabled={catPage === catTotal} actionType="categoryNav" actionTarget="next" />
+      <Button toggle ttsText="이전" label="◀" disabled={!catHasPrev} actionType="categoryNav" actionTarget="prev" />
+      <div 
+        className={`category${isCompact ? ' compact' : ''}`} 
+        ref={containerRef}
+        style={{ visibility: isReady ? 'visible' : 'hidden' }}
+      >
+        {catItems.map((tab, idx) => (
+          <React.Fragment key={tab.id}>
+            <CategoryTab tab={tab} isSelected={selectedTab === tab.name} />
+            {idx < catItems.length - 1 && <CategorySeparator />}
+          </React.Fragment>
+        ))}
+      </div>
+      <Button toggle ttsText="다음" label="▶" disabled={!catHasNext} actionType="categoryNav" actionTarget="next" />
     </div>
   );
 });
@@ -1527,19 +1821,17 @@ CategoryNav.displayName = 'CategoryNav';
 // 메뉴 아이템
 const MenuItem = memo(({ item, disabled, onPress }) => (
   <Button 
-    className="w242h280" 
+    className="primary3"
     ttsText={disabled ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`} 
     disabled={disabled} 
     onClick={onPress}
   >
-    <span className="content icon" aria-hidden="true">
+    <span className="icon" aria-hidden="true">
       <img src={`./images/${item.img}`} alt={item.name} />
     </span>
-    <span className="content label">
-      <div className="txt-box">
-        <p>{item.name}</p>
-        <p>{Number(item.price).toLocaleString()}원</p>
-      </div>
+    <span className="label">
+      <p>{item.name}</p>
+      <p>{Number(item.price).toLocaleString()}원</p>
     </span>
   </Button>
 ));
@@ -1629,11 +1921,7 @@ const OrderHeader = memo(({ isLow }) => (
 OrderHeader.displayName = 'OrderHeader';
 
 // 페이지 타이틀
-const PageTitle = memo(({ children, isDark }) => (
-  <div className="title">
-    {children}
-  </div>
-));
+const PageTitle = memo(({ children }) => <div className="title">{children}</div>);
 PageTitle.displayName = 'PageTitle';
 
 // 하이라이트 텍스트
@@ -1648,7 +1936,7 @@ Highlight.displayName = 'Highlight';
 
 const Process1 = memo(() => {
   const { 
-    sections, setCurrentPage, volume, setisDark, setVolume, setisLarge, setisLow
+    sections, setCurrentPage, volume, setIsDark, setVolume, setIsLarge, setIsLow
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { startIntroTimer } = useTimer();
@@ -1661,11 +1949,11 @@ const Process1 = memo(() => {
   });
 
   const handleIntroComplete = useCallback(() => {
-    setisDark(DEFAULT_SETTINGS.IS_DARK);
+    setIsDark(DEFAULT_SETTINGS.IS_DARK);
     setVolume(DEFAULT_SETTINGS.VOLUME);
-    setisLarge(DEFAULT_SETTINGS.IS_LARGE);
-    setisLow(DEFAULT_SETTINGS.IS_LOW);
-  }, [setisDark, setVolume, setisLarge, setisLow]);
+    setIsLarge(DEFAULT_SETTINGS.IS_LARGE);
+    setIsLow(DEFAULT_SETTINGS.IS_LOW);
+  }, [setIsDark, setVolume, setIsLarge, setIsLow]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1694,7 +1982,7 @@ Process1.displayName = 'Process1';
 
 const Process2 = memo(() => {
   const {
-    sections, isLow, isDark, tabs, menuItems, selectedTab, setSelectedTab,
+    sections, isLow, isDark, isLarge, tabs, menuItems, selectedTab, setSelectedTab,
     handleIncrease, commonScript, volume, quantities, convertToKoreanQuantity,
     setCurrentPage, setHandleCategoryPageNav, categoryInfo
   } = useContext(AppContext);
@@ -1725,9 +2013,25 @@ const Process2 = memo(() => {
   const handlePaginationPress = useCallback((e, dir) => { e.preventDefault(); e.target.focus(); dir === 'prev' ? handlePrevPage() : handleNextPage(); }, [handlePrevPage, handleNextPage]);
   const handleMenuItemPress = useCallback((e, id) => { e.preventDefault(); e.target.focus(); handleTouchEndWrapper(e, id); }, [handleTouchEndWrapper]);
 
+  // 카테고리 탭 데이터
   const allTabs = useMemo(() => (categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [categoryInfo]);
-  const { containerRef: catContainerRef, itemsPerPage: catItemsPerPage } = useCategoryLayout(2);
-  const { pageNumber: catPage, totalPages: catTotal, currentItems: catItems, handlePrevPage: catPrev, handleNextPage: catNext } = usePagination(allTabs, catItemsPerPage, catItemsPerPage, false);
+  
+  // [중요] 가변 너비 카테고리 페이지네이션 - useCategoryPagination 훅 참조
+  // [중요] 가변 너비 카테고리 페이지네이션 - useCategoryPagination 훅 참조
+  // gap, separatorWidth 모두 CSS에서 자동으로 가져옴
+  const { 
+    containerRef: catContainerRef,  // 실제 표시 컨테이너
+    measureRef: catMeasureRef,      // 숨겨진 측정용 컨테이너
+    currentPage: catPage, 
+    totalPages: catTotal, 
+    currentItems: catItems,         // 현재 페이지에 표시할 탭들
+    hasPrev: catHasPrev,
+    hasNext: catHasNext,
+    prevPage: catPrev, 
+    nextPage: catNext,
+    isCompact: catIsCompact,        // compact 모드 여부
+    isReady: catIsReady             // 계산 완료 후 표시 준비됨
+  } = useCategoryPagination(allTabs, isLarge);
 
   // 카테고리 페이지 네비게이션 핸들러 등록
   const localCategoryPageNav = useCallback((dir) => { dir === 'prev' ? catPrev() : catNext(); }, [catPrev, catNext]);
@@ -1741,8 +2045,9 @@ const Process2 = memo(() => {
       <CategoryNav 
         categories={allTabs}
         selectedTab={selectedTab}
-        pagination={{ catPage, catTotal, catItems }}
+        pagination={{ catPage, catTotal, catItems, catHasPrev, catHasNext, catPrev, catNext, isCompact: catIsCompact, isReady: catIsReady }}
         containerRef={catContainerRef}
+        measureRef={catMeasureRef}
         sections={sections}
         convertToKoreanQuantity={convertToKoreanQuantity}
       />
@@ -1798,9 +2103,8 @@ const Process3 = memo(() => {
   return (
     <div className="main third">
       <PageTitle>
-        <div className="sentence">
-          <Highlight isDark={isDark}>내역</Highlight>을 확인하시고 <Highlight isDark={isDark}>결제하기</Highlight> 버튼을 누르세요
-        </div>
+        <span><Highlight isDark={isDark}>내역</Highlight>을 확인하시고</span>
+        <span><Highlight isDark={isDark}>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
       </PageTitle>
       <OrderHeader isLow={isLow} />
       <div className="details">
@@ -1837,12 +2141,12 @@ Process3.displayName = 'Process3';
 // ============================================================================
 
 const Process4 = memo(() => {
-  const { sections, totalSum, isLow, setisLow, isDark, setisDark, isCreditPayContent, setisCreditPayContent, totalMenuItems, quantities, setQuantities, volume, setVolume, isLarge, setisLarge, ModalReturn, ModalAccessibility, setCurrentPage } = useContext(AppContext);
+  const { sections, totalSum, isLow, setIsLow, isDark, setIsDark, isCreditPayContent, setIsCreditPayContent, totalMenuItems, quantities, setQuantities, volume, setVolume, isLarge, setIsLarge, ModalReturn, ModalAccessibility, setCurrentPage } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { orderNum, updateOrderNumber } = useOrderNumber();
-  const countdown = usePaymentCountdown({ isCreditPayContent, setisCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setisDark, setVolume, setisLarge, setisLow, setCurrentPage });
-  useWebViewMessage(setisCreditPayContent);
-  useEffect(() => { setisCreditPayContent(PAY_STEP.SELECT_METHOD); }, []); // eslint-disable-line
+  const countdown = usePaymentCountdown({ isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage });
+  useWebViewMessage(setIsCreditPayContent);
+  useEffect(() => { setIsCreditPayContent(PAY_STEP.SELECT_METHOD); }, []); // eslint-disable-line
   const { querySelector, getActiveElementText } = useSafeDocument();
   useEffect(() => { const btn = querySelector('.hidden-btn.page-btn'); if (btn) { btn.focus(); const p = getActiveElementText(); if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY); } }, [isCreditPayContent, querySelector, getActiveElementText, handleText]);
   useMultiModalButtonHandler({ initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.BOTTOM_FOOTER], initFirstButtonSection: FOCUS_SECTIONS.PAGE, enableGlobalHandlers: false, enableKeyboardNavigation: true });
@@ -1857,13 +2161,13 @@ const Process4 = memo(() => {
     switch (isCreditPayContent) {
       case 0: return (
         <div className="main forth">
-          <div className="title"><div className="sentence"><span className={highlight}>결제방법</span>을 선택하세요</div></div>
-          <div className="banner price" onClick={(e) => { e.preventDefault(); e.target.focus(); updateOrderNumber(); setisCreditPayContent(4); }}>
+          <PageTitle><span className={highlight}>결제방법</span>을 선택하세요</PageTitle>
+          <div className="banner price" onClick={(e) => { e.preventDefault(); e.target.focus(); updateOrderNumber(); setIsCreditPayContent(4); }}>
             <span>결제금액</span><span className="payment-amount-large">{totalSum.toLocaleString("ko-KR")}원</span>
           </div>
           <div className="task-manager" ref={sections.middle} data-tts-text="결제 선택. 버튼 두 개, ">
-            <Button ttsText="신용카드," className="w328h460" actionType="payment" actionMethod="card" img="/images/payment-card.png" imgAlt="card" label="신용카드" />
-            <Button ttsText="모바일페이," className="w328h460" actionType="payment" actionMethod="mobile" img="/images/payment-mobile.png" imgAlt="mobile" label="모바일 페이" />
+            <Button ttsText="신용카드," className="w328h460" actionType="payment" actionMethod="card" img="./images/payment-card.png" imgAlt="card" label="신용카드" />
+            <Button ttsText="모바일페이," className="w328h460" actionType="payment" actionMethod="mobile" img="./images/payment-mobile.png" imgAlt="mobile" label="모바일 페이" />
           </div>
           <div ref={sections.bottom} className="task-manager" data-tts-text="작업관리. 버튼 한 개,">
             <Button ttsText="취소," className="w500h120" actionType="cancel" actionTarget={PAGE_CONFIG.THIRD} label="취소" />
@@ -1872,39 +2176,42 @@ const Process4 = memo(() => {
       );
       case 1: return (
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <div className="title">
+          <PageTitle>
             <div>가운데 아래에 있는 <span className={highlight}>카드리더기</span>{brSmall ? <>{brSmall}<div className="flex center">에</div></> : "에"}</div>
             <div><span className={highlight}>신용카드</span>를 끝까지 넣으세요</div>
-          </div>
-          <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image" onClick={() => setisCreditPayContent(3)} />
+          </PageTitle>
+          <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(3)} />
           <Button ttsText="취소" className="w500h120" actionType="cancel" label="취소" />
         </div>
       );
       case 2: return (
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <div className="title">
+          <PageTitle>
             <div>가운데 아래에 있는 <span className={highlight}>카드리더기</span>에</div>
             <div>휴대전화의 <span className={highlight}>모바일페이</span>를 켜고 접근시키세요</div>
-          </div>
-          <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" onClick={() => setisCreditPayContent(4)} />
+          </PageTitle>
+          <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(4)} />
           <Button ttsText="취소" className="w500h120" actionType="cancel" label="취소" />
         </div>
       );
       case 3: return (
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <div className="title"><div><span className={highlight}>신용카드</span>를 뽑으세요.</div></div>
-          <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" onClick={() => setisCreditPayContent(4)} />
+          <PageTitle><span className={highlight}>신용카드</span>를 뽑으세요.</PageTitle>
+          <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(4)} />
         </div>
       );
       case 4: return (
         <div data-tts-text="인쇄 선택, 버튼 두 개," ref={sections.bottom} className="main forth">
-          <div className="title">
-            <div className="sentence"><span className={highlight}>결제되었습니다</span></div>
+          <PageTitle>
+            <span className={highlight}>결제되었습니다</span>
             <div>왼쪽 아래의 프린터에서 <span className={highlight}>주문표</span>를 받으시고</div>
             <div><span className={highlight}>영수증 출력</span>을 선택하세요</div>
-          </div>
+          </PageTitle>
           <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
-          <div className="order-num"><span>100</span></div>
+          <div className="order-num">
+            <p>주문</p>
+            <p>100</p>
+          </div>
           <div className="task-manager">
             <Button ttsText="영수증 출력," className="w371h120" actionType="receipt" actionTarget="print" label="영수증 출력" />
             <Button ttsText="출력 안함," className="w371h120" actionType="receipt" actionTarget="skip" label={`출력 안함${countdown}`} />
@@ -1913,10 +2220,10 @@ const Process4 = memo(() => {
       );
       case 5: return (
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <div className="title">
+          <PageTitle>
             <div>왼쪽 아래의 <span className={highlight}>프린터</span>에서 <span className={highlight}>주문표</span>가 출력됩니다</div>
             <div>인쇄가 완전히 <span className={highlight}>끝나고</span>&nbsp;받으세요</div>
-          </div>
+          </PageTitle>
           <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
           <div className="order-num"><span>{orderNum}</span></div>
           <Button ttsText="마무리하기" className="w500h120" actionType="finish" label="마무리하기" />
@@ -1924,23 +2231,23 @@ const Process4 = memo(() => {
       );
       case 6: return (
         <div data-tts-text="작업 관리, 버튼 한 개," className="main forth" ref={sections.bottom}>
-          <div className="title">
+          <PageTitle>
             <div>왼쪽 아래의 <span className={highlight}>프린터</span>에서 <span className={highlight}>영수증</span>을 받으시고</div>
             <div><span className={highlight}>마무리하기</span>&nbsp;버튼을 누르세요</div>
-          </div>
+          </PageTitle>
           <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
           <Button ttsText="마무리하기" className="w500h120" actionType="finish" label={`마무리${countdown}`} />
         </div>
       );
       case 7: return (
         <div className="main forth">
-          <div className="title">이용해 주셔서 감사합니다</div>
-          <div className="return-num-txt">
+          <PageTitle>이용해 주셔서 감사합니다</PageTitle>
+          <div className="end-countdown">
               <span>
                 {countdown <= 0 ? '✓' : countdown}
               </span>
           </div>
-          </div>
+        </div>
       );
       default: return null;
     }
@@ -1999,8 +2306,8 @@ Step.displayName = 'Step';
 
 const Summary = memo(() => {
   const { sections, totalCount, totalSum, convertToKoreanQuantity, currentPage } = useContext(AppContext);
-  const [isDisabledBtn, setisDisabledBtn] = useState(true);
-  useEffect(() => { setisDisabledBtn(totalCount <= 0); }, [totalCount]);
+  const [isDisabledBtn, setIsDisabledBtn] = useState(true);
+  useEffect(() => { setIsDisabledBtn(totalCount <= 0); }, [totalCount]);
   if (currentPage !== PAGE_CONFIG.SECOND && currentPage !== PAGE_CONFIG.THIRD) return null;
   return (
     <div className="summary">
@@ -2022,7 +2329,7 @@ const Bottom = memo(() => {
     <div className="bottom" data-tts-text={showHome ? "시스템 설정, 버튼 두 개," : "시스템 설정, 버튼 한개,"} ref={sections.bottomfooter}>
       {showHome ? <Button className="down-footer-button btn-home" ttsText="처음으로," svg={<HomeIcon />} label="처음으로" actionType="modal" actionTarget="Return" /> : <div className="footer-coffeelogo"></div>}
       {isActive && <div className="countdown"><span>{remainingTimeFormatted}</span></div>}
-      <Button className="down-footer-button" ttsText="접근성," svg={<LowposIcon />} label="접근성" actionType="modal" actionTarget="Accessibility" />
+      <Button className="down-footer-button" ttsText="접근성," svg={<WheelchairIcon />} label="접근성" actionType="modal" actionTarget="Accessibility" />
     </div>
   );
 });
@@ -2040,7 +2347,7 @@ ToggleButton.displayName = 'ToggleButton';
 
 // 접근성 모달
 const AccessibilityModal = memo(() => {
-  const { sections, isLow, setisLow, isDark, setisDark, setAccessibility, ModalAccessibility, volume, setVolume, isLarge, setisLarge, commonScript, readCurrentPage } = useContext(AppContext);
+  const { sections, isLow, setIsLow, isDark, setIsDark, setAccessibility, ModalAccessibility, volume, setVolume, isLarge, setIsLarge, commonScript, readCurrentPage } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { containerRef } = useFocusTrap(ModalAccessibility.isOpen);
   const { setAudioVolume } = useSafeDocument();
@@ -2056,29 +2363,29 @@ const AccessibilityModal = memo(() => {
   }, [ModalAccessibility.isOpen, isDark, isLow, isLarge, volume]);
 
   // 현재 접근성 설정 상태 관리
-  const { settings: currentSettings, setHighContrast, setLowScreen, setBigSize, setVolume: setSettingsVolume, updateAll: updateAllSettings, getStatusText } = useAccessibilitySettings({ isHighContrast: isDark, isLowScreen: isLow, isBigSize: isLarge, volume });
+  const { settings: currentSettings, setDark, setLow, setLarge, setVolume: setSettingsVolume, updateAll: updateAllSettings, getStatusText } = useAccessibilitySettings({ isDark, isLow, isLarge, volume });
 
   useActiveElementTTS(handleText, 500, ModalAccessibility.isOpen);
 
   // 즉시 적용 핸들러들
-  const handleHighContrastChange = useCallback((v) => { setHighContrast(v); setisDark(v); }, [setHighContrast, setisDark]);
+  const handleDarkChange = useCallback((v) => { setDark(v); setIsDark(v); }, [setDark, setIsDark]);
   const handleVolumeChange = useCallback((v) => { setSettingsVolume(v); setVolume(v); setAudioVolume('audioPlayer', VOLUME_VALUES[v]); }, [setSettingsVolume, setVolume, setAudioVolume]);
-  const handleBigSizeChange = useCallback((v) => { setBigSize(v); setisLarge(v); }, [setBigSize, setisLarge]);
-  const handleLowScreenChange = useCallback((v) => { setLowScreen(v); setisLow(v); }, [setLowScreen, setisLow]);
+  const handleLargeChange = useCallback((v) => { setLarge(v); setIsLarge(v); }, [setLarge, setIsLarge]);
+  const handleLowChange = useCallback((v) => { setLow(v); setIsLow(v); }, [setLow, setIsLow]);
 
   // 초기설정 핸들러
   const handleInitialSettingsPress = useCallback(() => {
-    updateAllSettings({ isHighContrast: false, isLowScreen: false, volume: 1, isBigSize: false });
-    setisDark(false); setVolume(1); setisLarge(false); setisLow(false);
+    updateAllSettings({ isDark: false, isLow: false, isLarge: false, volume: 1 });
+    setIsDark(false); setVolume(1); setIsLarge(false); setIsLow(false);
     setAudioVolume('audioPlayer', VOLUME_VALUES[1]);
-  }, [updateAllSettings, setisDark, setVolume, setisLarge, setisLow, setAudioVolume]);
+  }, [updateAllSettings, setIsDark, setVolume, setIsLarge, setIsLow, setAudioVolume]);
 
   // 적용안함 핸들러 (원래 상태로 복원)
   const handleCancelPress = useCallback(() => {
     const o = originalSettingsRef.current;
-    if (o) { setisDark(o.isDark); setVolume(o.volume); setisLarge(o.isLarge); setisLow(o.isLow); setAudioVolume('audioPlayer', VOLUME_VALUES[o.volume]); }
+    if (o) { setIsDark(o.isDark); setVolume(o.volume); setIsLarge(o.isLarge); setIsLow(o.isLow); setAudioVolume('audioPlayer', VOLUME_VALUES[o.volume]); }
     ModalAccessibility.close(); readCurrentPage();
-  }, [setisDark, setVolume, setisLarge, setisLow, setAudioVolume, ModalAccessibility, readCurrentPage]);
+  }, [setIsDark, setVolume, setIsLarge, setIsLow, setAudioVolume, ModalAccessibility, readCurrentPage]);
 
   // 적용하기 핸들러
   const handleApplyPress = useCallback(() => {
@@ -2087,73 +2394,75 @@ const AccessibilityModal = memo(() => {
 
   if (!ModalAccessibility.isOpen) return null;
 
-  const highlight = isDark ? "accessibility-subtitle-highlight" : "accessibility-subtitle-highlight-light";
+  const highlight = "modal-subtitle-highlight";
 
   return (
     <>
       <div className="hidden-div" ref={sections.modalPage}>
         <button type="hidden" autoFocus className="hidden-btn" data-tts-text={'오버레이, 설정, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다,' + commonScript.replay} />
       </div>
-      <div className="accessibility-modal-overlay" />
-      <div className={`accessibility-modal-content ${isLow ? "reverse" : ""}`} ref={containerRef}>
-        <div className="accessibility-up-content">
-          <div className="accessibility-title">접근성</div>
-          <div>
-            <div className="accessibility-subtitle">원하시는&nbsp;<span className={highlight}>접근성 옵션</span>을 선택하시고</div>
-            <div className="accessibility-description"><span className={highlight}>적용하기</span>&nbsp;버튼을 누르세요</div>
+      <div className="modal-overlay">
+      <div className="modal-content" ref={containerRef}>
+        <div className="up-content">
+          <Icon name="Wheelchair" className="modal-image" />
+          <div className="modal-title">접근성</div>
+          <div className="modal-description">
+            <div className="modal-subtitle">원하시는&nbsp;<span className={highlight}>접근성 옵션</span>을 선택하시고</div>
+            <div className="modal-subtitle"><span className={highlight}>적용하기</span>&nbsp;버튼을 누르세요</div>
           </div>
         </div>
-        <div className="accessibility-down-content">
+        <div className="down-content">
           {/* 초기설정 */}
-          <div className="accessibility-down-content-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
-            <span className="accessibility-down-content-label">초기설정으로 일괄선택</span>
-            <div className="accessibility-down-content-buttons">
-              <Button className="w200h064" svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
+          <div className="setting-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
+            <span className="modal-message">초기설정으로 일괄선택</span>
+            <div className="task-manager">
+              <Button svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
             </div>
           </div>
-          <hr className="accessibility-down-content-line" />
+          <hr className="setting-line" />
           {/* 고대비화면 */}
-          <div className="accessibility-down-content-row">
-            <span className="accessibility-down-content-label"><Icon name="Contrast" />고대비화면</span>
-            <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections2} data-tts-text={`고대비 화면, 선택상태, ${getStatusText.highContrast}, 버튼 두 개,`}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isHighContrast ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isHighContrast} onClick={() => handleHighContrastChange(false)} className="w150h064" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isHighContrast ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isHighContrast} onClick={() => handleHighContrastChange(true)} className="w150h064" />
+          <div className="setting-row">
+            <span className="modal-message"><Icon name="Contrast" />고대비화면</span>
+            <div className="task-manager" ref={sections.AccessibilitySections2} data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark}, 버튼 두 개,`}>
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isDark ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isDark} onClick={() => handleDarkChange(false)} className="w113h076" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isDark ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isDark} onClick={() => handleDarkChange(true)} className="w113h076" />
             </div>
           </div>
-          <hr className="accessibility-down-content-line" />
+          <hr className="setting-line" />
           {/* 소리크기 */}
-          <div className="accessibility-down-content-row">
-            <span className="accessibility-down-content-label"><Icon name="Volume" />소리크기</span>
-            <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections3} data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
+          <div className="setting-row">
+            <span className="modal-message"><Icon name="Volume" />소리크기</span>
+            <div className="task-manager" ref={sections.AccessibilitySections3} data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
               {[0, 1, 2, 3].map((vol) => (
-                <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="w076h064" />
+                <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="w070h076" />
               ))}
             </div>
           </div>
-          <hr className="accessibility-down-content-line" />
+          <hr className="setting-line" />
           {/* 큰글씨화면 */}
-          <div className="accessibility-down-content-row">
-            <span className="accessibility-down-content-label"><Icon name="Large" />큰글씨화면</span>
-            <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections4} data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.bigSize}, 버튼 두 개, `}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isBigSize ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isBigSize} onClick={() => handleBigSizeChange(false)} className="w150h064" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isBigSize ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isBigSize} onClick={() => handleBigSizeChange(true)} className="w150h064" />
+          <div className="setting-row">
+            <span className="modal-message"><Icon name="Large" />큰글씨화면</span>
+            <div className="task-manager" ref={sections.AccessibilitySections4} data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large}, 버튼 두 개, `}>
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLarge ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLarge} onClick={() => handleLargeChange(false)} className="w113h076" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLarge ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLarge} onClick={() => handleLargeChange(true)} className="w113h076" />
             </div>
           </div>
-          <hr className="accessibility-down-content-line" />
+          <hr className="setting-line" />
           {/* 낮은화면 */}
-          <div className="accessibility-down-content-row">
-            <span className="accessibility-down-content-label"><Icon name="Lowpos" />낮은화면</span>
-            <div className="accessibility-down-content-buttons" ref={sections.AccessibilitySections5} data-tts-text={`낮은 화면, 선택상태, ${getStatusText.lowScreen}, 버튼 두 개, `}>
-              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLowScreen ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLowScreen} onClick={() => handleLowScreenChange(false)} className="w150h064" />
-              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLowScreen ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLowScreen} onClick={() => handleLowScreenChange(true)} className="w150h064" />
+          <div className="setting-row">
+            <span className="modal-message"><Icon name="Wheelchair" />낮은화면</span>
+            <div className="task-manager" ref={sections.AccessibilitySections5} data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low}, 버튼 두 개, `}>
+              <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLow ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLow} onClick={() => handleLowChange(false)} className="w113h076" />
+              <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLow ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLow} onClick={() => handleLowChange(true)} className="w113h076" />
             </div>
           </div>
           {/* 적용 버튼들 */}
-          <div className="accessibility-modal-buttons" ref={sections.AccessibilitySections6} data-tts-text="작업 관리, 버튼 두 개, ">
-            <Button className="w200h072" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
-            <Button className="w200h072" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
+          <div className="task-manager" ref={sections.AccessibilitySections6} data-tts-text="작업 관리, 버튼 두 개, ">
+            <Button className="w242h090" svg={<Icon name="Cancel" />} label="적용안함" ttsText="적용안함, " onClick={handleCancelPress} />
+            <Button className="w242h090" svg={<Icon name="Ok" />} label="적용하기" ttsText="적용하기, " onClick={handleApplyPress} />
           </div>
         </div>
+      </div>
       </div>
     </>
   );
@@ -2165,8 +2474,7 @@ AccessibilityModal.displayName = 'AccessibilityModal';
 // ============================================================================
 
 const GlobalModals = () => {
-  const { ModalReturn, ModalAccessibility, ModalReset, ModalCall, ModalDelete, ModalDeleteCheck, ModalDeleteItemId, quantities, handleDecrease, totalMenuItems, filterMenuItems } = useContext(AppContext);
-  const currentItems = filterMenuItems(totalMenuItems, quantities);
+  const { ModalReturn, ModalAccessibility, ModalReset, ModalCall, ModalDelete, ModalDeleteCheck, ModalDeleteItemId, handleDelete } = useContext(AppContext);
 
   return (
     <>
@@ -2174,8 +2482,8 @@ const GlobalModals = () => {
       {ModalReset.isOpen && <ResetModal />}
       {ModalAccessibility.isOpen && <AccessibilityModal />}
       {ModalCall.isOpen && <CallModal />}
-      {ModalDelete.isOpen && <DeleteModal handleDecrease={handleDecrease} id={ModalDeleteItemId} quantities={quantities} currentItems={currentItems} />}
-      {ModalDeleteCheck.isOpen && <DeleteCheckModal handleDecrease={handleDecrease} id={ModalDeleteItemId} quantities={quantities} currentItems={currentItems} />}
+      {ModalDelete.isOpen && <DeleteModal handleDelete={handleDelete} id={ModalDeleteItemId} />}
+      {ModalDeleteCheck.isOpen && <DeleteCheckModal handleDelete={handleDelete} id={ModalDeleteItemId} />}
     </>
   );
 };
@@ -2186,10 +2494,10 @@ const Layout = ({ children }) => {
   const cond = LAYOUT_ASSEMBLY_CONTEXT.conditions;
   const render = useMemo(() => ({
     step: cond[LAYOUT_COMPONENTS.STEP](ctx),
-    content: cond[LAYOUT_COMPONENTS.CONTENT](ctx),
+    main: cond[LAYOUT_COMPONENTS.MAIN](ctx),
     summary: cond[LAYOUT_COMPONENTS.SUMMARY](ctx),
     bottom: cond[LAYOUT_COMPONENTS.BOTTOM](ctx),
-    modals: cond[LAYOUT_COMPONENTS.MODALS](ctx),
+    globalModals: cond[LAYOUT_COMPONENTS.GLOBAL_MODALS](ctx),
   }), [ctx.currentPage]); // eslint-disable-line
 
   return (
@@ -2197,24 +2505,24 @@ const Layout = ({ children }) => {
       <Black />
       <Top />
       {render.step && <Step />}
-      {render.content && children}
+      {render.main && children}
       {render.summary && <Summary />}
       {render.bottom && <Bottom />}
-      {render.modals && <GlobalModals />}
+      {render.globalModals && <GlobalModals />}
     </>
   );
 };
 
 // 페이지 렌더링 컴포넌트
 const AppContent = () => {
-  const { currentPage, setCurrentPage, totalMenuItems, setQuantities, setisDark, setVolume, setisLarge, setisLow } = useContext(AppContext);
+  const { currentPage, setCurrentPage, totalMenuItems, setQuantities, setIsDark, setVolume, setIsLarge, setIsLow } = useContext(AppContext);
   const { containerRef } = useFocusTrap(true, { autoFocus: false, restoreFocus: false });
 
   const resetOrder = useCallback(() => {
     if (!totalMenuItems?.length) return;
     setQuantities(totalMenuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {}));
-    setisDark(false); setVolume(1); setisLarge(false); setisLow(false);
-  }, [totalMenuItems, setQuantities, setisDark, setVolume, setisLarge, setisLow]);
+    setIsDark(false); setVolume(1); setIsLarge(false); setIsLow(false);
+  }, [totalMenuItems, setQuantities, setIsDark, setVolume, setIsLarge, setIsLow]);
 
   const idleTimeout = useAppIdleTimeout(currentPage, setCurrentPage, resetOrder);
   useLayoutEffect(() => { resetOrder(); }, [totalMenuItems]); // eslint-disable-line

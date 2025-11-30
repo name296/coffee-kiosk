@@ -238,36 +238,9 @@ const categories = [
 ];
 
 // ============================================================================
-// 헬퍼: 기존 구조 호환용 (ID 자동 생성)
-// ============================================================================
-
-// 카테고리 정보 (cate_id = 배열 인덱스)
-const categoryInfo = categories.map((cat, index) => ({
-  cate_id: index,
-  cate_name: cat.name,
-}));
-
-// 전체 메뉴 리스트 (id, cate_id 자동 생성)
-let menuId = 1;
-const menuList = categories
-  .map((cat, catIndex) => ({ ...cat, cate_id: catIndex }))
-  .filter(cat => cat.cate_id !== 0) // 전체메뉴 제외
-  .flatMap(cat =>
-    cat.items.map(item => ({
-      id: menuId++,
-      cate_id: cat.cate_id,
-      ...item,
-    }))
-  );
-
-// ============================================================================
 // Export
 // ============================================================================
 
-const menuData = {
-  categories,    // 네스티드 구조 (ID 없음)
-  categoryInfo,  // 기존 호환: [{ cate_id, cate_name }, ...]
-  menuList,      // 기존 호환: [{ id, cate_id, name, price, img }, ...]
-};
+const menuData = { categories };
 
 export default menuData;

@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 
 // 경로 설정
 const svgDir = path.join(__dirname, '../src/svg/');  // 모든 SVG
-const componentDir = path.join(__dirname, '../src/components/');
-const iconFile = path.join(componentDir, 'Icon.js');
+const srcDir = path.join(__dirname, '../src/');
+const iconFile = path.join(srcDir, 'Icon.js');
 
 // 컴포넌트 이름 변환 (kebab-case → PascalCase)
 function toPascalCase(str) {
@@ -129,14 +129,15 @@ const ${componentName} = (props) => (
 function generateIconComponent() {
   console.log('🔍 SVG 파일 스캔 중...\n');
   
-  // 컴포넌트 디렉토리 확인 및 생성
-  if (!fs.existsSync(componentDir)) {
-    fs.mkdirSync(componentDir, { recursive: true });
+  // src 디렉토리 확인
+  if (!fs.existsSync(srcDir)) {
+    fs.mkdirSync(srcDir, { recursive: true });
   }
 
   const iconComponents = [];
   const iconMapEntries = [];
 
+  // 메인 SVG 폴더 처리
   const files = fs.readdirSync(svgDir)
     .filter(f => f.endsWith('.svg'))
     .sort();
@@ -149,25 +150,17 @@ function generateIconComponent() {
     const filePath = path.join(svgDir, file);
 
     try {
-      // SVG 파일 읽기
       const svgContent = fs.readFileSync(filePath, 'utf8');
-      
-      // React 컴포넌트 코드 생성
       const componentCode = convertSvgToReactComponent(svgContent, componentName);
       
-      iconComponents.push({
-        iconName,
-        componentName,
-        componentCode
-      });
-      
+      iconComponents.push({ iconName, componentName, componentCode });
       iconMapEntries.push(`  '${iconName}': ${componentName}`);
-  
       console.log(`✅ ${file} → ${componentName}`);
     } catch (error) {
       console.error(`❌ ${file} 변환 실패:`, error.message);
-}
+    }
   });
+
 
   // Icon.jsx 파일 생성 (모든 컴포넌트를 인라인으로 정의)
   const componentDefinitions = iconComponents
