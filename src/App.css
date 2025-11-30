@@ -209,6 +209,10 @@
     --body3-background-color: var(--color-gray-11);
     --body3-content-color: var(--color-gray-02);
 
+    --body4-background-color: var(--color-gray-14);
+    --body4-border-color: var(--color-gray-09);
+    --body4-content-color: var(--color-gray-01);
+
     /* 버튼 팔레트(Light 테마) */
     /* Primary1 팔레트*/
     --primary1-background-color-default: var(--color-brown-03);
@@ -352,6 +356,10 @@
     
     --body3-background-color: var(--color-gray-03);
     --body3-content-color: var(--color-gray-14);
+
+    --body4-background-color: var(--color-gray-02);
+    --body4-border-color: var(--color-gray-07);
+    --body4-content-color: var(--color-gray-14);
 
     /* 버튼 팔레트(Dark 테마) */
     /* Primary1 팔레트*/
@@ -1595,6 +1603,46 @@
    전체 유틸리티 (Utilities)
    ======================================== */
 @layer utilities {
+
+  /* ========================================
+     Body 팔레트 유틸리티 클래스
+     - 테마(Light/Dark) 자동 전환
+     ======================================== */
+  
+  /* Body1: 메인 배경 팔레트 */
+  .body1 {
+    background-color: var(--body1-background-color);
+    border-color: var(--body1-border-color);
+    color: var(--body1-content-secondary-color);
+
+    & .primary { color: var(--body1-content-primary-color); }
+    & .secondary { color: var(--body1-content-secondary-color); }
+  }
+
+  /* Body2: 콘텐츠 영역 팔레트 */
+  .body2 {
+    background-color: var(--body2-background-color);
+    color: var(--body2-secondary2-color);
+
+    & .primary1 { color: var(--body2-primary1-color); }
+    & .primary2 { color: var(--body2-primary2-color); }
+    & .secondary1 { color: var(--body2-secondary1-color); }
+    & .secondary2 { color: var(--body2-secondary2-color); }
+  }
+
+  /* Body3: 배너/강조 영역 팔레트 */
+  .body3 {
+    background-color: var(--body3-background-color);
+    border-color: var(--body1-border-color);
+    color: var(--body3-content-color);
+  }
+
+  /* Body4: 추가 팔레트 (필요시 확장) */
+  .body4 {
+    background-color: var(--body4-background-color, var(--body1-background-color));
+    border-color: var(--body4-border-color, var(--body1-border-color));
+    color: var(--body4-content-color, var(--body1-content-secondary-color));
+  }
 
   .task-manager {
     width: fit-content;

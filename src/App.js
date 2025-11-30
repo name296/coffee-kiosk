@@ -2284,9 +2284,9 @@ OrderHeader.displayName = 'OrderHeader';
 const PageTitle = memo(({ children }) => <div className="title">{children}</div>);
 PageTitle.displayName = 'PageTitle';
 
-// 하이라이트 텍스트
-const Highlight = memo(({ children, isDark }) => (
-  <span className={isDark ? "text-highlight-dark" : "text-highlight-light"}>{children}</span>
+// 하이라이트 텍스트 (.title .primary 스타일 사용)
+const Highlight = memo(({ children }) => (
+  <span className="primary">{children}</span>
 ));
 Highlight.displayName = 'Highlight';
 
@@ -2674,7 +2674,7 @@ const Process4 = memo(() => {
   // 접근성 줄바꿈 헬퍼
   const brLarge = isLow && isLarge ? <br /> : '';
   const brSmall = isLow && !isLarge ? <br /> : '';
-  const highlight = isDark ? "text-highlight-dark" : "text-highlight-light";
+  const highlight = "primary";  // .title .primary 사용
 
   // 결제 단계별 렌더링
   const renderPaymentStep = () => {
