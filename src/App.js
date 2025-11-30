@@ -4,22 +4,22 @@
 //
 // [구조 순서 - 서비스 구성 절차]
 // 1. 유틸리티 (37행~)        - 헬퍼 함수, 포맷터, 스토리지
-// 2. 상수 (184행~)           - CFG, PAY, TTS, VOLUME 등
-// 3. Hooks (220행~)          - 상태/로직 훅 (메뉴, 사운드, TTS, 타이머 등)
-// 4. Button/Modal (1145행~)  - 핵심 UI 컴포넌트
-// 5. Contexts (1629행~)      - 상태 관리 Provider
-// 6. UI 컴포넌트 (2049행~)   - CategoryNav, MenuGrid, Pagination 등
+// 2. 상수 (178행~)           - CFG, PAY, TTS, VOLUME, KEYBOARD 등
+// 3. Hooks (234행~)          - 상태/로직 훅 (메뉴, 사운드, TTS, 타이머 등)
+// 4. Button/Modal (1167행~)  - 핵심 UI 컴포넌트
+// 5. Contexts (1670행~)      - 상태 관리 Provider
+// 6. UI 컴포넌트 (2159행~)   - CategoryNav, MenuGrid, Pagination 등
 //
 // [사용 흐름 - Process 순서]
-// Process1 (2289행) → 시작화면 (포장/매장 선택)
-// Process2 (2335행) → 메뉴선택 (카테고리, 메뉴그리드)
-// Process3 (2465행) → 주문확인 (수량조절, 삭제)
-// Process4 (2601행) → 결제 (카드/모바일, 영수증)
+// Process1 (2327행) → 시작화면 (포장/매장 선택)
+// Process2 (2381행) → 메뉴선택 (카테고리, 메뉴그리드)
+// Process3 (2513행) → 주문확인 (수량조절, 삭제)
+// Process4 (2653행) → 결제 (카드/모바일, 영수증)
 //
 // [레이아웃]
-// Top/Step/Summary/Bottom (2764행~) - 공통 프레임
-// AccessibilityModal (2999행~) - 접근성 설정
-// Layout/App (3186행~) - 메인 조립
+// Top/Step/Summary/Bottom (2819행~) - 공통 프레임
+// AccessibilityModal (3060행~) - 접근성 설정
+// Layout/App (3263행~) - 메인 조립
 // ============================================================================
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, createContext, useContext, memo } from "react";
@@ -28,7 +28,10 @@ import "./App.css";
 import menuData from "./menuData";
 
 // Components
-import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon, StepIcon } from "./Icon";
+import Icon, { 
+  TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, 
+  AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon, StepIcon 
+} from "./Icon";
 
 // ============================================================================
 // 유틸리티
@@ -195,6 +198,18 @@ const CFG = {
 const PAY = { CARD_OUT: 3, PRINT_SELECT: 4, RECEIPT: 6, FINISH: 7 };
 const WEBVIEW = { PAY: 'PAY', PRINT: 'PRINT', CANCEL: 'CANCEL' };
 const STORAGE = { ORDER_NUM: 'orderNumber' };
+
+// 키보드 상수
+const KEYBOARD = {
+  ARROW_UP: 'ArrowUp',
+  ARROW_DOWN: 'ArrowDown',
+  ARROW_LEFT: 'ArrowLeft',
+  ARROW_RIGHT: 'ArrowRight',
+  ENTER: 'Enter',
+  SPACE: ' ',
+  TAB: 'Tab',
+  ESCAPE: 'Escape'
+};
 const PLACEHOLDER_MENU = { id: 0, name: "추가예정", price: "0", img: "item-americano.png" };
 
 // TTS 스크립트
@@ -2079,7 +2094,16 @@ export const AppContextProvider = ({ children }) => {
 export const PAGE = { FIRST: 'process1', SECOND: 'process2', THIRD: 'process3', FOURTH: 'process4' };
 
 // 결제 단계
-export const PAY_STEP = { SELECT_METHOD: 0, CARD_INSERT: 1, MOBILE_PAY: 2, CARD_REMOVE: 3, PRINT_SELECT: 4, ORDER_PRINT: 5, RECEIPT_PRINT: 6, FINISH: 7 };
+export const PAY_STEP = { 
+  SELECT_METHOD: 0, 
+  CARD_INSERT: 1, 
+  MOBILE_PAY: 2, 
+  CARD_REMOVE: 3, 
+  PRINT_SELECT: 4, 
+  ORDER_PRINT: 5, 
+  RECEIPT_PRINT: 6, 
+  FINISH: 7 
+};
 
 // 타이머 (ms)
 export const TIMER = { AUTO_FINISH: 60000, FINAL_PAGE: 4000, TTS_DELAY: CFG.TTS_DELAY, ACTION_DELAY: 100, INTERVAL: 1000, IDLE: CFG.IDLE_TIMEOUT };
@@ -2347,9 +2371,13 @@ const Process1 = memo(() => {
       <img src="./images/poster.png" className="poster" alt="" />
       <div className="hero">
         <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
-      <div className="task-manager" data-tts-text="취식방식 선택 영역입니다. 포장하기, 먹고가기 버튼이 있습니다. 좌우 방향키로 버튼을 선택하세요," ref={sections.middle}>
+        <div 
+          className="task-manager" 
+          data-tts-text="취식방식 선택 영역입니다. 포장하기, 먹고가기 버튼이 있습니다. 좌우 방향키로 버튼을 선택하세요," 
+          ref={sections.middle}
+        >
           <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
-          <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
+          <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
         </div>
         <p>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</p>
       </div>

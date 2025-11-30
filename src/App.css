@@ -792,6 +792,9 @@
       box-sizing: border-box;
       background-clip: padding-box;
 
+      /* 숫자/체크 (색상 상속) */
+      & .num { color: inherit; }
+
       /* 대기 */
       &.yet {
         background-color: var(--body2-progress-background-standby-color);
@@ -1688,6 +1691,18 @@
       height: 70px;
       justify-content: space-around;
       flex-flow: row nowrap;
+      
+      /* 주문 내역 헤더 컬럼 (저시력 모드) */
+      & .one { flex: 1; text-align: center; }
+      & .one.qty { flex: 0 0 240px; }
+      & .one.price { flex: 0 0 180px; }
+      & .one.delete { flex: 0 0 80px; }
+      
+      /* 주문 내역 헤더 컬럼 (기본 모드) */
+      & .one-normal { flex: 1; text-align: center; }
+      & .one-qty-normal { flex: 0 0 240px; text-align: center; }
+      & .one-price-normal { flex: 0 0 180px; text-align: center; }
+      & .one-delete-normal { flex: 0 0 80px; text-align: center; }
     }
   }
 
