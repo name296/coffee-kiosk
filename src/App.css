@@ -1248,7 +1248,7 @@
     border-radius: 50%;
     position: absolute;
     justify-content: center;
-    text-box-trim: both;
+    line-height: 1;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); 
