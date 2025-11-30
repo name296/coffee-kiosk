@@ -2327,12 +2327,14 @@ const Process1 = memo(() => {
   return (
     <div className="main first">
       <img src="./images/poster.png" className="poster" alt="" />
-      <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
-      <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>
-        <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
-        <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
-      </div>
-      <p>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</p>
+      <div className="hero">
+        <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
+        <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>     
+          <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
+          <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
+        </div>
+        <p>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</p>
+      </div>      
     </div>
   );
 });
@@ -2783,7 +2785,7 @@ Process4.displayName = 'Process4';
 const Black = memo(() => <div className="black"></div>);
 Black.displayName = 'Black';
 
-const Top = memo(() => {
+const PageTTS = memo(() => {
   const { isCreditPayContent, currentPage, sections, totalSum } = useContext(AppContext);
   const pageText = useMemo(() => {
     switch (currentPage) {
@@ -2809,19 +2811,17 @@ const Top = memo(() => {
   }, [currentPage, isCreditPayContent, totalSum]);
   
   return (
-    <div className="top">
-      <div className="hidden-div" ref={sections.page}>
-        <button
-          type="hidden"
-          className="hidden-btn page-btn"
-          autoFocus={currentPage !== PAGE_CONFIG.FIRST}
-          data-tts-text={pageText}
-        />
-      </div>
+    <div className="hidden-div" ref={sections.page}>
+      <button
+        type="hidden"
+        className="hidden-btn page-btn"
+        autoFocus={currentPage !== PAGE_CONFIG.FIRST}
+        data-tts-text={pageText}
+      />
     </div>
   );
 });
-Top.displayName = 'Top';
+PageTTS.displayName = 'PageTTS';
 
 // 단계 표시 아이템 컴포넌트
 // Step 공통 클래스 헬퍼
@@ -2989,23 +2989,18 @@ const Summary = memo(() => {
 Summary.displayName = 'Summary';
 
 const Bottom = memo(() => {
-  const { sections, isCreditPayContent, currentPage } = useContext(AppContext);
+  const { sections } = useContext(AppContext);
   const { remainingTimeFormatted, isActive } = useIdleTimeoutContext();
-  const showHome = !(currentPage === "" || (currentPage === PAGE_CONFIG.FOURTH && [1,2,3].includes(isCreditPayContent)));
   return (
-    <div className="bottom" data-tts-text={showHome ? "시스템 설정, 버튼 두 개," : "시스템 설정, 버튼 한개,"} ref={sections.bottomfooter}>
-      {showHome ? (
-        <Button
-          className="down-footer-button btn-home"
-          ttsText="처음으로,"
-          svg={<HomeIcon />}
-          label="처음으로"
-          actionType="modal"
-          actionTarget="Return"
-        />
-      ) : (
-        <div className="footer-coffeelogo"></div>
-      )}
+    <div className="bottom" data-tts-text="시스템 설정, 버튼 두 개," ref={sections.bottomfooter}>
+      <Button
+        className="down-footer-button btn-home"
+        ttsText="처음으로,"
+        svg={<HomeIcon />}
+        label="처음으로"
+        actionType="modal"
+        actionTarget="Return"
+      />
       {isActive && <div className="countdown"><span>{remainingTimeFormatted}</span></div>}
       <Button className="down-footer-button" ttsText="접근성," svg={<WheelchairIcon />} label="접근성" actionType="modal" actionTarget="Accessibility" />
     </div>
@@ -3234,7 +3229,7 @@ const Layout = ({ children }) => {
   return (
     <>
       <Black />
-      <Top />
+      <PageTTS />
       {render.step && <Step />}
       {render.main && children}
       {render.summary && <Summary />}

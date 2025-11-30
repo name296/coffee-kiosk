@@ -528,7 +528,6 @@
     --layout-gap: var(--spacing-sm);  /* 1rem = 16px */
     
     /* 섹션 높이 */
-    --height-top: 70px;
     --height-step: 120px;
     --height-title: 200px;
     --height-summary: 122px;
@@ -584,16 +583,6 @@
   /* ========================================
      헤더 영역 (.top, .step)
      ======================================== */
-  .top {
-    width: 100%;
-    height: var(--height-top);
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid lightgray;
-  }
 
   .step {
     width: 100%;
@@ -638,9 +627,13 @@
 
     /* 페이지별 변형 */
     &.first { 
-    justify-content: space-evenly;
+      position: relative;
       height: 100%;
-      & .poster { width: 100%; height: auto; object-fit: contain; }
+      & .poster { 
+        width: var(--layout-width);
+        height: auto; 
+        object-fit: contain; 
+      }
       & p {
         letter-spacing: inherit;
         line-height: inherit;
@@ -709,11 +702,6 @@
     justify-content: space-between;
     align-items: center;
     
-    & .footer-coffeelogo {
-      width: 163px;
-      height: 45px;
-      /* 로고 이미지가 없으면 빈 공간으로 유지 */
-    }
   }
 
   .countdown {
@@ -826,8 +814,8 @@
     inset: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-end;  /* 바닥 정렬 */
-    padding: 0 var(--layout-padding-x) 350px;  /* 바닥에서 350px 위 */
+    align-items: center;  /* 화면 중앙 */
+    padding: 0 var(--layout-padding-x);
     background: #00000099;
     backdrop-filter: blur(4px);
     z-index: 10;
@@ -898,7 +886,7 @@
         justify-content: center;
         align-items: center;  /* 가로 중앙 */
         padding: var(--spacing-xl);
-        gap: var(--spacing-xl);
+        gap: var(--spacing-md);
 
         /* 메시지/레이블 (공통) */
         & .modal-message {
@@ -1127,8 +1115,9 @@
 
   .order-num{
     position: absolute;
-    top: 650px;
-    left: 635px;
+    top: 707px;
+    left: 707px;  /* 기존 중심점 (635 + 콘텐츠폭/2) */
+    transform: translateX(-50%);
     width: fit-content;
     height: fit-content;
     font-size: var(--font-size-d2);
@@ -1724,5 +1713,14 @@
     & .order-image { width: 30px; height: 70px; }
     & .order-name { left: 145px; }
     & .order-quantity { left: 360px; }
+  }
+
+  /* Hero 섹션 (첫 화면 메인 콘텐츠) */
+  .hero {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+    align-items: center;
+    flex: 1;  /* 남은 공간 채우기 */
   }
 } /* @layer utilities */
