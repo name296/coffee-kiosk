@@ -233,22 +233,16 @@ export const useHtmlClass = (className, condition) => {
   useLayoutEffect(() => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
-    console.log(`🎨 useHtmlClass: ${className} = ${condition}`);
+    const targetFontSize = condition ? '12px' : '10px';
+    
+    html.style.fontSize = targetFontSize;
     if (condition) {
       html.classList.add(className);
-      html.style.fontSize = '12px'; // 직접 px로 설정
     } else {
       html.classList.remove(className);
-      html.style.fontSize = '10px'; // 직접 px로 설정
     }
-    // 강제 reflow - 스타일 변경 즉시 적용
-    void html.offsetHeight;
-    console.log(`🎨 html font-size 적용됨: ${getComputedStyle(html).fontSize}`);
-    
-    return () => {
-      html.classList.remove(className);
-      html.style.fontSize = '';
-    };
+    console.log(`🎨 useHtmlClass: ${className}=${condition}, font-size=${targetFontSize}`);
+    // cleanup 없음 - ResizeObserver가 변경 감지
   }, [className, condition]);
 };
 
@@ -645,7 +639,85 @@ export const useAppIdleTimeout = (currentPage, setCurrentPage, resetOrder) => {
   return { remainingTime, remainingTimeFormatted, isActive: true, resetTimer };
 };
 
-export const usePaymentCountdown = ({ isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage }) => { const [countdown, setCountdown] = useState(60); useEffect(() => { if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) { const rc = () => setCountdown(CFG.TIME.AUTO_FINISH); setCountdown(CFG.TIME.AUTO_FINISH); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => setIsCreditPayContent(PAY.FINISH), 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); const h = () => rc(); window.addEventListener('keydown', h); window.addEventListener('click', h); return () => { window.removeEventListener('keydown', h); window.removeEventListener('click', h); clearInterval(t); }; } if (isCreditPayContent === PAY.FINISH) { setCountdown(CFG.TIME.FINAL_PAGE); const t = setInterval(() => { setCountdown(p => { if (p === 0) { clearInterval(t); setTimeout(() => { ModalReturn.close(); ModalAccessibility.close(); setQuantities(totalMenuItems.reduce((a, i) => ({ ...a, [i.id]: 0 }), {})); setIsDark(false); setVolume(1); setIsLarge(false); setIsLow(false); setCurrentPage(CFG.PAGE_FIRST); }, 0); return 0; } return p - 1; }); }, CFG.TIME.INTERVAL); return () => clearInterval(t); } }, [isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage]); return countdown; };
+export const usePaymentCountdown = ({
+  isCreditPayContent,
+  setIsCreditPayContent,
+  ModalReturn,
+  ModalAccessibility,
+  setQuantities,
+  totalMenuItems,
+  setIsDark,
+  setVolume,
+  setIsLarge,
+  setIsLow,
+  setCurrentPage
+}) => {
+  const [countdown, setCountdown] = useState(60);
+  
+  useEffect(() => {
+    // 인쇄 선택 또는 영수증 단계
+    if (isCreditPayContent === PAY.PRINT_SELECT || isCreditPayContent === PAY.RECEIPT) {
+      const resetCountdown = () => setCountdown(CFG.TIME.AUTO_FINISH);
+      setCountdown(CFG.TIME.AUTO_FINISH);
+      
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev === 0) {
+            clearInterval(timer);
+            setTimeout(() => setIsCreditPayContent(PAY.FINISH), 0);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, CFG.TIME.INTERVAL);
+      
+      // 사용자 입력 시 카운트다운 리셋
+      window.addEventListener('keydown', resetCountdown);
+      window.addEventListener('click', resetCountdown);
+      
+      return () => {
+        window.removeEventListener('keydown', resetCountdown);
+        window.removeEventListener('click', resetCountdown);
+        clearInterval(timer);
+      };
+    }
+    
+    // 완료 단계
+    if (isCreditPayContent === PAY.FINISH) {
+      setCountdown(CFG.TIME.FINAL_PAGE);
+      
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev === 0) {
+            clearInterval(timer);
+            setTimeout(() => {
+              // 모달 닫기 및 상태 초기화
+              ModalReturn.close();
+              ModalAccessibility.close();
+              setQuantities(totalMenuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {}));
+              setIsDark(false);
+              setVolume(1);
+              setIsLarge(false);
+              setIsLow(false);
+              setCurrentPage(CFG.PAGE_FIRST);
+            }, 0);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, CFG.TIME.INTERVAL);
+      
+      return () => clearInterval(timer);
+    }
+  }, [
+    isCreditPayContent, setIsCreditPayContent,
+    ModalReturn, ModalAccessibility,
+    setQuantities, totalMenuItems,
+    setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage
+  ]);
+  
+  return countdown;
+};
 
 // ============================================================================
 // 카테고리 페이지네이션 (가변 너비 버튼, 페이지별 시작 인덱스 저장)
@@ -687,7 +759,7 @@ export const usePaymentCountdown = ({ isCreditPayContent, setIsCreditPayContent,
 //   - pageBreakpoints: 각 페이지의 시작 인덱스 배열 [0, N, N+M, ...]
 // 
 // ============================================================================
-const ACTUAL_GAP_THRESHOLD = 36; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
+const ACTUAL_GAP_THRESHOLD = 50; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
 
 export const useCategoryPagination = (items, isLarge = false) => {
   const containerRef = useRef(null);  // 실제 표시 컨테이너
@@ -697,7 +769,6 @@ export const useCategoryPagination = (items, isLarge = false) => {
   const [calcTrigger, setCalcTrigger] = useState(0); // 재계산 트리거
   const [isCompact, setIsCompact] = useState(false); // compact 모드
   const [isReady, setIsReady] = useState(false); // 최종 표시 준비
-  const measurePhaseRef = useRef(0); // 0: 초기, 1: 측정중, 2: 완료
   
   // 재계산 함수
   const recalculate = useCallback(() => {
@@ -706,134 +777,141 @@ export const useCategoryPagination = (items, isLarge = false) => {
   
   // isLarge 변경 추적 (페이지 리셋용)
   const prevIsLargeRef = useRef(isLarge);
+  const lastWidthRef = useRef(0); // 이전 버튼 폭 저장
+  const isCalculatingRef = useRef(false); // 계산 중 플래그 (무한루프 방지)
   
-  // 1단계: 브레이크포인트 계산 (측정용 컨테이너 사용)
-  // useLayoutEffect 사용: useHtmlClass 직후 동기 실행 → 스타일 적용 보장
-  useLayoutEffect(() => {
+  // 계산 함수
+  const calculate = useCallback(() => {
+    if (!measureRef.current || !containerRef.current) return;
+    
     const isLargeChanged = prevIsLargeRef.current !== isLarge;
     prevIsLargeRef.current = isLarge;
     
-    const calculate = () => {
-      if (!measureRef.current || !containerRef.current) return;
+    // 새 계산 시작 - 숨기고 compact 리셋
+    setIsReady(false);
+    setIsCompact(false);
+    
+    const containerWidth = containerRef.current.clientWidth;
+    const gap = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
+    
+    const buttons = measureRef.current.querySelectorAll('.button');
+    if (!buttons.length) return;
+    
+    const separator = measureRef.current.querySelector('.category-separator');
+    const separatorWidth = separator ? separator.offsetWidth : 0;
+    
+    const breakpoints = [0];
+    let accumulatedWidth = 0;
+    let lineButtonCount = 0;
+    
+    const btnWidths = [];
+    for (let i = 0; i < buttons.length; i++) {
+      const btnWidth = buttons[i].offsetWidth;
+      btnWidths.push(btnWidth);
+      const isLast = i === buttons.length - 1;
+      const toNextBtnStart = isLast ? btnWidth : btnWidth + gap + separatorWidth + gap;
+      const willOverflow = accumulatedWidth + toNextBtnStart > containerWidth && lineButtonCount > 0;
       
-      // 새 계산 시작 - 숨기고 compact 리셋
-      setIsReady(false);
-      setIsCompact(false);
-      measurePhaseRef.current = 1; // 측정 단계
-      
-      const containerWidth = containerRef.current.clientWidth;
-      const gap = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
-      
-      // 측정용 컨테이너의 버튼 font-size 확인
-      const measureButtons = measureRef.current.querySelectorAll('.button');
-      if (measureButtons.length > 0) {
-        const btnFontSize = getComputedStyle(measureButtons[0]).fontSize;
-        console.log(`🔤 측정 버튼 font-size: ${btnFontSize}`);
-      }
-      
-      const buttons = measureRef.current.querySelectorAll('.button');
-      if (!buttons.length) return;
-      
-      const separator = measureRef.current.querySelector('.category-separator');
-      const separatorWidth = separator ? separator.offsetWidth : 0;
-      
-      const breakpoints = [0];
-      let accumulatedWidth = 0;
-      let lineButtonCount = 0;
-      
-      const btnWidths = [];
-      for (let i = 0; i < buttons.length; i++) {
-        const btnWidth = buttons[i].offsetWidth;
-        btnWidths.push(btnWidth);
-        const isLast = i === buttons.length - 1;
-        const toNextBtnStart = isLast ? btnWidth : btnWidth + gap + separatorWidth + gap;
-        const willOverflow = accumulatedWidth + toNextBtnStart > containerWidth && lineButtonCount > 0;
-        
-        if (willOverflow) {
-          breakpoints.push(i);
-          accumulatedWidth = toNextBtnStart;
-          lineButtonCount = 1;
-        } else {
-          accumulatedWidth += toNextBtnStart;
-          lineButtonCount++;
-        }
-      }
-      
-      console.log(`📊 카테고리폭=${containerWidth}px, 버튼폭=${btnWidths.slice(0,3).join(',')}... → ${breakpoints.length}페이지`, breakpoints);
-      
-      setPageBreakpoints(breakpoints);
-      // isLarge 변경 시 페이지 리셋, 아니면 현재 페이지 유지 (범위 내)
-      if (isLargeChanged) {
-        setCurrentPage(0);
+      if (willOverflow) {
+        breakpoints.push(i);
+        accumulatedWidth = toNextBtnStart;
+        lineButtonCount = 1;
       } else {
-        setCurrentPage(p => Math.min(p, breakpoints.length - 1));
+        accumulatedWidth += toNextBtnStart;
+        lineButtonCount++;
       }
-    };
+    }
     
-    // 자식 컴포넌트가 먼저 실행되므로 여기서 직접 font-size 적용
-    const html = document.documentElement;
-    const targetFontSize = isLarge ? '12px' : '10px';
-    html.style.fontSize = targetFontSize;
-    if (isLarge) {
-      html.classList.add('large');
+    console.log(`📊 버튼폭=${btnWidths.slice(0,3).join(',')}... → ${breakpoints.length}페이지`, breakpoints);
+    
+    setPageBreakpoints(breakpoints);
+    // isLarge 변경 시 페이지 리셋, 아니면 현재 페이지 유지 (범위 내)
+    if (isLargeChanged) {
+      setCurrentPage(0);
     } else {
-      html.classList.remove('large');
+      setCurrentPage(p => Math.min(p, breakpoints.length - 1));
     }
-    void html.offsetHeight; // 강제 reflow
-    const htmlFontSize = getComputedStyle(html).fontSize;
-    console.log(`🔤 html font-size: ${htmlFontSize} (isLarge: ${isLarge}, 목표: ${targetFontSize})`);
+  }, [isLarge]);
+  
+  // ResizeObserver로 버튼 크기 변경 감지
+  useEffect(() => {
+    if (!measureRef.current) return;
     
-    if (measureRef.current) {
-      void measureRef.current.offsetHeight;
-    }
+    const firstButton = measureRef.current.querySelector('.button');
+    if (!firstButton) return;
     
+    const observer = new ResizeObserver((entries) => {
+      // 계산 중이면 무시 (무한루프 방지)
+      if (isCalculatingRef.current) return;
+      
+      const newWidth = entries[0]?.contentRect.width || 0;
+      // 폭이 변경되었을 때만 재계산
+      if (Math.abs(newWidth - lastWidthRef.current) > 1) {
+        console.log(`🔄 버튼 크기 변경 감지: ${lastWidthRef.current}px → ${newWidth}px`);
+        lastWidthRef.current = newWidth;
+        // 뷰포트 리사이즈 이벤트 강제 발생 → 렌더링 트리거
+        isCalculatingRef.current = true;
+        window.dispatchEvent(new Event('resize'));
+        // 다음 프레임에서 플래그 해제
+        requestAnimationFrame(() => {
+          isCalculatingRef.current = false;
+        });
+      }
+    });
+    
+    observer.observe(firstButton);
+    
+    // 초기 계산
     calculate();
     
+    // 윈도우 리사이즈도 감지
     window.addEventListener('resize', calculate);
-    return () => window.removeEventListener('resize', calculate);
-  }, [items, calcTrigger, isLarge]);  // isLarge 변경 시 재계산
-  
-  // 2단계: 렌더링된 실제 간격 측정 → compact 결정
-  useEffect(() => {
-    if (measurePhaseRef.current !== 1) return; // 측정 단계가 아니면 스킵
     
-    // 1차 렌더 후 측정 (rAF 2번)
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (!containerRef.current) return;
-      
-      const renderedButtons = containerRef.current.querySelectorAll('.button');
-      if (renderedButtons.length <= 1) {
-        // 아이템 1개 이하면 compact 불필요, 바로 표시
-        measurePhaseRef.current = 2;
-        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
-        return;
-      }
-      
-      // 실제 간격 측정
-      let maxGap = 0;
-      for (let i = 0; i < renderedButtons.length - 1; i++) {
-        const rect1 = renderedButtons[i].getBoundingClientRect();
-        const rect2 = renderedButtons[i + 1].getBoundingClientRect();
-        const actualGap = rect2.left - rect1.right;
-        maxGap = Math.max(maxGap, actualGap);
-      }
-      
-      console.log(`📐 실제 간격: ${Math.round(maxGap)}px (기준: ${ACTUAL_GAP_THRESHOLD}px)`);
-      
-      const shouldCompact = maxGap > ACTUAL_GAP_THRESHOLD;
-      measurePhaseRef.current = 2; // 완료
-      
-      if (shouldCompact) {
-        console.log(`🔄 compact 적용`);
-        setIsCompact(true);
-        // 3차 렌더(compact 적용) 후 → 4차 렌더에서 표시
-        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
-      } else {
-        // compact 불필요 → 2프레임 후 표시
-        requestAnimationFrame(() => requestAnimationFrame(() => setIsReady(true)));
-      }
-    }));
-  }, [pageBreakpoints, currentPage]);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', calculate);
+    };
+  }, [items, calcTrigger, calculate]);
+  
+  // 2단계: 렌더링 후 compact 결정 (pageBreakpoints 변경 시)
+  useEffect(() => {
+    if (pageBreakpoints.length === 0) return;
+    
+    // 다음 프레임에서 측정 (DOM 업데이트 후)
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!containerRef.current) {
+          setIsReady(true);
+          return;
+        }
+        
+        const renderedButtons = containerRef.current.querySelectorAll('.button');
+        if (renderedButtons.length <= 1) {
+          setIsReady(true);
+          return;
+        }
+        
+        // 실제 간격 측정
+        let maxGap = 0;
+        for (let i = 0; i < renderedButtons.length - 1; i++) {
+          const rect1 = renderedButtons[i].getBoundingClientRect();
+          const rect2 = renderedButtons[i + 1].getBoundingClientRect();
+          const actualGap = rect2.left - rect1.right;
+          maxGap = Math.max(maxGap, actualGap);
+        }
+        
+        console.log(`📐 실제 간격: ${Math.round(maxGap)}px (기준: ${ACTUAL_GAP_THRESHOLD}px)`);
+        
+        const shouldCompact = maxGap > ACTUAL_GAP_THRESHOLD;
+        setIsCompact(shouldCompact);
+        
+        // compact 적용 후 다음 프레임에서 표시
+        requestAnimationFrame(() => setIsReady(true));
+      });
+    });
+    
+    return () => cancelAnimationFrame(rafId);
+  }, [pageBreakpoints, currentPage]); // isCompact 제거!
   
   // ---------------------------------------------------------------
   // 페이지별 아이템 슬라이싱 (pagedItems)
@@ -852,18 +930,14 @@ export const useCategoryPagination = (items, isLarge = false) => {
   const startIdx = pageBreakpoints[currentPage] ?? 0;
   const endIdx = pageBreakpoints[currentPage + 1] ?? items.length;
   
-  // 페이지 변경 + 측정 리셋
+  // 페이지 변경
   const prevPage = useCallback(() => {
-    measurePhaseRef.current = 1; // 측정 단계로
     setIsReady(false);
-    setIsCompact(false);
     setCurrentPage(p => Math.max(0, p - 1));
   }, []);
   
   const nextPage = useCallback(() => {
-    measurePhaseRef.current = 1; // 측정 단계로
     setIsReady(false);
-    setIsCompact(false);
     setCurrentPage(p => Math.min(totalPages - 1, p + 1));
   }, [totalPages]);
   
@@ -1051,9 +1125,22 @@ export const useTimer = () => {
   };
 };
 
-export const applyButtonMinSide = (btn) => { const w = btn.offsetWidth, h = btn.offsetHeight, m = Math.min(w, h); if (m > 0) btn.style.setProperty('--min-side', `${m}px`); };
-const isButtonDisabled = (b) => b.classList.contains('disabled') || b.getAttribute('aria-disabled') === 'true' || b.disabled === true;
-const isToggleButton = (b) => b.classList.contains('toggle');
+export const applyButtonMinSide = (btn) => {
+  const w = btn.offsetWidth;
+  const h = btn.offsetHeight;
+  const minSide = Math.min(w, h);
+  if (minSide > 0) {
+    btn.style.setProperty('--min-side', `${minSide}px`);
+  }
+};
+
+const isButtonDisabled = (btn) => {
+  return btn.classList.contains('disabled') || 
+         btn.getAttribute('aria-disabled') === 'true' || 
+         btn.disabled === true;
+};
+
+const isToggleButton = (btn) => btn.classList.contains('toggle');
 
 // ============================================================================
 // Button 컴포넌트 (최적화)
@@ -1089,7 +1176,26 @@ const useButtonAction = (actionType, actionTarget, actionMethod, disabled) => {
 // 키 검증 유틸
 const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
-const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '', imgStyle = {}, label, children, disabled = false, pressed = false, pointed = false, toggle = false, actionType, actionTarget, actionMethod, onClick, ttsText, ...rest }) => {
+const Button = memo(({
+  className = '',
+  style = {},
+  svg = null,
+  img,
+  imgAlt = '',
+  imgStyle = {},
+  label,
+  children,
+  disabled = false,
+  pressed = false,
+  pointed = false,
+  toggle = false,
+  actionType,
+  actionTarget,
+  actionMethod,
+  onClick,
+  ttsText,
+  ...rest
+}) => {
   const btnRef = useRef(null);
   const [isPressing, setIsPressing] = useState(false);
   const { playOnPressedSound } = useButtonStyle();
@@ -1124,11 +1230,36 @@ const Button = memo(({ className = '', style = {}, svg = null, img, imgAlt = '',
   }, [disabled, toggle, actionType, handleAction, onClick]);
 
   return (
-    <button ref={btnRef} className={cls} style={style} data-tts-text={ttsText} data-react-handler="true" disabled={disabled} aria-disabled={disabled} aria-pressed={toggle ? pressed : undefined} onMouseDown={onStart} onMouseUp={onEnd} onMouseLeave={() => setIsPressing(false)} onTouchStart={onStart} onTouchEnd={onEnd} onKeyDown={onStart} onKeyUp={onEnd} {...rest}>
-      {(svg || img) && <span className="icon" aria-hidden="true">{svg || <img src={img} alt={imgAlt} style={imgStyle} />}</span>}
+    <button
+      ref={btnRef}
+      className={cls}
+      style={style}
+      data-tts-text={ttsText}
+      data-react-handler="true"
+      disabled={disabled}
+      aria-disabled={disabled}
+      aria-pressed={toggle ? pressed : undefined}
+      onMouseDown={onStart}
+      onMouseUp={onEnd}
+      onMouseLeave={() => setIsPressing(false)}
+      onTouchStart={onStart}
+      onTouchEnd={onEnd}
+      onKeyDown={onStart}
+      onKeyUp={onEnd}
+      {...rest}
+    >
+      {(svg || img) && (
+        <span className="icon" aria-hidden="true">
+          {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
+        </span>
+      )}
       {label}
       {children}
-      {toggle && <span className="icon pressed" aria-hidden="true"><ToggleIcon /></span>}
+      {toggle && (
+        <span className="icon pressed" aria-hidden="true">
+          <ToggleIcon />
+        </span>
+      )}
     </button>
   );
 });
@@ -1262,7 +1393,207 @@ const CallModal = () => {
   return <BaseModal isOpen={ModalCall.isOpen} type="call" onCancel={close} onConfirm={close} />;
 };
 
-export const useMultiModalButtonHandler = (options = {}) => { const { initFocusableSections = [], initFirstButtonSection = null, enableGlobalHandlers = true, handleTextOpt = null, prefixOpt = '', enableKeyboardNavigation = false } = options; const [, setFocusableSections] = useState(initFocusableSections); const handlersRef = useRef({}); const keyboardNavState = useRef({ currentSectionIndex: 0, currentButtonIndex: 0, sections: initFocusableSections, firstButtonSection: initFirstButtonSection }); const updateFocusableSections = useCallback((ns) => { setFocusableSections(ns); keyboardNavState.current.sections = ns; }, []); const finalHandleText = useCallback((t) => { if (handleTextOpt && typeof handleTextOpt === 'function') handleTextOpt(t); }, [handleTextOpt]); const handleButtonClick = useCallback((e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b)) return; if (b.dataset.reactHandler === 'true') return; const tts = b.dataset.ttsText; if (tts && finalHandleText) finalHandleText(prefixOpt ? `${prefixOpt}${tts}` : tts); }, [finalHandleText, prefixOpt]); useEffect(() => { if (!enableGlobalHandlers) return; const htc = (e) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || !isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; }; document.addEventListener('click', htc, false); handlersRef.current.toggleClickHandler = htc; return () => document.removeEventListener('click', htc, false); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers) return; const bdb = (e) => { const b = e.target?.closest?.('.button'); if (b && isButtonDisabled(b)) { e.preventDefault(); e.stopPropagation(); } }; document.addEventListener('click', bdb, true); return () => document.removeEventListener('click', bdb, true); }, [enableGlobalHandlers]); useEffect(() => { if (!enableGlobalHandlers || !enableKeyboardNavigation) return; const hkd = (e) => { const { key } = e; if ([KEYBOARD.ARROW_UP, KEYBOARD.ARROW_DOWN, KEYBOARD.ARROW_LEFT, KEYBOARD.ARROW_RIGHT].includes(key)) { e.preventDefault(); const ae = document.activeElement; if (!ae) return; const cs = ae.closest('[data-tts-text]'); if (!cs) return; const btns = cs.querySelectorAll('.button:not([aria-disabled="true"])'); const ci = Array.from(btns).indexOf(ae); let ni = ci; if (key === KEYBOARD.ARROW_RIGHT || key === KEYBOARD.ARROW_DOWN) ni = (ci + 1) % btns.length; else if (key === KEYBOARD.ARROW_LEFT || key === KEYBOARD.ARROW_UP) ni = (ci - 1 + btns.length) % btns.length; if (btns[ni]) btns[ni].focus(); } if (key === KEYBOARD.TAB) { const secs = keyboardNavState.current.sections; if (secs.length === 0) return; e.preventDefault(); const csi = keyboardNavState.current.currentSectionIndex; const nsi = e.shiftKey ? (csi - 1 + secs.length) % secs.length : (csi + 1) % secs.length; const ns = secs[nsi]?.current; if (ns) { const fb = ns.querySelector('.button:not([aria-disabled="true"])'); if (fb) { fb.focus(); keyboardNavState.current.currentSectionIndex = nsi; } } } if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) { const ae = document.activeElement; if (ae?.classList?.contains('button')) { e.preventDefault(); ae.click(); } } }; document.addEventListener('keydown', hkd, true); return () => document.removeEventListener('keydown', hkd, true); }, [enableGlobalHandlers, enableKeyboardNavigation]); useEffect(() => { if (!enableGlobalHandlers) return; const hps = (e, a) => { const b = e.target?.closest?.('.button'); if (!b || isButtonDisabled(b) || isToggleButton(b)) return; if (b.dataset.reactHandler === 'true') return; if (a === 'add') b.classList.add('pressed'); else if (a === 'remove' && b.classList.contains('pressed')) { b.classList.remove('pressed'); requestAnimationFrame(() => { if (b instanceof HTMLElement && document.activeElement !== b) b.focus(); }); } }; const hmd = (e) => hps(e, 'add'); const hmu = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const hml = (e) => e.target?.closest && hps(e, 'remove'); const hts = (e) => hps(e, 'add'); const hte = (e) => { hps(e, 'remove'); const b = e.target?.closest?.('.button'); if (b && !isButtonDisabled(b) && !isToggleButton(b) && b.dataset.reactHandler !== 'true') requestAnimationFrame(() => b instanceof HTMLElement && b.focus()); }; const htc = (e) => hps(e, 'remove'); document.addEventListener('mousedown', hmd, true); document.addEventListener('mouseup', hmu, true); document.addEventListener('mouseleave', hml, true); document.addEventListener('touchstart', hts, { passive: true }); document.addEventListener('touchend', hte, { passive: true }); document.addEventListener('touchcancel', htc, { passive: true }); return () => { document.removeEventListener('mousedown', hmd, true); document.removeEventListener('mouseup', hmu, true); document.removeEventListener('mouseleave', hml, true); document.removeEventListener('touchstart', hts); document.removeEventListener('touchend', hte); document.removeEventListener('touchcancel', htc); }; }, [enableGlobalHandlers]); return enableKeyboardNavigation ? { handleButtonClick, updateFocusableSections } : { handleButtonClick }; };
+export const useMultiModalButtonHandler = (options = {}) => {
+  const {
+    initFocusableSections = [],
+    initFirstButtonSection = null,
+    enableGlobalHandlers = true,
+    handleTextOpt = null,
+    prefixOpt = '',
+    enableKeyboardNavigation = false
+  } = options;
+  
+  const [, setFocusableSections] = useState(initFocusableSections);
+  const handlersRef = useRef({});
+  const keyboardNavState = useRef({
+    currentSectionIndex: 0,
+    currentButtonIndex: 0,
+    sections: initFocusableSections,
+    firstButtonSection: initFirstButtonSection
+  });
+  
+  // 섹션 업데이트 함수
+  const updateFocusableSections = useCallback((newSections) => {
+    setFocusableSections(newSections);
+    keyboardNavState.current.sections = newSections;
+  }, []);
+  
+  // TTS 텍스트 핸들러
+  const finalHandleText = useCallback((text) => {
+    if (handleTextOpt && typeof handleTextOpt === 'function') {
+      handleTextOpt(text);
+    }
+  }, [handleTextOpt]);
+  
+  // 버튼 클릭 핸들러
+  const handleButtonClick = useCallback((e) => {
+    const btn = e.target?.closest?.('.button');
+    if (!btn || isButtonDisabled(btn)) return;
+    if (btn.dataset.reactHandler === 'true') return;
+    
+    const ttsText = btn.dataset.ttsText;
+    if (ttsText && finalHandleText) {
+      finalHandleText(prefixOpt ? `${prefixOpt}${ttsText}` : ttsText);
+    }
+  }, [finalHandleText, prefixOpt]);
+  
+  // 토글 버튼 클릭 핸들러
+  useEffect(() => {
+    if (!enableGlobalHandlers) return;
+    
+    const handleToggleClick = (e) => {
+      const btn = e.target?.closest?.('.button');
+      if (!btn || isButtonDisabled(btn) || !isToggleButton(btn)) return;
+      if (btn.dataset.reactHandler === 'true') return;
+    };
+    
+    document.addEventListener('click', handleToggleClick, false);
+    handlersRef.current.toggleClickHandler = handleToggleClick;
+    
+    return () => document.removeEventListener('click', handleToggleClick, false);
+  }, [enableGlobalHandlers]);
+  
+  // 비활성화 버튼 클릭 방지
+  useEffect(() => {
+    if (!enableGlobalHandlers) return;
+    
+    const blockDisabledButton = (e) => {
+      const btn = e.target?.closest?.('.button');
+      if (btn && isButtonDisabled(btn)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    
+    document.addEventListener('click', blockDisabledButton, true);
+    return () => document.removeEventListener('click', blockDisabledButton, true);
+  }, [enableGlobalHandlers]);
+  
+  // 키보드 네비게이션
+  useEffect(() => {
+    if (!enableGlobalHandlers || !enableKeyboardNavigation) return;
+    
+    const handleKeyDown = (e) => {
+      const { key } = e;
+      
+      // 방향키 네비게이션
+      if ([KEYBOARD.ARROW_UP, KEYBOARD.ARROW_DOWN, KEYBOARD.ARROW_LEFT, KEYBOARD.ARROW_RIGHT].includes(key)) {
+        e.preventDefault();
+        const activeEl = document.activeElement;
+        if (!activeEl) return;
+        
+        const currentSection = activeEl.closest('[data-tts-text]');
+        if (!currentSection) return;
+        
+        const buttons = currentSection.querySelectorAll('.button:not([aria-disabled="true"])');
+        const currentIndex = Array.from(buttons).indexOf(activeEl);
+        let nextIndex = currentIndex;
+        
+        if (key === KEYBOARD.ARROW_RIGHT || key === KEYBOARD.ARROW_DOWN) {
+          nextIndex = (currentIndex + 1) % buttons.length;
+        } else if (key === KEYBOARD.ARROW_LEFT || key === KEYBOARD.ARROW_UP) {
+          nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        }
+        
+        if (buttons[nextIndex]) buttons[nextIndex].focus();
+      }
+      
+      // Tab 키 섹션 이동
+      if (key === KEYBOARD.TAB) {
+        const sections = keyboardNavState.current.sections;
+        if (sections.length === 0) return;
+        
+        e.preventDefault();
+        const currentSectionIndex = keyboardNavState.current.currentSectionIndex;
+        const nextSectionIndex = e.shiftKey
+          ? (currentSectionIndex - 1 + sections.length) % sections.length
+          : (currentSectionIndex + 1) % sections.length;
+        
+        const nextSection = sections[nextSectionIndex]?.current;
+        if (nextSection) {
+          const firstButton = nextSection.querySelector('.button:not([aria-disabled="true"])');
+          if (firstButton) {
+            firstButton.focus();
+            keyboardNavState.current.currentSectionIndex = nextSectionIndex;
+          }
+        }
+      }
+      
+      // Enter/Space 버튼 활성화
+      if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) {
+        const activeEl = document.activeElement;
+        if (activeEl?.classList?.contains('button')) {
+          e.preventDefault();
+          activeEl.click();
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [enableGlobalHandlers, enableKeyboardNavigation]);
+  
+  // 마우스/터치 pressed 상태 관리
+  useEffect(() => {
+    if (!enableGlobalHandlers) return;
+    
+    const handlePressState = (e, action) => {
+      const btn = e.target?.closest?.('.button');
+      if (!btn || isButtonDisabled(btn) || isToggleButton(btn)) return;
+      if (btn.dataset.reactHandler === 'true') return;
+      
+      if (action === 'add') {
+        btn.classList.add('pressed');
+      } else if (action === 'remove' && btn.classList.contains('pressed')) {
+        btn.classList.remove('pressed');
+        requestAnimationFrame(() => {
+          if (btn instanceof HTMLElement && document.activeElement !== btn) {
+            btn.focus();
+          }
+        });
+      }
+    };
+    
+    const handleMouseDown = (e) => handlePressState(e, 'add');
+    const handleMouseUp = (e) => {
+      handlePressState(e, 'remove');
+      const btn = e.target?.closest?.('.button');
+      if (btn && !isButtonDisabled(btn) && !isToggleButton(btn) && btn.dataset.reactHandler !== 'true') {
+        requestAnimationFrame(() => btn instanceof HTMLElement && btn.focus());
+      }
+    };
+    const handleMouseLeave = (e) => e.target?.closest && handlePressState(e, 'remove');
+    const handleTouchStart = (e) => handlePressState(e, 'add');
+    const handleTouchEnd = (e) => {
+      handlePressState(e, 'remove');
+      const btn = e.target?.closest?.('.button');
+      if (btn && !isButtonDisabled(btn) && !isToggleButton(btn) && btn.dataset.reactHandler !== 'true') {
+        requestAnimationFrame(() => btn instanceof HTMLElement && btn.focus());
+      }
+    };
+    const handleTouchCancel = (e) => handlePressState(e, 'remove');
+    
+    document.addEventListener('mousedown', handleMouseDown, true);
+    document.addEventListener('mouseup', handleMouseUp, true);
+    document.addEventListener('mouseleave', handleMouseLeave, true);
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+    
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown, true);
+      document.removeEventListener('mouseup', handleMouseUp, true);
+      document.removeEventListener('mouseleave', handleMouseLeave, true);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchcancel', handleTouchCancel);
+    };
+  }, [enableGlobalHandlers]);
+  
+  return enableKeyboardNavigation
+    ? { handleButtonClick, updateFocusableSections }
+    : { handleButtonClick };
+};
 
 export const useWebViewMessage = (setIsCreditPayContent) => {
   useEffect(() => {
@@ -2288,33 +2619,179 @@ const Top = memo(() => {
       default: return "";
     }
   }, [currentPage, isCreditPayContent, totalSum]);
-  return (<div className="top"><div className="hidden-div" ref={sections.page}><button type="hidden" className="hidden-btn page-btn" autoFocus={currentPage !== PAGE_CONFIG.FIRST} data-tts-text={pageText} /></div></div>);
+  
+  return (
+    <div className="top">
+      <div className="hidden-div" ref={sections.page}>
+        <button
+          type="hidden"
+          className="hidden-btn page-btn"
+          autoFocus={currentPage !== PAGE_CONFIG.FIRST}
+          data-tts-text={pageText}
+        />
+      </div>
+    </div>
+  );
 });
 Top.displayName = 'Top';
+
+// 단계 표시 아이템 컴포넌트
+const StepItem = ({ num, label, active, checked }) => (
+  <li className="step">
+    {checked 
+      ? <div className="checked-circle" />
+      : <div className={active ? "border-circle" : "header-black-circle"}>{num}</div>
+    }
+    <span>{label}</span>
+    <span className={active ? "active step-separator" : "step-separator"}>›</span>
+  </li>
+);
+
+const StepLast = ({ num, label, checked }) => (
+  <li className="step">
+    {checked 
+      ? <div className="checked-circle" />
+      : <div className="border-circle">{num}</div>
+    }
+    <span>{label}</span>
+  </li>
+);
 
 const Step = memo(() => {
   const { isCreditPayContent, currentPage } = useContext(AppContext);
   const path = currentPage;
-  const StepItem = ({ num, label, active, checked }) => (<li className="step">{checked ? <div className="checked-circle"></div> : <div className={active ? "border-circle" : "header-black-circle"}>{num}</div>}<span>{label}</span><span className={active ? "active step-separator" : "step-separator"}>›</span></li>);
-  const StepLast = ({ num, label, checked }) => (<li className="step">{checked ? <div className="checked-circle"></div> : <div className="border-circle">{num}</div>}<span>{label}</span></li>);
-  if (path === PAGE_CONFIG.SECOND) return (<div className="step"><ol className="step-progress"><StepItem num={1} label="메뉴선택" active checked={false} /><StepItem num={2} label="내역확인" /><StepItem num={3} label="결제" /><StepLast num={4} label="완료" /></ol></div>);
-  if (path === PAGE_CONFIG.THIRD) return (<div className="step"><ol className="step-progress"><StepItem num={1} label="메뉴선택" active checked /><StepItem num={2} label="내역확인" active /><StepItem num={3} label="결제" /><StepLast num={4} label="완료" /></ol></div>);
-  if (path === PAGE_CONFIG.FOURTH) return (<div className="step"><ol className="step-progress"><StepItem num={1} label="메뉴선택" checked /><StepItem num={2} label="내역확인" checked />{isCreditPayContent < 3 ? <StepItem num={3} label="결제" active /> : <StepItem num={3} label="결제" checked />}{isCreditPayContent < 3 ? <StepLast num={4} label="완료" /> : isCreditPayContent !== 7 ? <StepLast num={4} label="완료" /> : <StepLast num={4} label="완료" checked />}</ol></div>);
+  
+  if (path === PAGE_CONFIG.SECOND) {
+    return (
+      <div className="step">
+        <ol className="step-progress">
+          <StepItem num={1} label="메뉴선택" active checked={false} />
+          <StepItem num={2} label="내역확인" />
+          <StepItem num={3} label="결제" />
+          <StepLast num={4} label="완료" />
+        </ol>
+      </div>
+    );
+  }
+  
+  if (path === PAGE_CONFIG.THIRD) {
+    return (
+      <div className="step">
+        <ol className="step-progress">
+          <StepItem num={1} label="메뉴선택" active checked />
+          <StepItem num={2} label="내역확인" active />
+          <StepItem num={3} label="결제" />
+          <StepLast num={4} label="완료" />
+        </ol>
+      </div>
+    );
+  }
+  
+  if (path === PAGE_CONFIG.FOURTH) {
+    const isPaymentComplete = isCreditPayContent >= 3;
+    const isFullyComplete = isCreditPayContent === 7;
+    
+    return (
+      <div className="step">
+        <ol className="step-progress">
+          <StepItem num={1} label="메뉴선택" checked />
+          <StepItem num={2} label="내역확인" checked />
+          <StepItem 
+            num={3} 
+            label="결제" 
+            active={!isPaymentComplete} 
+            checked={isPaymentComplete} 
+          />
+          <StepLast 
+            num={4} 
+            label="완료" 
+            checked={isFullyComplete} 
+          />
+        </ol>
+      </div>
+    );
+  }
+  
   return null;
 });
 Step.displayName = 'Step';
 
 const Summary = memo(() => {
-  const { sections, totalCount, totalSum, convertToKoreanQuantity, currentPage } = useContext(AppContext);
+  const { 
+    sections, 
+    totalCount, 
+    totalSum, 
+    convertToKoreanQuantity, 
+    currentPage 
+  } = useContext(AppContext);
+  
   const [isDisabledBtn, setIsDisabledBtn] = useState(true);
-  useEffect(() => { setIsDisabledBtn(totalCount <= 0); }, [totalCount]);
-  if (currentPage !== PAGE_CONFIG.SECOND && currentPage !== PAGE_CONFIG.THIRD) return null;
+  
+  useEffect(() => {
+    setIsDisabledBtn(totalCount <= 0);
+  }, [totalCount]);
+  
+  // 메뉴선택/내역확인 페이지에서만 표시
+  if (currentPage !== PAGE_CONFIG.SECOND && currentPage !== PAGE_CONFIG.THIRD) {
+    return null;
+  }
+  
+  const summaryTtsText = `주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
+  
   return (
     <div className="summary">
-      <div className="task-manager"><p className="summary-label">수량</p><p className="summary-text">{totalCount}개</p><div className="short-colline"></div><p className="summary-label">금액</p><p className="summary-text">{formatNumber(totalSum)}원</p></div>
-      <div className="task-manager" ref={sections.footer} data-tts-text={`주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`}>
-        {currentPage === PAGE_CONFIG.SECOND && (<><Button className="w199h090" ttsText="초기화," svg={<ResetIcon className="summary-btn-icon" />} label="초기화" actionType="modal" actionTarget="Reset" /><Button className="w199h090" ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`} svg={<OrderIcon className="summary-btn-icon" />} label="주문" disabled={isDisabledBtn} actionType="navigate" actionTarget={PAGE_CONFIG.THIRD} /></>)}
-        {currentPage === PAGE_CONFIG.THIRD && (<><Button className="w199h090" ttsText="추가하기," svg={<AddIcon className="summary-btn-icon" />} label="추가" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} /><Button className="w199h090" ttsText="결제하기," svg={<PayIcon className="summary-btn-icon" />} label="결제" actionType="navigate" actionTarget={PAGE_CONFIG.FOURTH} /></>)}
+      {/* 수량/금액 표시 영역 */}
+      <div className="task-manager">
+        <p className="summary-label">수량</p>
+        <p className="summary-text">{totalCount}개</p>
+        <div className="short-colline" />
+        <p className="summary-label">금액</p>
+        <p className="summary-text">{formatNumber(totalSum)}원</p>
+      </div>
+      
+      {/* 버튼 영역 */}
+      <div className="task-manager" ref={sections.footer} data-tts-text={summaryTtsText}>
+        {currentPage === PAGE_CONFIG.SECOND && (
+          <>
+            <Button
+              className="w199h090"
+              ttsText="초기화,"
+              svg={<ResetIcon className="summary-btn-icon" />}
+              label="초기화"
+              actionType="modal"
+              actionTarget="Reset"
+            />
+            <Button
+              className="w199h090"
+              ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`}
+              svg={<OrderIcon className="summary-btn-icon" />}
+              label="주문"
+              disabled={isDisabledBtn}
+              actionType="navigate"
+              actionTarget={PAGE_CONFIG.THIRD}
+            />
+          </>
+        )}
+        {currentPage === PAGE_CONFIG.THIRD && (
+          <>
+            <Button
+              className="w199h090"
+              ttsText="추가하기,"
+              svg={<AddIcon className="summary-btn-icon" />}
+              label="추가"
+              actionType="navigate"
+              actionTarget={PAGE_CONFIG.SECOND}
+            />
+            <Button
+              className="w199h090"
+              ttsText="결제하기,"
+              svg={<PayIcon className="summary-btn-icon" />}
+              label="결제"
+              actionType="navigate"
+              actionTarget={PAGE_CONFIG.FOURTH}
+            />
+          </>
+        )}
       </div>
     </div>
   );
@@ -2347,7 +2824,18 @@ ToggleButton.displayName = 'ToggleButton';
 
 // 접근성 모달
 const AccessibilityModal = memo(() => {
-  const { sections, isLow, setIsLow, isDark, setIsDark, setAccessibility, ModalAccessibility, volume, setVolume, isLarge, setIsLarge, commonScript, readCurrentPage } = useContext(AppContext);
+  const {
+    sections,
+    isLow, setIsLow,
+    isDark, setIsDark,
+    isLarge, setIsLarge,
+    volume, setVolume,
+    setAccessibility,
+    ModalAccessibility,
+    commonScript,
+    readCurrentPage
+  } = useContext(AppContext);
+  
   const { handleText } = useTextHandler(volume);
   const { containerRef } = useFocusTrap(ModalAccessibility.isOpen);
   const { setAudioVolume } = useSafeDocument();
@@ -2363,33 +2851,69 @@ const AccessibilityModal = memo(() => {
   }, [ModalAccessibility.isOpen, isDark, isLow, isLarge, volume]);
 
   // 현재 접근성 설정 상태 관리
-  const { settings: currentSettings, setDark, setLow, setLarge, setVolume: setSettingsVolume, updateAll: updateAllSettings, getStatusText } = useAccessibilitySettings({ isDark, isLow, isLarge, volume });
+  const {
+    settings: currentSettings,
+    setDark,
+    setLow,
+    setLarge,
+    setVolume: setSettingsVolume,
+    updateAll: updateAllSettings,
+    getStatusText
+  } = useAccessibilitySettings({ isDark, isLow, isLarge, volume });
 
   useActiveElementTTS(handleText, 500, ModalAccessibility.isOpen);
 
   // 즉시 적용 핸들러들
-  const handleDarkChange = useCallback((v) => { setDark(v); setIsDark(v); }, [setDark, setIsDark]);
-  const handleVolumeChange = useCallback((v) => { setSettingsVolume(v); setVolume(v); setAudioVolume('audioPlayer', VOLUME_VALUES[v]); }, [setSettingsVolume, setVolume, setAudioVolume]);
-  const handleLargeChange = useCallback((v) => { setLarge(v); setIsLarge(v); }, [setLarge, setIsLarge]);
-  const handleLowChange = useCallback((v) => { setLow(v); setIsLow(v); }, [setLow, setIsLow]);
+  const handleDarkChange = useCallback((val) => {
+    setDark(val);
+    setIsDark(val);
+  }, [setDark, setIsDark]);
+  
+  const handleVolumeChange = useCallback((val) => {
+    setSettingsVolume(val);
+    setVolume(val);
+    setAudioVolume('audioPlayer', VOLUME_VALUES[val]);
+  }, [setSettingsVolume, setVolume, setAudioVolume]);
+  
+  const handleLargeChange = useCallback((val) => {
+    setLarge(val);
+    setIsLarge(val);
+  }, [setLarge, setIsLarge]);
+  
+  const handleLowChange = useCallback((val) => {
+    setLow(val);
+    setIsLow(val);
+  }, [setLow, setIsLow]);
 
   // 초기설정 핸들러
   const handleInitialSettingsPress = useCallback(() => {
     updateAllSettings({ isDark: false, isLow: false, isLarge: false, volume: 1 });
-    setIsDark(false); setVolume(1); setIsLarge(false); setIsLow(false);
+    setIsDark(false);
+    setVolume(1);
+    setIsLarge(false);
+    setIsLow(false);
     setAudioVolume('audioPlayer', VOLUME_VALUES[1]);
   }, [updateAllSettings, setIsDark, setVolume, setIsLarge, setIsLow, setAudioVolume]);
 
   // 적용안함 핸들러 (원래 상태로 복원)
   const handleCancelPress = useCallback(() => {
-    const o = originalSettingsRef.current;
-    if (o) { setIsDark(o.isDark); setVolume(o.volume); setIsLarge(o.isLarge); setIsLow(o.isLow); setAudioVolume('audioPlayer', VOLUME_VALUES[o.volume]); }
-    ModalAccessibility.close(); readCurrentPage();
+    const original = originalSettingsRef.current;
+    if (original) {
+      setIsDark(original.isDark);
+      setVolume(original.volume);
+      setIsLarge(original.isLarge);
+      setIsLow(original.isLow);
+      setAudioVolume('audioPlayer', VOLUME_VALUES[original.volume]);
+    }
+    ModalAccessibility.close();
+    readCurrentPage();
   }, [setIsDark, setVolume, setIsLarge, setIsLow, setAudioVolume, ModalAccessibility, readCurrentPage]);
 
   // 적용하기 핸들러
   const handleApplyPress = useCallback(() => {
-    setAccessibility(currentSettings); ModalAccessibility.close(); readCurrentPage(currentSettings.volume);
+    setAccessibility(currentSettings);
+    ModalAccessibility.close();
+    readCurrentPage(currentSettings.volume);
   }, [currentSettings, setAccessibility, ModalAccessibility, readCurrentPage]);
 
   if (!ModalAccessibility.isOpen) return null;

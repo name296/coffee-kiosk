@@ -3,12 +3,7 @@
   ============================== */
 @layer reset, design-system, layout, components, utilities;
 
-/* ========================================
-   큰글씨 모드 (레이어 밖에서 최우선 적용)
-   ======================================== */
-html.large {
-  font-size: calc(62.5% * 1.2) !important; /* 12px */
-}
+/* 큰글씨 모드는 JS에서 inline style로 직접 적용 (useHtmlClass) */
 
 /* ==============================
   폰트 정의 (Font Faces)
