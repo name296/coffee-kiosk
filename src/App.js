@@ -2824,26 +2824,34 @@ const Top = memo(() => {
 Top.displayName = 'Top';
 
 // 단계 표시 아이템 컴포넌트
-const StepItem = ({ num, label, active, checked }) => (
-  <li className="step">
-    {checked 
-      ? <div className="step-complete" />
-      : <div className={active ? "step-now" : "step-yet"}>{num}</div>
-    }
-    <span>{label}</span>
-    <span className={active ? "active step-separator" : "step-separator"}><StepIcon /></span>
-  </li>
-);
+// Step 공통 클래스 헬퍼
+const getStepClass = (isPassed, isNow = false) => ({
+  circle: `circle ${isPassed ? 'passed' : 'yet'}${isNow ? ' now' : ''}`,
+  label: `label${isPassed ? ' passed' : ''}`,
+  separator: `separator${isPassed ? ' passed' : ''}`
+});
 
-const StepLast = ({ num, label, checked }) => (
-  <li className="step">
-    {checked 
-      ? <div className="step-complete" />
-      : <div className="step-yet">{num}</div>
-    }
-    <span>{label}</span>
-  </li>
-);
+const StepItem = ({ num, label, active, checked }) => {
+  const isPassed = checked || active;
+  const cls = getStepClass(isPassed, active);
+  return (
+    <>
+      <div className={cls.circle}><span className="num">{checked ? '✓' : num}</span></div>
+      <span className={cls.label}>{label}</span>
+      <span className={cls.separator}><span className="icon"><StepIcon /></span></span>
+    </>
+  );
+};
+
+const StepLast = ({ num, label, checked }) => {
+  const cls = getStepClass(checked);
+  return (
+    <>
+      <div className={cls.circle}><span className="num">{checked ? '✓' : num}</span></div>
+      <span className={cls.label}>{label}</span>
+    </>
+  );
+};
 
 const Step = memo(() => {
   const { isCreditPayContent, currentPage } = useContext(AppContext);
@@ -2852,12 +2860,10 @@ const Step = memo(() => {
   if (path === PAGE_CONFIG.SECOND) {
     return (
       <div className="step">
-        <ol className="step-progress">
-          <StepItem num={1} label="메뉴선택" active checked={false} />
-          <StepItem num={2} label="내역확인" />
-          <StepItem num={3} label="결제" />
-          <StepLast num={4} label="완료" />
-        </ol>
+        <StepItem num={1} label="메뉴선택" active checked={false} />
+        <StepItem num={2} label="내역확인" />
+        <StepItem num={3} label="결제" />
+        <StepLast num={4} label="완료" />
       </div>
     );
   }
@@ -2865,12 +2871,10 @@ const Step = memo(() => {
   if (path === PAGE_CONFIG.THIRD) {
     return (
       <div className="step">
-        <ol className="step-progress">
-          <StepItem num={1} label="메뉴선택" active checked />
-          <StepItem num={2} label="내역확인" active />
-          <StepItem num={3} label="결제" />
-          <StepLast num={4} label="완료" />
-        </ol>
+        <StepItem num={1} label="메뉴선택" active checked />
+        <StepItem num={2} label="내역확인" active />
+        <StepItem num={3} label="결제" />
+        <StepLast num={4} label="완료" />
       </div>
     );
   }
@@ -2881,21 +2885,19 @@ const Step = memo(() => {
     
     return (
       <div className="step">
-        <ol className="step-progress">
-          <StepItem num={1} label="메뉴선택" checked />
-          <StepItem num={2} label="내역확인" checked />
-          <StepItem 
-            num={3} 
-            label="결제" 
-            active={!isPaymentComplete} 
-            checked={isPaymentComplete} 
-          />
-          <StepLast 
-            num={4} 
-            label="완료" 
-            checked={isFullyComplete} 
-          />
-        </ol>
+        <StepItem num={1} label="메뉴선택" checked />
+        <StepItem num={2} label="내역확인" checked />
+        <StepItem 
+          num={3} 
+          label="결제" 
+          active={!isPaymentComplete} 
+          checked={isPaymentComplete} 
+        />
+        <StepLast 
+          num={4} 
+          label="완료" 
+          checked={isFullyComplete} 
+        />
       </div>
     );
   }

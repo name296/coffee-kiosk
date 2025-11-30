@@ -204,6 +204,7 @@
     
     --body2-progress-background-standby-color: var(--color-gray-01);
     --body2-progress-content-complete-color: var(--color-gray-01);
+    --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
     
     --body3-background-color: var(--color-gray-11);
     --body3-content-color: var(--color-gray-02);
@@ -347,6 +348,7 @@
     
     --body2-progress-background-standby-color: var(--color-gray-07);
     --body2-progress-content-complete-color: var(--color-gray-01);
+    --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
     
     --body3-background-color: var(--color-gray-03);
     --body3-content-color: var(--color-gray-14);
@@ -743,68 +745,57 @@
     background: var(--body1-content-secondary-color);
   }
 
-
-
+  /* ========================================
+     Step Progress Bar
+     구조: .step > .circle + .label + .separator
+     상태: .yet (대기) / .passed (지나침) / .passed.now (현재)
+     ======================================== */
   .step {
     display: flex;
+    flex-shrink: 0;
     height: 120px;
+    flex-flow: row nowrap;
     align-items: center;
-    color: var(--body2-secondary2-color);
-  }
- /* Header step separator */
-  .step-separator {
-    margin: 0 20px;
-  }
-  .step-progress {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--body2-background-color);
-  }
+    justify-content: space-evenly;
 
-  /* 대기 단계 원 */
-  .step-yet {
-    width: 74px;
-    height: 74px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    font-size: var(--font-size-lg);
-    margin-right: 15px;
-    background-color: var(--body2-progress-background-standby-color);
-    border: 9px solid var(--body1-border-color);
-    color: var(--body2-secondary2-color);
-  }
+    /* 공통: 대기 상태 색상 */
+    & .label,
+    & .separator {
+      flex-shrink: 0;
+      color: var(--body2-secondary2-color);
 
-  /* 완료/현재 단계 원 (공통) */
-  .step-complete,
-  .step-now {
-    width: 58px;
-    height: 58px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    margin-right: 15px;
-    background-color: var(--body2-primary1-color);
-    color: var(--body2-progress-content-complete-color);
-  }
+      /* 지나침 상태 색상 */
+      &.passed { color: var(--body2-primary1-color); }
+    }
 
-  /* 완료 단계 (체크 아이콘) */
-  .step-complete { /* 二쇳??*/
-    background-image: var(--checked-icon-img);
-    background-size: 22.5px 14.5px;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
+    /* 단계 원 */
+    & .circle {
+      width: 74px;
+      height: 74px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: 8px solid transparent;
+      box-sizing: border-box;
+      background-clip: padding-box;
 
-  /* 현재 단계 (두꺼운 테두리) */
-  .step-now {
-    width: 74px;
-    height: 74px;
-    font-size: var(--font-size-lg);
-    border: 8px solid var(--body2-primary2-color);
+      /* 대기 */
+      &.yet {
+        background-color: var(--body2-progress-background-standby-color);
+        color: var(--body2-secondary2-color);
+      }
+
+      /* 지나침/완료 */
+      &.passed {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+
+        /* 현재 (테두리 표시) */
+        &.now { border-color: var(--body2-primary2-color); }
+      }
+    }
   }
 } /* @layer layout */
 
@@ -1250,6 +1241,7 @@
     .button {
       --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
       background: none;
+      background-clip: padding-box;
       position: relative;
       display: flex;
       box-sizing: border-box;
