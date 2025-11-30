@@ -182,7 +182,7 @@ export const VOLUME_VALUES = { 0: 0, 1: 0.5, 2: 0.75, 3: 1 };
 export const DEFAULT_ACCESSIBILITY = { isDark: false, isLow: false, isLarge: false, volume: 1 };
 
 const CFG = {
-  TTS_DELAY: 500,
+  TTS_DELAY: 100,
   IDLE_TIMEOUT: 300000,
   INTRO_TTS_TIME: 180,
   PAGE_FIRST: 'process1',
@@ -199,18 +199,18 @@ const PLACEHOLDER_MENU = { id: 0, name: "추가예정", price: "0", img: "item-a
 
 // TTS 스크립트
 export const TTS = {
-  intro: "안녕하세요,장애인, 비장애인 모두 사용 가능한 무인주문기입니다,시각 장애인을 위한 음성 안내와 키패드를 제공합니다,키패드는 손을 아래로 뻗으면 닿는 조작부 영역에 있으며, 돌출된 점자 및 테두리로 자세한 위치를 파악할 수 있습니다,키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다,",
+  intro: "안녕하세요,장애인, 비장애인 모두 사용 가능한 무인주문기입니다,시각 장애인을 위한 음성 안내와 키패드를 제공합니다,키패드는 손을 아래로 뻗으면 닿는 조작부 영역에 있으며, 돌출된 점자 및 테두리로 자세한 위치를 파악할 수 있습니다,키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다,취식방식 선택입니다. 포장하기, 먹고가기 버튼 두 개가 있습니다,",
   replay: REPLAY,
   return: "초기화면으로 돌아갑니다.",
   page1: () => `안내, 시작 단계, 음식을 포장할지 먹고갈지 선택합니다.${REPLAY}`,
   page2: () => `안내, 선택 단계, 카테고리에서 메뉴종류를 선택하시고, 메뉴에서 상품을 선택합니다, 초기화 버튼으로 상품을 다시 선택할 수 있습니다, 주문하기 버튼으로 다음 단계, 내역확인으로 이동 할 수 있습니다, ${REPLAY}`,
   page3: () => `안내, 내역 확인, 주문목록에서 상품명, 수량, 가격을 확인합니다, 수량 버튼 및 삭제 버튼으로 주문목록을 수정 할 수 있습니다. 추가하기 버튼으로 이전 단계, 메뉴선택으로 돌아갈 수 있습니다, 결제하기 버튼으로 다음 단계, 결제선택으로 이동할 수 있습니다,${REPLAY}`,
-  paySelect: (sum, fmt) => `작업 안내, 결제 단계, 결제 금액, ${fmt(sum)}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ${REPLAY}`,
+  paySelect: (sum, fmt) => `안내, 결제 단계, 결제 금액, ${fmt(sum)}원, 결제 방법을 선택합니다. 취소 버튼으로 이전 단계, 내역확인으로 돌아갈 수 있습니다. ${REPLAY}`,
   cardIn: `안내, 신용카드 삽입, 가운데 아래에 있는 카드리더기에 신용카드를 끝까지 넣습니다, 취소 버튼으로 이전 단계, 결제선택으로 이동 할 수 있습니다, ${REPLAY}`,
   mobile: `안내, 모바일페이, 가운데 아래에 있는 카드리더기에 휴대전화의 모바일페이를 켜고 접근시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${REPLAY}`,
   cardOut: `안내, 신용카드 제거, 신용카드를 뽑습니다, 정상적으로 결제되고 나서 카드가 제거되면, 자동으로 다음 작업, 인쇄 선택으로 이동합니다, 확인 버튼을 눌러 결제 상황을 확인합니다, ${REPLAY}`,
-  printSelect: (n) => `작업 안내, 인쇄 선택, 결제되었습니다, 주문번호 ${n}번, 왼쪽 아래의 프린터에서 주문표를 받으시고, 영수증 출력 여부를 선택합니다, 육십초 동안 조작이 없을 경우, 출력 안함으로 자동 선택됩니다,${REPLAY}`,
-  orderPrint: (n) => `작업 안내, 주문표, 주문번호, ${n}, 왼쪽 아래의 프린터에서 주문표가 출력됩니다. 인쇄가 완전히 끝나고 받습니다. 마무리하기 버튼으로 서비스 이용을 종료할 수 있습니다. ${REPLAY}`,
+  printSelect: (n) => `안내, 인쇄 선택, 결제되었습니다, 주문번호 ${n}번, 왼쪽 아래의 프린터에서 주문표를 받으시고, 영수증 출력 여부를 선택합니다, 육십초 동안 조작이 없을 경우, 출력 안함으로 자동 선택됩니다,${REPLAY}`,
+  orderPrint: (n) => `안내, 주문표, 주문번호, ${n}, 왼쪽 아래의 프린터에서 주문표가 출력됩니다. 인쇄가 완전히 끝나고 받습니다. 마무리하기 버튼으로 서비스 이용을 종료할 수 있습니다. ${REPLAY}`,
   receipt: `안내, 영수증 출력, 왼쪽 아래의 프린터에서 영수증을 받습니다, 마무리하기 버튼으로 사용을 종료할 수 있습니다,${REPLAY}`,
   finish: `안내, 사용종료, 이용해주셔서 감사합니다,`,
 };
@@ -560,8 +560,12 @@ export const useActiveElementTTS = (handleText, delay = CFG.TTS_DELAY, condition
     }
     
     const t = setTimeout(() => {
-      if (typeof document !== 'undefined' && document.activeElement?.dataset?.ttsText) {
-        handleText(document.activeElement.dataset.ttsText);
+      if (typeof document !== 'undefined' && document.activeElement) {
+        const el = document.activeElement;
+        const elTts = el.dataset?.ttsText || '';
+        const parentTts = el.parentElement?.dataset?.ttsText || '';
+        const fullTts = parentTts + elTts;
+        if (fullTts) handleText(fullTts);
       }
     }, delay);
     
@@ -1329,7 +1333,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel = "취�
   // 모달 열릴 때 TTS 안내
   useEffect(() => {
     if (isOpen && config?.tts) {
-      const t = setTimeout(() => handleText(config.tts + commonScript.replay), 300);
+      const t = setTimeout(() => handleText(config.tts + commonScript.replay), CFG.TTS_DELAY);
       return () => clearTimeout(t);
     }
   }, [isOpen, config, commonScript.replay, handleText]);
@@ -1510,7 +1514,10 @@ export const useMultiModalButtonHandler = (options = {}) => {
           nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
         }
         
-        if (buttons[nextIndex]) buttons[nextIndex].focus();
+        if (buttons[nextIndex]) {
+          buttons[nextIndex].focus();
+          // TTS는 focusin 이벤트에서 처리
+        }
       }
       
       // Tab 키 섹션 이동
@@ -1588,6 +1595,16 @@ export const useMultiModalButtonHandler = (options = {}) => {
     };
     const handleTouchCancel = (e) => handlePressState(e, 'remove');
     
+    // 버튼 포커스 시 TTS 재생 (마우스/키보드 공통)
+    const handleFocusIn = (e) => {
+      const btn = e.target?.closest?.('.button');
+      if (!btn) return;
+      const parentTts = btn.parentElement?.dataset?.ttsText || '';
+      const btnTts = btn.dataset?.ttsText || '';
+      if (parentTts || btnTts) finalHandleText(parentTts + btnTts);
+    };
+    
+    document.addEventListener('focusin', handleFocusIn, true);
     document.addEventListener('mousedown', handleMouseDown, true);
     document.addEventListener('mouseup', handleMouseUp, true);
     document.addEventListener('mouseleave', handleMouseLeave, true);
@@ -1596,6 +1613,7 @@ export const useMultiModalButtonHandler = (options = {}) => {
     document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     
     return () => {
+      document.removeEventListener('focusin', handleFocusIn, true);
       document.removeEventListener('mousedown', handleMouseDown, true);
       document.removeEventListener('mouseup', handleMouseUp, true);
       document.removeEventListener('mouseleave', handleMouseLeave, true);
@@ -2329,7 +2347,7 @@ const Process1 = memo(() => {
       <img src="./images/poster.png" className="poster" alt="" />
       <div className="hero">
         <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
-      <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>
+      <div className="task-manager" data-tts-text="취식방식 선택 영역입니다. 포장하기, 먹고가기 버튼이 있습니다. 좌우 방향키로 버튼을 선택하세요," ref={sections.middle}>
           <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
           <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
         </div>
@@ -2754,7 +2772,7 @@ const Process4 = memo(() => {
         <div data-tts-text="작업 관리, 버튼 한 개," className="main forth" ref={sections.bottom}>
           <PageTitle>
             <div>왼쪽 아래의 <span className={highlight}>프린터</span>에서 <span className={highlight}>영수증</span>을</div>
-            <div>받으시고<span className={highlight}>마무리</span>&nbsp;버튼을 누르세요</div>
+            <div>받으시고 <span className={highlight}>마무리</span>&nbsp;버튼을 누르세요</div>
           </PageTitle>
           <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
           <Button ttsText="마무리하기" className="w500h120" actionType="finish" label={`마무리${countdown}`} />
@@ -2785,9 +2803,9 @@ Process4.displayName = 'Process4';
 const Black = memo(() => <div className="black"></div>);
 Black.displayName = 'Black';
 
-const PageTTS = memo(() => {
-  const { isCreditPayContent, currentPage, sections, totalSum } = useContext(AppContext);
-  const { handleText } = useTTS();
+const Top = memo(() => {
+  const { isCreditPayContent, currentPage, sections, totalSum, volume } = useContext(AppContext);
+  const { handleText } = useTextHandler(volume);
   
   const pageText = useMemo(() => {
     switch (currentPage) {
@@ -2812,25 +2830,27 @@ const PageTTS = memo(() => {
     }
   }, [currentPage, isCreditPayContent, totalSum]);
   
-  // 페이지/단계 변경 시 TTS 재생
+  // 페이지 변경 시 TTS 재생 (결제 페이지는 FourthPage에서 별도 처리)
   useEffect(() => {
-    if (pageText && currentPage !== PAGE_CONFIG.FIRST) {
-      const t = setTimeout(() => handleText(pageText), 300);
+    if (pageText && currentPage !== PAGE_CONFIG.FIRST && currentPage !== PAGE_CONFIG.FOURTH) {
+      const t = setTimeout(() => handleText(pageText), CFG.TTS_DELAY);
       return () => clearTimeout(t);
     }
-  }, [currentPage, isCreditPayContent, pageText, handleText]);
+  }, [currentPage, pageText, handleText]);
   
   return (
-    <div className="hidden-div" ref={sections.page}>
-      <button
-        type="hidden"
-        className="hidden-btn page-btn"
-        data-tts-text={pageText}
-      />
+    <div className="top">
+      <div className="hidden-div" ref={sections.page}>
+        <button
+          type="hidden"
+          className="hidden-btn page-btn"
+          data-tts-text={pageText}
+        />
+      </div>
     </div>
   );
 });
-PageTTS.displayName = 'PageTTS';
+Top.displayName = 'Top';
 
 // 단계 표시 아이템 컴포넌트
 // Step 공통 클래스 헬퍼
@@ -3069,7 +3089,7 @@ const AccessibilityModal = memo(() => {
   // 모달 열릴 때 TTS 안내
   useEffect(() => {
     if (ModalAccessibility.isOpen) {
-      const t = setTimeout(() => handleText("알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, " + commonScript.replay), 300);
+      const t = setTimeout(() => handleText("알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, " + commonScript.replay), CFG.TTS_DELAY);
       return () => clearTimeout(t);
     }
   }, [ModalAccessibility.isOpen, handleText, commonScript.replay]);
@@ -3238,7 +3258,7 @@ const Layout = ({ children }) => {
   return (
     <>
       <Black />
-      <PageTTS />
+      <Top />
       {render.step && <Step />}
       {render.main && children}
       {render.summary && <Summary />}
