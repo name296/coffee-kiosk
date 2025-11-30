@@ -2329,12 +2329,12 @@ const Process1 = memo(() => {
       <img src="./images/poster.png" className="poster" alt="" />
       <div className="hero">
         <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
-        <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>     
+      <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>
           <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
           <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
         </div>
         <p>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</p>
-      </div>      
+      </div>
     </div>
   );
 });
@@ -2787,6 +2787,8 @@ Black.displayName = 'Black';
 
 const PageTTS = memo(() => {
   const { isCreditPayContent, currentPage, sections, totalSum } = useContext(AppContext);
+  const { handleText } = useTTS();
+  
   const pageText = useMemo(() => {
     switch (currentPage) {
       case PAGE_CONFIG.FIRST: return PAGE_MESSAGES.FIRST.FULL();
@@ -2810,12 +2812,19 @@ const PageTTS = memo(() => {
     }
   }, [currentPage, isCreditPayContent, totalSum]);
   
+  // 페이지/단계 변경 시 TTS 재생
+  useEffect(() => {
+    if (pageText && currentPage !== PAGE_CONFIG.FIRST) {
+      const t = setTimeout(() => handleText(pageText), 300);
+      return () => clearTimeout(t);
+    }
+  }, [currentPage, isCreditPayContent, pageText, handleText]);
+  
   return (
     <div className="hidden-div" ref={sections.page}>
       <button
         type="hidden"
         className="hidden-btn page-btn"
-        autoFocus={currentPage !== PAGE_CONFIG.FIRST}
         data-tts-text={pageText}
       />
     </div>
@@ -3060,7 +3069,7 @@ const AccessibilityModal = memo(() => {
   // 모달 열릴 때 TTS 안내
   useEffect(() => {
     if (ModalAccessibility.isOpen) {
-      const t = setTimeout(() => handleText("오버레이, 접근성 설정, " + commonScript.replay), 300);
+      const t = setTimeout(() => handleText("알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, " + commonScript.replay), 300);
       return () => clearTimeout(t);
     }
   }, [ModalAccessibility.isOpen, handleText, commonScript.replay]);
