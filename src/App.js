@@ -28,7 +28,7 @@ import "./App.css";
 import menuData from "./menuData";
 
 // Components
-import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon } from "./Icon";
+import Icon, { TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon, AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon, StepIcon } from "./Icon";
 
 // ============================================================================
 // 유틸리티
@@ -2327,10 +2327,12 @@ const Process1 = memo(() => {
   return (
     <div className="main first">
       <img src="./images/poster.png" className="poster" alt="" />
+      <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
       <div className="task-manager" data-tts-text="취식방식, 버튼 두개," ref={sections.middle}>
-        <Button className="w285h285" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
-        <Button className="w285h285" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
+        <Button className="w285h285 secondary1" ttsText="포장하기" svg={<TakeoutIcon />} label="포장하기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />
+        <Button className="w285h285 secondary1" ttsText="먹고가기" svg={<TakeinIcon />} label="먹고가기" actionType="navigate" actionTarget={PAGE_CONFIG.SECOND} />     
       </div>
+      <p>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</p>
     </div>
   );
 });
@@ -2706,24 +2708,23 @@ const Process4 = memo(() => {
         <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
           <PageTitle>
             <div>가운데 아래에 있는 <span className={highlight}>카드리더기</span>에</div>
-            <div>휴대전화의 <span className={highlight}>모바일페이</span>를 켜고 접근시키세요</div>
+            <div><span className={highlight}>모바일페이</span>를 켜고 접근시키세요</div>
           </PageTitle>
           <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(4)} />
           <Button ttsText="취소" className="w500h120" actionType="cancel" label="취소" />
         </div>
       );
       case 3: return (
-        <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth">
-          <PageTitle><span><span className={highlight}>신용카드</span>를 뽑으세요.</span></PageTitle>
+        <div data-tts-text="작업 관리, 버튼 한 개," ref={sections.bottom} className="main forth card-remove">
+          <PageTitle><span><span className={highlight}>카드</span>를 뽑으세요.</span></PageTitle>
           <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" onClick={() => setIsCreditPayContent(4)} />
         </div>
       );
       case 4: return (
         <div data-tts-text="인쇄 선택, 버튼 두 개," ref={sections.bottom} className="main forth">
           <PageTitle>
-            <span className={highlight}>결제되었습니다</span>
-            <div>왼쪽 아래의 프린터에서 <span className={highlight}>주문표</span>를 받으시고</div>
-            <div><span className={highlight}>영수증 출력</span>을 선택하세요</div>
+            <div>왼쪽 아래의 프린터에서 <span className={highlight}>주문표</span>를</div>
+            <div>받으시고 <span className={highlight}>영수증 출력</span>을 선택하세요</div>
           </PageTitle>
           <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
           <div className="order-num">
@@ -2750,8 +2751,8 @@ const Process4 = memo(() => {
       case 6: return (
         <div data-tts-text="작업 관리, 버튼 한 개," className="main forth" ref={sections.bottom}>
           <PageTitle>
-            <div>왼쪽 아래의 <span className={highlight}>프린터</span>에서 <span className={highlight}>영수증</span>을 받으시고</div>
-            <div><span className={highlight}>마무리하기</span>&nbsp;버튼을 누르세요</div>
+            <div>왼쪽 아래의 <span className={highlight}>프린터</span>에서 <span className={highlight}>영수증</span>을</div>
+            <div>받으시고<span className={highlight}>마무리</span>&nbsp;버튼을 누르세요</div>
           </PageTitle>
           <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
           <Button ttsText="마무리하기" className="w500h120" actionType="finish" label={`마무리${countdown}`} />
@@ -2826,19 +2827,19 @@ Top.displayName = 'Top';
 const StepItem = ({ num, label, active, checked }) => (
   <li className="step">
     {checked 
-      ? <div className="checked-circle" />
-      : <div className={active ? "border-circle" : "header-black-circle"}>{num}</div>
+      ? <div className="step-complete" />
+      : <div className={active ? "step-now" : "step-yet"}>{num}</div>
     }
     <span>{label}</span>
-    <span className={active ? "active step-separator" : "step-separator"}>›</span>
+    <span className={active ? "active step-separator" : "step-separator"}><StepIcon /></span>
   </li>
 );
 
 const StepLast = ({ num, label, checked }) => (
   <li className="step">
     {checked 
-      ? <div className="checked-circle" />
-      : <div className="border-circle">{num}</div>
+      ? <div className="step-complete" />
+      : <div className="step-yet">{num}</div>
     }
     <span>{label}</span>
   </li>
@@ -2949,7 +2950,7 @@ const Summary = memo(() => {
               actionTarget="Reset"
             />
             <Button
-              className="w199h090"
+              className="w199h090 primary1"
               ttsText={`주문하기, ${isDisabledBtn ? "비활성" : ""}`}
               svg={<OrderIcon className="summary-btn-icon" />}
               label="주문"
@@ -2970,7 +2971,7 @@ const Summary = memo(() => {
               actionTarget={PAGE_CONFIG.SECOND}
             />
             <Button
-              className="w199h090"
+              className="w199h090 primary1"
               ttsText="결제하기,"
               svg={<PayIcon className="summary-btn-icon" />}
               label="결제"
@@ -3144,13 +3145,13 @@ const AccessibilityModal = memo(() => {
           <div className="setting-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, " ref={sections.AccessibilitySections1}>
             <span className="setting-name">초기설정으로 일괄선택</span>
             <div className="task-manager">
-              <Button svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
+              <Button className="w242h076" svg={<Icon name="Restart" />} label="초기설정" ttsText="초기설정," onClick={handleInitialSettingsPress} />
             </div>
           </div>
           <hr className="setting-line" />
           {/* 고대비화면 */}
           <div className="setting-row">
-            <span className="setting-name"><Icon name="Contrast" />고대비화면</span>
+            <span className="setting-name"><span className="icon"><Icon name="Contrast" /></span>고대비화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections2} data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark}, 버튼 두 개,`}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isDark ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isDark} onClick={() => handleDarkChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isDark ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isDark} onClick={() => handleDarkChange(true)} className="w113h076" />
@@ -3159,7 +3160,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 소리크기 */}
           <div className="setting-row">
-            <span className="setting-name"><Icon name="Volume" />소리크기</span>
+            <span className="setting-name"><span className="icon"><Icon name="Volume" /></span>소리크기</span>
             <div className="task-manager" ref={sections.AccessibilitySections3} data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
               {[0, 1, 2, 3].map((vol) => (
                 <ToggleButton key={vol} label={VOLUME_MAP[vol]} ttsText={`${VOLUME_MAP[vol]}, ${currentSettings.volume === vol ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.volume === vol} onClick={() => handleVolumeChange(vol)} className="w070h076" />
@@ -3169,7 +3170,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 큰글씨화면 */}
           <div className="setting-row">
-            <span className="setting-name"><Icon name="Large" />큰글씨화면</span>
+            <span className="setting-name"><span className="icon"><Icon name="Large" /></span>큰글씨화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections4} data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large}, 버튼 두 개, `}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLarge ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLarge} onClick={() => handleLargeChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLarge ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLarge} onClick={() => handleLargeChange(true)} className="w113h076" />
@@ -3178,7 +3179,7 @@ const AccessibilityModal = memo(() => {
           <hr className="setting-line" />
           {/* 낮은화면 */}
           <div className="setting-row">
-            <span className="setting-name"><Icon name="Wheelchair" />낮은화면</span>
+            <span className="setting-name"><span className="icon"><Icon name="Wheelchair" /></span>낮은화면</span>
             <div className="task-manager" ref={sections.AccessibilitySections5} data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low}, 버튼 두 개, `}>
               <ToggleButton label="끔" ttsText={`끔, ${currentSettings.isLow ? '선택가능, ' : '선택됨, '}`} isPressed={!currentSettings.isLow} onClick={() => handleLowChange(false)} className="w113h076" />
               <ToggleButton label="켬" ttsText={`켬, ${currentSettings.isLow ? '선택됨, ' : '선택가능, '}`} isPressed={currentSettings.isLow} onClick={() => handleLowChange(true)} className="w113h076" />
