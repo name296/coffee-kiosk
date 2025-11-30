@@ -3,23 +3,23 @@
 // ============================================================================
 //
 // [구조 순서 - 서비스 구성 절차]
-// 1. 유틸리티 (38행~)       - 헬퍼 함수, 포맷터, 스토리지
-// 2. 상수 (48행~)           - CFG, PAY, TTS, VOLUME 등
-// 3. Hooks (83행~)          - 상태/로직 훅 (메뉴, 사운드, TTS, 타이머 등)
-// 4. Button/Modal (218행~)  - 핵심 UI 컴포넌트
-// 5. Contexts (387행~)      - 상태 관리 Provider
-// 6. UI 컴포넌트 (472행~)   - CategoryNav, MenuGrid, Pagination 등
+// 1. 유틸리티 (37행~)        - 헬퍼 함수, 포맷터, 스토리지
+// 2. 상수 (184행~)           - CFG, PAY, TTS, VOLUME 등
+// 3. Hooks (220행~)          - 상태/로직 훅 (메뉴, 사운드, TTS, 타이머 등)
+// 4. Button/Modal (1145행~)  - 핵심 UI 컴포넌트
+// 5. Contexts (1629행~)      - 상태 관리 Provider
+// 6. UI 컴포넌트 (2049행~)   - CategoryNav, MenuGrid, Pagination 등
 //
 // [사용 흐름 - Process 순서]
-// Process1 (636행) → 시작화면 (포장/매장 선택)
-// Process2 (682행) → 메뉴선택 (카테고리, 메뉴그리드)
-// Process3 (762행) → 주문확인 (수량조절, 삭제)
-// Process4 (826행) → 결제 (카드/모바일, 영수증)
+// Process1 (2289행) → 시작화면 (포장/매장 선택)
+// Process2 (2335행) → 메뉴선택 (카테고리, 메뉴그리드)
+// Process3 (2465행) → 주문확인 (수량조절, 삭제)
+// Process4 (2601행) → 결제 (카드/모바일, 영수증)
 //
 // [레이아웃]
-// Top/Step/Summary/Bottom (940행~) - 공통 프레임
-// AccessibilityModal (1018행~) - 접근성 설정
-// Layout/App (1172행~) - 메인 조립
+// Top/Step/Summary/Bottom (2764행~) - 공통 프레임
+// AccessibilityModal (2999행~) - 접근성 설정
+// Layout/App (3186행~) - 메인 조립
 // ============================================================================
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, createContext, useContext, memo } from "react";
@@ -1316,9 +1316,17 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel = "취�
   const { sections, volume, commonScript } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { containerRef } = useFocusTrap(isOpen);
-  useActiveElementTTS(handleText, 500, isOpen);
   
   const config = MODAL_CONFIG[type];
+  
+  // 모달 열릴 때 TTS 안내
+  useEffect(() => {
+    if (isOpen && config?.tts) {
+      const t = setTimeout(() => handleText(config.tts + commonScript.replay), 300);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen, config, commonScript.replay, handleText]);
+  
   if (!isOpen || !config) return null;
   
   return (
@@ -2087,8 +2095,21 @@ export const FOCUS_SECTIONS = SECTION;
 export const DEFAULT_SETTINGS = DEFAULT;
 export const ERROR_MESSAGES = ERROR;
 export const commonScript = TTS;
-export const PAGE_MESSAGES = { FIRST: { FULL: TTS.page1 }, SECOND: { FULL: TTS.page2 }, THIRD: { FULL: TTS.page3 } };
-export const PAYMENT_MESSAGES = { SELECT_METHOD: TTS.paySelect, CARD_INSERT: TTS.cardIn, MOBILE_PAY: TTS.mobile, CARD_REMOVE: TTS.cardOut, PRINT_SELECT: TTS.printSelect, ORDER_PRINT: TTS.orderPrint, RECEIPT_PRINT: TTS.receipt, FINISH: TTS.finish };
+export const PAGE_MESSAGES = {
+  FIRST: { FULL: TTS.page1 },
+  SECOND: { FULL: TTS.page2 },
+  THIRD: { FULL: TTS.page3 }
+};
+export const PAYMENT_MESSAGES = {
+  SELECT_METHOD: TTS.paySelect,
+  CARD_INSERT: TTS.cardIn,
+  MOBILE_PAY: TTS.mobile,
+  CARD_REMOVE: TTS.cardOut,
+  PRINT_SELECT: TTS.printSelect,
+  ORDER_PRINT: TTS.orderPrint,
+  RECEIPT_PRINT: TTS.receipt,
+  FINISH: TTS.finish
+};
 export const LAYOUT_COMPONENTS = LAYOUT;
 export const LAYOUT_ASSEMBLY_CONTEXT = { conditions: LAYOUT_COND };
 
@@ -2319,30 +2340,63 @@ const Process2 = memo(() => {
   } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { stopIntroTimer } = useTimer();
-  const { blurActiveElement, getActiveElementText } = useSafeDocument();
+  const { blurActiveElement } = useSafeDocument();
 
-  useEffect(() => { const t = setTimeout(() => setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB), 0); return () => clearTimeout(t); }, []); // eslint-disable-line
-
+  // 기본 탭 설정
   useEffect(() => {
-    stopIntroTimer(); blurActiveElement();
-    const t = setTimeout(() => { const p = getActiveElementText(); if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY); }, 0);
+    const t = setTimeout(() => setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB), 0);
     return () => clearTimeout(t);
-  }, [handleText, blurActiveElement, getActiveElementText, stopIntroTimer]);
+  }, []); // eslint-disable-line
+
+  // 페이지 진입 시 TTS 안내
+  useEffect(() => {
+    stopIntroTimer();
+    blurActiveElement();
+    const t = setTimeout(() => handleText(PAGE_MESSAGES.SECOND.FULL()), TIMER_CONFIG.TTS_DELAY);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line
 
   useMultiModalButtonHandler({
     initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.TOP, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.FOOTER, FOCUS_SECTIONS.BOTTOM_FOOTER],
     initFirstButtonSection: FOCUS_SECTIONS.TOP, enableGlobalHandlers: false, enableKeyboardNavigation: true
   });
 
-  const { pageNumber, totalPages, currentItems, handlePrevPage, handleNextPage, resetOnChange } = usePagination(menuItems, PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL, PAGINATION_CONFIG.ITEMS_PER_PAGE_LOW, isLow);
-  useEffect(() => { const t = setTimeout(() => resetOnChange(), 0); return () => clearTimeout(t); }, [selectedTab]); // eslint-disable-line
+  const {
+    pageNumber, totalPages, currentItems,
+    handlePrevPage, handleNextPage, resetOnChange
+  } = usePagination(
+    menuItems,
+    PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL,
+    PAGINATION_CONFIG.ITEMS_PER_PAGE_LOW,
+    isLow
+  );
+  
+  // 탭 변경 시 페이지 리셋
+  useEffect(() => {
+    const t = setTimeout(() => resetOnChange(), 0);
+    return () => clearTimeout(t);
+  }, [selectedTab]); // eslint-disable-line
 
   const handleTouchEndWrapper = useCallback((e, id) => {
-    if (id !== DISABLED_MENU_ID) { handleIncrease(id); handleText('담기, '); } else { handleText(ERROR_MESSAGES.NO_PRODUCT); }
+    if (id !== DISABLED_MENU_ID) {
+      handleIncrease(id);
+      handleText('담기, ');
+    } else {
+      handleText(ERROR_MESSAGES.NO_PRODUCT);
+    }
   }, [handleIncrease, handleText]);
 
-  const handlePaginationPress = useCallback((e, dir) => { e.preventDefault(); e.target.focus(); dir === 'prev' ? handlePrevPage() : handleNextPage(); }, [handlePrevPage, handleNextPage]);
-  const handleMenuItemPress = useCallback((e, id) => { e.preventDefault(); e.target.focus(); handleTouchEndWrapper(e, id); }, [handleTouchEndWrapper]);
+  const handlePaginationPress = useCallback((e, dir) => {
+    e.preventDefault();
+    e.target.focus();
+    dir === 'prev' ? handlePrevPage() : handleNextPage();
+  }, [handlePrevPage, handleNextPage]);
+  
+  const handleMenuItemPress = useCallback((e, id) => {
+    e.preventDefault();
+    e.target.focus();
+    handleTouchEndWrapper(e, id);
+  }, [handleTouchEndWrapper]);
 
   // 카테고리 탭 데이터
   const allTabs = useMemo(() => (categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [categoryInfo]);
@@ -2409,27 +2463,100 @@ Process2.displayName = 'Process2';
 // ============================================================================
 
 const Process3 = memo(() => {
-  const { sections, totalMenuItems, isDark, isLow, quantities, handleIncrease, handleDecrease, filterMenuItems, ModalDelete, ModalDeleteCheck, setModalDeleteItemId, volume, convertToKoreanQuantity, setCurrentPage } = useContext(AppContext);
+  const {
+    sections, totalMenuItems, isDark, isLow, quantities,
+    handleIncrease, handleDecrease, filterMenuItems,
+    ModalDelete, ModalDeleteCheck, setModalDeleteItemId,
+    volume, convertToKoreanQuantity, setCurrentPage
+  } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
-  const priceItems = useMemo(() => filterMenuItems(totalMenuItems, quantities), [totalMenuItems, quantities, filterMenuItems]);
-  const { pageNumber, totalPages, currentItems, handlePrevPage, handleNextPage, itemsPerPage } = usePagination(priceItems, 6, 3, isLow);
-  const startIndex = useMemo(() => (pageNumber - 1) * itemsPerPage, [pageNumber, itemsPerPage]);
-  const prependRows = useCallback((arr, cnt) => [FOCUS_SECTIONS.PAGE, ...Array.from({ length: cnt }, (_, i) => `row${i + 1}`), ...arr], []);
-  const focusableSections = useMemo(() => prependRows([FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.FOOTER, FOCUS_SECTIONS.BOTTOM_FOOTER], currentItems.length), [currentItems.length, prependRows]);
-  const { updateFocusableSections } = useMultiModalButtonHandler({ initFocusableSections: focusableSections, initFirstButtonSection: "row1", enableGlobalHandlers: false, enableKeyboardNavigation: true });
+  
+  const priceItems = useMemo(
+    () => filterMenuItems(totalMenuItems, quantities),
+    [totalMenuItems, quantities, filterMenuItems]
+  );
+  const {
+    pageNumber, totalPages, currentItems,
+    handlePrevPage, handleNextPage, itemsPerPage
+  } = usePagination(priceItems, 6, 3, isLow);
+  const startIndex = useMemo(
+    () => (pageNumber - 1) * itemsPerPage,
+    [pageNumber, itemsPerPage]
+  );
+  
+  const prependRows = useCallback((arr, cnt) => [
+    FOCUS_SECTIONS.PAGE,
+    ...Array.from({ length: cnt }, (_, i) => `row${i + 1}`),
+    ...arr
+  ], []);
+  
+  const focusableSections = useMemo(
+    () => prependRows(
+      [FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.FOOTER, FOCUS_SECTIONS.BOTTOM_FOOTER],
+      currentItems.length
+    ),
+    [currentItems.length, prependRows]
+  );
+  
+  const { updateFocusableSections } = useMultiModalButtonHandler({
+    initFocusableSections: focusableSections,
+    initFirstButtonSection: "row1",
+    enableGlobalHandlers: false,
+    enableKeyboardNavigation: true
+  });
 
   const handleTouchDecrease = useCallback((id) => {
-    if (quantities[id] === 1) { setModalDeleteItemId(id); currentItems.length > 1 ? ModalDelete.open() : ModalDeleteCheck.open(); } else { handleDecrease(id); }
+    if (quantities[id] === 1) {
+      setModalDeleteItemId(id);
+      currentItems.length > 1 ? ModalDelete.open() : ModalDeleteCheck.open();
+    } else {
+      handleDecrease(id);
+    }
   }, [quantities, currentItems.length, setModalDeleteItemId, ModalDelete, ModalDeleteCheck, handleDecrease]);
-  const handleTouchDelete = useCallback((id) => { setModalDeleteItemId(id); currentItems.length > 1 ? ModalDelete.open() : ModalDeleteCheck.open(); }, [currentItems.length, setModalDeleteItemId, ModalDelete, ModalDeleteCheck]);
-  const handleQuantityPress = useCallback((e, id, act) => { e.preventDefault(); e.currentTarget.focus(); act === 'decrease' ? handleTouchDecrease(id) : handleIncrease(id); }, [handleTouchDecrease, handleIncrease]);
-  const handleDeletePress = useCallback((e, id) => { e.preventDefault(); e.currentTarget.focus(); handleTouchDelete(id); }, [handleTouchDelete]);
-  const handlePaginationPress = useCallback((e, dir) => { e.preventDefault(); e.target.focus(); dir === 'prev' ? handlePrevPage() : handleNextPage(); }, [handlePrevPage, handleNextPage]);
+  
+  const handleTouchDelete = useCallback((id) => {
+    setModalDeleteItemId(id);
+    currentItems.length > 1 ? ModalDelete.open() : ModalDeleteCheck.open();
+  }, [currentItems.length, setModalDeleteItemId, ModalDelete, ModalDeleteCheck]);
+  
+  const handleQuantityPress = useCallback((e, id, act) => {
+    e.preventDefault();
+    e.currentTarget.focus();
+    act === 'decrease' ? handleTouchDecrease(id) : handleIncrease(id);
+  }, [handleTouchDecrease, handleIncrease]);
+  
+  const handleDeletePress = useCallback((e, id) => {
+    e.preventDefault();
+    e.currentTarget.focus();
+    handleTouchDelete(id);
+  }, [handleTouchDelete]);
+  
+  const handlePaginationPress = useCallback((e, dir) => {
+    e.preventDefault();
+    e.target.focus();
+    dir === 'prev' ? handlePrevPage() : handleNextPage();
+  }, [handlePrevPage, handleNextPage]);
 
-  useEffect(() => { updateFocusableSections(focusableSections); }, [pageNumber, focusableSections, updateFocusableSections]);
-  useEffect(() => { if (currentItems.length === 0) { const t = setTimeout(() => setCurrentPage(PAGE_CONFIG.SECOND), 0); return () => clearTimeout(t); } }, [currentItems.length]); // eslint-disable-line
-  const { blurActiveElement, getActiveElementText } = useSafeDocument();
-  useEffect(() => { blurActiveElement(); const t = setTimeout(() => { const p = getActiveElementText(); if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY); }, 0); return () => clearTimeout(t); }, [handleText, blurActiveElement, getActiveElementText]);
+  useEffect(() => {
+    updateFocusableSections(focusableSections);
+  }, [pageNumber, focusableSections, updateFocusableSections]);
+  
+  // 아이템 없으면 메뉴선택으로 이동
+  useEffect(() => {
+    if (currentItems.length === 0) {
+      const t = setTimeout(() => setCurrentPage(PAGE_CONFIG.SECOND), 0);
+      return () => clearTimeout(t);
+    }
+  }, [currentItems.length]); // eslint-disable-line
+  
+  const { blurActiveElement } = useSafeDocument();
+  
+  // 페이지 진입 시 TTS 안내
+  useEffect(() => {
+    blurActiveElement();
+    const t = setTimeout(() => handleText(PAGE_MESSAGES.THIRD.FULL()), TIMER_CONFIG.TTS_DELAY);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line
 
   return (
     <div className="main third">
@@ -2472,15 +2599,61 @@ Process3.displayName = 'Process3';
 // ============================================================================
 
 const Process4 = memo(() => {
-  const { sections, totalSum, isLow, setIsLow, isDark, setIsDark, isCreditPayContent, setIsCreditPayContent, totalMenuItems, quantities, setQuantities, volume, setVolume, isLarge, setIsLarge, ModalReturn, ModalAccessibility, setCurrentPage } = useContext(AppContext);
+  const {
+    sections, totalSum, isLow, setIsLow, isDark, setIsDark,
+    isCreditPayContent, setIsCreditPayContent,
+    totalMenuItems, quantities, setQuantities,
+    volume, setVolume, isLarge, setIsLarge,
+    ModalReturn, ModalAccessibility, setCurrentPage
+  } = useContext(AppContext);
   const { handleText } = useTextHandler(volume);
   const { orderNum, updateOrderNumber } = useOrderNumber();
-  const countdown = usePaymentCountdown({ isCreditPayContent, setIsCreditPayContent, ModalReturn, ModalAccessibility, setQuantities, totalMenuItems, setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage });
+  
+  const countdown = usePaymentCountdown({
+    isCreditPayContent, setIsCreditPayContent,
+    ModalReturn, ModalAccessibility,
+    setQuantities, totalMenuItems,
+    setIsDark, setVolume, setIsLarge, setIsLow, setCurrentPage
+  });
+  
   useWebViewMessage(setIsCreditPayContent);
-  useEffect(() => { setIsCreditPayContent(PAY_STEP.SELECT_METHOD); }, []); // eslint-disable-line
-  const { querySelector, getActiveElementText } = useSafeDocument();
-  useEffect(() => { const btn = querySelector('.hidden-btn.page-btn'); if (btn) { btn.focus(); const p = getActiveElementText(); if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY); } }, [isCreditPayContent, querySelector, getActiveElementText, handleText]);
-  useMultiModalButtonHandler({ initFocusableSections: [FOCUS_SECTIONS.PAGE, FOCUS_SECTIONS.MIDDLE, FOCUS_SECTIONS.BOTTOM, FOCUS_SECTIONS.BOTTOM_FOOTER], initFirstButtonSection: FOCUS_SECTIONS.PAGE, enableGlobalHandlers: false, enableKeyboardNavigation: true });
+  
+  // 초기 결제 단계 설정
+  useEffect(() => {
+    setIsCreditPayContent(PAY_STEP.SELECT_METHOD);
+  }, []); // eslint-disable-line
+  
+  // 결제 단계별 TTS 안내
+  useEffect(() => {
+    const oNum = safeParseInt(safeLocalStorage.getItem("ordernum"), 0);
+    const ttsMap = {
+      [PAYMENT_STEPS.SELECT_METHOD]: PAYMENT_MESSAGES.SELECT_METHOD(totalSum, formatNumber),
+      [PAYMENT_STEPS.CARD_INSERT]: PAYMENT_MESSAGES.CARD_INSERT,
+      [PAYMENT_STEPS.MOBILE_PAY]: PAYMENT_MESSAGES.MOBILE_PAY,
+      [PAYMENT_STEPS.CARD_REMOVE]: PAYMENT_MESSAGES.CARD_REMOVE,
+      [PAYMENT_STEPS.PRINT_SELECT]: PAYMENT_MESSAGES.PRINT_SELECT(oNum),
+      [PAYMENT_STEPS.ORDER_PRINT]: PAYMENT_MESSAGES.ORDER_PRINT(oNum),
+      [PAYMENT_STEPS.RECEIPT_PRINT]: PAYMENT_MESSAGES.RECEIPT_PRINT,
+      [PAYMENT_STEPS.FINISH]: PAYMENT_MESSAGES.FINISH,
+    };
+    const tts = ttsMap[isCreditPayContent];
+    if (tts) {
+      const t = setTimeout(() => handleText(tts), TIMER_CONFIG.TTS_DELAY);
+      return () => clearTimeout(t);
+    }
+  }, [isCreditPayContent, totalSum, handleText]);
+  
+  useMultiModalButtonHandler({
+    initFocusableSections: [
+      FOCUS_SECTIONS.PAGE,
+      FOCUS_SECTIONS.MIDDLE,
+      FOCUS_SECTIONS.BOTTOM,
+      FOCUS_SECTIONS.BOTTOM_FOOTER
+    ],
+    initFirstButtonSection: FOCUS_SECTIONS.PAGE,
+    enableGlobalHandlers: false,
+    enableKeyboardNavigation: true
+  });
 
   // 접근성 줄바꿈 헬퍼
   const brLarge = isLow && isLarge ? <br /> : '';
@@ -2804,7 +2977,18 @@ const Bottom = memo(() => {
   const showHome = !(currentPage === "" || (currentPage === PAGE_CONFIG.FOURTH && [1,2,3].includes(isCreditPayContent)));
   return (
     <div className="bottom" data-tts-text={showHome ? "시스템 설정, 버튼 두 개," : "시스템 설정, 버튼 한개,"} ref={sections.bottomfooter}>
-      {showHome ? <Button className="down-footer-button btn-home" ttsText="처음으로," svg={<HomeIcon />} label="처음으로" actionType="modal" actionTarget="Return" /> : <div className="footer-coffeelogo"></div>}
+      {showHome ? (
+        <Button
+          className="down-footer-button btn-home"
+          ttsText="처음으로,"
+          svg={<HomeIcon />}
+          label="처음으로"
+          actionType="modal"
+          actionTarget="Return"
+        />
+      ) : (
+        <div className="footer-coffeelogo"></div>
+      )}
       {isActive && <div className="countdown"><span>{remainingTimeFormatted}</span></div>}
       <Button className="down-footer-button" ttsText="접근성," svg={<WheelchairIcon />} label="접근성" actionType="modal" actionTarget="Accessibility" />
     </div>
@@ -2861,7 +3045,13 @@ const AccessibilityModal = memo(() => {
     getStatusText
   } = useAccessibilitySettings({ isDark, isLow, isLarge, volume });
 
-  useActiveElementTTS(handleText, 500, ModalAccessibility.isOpen);
+  // 모달 열릴 때 TTS 안내
+  useEffect(() => {
+    if (ModalAccessibility.isOpen) {
+      const t = setTimeout(() => handleText("오버레이, 접근성 설정, " + commonScript.replay), 300);
+      return () => clearTimeout(t);
+    }
+  }, [ModalAccessibility.isOpen, handleText, commonScript.replay]);
 
   // 즉시 적용 핸들러들
   const handleDarkChange = useCallback((val) => {
