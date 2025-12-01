@@ -1265,7 +1265,7 @@
       gap: var(--spacing-xs);
       min-width: 70px;
       min-height: 76px;
-      padding-inline: calc(var(--min-side) * 0.125);
+      padding: calc(var(--min-side) * 0.0625);
       outline-offset: calc(var(--min-side) * -0.03125);
       border-radius: calc(var(--min-side) * 0.0625);
       border: calc(var(--min-side) * 0.03125) solid var(--primary2-border-color-default);
