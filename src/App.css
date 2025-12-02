@@ -656,7 +656,9 @@
       }
     }
 
-    &.second { justify-content: space-evenly; }
+    &.second {
+      justify-content: space-evenly;
+    }
 
     &.third { 
       padding-bottom: 100px;
@@ -758,8 +760,8 @@
 
   /* ========================================
      Step Progress Bar
-     구조: .step > .circle + .label + .separator
-     상태: .yet (대기) / .passed (지나침) / .passed.now (현재)
+     구조: .step > .step-num + .step-name + .separator
+     상태: .standby (대기) / .progress (진행) / .progress.current (현재)
      ======================================== */
   .step {
     display: flex;
@@ -769,18 +771,8 @@
     align-items: center;
     justify-content: space-evenly;
 
-    /* 공통: 대기 상태 색상 */
-    & .label,
-    & .separator {
-      flex-shrink: 0;
-      color: var(--body2-secondary2-color);
-
-      /* 지나침 상태 색상 */
-      &.passed { color: var(--body2-primary1-color); }
-    }
-
-    /* 단계 원 */
-    & .circle {
+    /* 단계 번호 */
+    & .step-num {
       width: 74px;
       height: 74px;
       display: flex;
@@ -791,23 +783,29 @@
       border: 8px solid transparent;
       box-sizing: border-box;
       background-clip: padding-box;
+      background-color: var(--body2-progress-background-standby-color);
+      color: var(--body2-secondary2-color);
 
-      /* 숫자/체크 (색상 상속) */
-      & .num { color: inherit; }
-
-      /* 대기 */
-      &.yet {
-        background-color: var(--body2-progress-background-standby-color);
-        color: var(--body2-secondary2-color);
-      }
-
-      /* 지나침/완료 */
-      &.passed {
+      /* 진행 상태 */
+      &.progress {
         background-color: var(--body2-primary1-color);
         color: var(--body2-progress-content-complete-color);
 
-        /* 현재 (테두리 표시) */
-        &.now { border-color: var(--body2-primary2-color); }
+        /* 현재 위치 (보더 투명도 해제) */
+        &.current {
+          border-color: var(--body2-primary2-color);
+        }
+      }
+    }
+
+    /* 공통: 대기 상태 색상 */
+    & .step-name, .separator {
+      flex-shrink: 0;
+      color: var(--body2-secondary2-color);
+      
+      /* 진행 상태 색상 */
+      &.progress {
+        color: var(--body2-primary1-color);
       }
     }
   }
@@ -906,7 +904,7 @@
         justify-content: center;
         align-items: center;  /* 가로 중앙 */
         padding: var(--spacing-xl);
-        gap: var(--spacing-md);
+        gap: var(--spacing-xl);
 
         /* 메시지/레이블 (공통) */
         & .modal-message {
@@ -1265,7 +1263,7 @@
       gap: var(--spacing-xs);
       min-width: 70px;
       min-height: 76px;
-      padding: calc(var(--min-side) * 0.0625);
+      padding: calc(var(--min-side) * 0.135);
       outline-offset: calc(var(--min-side) * -0.03125);
       border-radius: calc(var(--min-side) * 0.0625);
       border: calc(var(--min-side) * 0.03125) solid var(--primary2-border-color-default);
@@ -1533,8 +1531,9 @@
     
     /* 정사각형 */
     &.w285h285 { 
-      width: 285px; 
-      height: 285px; 
+      width: 285px;
+      height: 285px;
+      white-space: nowrap;
       flex-direction: column;
       font-size: var(--font-size-h2);
       font-weight: var(--font-weight-semibold);
@@ -1545,7 +1544,7 @@
     &.w070h070 { width: 70px; height: 70px; }
     
     /* 메뉴/카드 */
-    &.w328h460 { width: 328px; height: 460px; flex-direction: column; & .icon { width: 19.2rem; height: 19.2rem; } }
+    &.w328h460 { width: 328px; height: 460px; flex-direction: column; & .icon { width: 25.6rem; height: 25.6rem; } }
     
     /* 액션 버튼 */
     &.w500h120 { width: 500px; height: 120px; }
@@ -1701,33 +1700,6 @@
       & .one-qty-normal { flex: 0 0 240px; text-align: center; }
       & .one-price-normal { flex: 0 0 180px; text-align: center; }
       & .one-delete-normal { flex: 0 0 80px; text-align: center; }
-    }
-  }
-
-  .accessibility {
-    /* 상속 속성 - 자식에게 전파 */
-    color: var(--color-gray-12);
-    
-    &-title {
-      font-size: 6rem;
-      font-weight: var(--font-weight-semibold);
-    }
-
-    &-subtitle {
-      font-size: 4.1rem;
-      
-      &-highlight {
-        color: var(--color-yellow-03);
-        
-        &-light {
-          color: var(--color-brown-05);
-        }
-      }
-    }
-
-    &-description {
-      text-align: center;
-      margin-top: 3px;
     }
   }
 

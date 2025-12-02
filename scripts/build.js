@@ -22,6 +22,8 @@ console.log('📁 Copying static assets...');
 cpSync('./src/images', './dist/images', { recursive: true });
 cpSync('./src/fonts', './dist/fonts', { recursive: true });
 cpSync('./src/sounds', './dist/sounds', { recursive: true });
+cpSync('./src/SoundOnPressed.mp3', './dist/SoundOnPressed.mp3');
+cpSync('./src/SoundNote.wav', './dist/SoundNote.wav');
 
 // 3. JavaScript/CSS 빌드
 console.log('📦 Building JavaScript and CSS...');
@@ -41,7 +43,7 @@ console.log('📄 Copying index.html...');
 const html = readFileSync('./src/index.html', 'utf8');
 writeFileSync('./dist/index.html', html);
 
-// 5. 404.html 생성 (SPA 라우팅)
+// 6. 404.html 생성 (SPA 라우팅)
 console.log('📄 Creating 404.html...');
 writeFileSync('./dist/404.html', html);
 

@@ -46,7 +46,7 @@ const categories = [
     items: [],
   },
   {
-    name: "주스",
+    name: "주스주스주스스",
     items: [],
   },
   {

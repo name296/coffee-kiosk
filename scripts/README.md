@@ -1,52 +1,49 @@
-# Scripts
+﻿# Scripts
 
-## 📁 포함된 스크립트
+## ?뱚 ?ы븿???ㅽ겕由쏀듃
 
 ### update-icons.ps1
-아이콘 인덱스 자동 생성 스크립트
+?꾩씠肄??몃뜳???먮룞 ?앹꽦 ?ㅽ겕由쏀듃
 
-**기능:**
-- `src/assets/icons/` 디렉토리의 모든 `.svg` 파일 스캔
-- `src/assets/icons/index.js` 자동 생성
-- 메타데이터 포함 (개수, 일시, 목록)
+**湲곕뒫:**
+- `src/assets/icons/` ?붾젆?좊━??紐⑤뱺 `.svg` ?뚯씪 ?ㅼ틪
+- `src/assets/icons/index.js` ?먮룞 ?앹꽦
+- 硫뷀??곗씠???ы븿 (媛쒖닔, ?쇱떆, 紐⑸줉)
 
-**사용법:**
+**?ъ슜踰?**
 ```powershell
 .\scripts\update-icons.ps1
 ```
 
-**언제 실행하나요?**
-- 새 아이콘 추가 시
-- 아이콘 삭제 시
-- 아이콘 이름 변경 시
+**?몄젣 ?ㅽ뻾?섎굹??**
+- ???꾩씠肄?異붽? ??- ?꾩씠肄???젣 ??- ?꾩씠肄??대쫫 蹂寃???
+**異쒕젰:**
+- `src/assets/icons/index.js` (?먮룞 ?앹꽦/媛깆떊)
 
-**출력:**
-- `src/assets/icons/index.js` (자동 생성/갱신)
+**二쇱쓽?ы빆:**
+- `svg/icon/index.js`瑜?吏곸젒 ?섏젙?섏? 留덉꽭??(?먮룞 ?앹꽦??
+- Git commit ?꾩뿉 ?ㅽ뻾?섏뿬 理쒖떊 ?곹깭 ?좎?
 
-**주의사항:**
-- `svg/icon/index.js`를 직접 수정하지 마세요 (자동 생성됨)
-- Git commit 전에 실행하여 최신 상태 유지
+## ?봽 Git Hook (?좏깮?ы빆)
 
-## 🔄 Git Hook (선택사항)
+?꾩씠肄?蹂寃????먮룞 ?ㅽ뻾?섎젮硫?
 
-아이콘 변경 시 자동 실행하려면:
-
-**.git/hooks/pre-commit** (생성)
+**.git/hooks/pre-commit** (?앹꽦)
 ```bash
 #!/bin/sh
-# 아이콘이 변경되었는지 확인
+# ?꾩씠肄섏씠 蹂寃쎈릺?덈뒗吏 ?뺤씤
 if git diff --cached --name-only | grep -q "^src/assets/icons/.*\.svg$"; then
-  echo "🔄 아이콘 변경 감지, index.js 갱신 중..."
+  echo "?봽 ?꾩씠肄?蹂寃?媛먯?, index.js 媛깆떊 以?.."
   powershell.exe -File ./scripts/update-icons.ps1
   git add src/assets/icons/index.js
 fi
 ```
 
-## 📦 Node.js 버전 (선택사항)
+## ?벀 Node.js 踰꾩쟾 (?좏깮?ы빆)
 
-Node.js가 설치되어 있다면:
+Node.js媛 ?ㅼ튂?섏뼱 ?덈떎硫?
 
-**scripts/update-icons.js** 사용
+**scripts/update-icons.js** ?ъ슜
 ```bash
 npm run update-icons
 ```
