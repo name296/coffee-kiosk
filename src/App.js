@@ -1497,6 +1497,8 @@ const Button = memo(({
   actionTarget,
   actionMethod,
   onClick,
+  onPressed,
+  onPointed,
   ttsText,
   ...rest
 }) => {
@@ -1509,6 +1511,96 @@ const Button = memo(({
   const [isPressing, setIsPressing] = useState(false);
   const prevParentRef = useRef(null);
   const prevButtonRef = useRef(null);
+  const [internalPointed, setInternalPointed] = useState(pointed);
+  const isPressingRef = useRef(false);
+  // 호버를 포커스로 치환: 호버가 들어오면 포커스로 변환되므로 포커스만 관리
+  const [isFocused, setIsFocused] = useState(false);
+  const wasPointedBeforePressRef = useRef(false);
+  
+  // 전역 포인티드 관리를 위한 Context 사용
+  const pointedButtonContext = useContext(PointedButtonContext);
+  const buttonIdRef = useRef(Math.random().toString(36).substr(2, 9));
+  const buttonId = buttonIdRef.current;
+  
+  // pressed 계산: value와 selectedValue가 제공되면 자동 계산, 아니면 pressed prop 사용
+  // useEffect보다 먼저 선언되어야 함
+  const pressed = useMemo(() => {
+    if (value !== undefined && selectedValue !== undefined) {
+      return value === selectedValue;
+    }
+    return pressedProp;
+  }, [value, selectedValue, pressedProp]);
+  
+  // pointed prop이 변경되면 내부 상태 동기화
+  useEffect(() => {
+    if (pointed) {
+      setInternalPointed(true);
+    }
+  }, [pointed]);
+  
+  useEffect(() => {
+    isPressingRef.current = isPressing;
+  }, [isPressing]);
+  
+  // 포인티드 상태 관리: 호버는 계속 입력이 들어오므로 자연스럽게 포인티드 유지
+  // 호버 입력이 없을 때만 포커스로 포인티드 가능
+  // press 입력을 해도 포인티드는 유지되어야 함
+  useEffect(() => {
+    if (!pointedButtonContext) return;
+    
+    // 호버를 포커스로 치환: 포커스가 있으면 포인티드
+    if (isFocused) {
+      wasPointedBeforePressRef.current = true;
+      
+      // 다른 버튼이 포인티드되어 있으면 해제
+      if (pointedButtonContext.pointedButtonId !== buttonId) {
+        if (pointedButtonContext.pointedButtonId) {
+          pointedButtonContext.clearPointed(pointedButtonContext.pointedButtonId);
+        }
+      }
+      pointedButtonContext.setPointed(buttonId);
+      setInternalPointed(true);
+      onPointed?.(true);
+      return;
+    }
+    
+    // 포커스가 없을 때: pressing/pressed 상태이고 이전에 포인티드였으면 포인티드 유지
+    if ((isPressing || pressed) && wasPointedBeforePressRef.current) {
+      if (pointedButtonContext.pointedButtonId !== buttonId) {
+        if (pointedButtonContext.pointedButtonId) {
+          pointedButtonContext.clearPointed(pointedButtonContext.pointedButtonId);
+        }
+      }
+      pointedButtonContext.setPointed(buttonId);
+      setInternalPointed(true);
+      onPointed?.(true);
+      return;
+    }
+    
+    // 포커스/pressing 모두 없으면 포인티드 해제
+    if (pointedButtonContext.pointedButtonId === buttonId) {
+      pointedButtonContext.clearPointed(buttonId);
+    }
+    setInternalPointed(false);
+    wasPointedBeforePressRef.current = false;
+    onPointed?.(false);
+  }, [isFocused, isPressing, pressed, onPointed, pointedButtonContext, buttonId]);
+  
+  // 다른 버튼이 포인티드되었을 때 이 버튼의 포인티드 해제
+  // Context의 pointedButtonId와 현재 buttonId를 비교하여 포인티드 여부 결정
+  useEffect(() => {
+    if (!pointedButtonContext) return;
+    const shouldBePointed = pointedButtonContext.pointedButtonId === buttonId;
+    if (!shouldBePointed && internalPointed) {
+      setInternalPointed(false);
+      wasPointedBeforePressRef.current = false;
+      onPointed?.(false);
+    } else if (shouldBePointed && !internalPointed) {
+      // Context에서 이 버튼이 포인티드로 설정되었지만 내부 상태가 아니면 동기화
+      setInternalPointed(true);
+      onPointed?.(true);
+    }
+  }, [pointedButtonContext?.pointedButtonId, buttonId, internalPointed, onPointed]);
   
   // svg에서 아이콘 이름 추출 (HomeIcon -> "Home")
   const getIconNameFromSvg = useMemo(() => {
@@ -1526,31 +1618,6 @@ const Button = memo(({
   const handleAction = useButtonAction(finalActionType, finalActionTarget, finalActionMethod, disabled, buttonLabel, buttonIcon);
 
   useLayoutEffect(() => { if (btnRef.current) applyButtonMinSide(btnRef.current); }, []);
-  
-  // 포인티드 상태일 때 TTS 재생 (부모 또는 버튼이 바뀔 때마다) - 전역 핸들러가 처리
-  useEffect(() => {
-    if (!pointed || !btnRef.current) return;
-    const btn = btnRef.current;
-    const parent = btn.parentElement;
-    const currentParent = parent?.closest('[data-tts-text]');
-    
-    // 부모도 안 바뀌고 버튼도 안 바뀌면 재생하지 않음
-    if (currentParent === prevParentRef.current && btn === prevButtonRef.current) return;
-    
-    prevParentRef.current = currentParent;
-    prevButtonRef.current = btn;
-    
-    // 전역 focusin 핸들러가 처리하도록 포커스 줌
-    btn.focus();
-  }, [pointed]);
-
-  // pressed 계산: value와 selectedValue가 제공되면 자동 계산, 아니면 pressed prop 사용
-  const pressed = useMemo(() => {
-    if (value !== undefined && selectedValue !== undefined) {
-      return value === selectedValue;
-    }
-    return pressedProp;
-  }, [value, selectedValue, pressedProp]);
 
   // TTS 텍스트: ttsText가 없으면 label 사용, 토글 버튼일 때는 상태 텍스트 자동 추가
   const finalTtsText = useMemo(() => {
@@ -1580,31 +1647,74 @@ const Button = memo(({
     // 일반 버튼: disabled면 "비활성" 추가
     return disabled ? `${cleanedText}, 비활성, ` : cleanedText;
   }, [ttsText, label, toggle, pressed, disabled]);
+  
+  // 포인티드 상태일 때 TTS 및 사운드 재생 (부모 또는 버튼이 바뀔 때마다)
+  // Context를 통해 포인티드 여부 결정 (화면에 포인티드는 하나만)
+  const finalPointed = useMemo(() => {
+    if (!pointedButtonContext) return pointed || internalPointed;
+    return pointedButtonContext.pointedButtonId === buttonId;
+  }, [pointedButtonContext?.pointedButtonId, buttonId, pointed, internalPointed]);
+  useEffect(() => {
+    if (!finalPointed || !btnRef.current) return;
+    const btn = btnRef.current;
+    const parent = btn.parentElement;
+    const currentParent = parent?.closest('[data-tts-text]');
+    
+    // 부모도 안 바뀌고 버튼도 안 바뀌면 재생하지 않음
+    if (currentParent === prevParentRef.current && btn === prevButtonRef.current) return;
+    
+    prevParentRef.current = currentParent;
+    prevButtonRef.current = btn;
+    
+    // 사운드 재생
+    if (!disabled && typeof window !== 'undefined' && window.__playSound) {
+      window.__playSound('onPressed');
+    }
+    
+    // 전역 핸들러를 통해 TTS 재생
+    const parentTts = currentParent?.dataset?.ttsText || '';
+    const btnTts = finalTtsText || '';
+    if ((parentTts || btnTts) && typeof window !== 'undefined' && window.__finalHandleText) {
+      window.__finalHandleText(parentTts + btnTts);
+    }
+  }, [finalPointed, finalTtsText, disabled]);
 
   // pressed: 눌린/선택된 상태 (토글 ON)
-  // pointed: 포커스/호버 상태 (강조 테두리) - 동시 적용 가능
+  // pointed: 포커스/호버 상태 (강조 테두리) - 동시 적용 가능 (pressed 상태에서도 유지)
   const cls = useMemo(() => {
     const c = ['button'];
     if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
     if (toggle) c.push('toggle');
     if (pressed || (isPressing && !toggle)) c.push('pressed');
     if (isPressing) c.push('pressing'); // 누르는 순간에만 적용
-    if (pointed) c.push('pointed');
+    if (finalPointed) c.push('pointed'); // pressed 상태에서도 포인티드 유지
     if (className) c.push(className);
     return c.join(' ');
-  }, [className, toggle, pressed, pointed, isPressing]);
+  }, [className, toggle, pressed, finalPointed, isPressing]);
 
   const onStart = useCallback((e) => {
     if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
-    if (e.type === 'keydown') e.preventDefault();
-    // pressed 사운드는 useMultiModalButtonHandler에서 처리
+    if (e.type === 'keydown') {
+      e.preventDefault();
+      // 키보드 입력 시작 시 전역 플래그 설정 (포커스 보호용)
+      if (typeof window !== 'undefined') {
+        window.__isKeyboardInputActive = true;
+      }
+    }
     setIsPressing(true); // 모든 버튼에 적용
-  }, [disabled]);
+    onPressed?.(true); // pressed 상태 시작
+    
+    // onPressStart (mousedown/touchstart/keydown) 시 사운드 재생
+    if (!disabled && typeof window !== 'undefined' && window.__playSound) {
+      window.__playSound('onPressed');
+    }
+  }, [disabled, onPressed]);
 
   const onEnd = useCallback((e) => {
     if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
     if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
     setIsPressing(false); // 모든 버튼에 적용
+    onPressed?.(false); // pressed 상태 해제
     
     // onChange가 있고 selectedValue가 제공되면 onChange(selectedValue) 호출
     if (onChange && selectedValue !== undefined) {
@@ -1614,7 +1724,25 @@ const Button = memo(({
     } else {
       onClick?.(e);
     }
-  }, [disabled, finalActionType, handleAction, onClick, onChange, selectedValue]);
+    
+    // 입력 후에도 포커스 유지 (키보드 입력의 경우)
+    if (e.type === 'keyup' && btnRef.current) {
+      // 키보드 입력 완료 시 전역 플래그 해제 (포커스 보호 해제)
+      if (typeof window !== 'undefined') {
+        window.__isKeyboardInputActive = false;
+      }
+      
+      // 포커스가 없으면 다시 포커스 설정
+      if (document.activeElement !== btnRef.current) {
+        requestAnimationFrame(() => {
+          if (btnRef.current && !disabled) {
+            btnRef.current.focus();
+            setIsFocused(true);
+          }
+        });
+      }
+    }
+  }, [disabled, finalActionType, handleAction, onClick, onChange, selectedValue, onPressed]);
 
   return (
     <button
@@ -1623,12 +1751,41 @@ const Button = memo(({
       style={style}
       data-tts-text={finalTtsText}
       data-react-handler="true"
-      disabled={disabled}
       aria-disabled={disabled}
       aria-pressed={toggle ? pressed : undefined}
+      tabIndex={disabled ? 0 : undefined}
       onMouseDown={onStart}
       onMouseUp={onEnd}
-      onMouseLeave={() => setIsPressing(false)}
+      onMouseEnter={() => {
+        // 호버를 포커스로 치환: 탭 키 포커스와 동일한 브라우저 기본 메커니즘 사용
+        // 브라우저가 자동으로 이전 포커스를 해제하므로 하나만 존재하게 됨 (탭 포커스와 동일)
+        if (btnRef.current) {
+          const isKeyboardInputActive = typeof window !== 'undefined' ? window.__isKeyboardInputActive : false;
+          if (!isKeyboardInputActive) {
+            // 탭 키 포커스와 동일한 방식: 브라우저 기본 포커스 메커니즘 사용
+            // focus() 호출 = 탭 키와 동일하게 브라우저가 하나의 포커스만 유지
+            btnRef.current.focus();
+          }
+        }
+      }}
+      onMouseLeave={() => {
+        // 호버가 나가도 포커스는 유지 (호버를 포커스로 치환했으므로 포커스 유지)
+        // 다른 버튼으로 호버가 이동했다면 그 버튼의 onMouseEnter가 포커스를 설정할 것
+      }}
+      onFocus={() => setIsFocused(true)}
+      onBlur={(e) => {
+        // 다른 요소로 포커스가 이동한 경우에만 포커스 해제
+        const relatedTarget = e.relatedTarget;
+        const isFocusMovingToChild = relatedTarget && btnRef.current?.contains(relatedTarget);
+        
+        if (!isFocusMovingToChild) {
+          setIsFocused(false);
+          // 포커스 해제 시 Context에서 포커스 상태 해제
+          if (pointedButtonContext) {
+            pointedButtonContext.clearPointed(buttonId);
+          }
+        }
+      }}
       onTouchStart={onStart}
       onTouchEnd={onEnd}
       onKeyDown={onStart}
@@ -1781,7 +1938,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
           <div className="down-content">
             {customContent || (
               <>
-                <div className="modal-message">{config.message(H)}</div>
+            <div className="modal-message">{config.message(H)}</div>
                 <div data-tts-text={finalCancelLabel ? "작업관리, 버튼 두 개," : "작업관리, 버튼 한 개,"} ref={modalConfirmButtonsRef} className="task-manager">
                   {finalCancelLabel && (
                     <Button 
@@ -1797,7 +1954,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
                     label={finalConfirmLabel} 
                     onClick={onConfirm} 
                   />
-                </div>
+            </div>
               </>
             )}
           </div>
@@ -1986,6 +2143,22 @@ const useMultiModalButtonHandler = (options = {}) => {
     }
   }, [handleTextOpt]);
   
+  // 전역 핸들러를 window에 등록 (Button 컴포넌트에서 접근 가능하도록)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.__finalHandleText = finalHandleText;
+      if (playSoundOpt && typeof playSoundOpt === 'function') {
+        window.__playSound = playSoundOpt;
+      }
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete window.__finalHandleText;
+        delete window.__playSound;
+      }
+    };
+  }, [finalHandleText, playSoundOpt]);
+  
   // 버튼 클릭 핸들러
   const handleButtonClick = useCallback((e) => {
     const btn = e.target?.closest?.('.button');
@@ -2117,11 +2290,11 @@ const useMultiModalButtonHandler = (options = {}) => {
       } else if (action === 'remove' && btn.classList.contains('pressed')) {
         btn.classList.remove('pressed');
         if (btn.dataset.reactHandler !== 'true') {
-          requestAnimationFrame(() => {
-            if (btn instanceof HTMLElement && document.activeElement !== btn) {
-              btn.focus();
-            }
-          });
+        requestAnimationFrame(() => {
+          if (btn instanceof HTMLElement && document.activeElement !== btn) {
+            btn.focus();
+          }
+        });
         }
       }
     };
@@ -2206,6 +2379,34 @@ const useWebViewMessage = (setCurrentPage) => {
 // Contexts
 // ============================================================================
 
+// 전역 포인티드 버튼 관리 Context (화면에 포인티드는 하나만)
+const PointedButtonContext = createContext();
+const PointedButtonProvider = ({ children }) => {
+  const [pointedButtonId, setPointedButtonId] = useState(null);
+  
+  // 호버를 포커스로 치환했으므로 단순화: 포커스만 관리
+  const setPointed = useCallback((buttonId) => {
+    setPointedButtonId(buttonId);
+  }, []);
+  
+  const clearPointed = useCallback((buttonId) => {
+    // 특정 버튼의 포인티드 해제
+    setPointedButtonId(prevPointed => prevPointed === buttonId ? null : prevPointed);
+  }, []);
+  
+  const value = useMemo(() => ({
+    pointedButtonId,
+    setPointed,
+    clearPointed
+  }), [pointedButtonId, setPointed, clearPointed]);
+  
+  return (
+    <PointedButtonContext.Provider value={value}>
+      {children}
+    </PointedButtonContext.Provider>
+  );
+};
+
 const AccessibilityContext = createContext();
 
 const AccessibilityProvider = ({ children }) => {
@@ -2275,8 +2476,8 @@ const useDOM = () => {
   const querySelector = useCallback((s, c = null) => safeQuerySelector(s, c), []);
   const getElementById = useCallback((id) => {
     try {
-      if (typeof document === 'undefined') return null;
-      return document.getElementById(id);
+    if (typeof document === 'undefined') return null;
+    return document.getElementById(id);
     } catch { return null; }
   }, []);
   const toggleBodyClass = useCallback((className, condition) => {
@@ -2325,7 +2526,7 @@ const RouteProvider = ({ children }) => {
   const [currentPage, setCurrentPageState] = useState('ScreenStart');
   
   const setCurrentPage = useCallback((p) => {
-    setCurrentPageState(p);
+      setCurrentPageState(p);
   }, []);
   
   const value = useMemo(() => ({
@@ -2613,7 +2814,7 @@ const useButtonStyle = () => {
   const stateContext = useButtonState();
   const groupContext = useButtonGroup();
   const { play: playSound } = useSound();
-  
+
   const playOnPressedSound = useCallback(() => playSound('onPressed'), [playSound]);
   
   return useMemo(() => ({
@@ -2642,7 +2843,7 @@ const SizeControlInitializer = () => {
   }, []);
   return null;
 };
-
+  
 // 뷰포트 초기화
 const ViewportInitializer = () => {
   useLayoutEffect(() => {
@@ -4694,52 +4895,52 @@ const AccessibilityModal = memo(() => {
         <div>원하시는&nbsp;<Highlight>접근성 옵션</Highlight>을 선택하시고</div>
         <div><Highlight>적용하기</Highlight>&nbsp;버튼을 누르세요</div>
       </div>
-      {/* 초기설정 */}
+          {/* 초기설정 */}
       <div className="setting-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, ">
-        <span className="setting-name">초기설정으로 일괄선택</span>
-        <div className="task-manager">
+            <span className="setting-name">초기설정으로 일괄선택</span>
+            <div className="task-manager">
           <Button className="w242h076" svg={<Icon name="Restart" />} label="초기설정" onClick={handleInitialSettingsPress} />
-        </div>
-      </div>
-      <hr className="setting-line" />
-      {/* 고대비화면 */}
-      <div className="setting-row">
-        <span className="setting-name"><span className="icon"><Icon name="Contrast" /></span>고대비화면</span>
+            </div>
+          </div>
+          <hr className="setting-line" />
+          {/* 고대비화면 */}
+          <div className="setting-row">
+            <span className="setting-name"><span className="icon"><Icon name="Contrast" /></span>고대비화면</span>
         <div className="task-manager" data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark}, 버튼 두 개,`}>
           <Button toggle value={currentSettings.isDark} selectedValue={false} onChange={handleDarkChange} label="끔" className="w113h076" />
           <Button toggle value={currentSettings.isDark} selectedValue={true} onChange={handleDarkChange} label="켬" className="w113h076" />
-        </div>
-      </div>
-      <hr className="setting-line" />
-      {/* 소리크기 */}
-      <div className="setting-row">
-        <span className="setting-name"><span className="icon"><Icon name="Volume" /></span>소리크기</span>
+            </div>
+          </div>
+          <hr className="setting-line" />
+          {/* 소리크기 */}
+          <div className="setting-row">
+            <span className="setting-name"><span className="icon"><Icon name="Volume" /></span>소리크기</span>
         <div className="task-manager" data-tts-text={`소리크기, 선택상태, ${getStatusText.volume}, 버튼 네 개, `}>
           <Button toggle value={currentSettings.volume} selectedValue={0} onChange={handleVolumeChange} label={VOLUME_MAP[0]} className="w070h076" />
           <Button toggle value={currentSettings.volume} selectedValue={1} onChange={handleVolumeChange} label={VOLUME_MAP[1]} className="w070h076" />
           <Button toggle value={currentSettings.volume} selectedValue={2} onChange={handleVolumeChange} label={VOLUME_MAP[2]} className="w070h076" />
           <Button toggle value={currentSettings.volume} selectedValue={3} onChange={handleVolumeChange} label={VOLUME_MAP[3]} className="w070h076" />
-        </div>
-      </div>
-      <hr className="setting-line" />
-      {/* 큰글씨화면 */}
-      <div className="setting-row">
-        <span className="setting-name"><span className="icon"><Icon name="Large" /></span>큰글씨화면</span>
+            </div>
+          </div>
+          <hr className="setting-line" />
+          {/* 큰글씨화면 */}
+          <div className="setting-row">
+            <span className="setting-name"><span className="icon"><Icon name="Large" /></span>큰글씨화면</span>
         <div className="task-manager" data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large}, 버튼 두 개, `}>
           <Button toggle value={currentSettings.isLarge} selectedValue={false} onChange={handleLargeChange} label="끔" className="w113h076" />
           <Button toggle value={currentSettings.isLarge} selectedValue={true} onChange={handleLargeChange} label="켬" className="w113h076" />
-        </div>
-      </div>
-      <hr className="setting-line" />
-      {/* 낮은화면 */}
-      <div className="setting-row">
-        <span className="setting-name"><span className="icon"><Icon name="Wheelchair" /></span>낮은화면</span>
+            </div>
+          </div>
+          <hr className="setting-line" />
+          {/* 낮은화면 */}
+          <div className="setting-row">
+            <span className="setting-name"><span className="icon"><Icon name="Wheelchair" /></span>낮은화면</span>
         <div className="task-manager" data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low}, 버튼 두 개, `}>
           <Button toggle value={currentSettings.isLow} selectedValue={false} onChange={handleLowChange} label="끔" className="w113h076" />
           <Button toggle value={currentSettings.isLow} selectedValue={true} onChange={handleLowChange} label="켬" className="w113h076" />
-        </div>
-      </div>
-      {/* 적용 버튼들 */}
+            </div>
+          </div>
+          {/* 적용 버튼들 */}
       <div className="task-manager" data-tts-text="작업 관리, 버튼 두 개, " ref={refs.BaseModal.modalConfirmButtonsRef}>
         <Button className="w285h090" svg={<Icon name="Cancel" />} label="적용안함" onClick={handleCancelPress} />
         <Button className="w285h090" svg={<Icon name="Ok" />} label="적용하기" onClick={handleApplyPress} />
@@ -4804,15 +5005,17 @@ const Run = () => (
       {/* Layer 2: TTS State Provider (TTSDBProvider 의존) */}
       <TTSStateProvider>
         {/* Layer 3: Accessibility Provider (독립) */}
-        <AccessibilityProvider>
+          <AccessibilityProvider>
           {/* Layer 4: Order Provider (독립) */}
-          <OrderProvider>
+            <OrderProvider>
             {/* Layer 5: Modal Provider (독립 - RouteProvider보다 바깥에 있어야 Screen 컴포넌트가 접근 가능) */}
-            <ModalProvider>
+                <ModalProvider>
               {/* Layer 6: Ref Provider (refs만 제공 - RouteProvider보다 바깥에 있어야 Screen 컴포넌트가 접근 가능) */}
               <RefProvider>
-                {/* Layer 7: UI Provider (독립) */}
-                <RouteProvider>
+                {/* Layer 6.5: Pointed Button Provider (전역 포인티드 버튼 관리) */}
+                <PointedButtonProvider>
+                  {/* Layer 7: UI Provider (독립) */}
+                  <RouteProvider>
                   {/* Layer 8: Button State Provider (독립) */}
                   <ButtonStateProvider>
                     {/* Layer 9: Button Group Provider (독립) */}
@@ -4823,10 +5026,11 @@ const Run = () => (
                     </ButtonGroupProvider>
                   </ButtonStateProvider>
                 </RouteProvider>
+                </PointedButtonProvider>
               </RefProvider>
-            </ModalProvider>
-          </OrderProvider>
-        </AccessibilityProvider>
+                </ModalProvider>
+            </OrderProvider>
+          </AccessibilityProvider>
       </TTSStateProvider>
     </TTSDBProvider>
   </>
