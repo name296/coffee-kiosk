@@ -1250,6 +1250,24 @@
     }  
   
     /* ========================================
+       포커스 가능한 요소 공통 스타일
+       ======================================== */
+    
+    /* 포커스 가능한 모든 요소에 --min-side 및 pointed 스타일 적용 */
+    button:not([disabled]),
+    a[href],
+    input:not([disabled]),
+    select:not([disabled]),
+    textarea:not([disabled]),
+    [tabindex]:not([tabindex="-1"]) {
+      --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+      
+      &.pointed {
+        outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
+      }
+    }
+
+    /* ========================================
        전체 버튼 컴포넌트 스타일
        ======================================== */
 

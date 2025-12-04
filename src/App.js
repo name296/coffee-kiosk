@@ -1377,14 +1377,17 @@ class IntroTimerSingleton {
 // Timer Context (전역 타이머 상태를 React 생명주기로 관리)
 // ============================================================================
 
-const applyButtonMinSide = (btn) => {
-  const w = btn.offsetWidth;
-  const h = btn.offsetHeight;
+const applyFocusableMinSide = (el) => {
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
   const minSide = Math.min(w, h);
   if (minSide > 0) {
-    btn.style.setProperty('--min-side', `${minSide}px`);
+    el.style.setProperty('--min-side', `${minSide}px`);
   }
 };
+
+// 하위 호환성을 위한 별칭
+const applyButtonMinSide = applyFocusableMinSide;
 
 const isButtonDisabled = (btn) => {
   return btn.classList.contains('disabled') || 
@@ -2111,29 +2114,41 @@ const useMultiModalButtonHandler = (options = {}) => {
     handleTextOpt = null,
     prefixOpt = '',
     enableKeyboardNavigation = false,
-    playSoundOpt = null
+    playSoundOpt = null,
+    sections: sectionsRefs = {} // 섹션 ref 객체 (예: { mainContent: ref })
   } = options;
   
   const [, setFocusableSections] = useState(initFocusableSections);
   // 로컬 ref 생성 (글로벌 ref 통합 관리 제거)
   const handlersRef = useRef({});
-  const keyboardNavState = useRef({ sections: {}, currentSection: null, currentIndex: -1 });
+  const keyboardNavState = useRef(null);
   
-  // 초기값 설정
-  if (Object.keys(handlersRef.current).length === 0) handlersRef.current = {};
-  if (!keyboardNavState.current || Object.keys(keyboardNavState.current).length === 0) {
+  // 초기값 설정 (한 번만)
+  if (!keyboardNavState.current) {
     keyboardNavState.current = {
-    currentSectionIndex: 0,
-    currentButtonIndex: 0,
-    sections: initFocusableSections,
-    firstButtonSection: initFirstButtonSection
+      currentSectionIndex: 0,
+      currentButtonIndex: 0,
+      sections: initFocusableSections,
+      sectionsRefs: sectionsRefs,
+      firstButtonSection: initFirstButtonSection
     };
   }
   
+  // sectionsRefs 업데이트 (ref 객체는 참조가 변하지 않으므로 즉시 업데이트)
+  useEffect(() => {
+    if (sectionsRefs && Object.keys(sectionsRefs).length > 0) {
+      keyboardNavState.current.sectionsRefs = sectionsRefs;
+    }
+  }, [sectionsRefs]);
+  
   // 섹션 업데이트 함수
-  const updateFocusableSections = useCallback((newSections) => {
+  const updateFocusableSections = useCallback((newSections, newSectionsRefs = null) => {
     setFocusableSections(newSections);
     keyboardNavState.current.sections = newSections;
+    // sectionsRefs가 제공되면 업데이트 (동적 섹션 변경 시)
+    if (newSectionsRefs) {
+      keyboardNavState.current.sectionsRefs = newSectionsRefs;
+    }
   }, []);
   
   // TTS 텍스트 핸들러
@@ -2203,58 +2218,71 @@ const useMultiModalButtonHandler = (options = {}) => {
     return () => document.removeEventListener('click', blockDisabledButton, true);
   }, [enableGlobalHandlers]);
   
-  // 키보드 네비게이션
+  // 키보드 네비게이션 (방향키만 처리, Tab은 브라우저 기본 동작 사용)
   useEffect(() => {
     if (!enableGlobalHandlers || !enableKeyboardNavigation) return;
     
     const handleKeyDown = (e) => {
       const { key } = e;
       
-      // 방향키 네비게이션
-      if ([KEYBOARD.ARROW_UP, KEYBOARD.ARROW_DOWN, KEYBOARD.ARROW_LEFT, KEYBOARD.ARROW_RIGHT].includes(key)) {
+      // 상하 방향키: 부모 요소(섹션) 간 이동
+      if (key === KEYBOARD.ARROW_UP || key === KEYBOARD.ARROW_DOWN) {
         e.preventDefault();
         const activeEl = document.activeElement;
         if (!activeEl) return;
         
-        const currentSection = activeEl.closest('[data-tts-text]');
-        if (!currentSection) return;
+        // 모든 포커스 가능 요소를 DOM 순서대로 찾기
+        const allFocusable = Array.from(document.querySelectorAll(CFG.FOCUSABLE))
+          .filter(el => {
+            const st = window.getComputedStyle(el);
+            return st.display !== 'none' && st.visibility !== 'hidden';
+          });
         
-        const buttons = currentSection.querySelectorAll('.button:not([aria-disabled="true"])');
-        const currentIndex = Array.from(buttons).indexOf(activeEl);
-        let nextIndex = currentIndex;
+        if (allFocusable.length === 0) return;
         
-        if (key === KEYBOARD.ARROW_RIGHT || key === KEYBOARD.ARROW_DOWN) {
-          nextIndex = (currentIndex + 1) % buttons.length;
-        } else if (key === KEYBOARD.ARROW_LEFT || key === KEYBOARD.ARROW_UP) {
-          nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        const currentIndex = allFocusable.indexOf(activeEl);
+        if (currentIndex === -1) return;
+        
+        // 현재 요소의 부모 섹션 찾기
+        const currentParent = activeEl.closest('[data-tts-text]');
+        
+        // 부모가 바뀌는 지점 찾기
+        let targetIndex = -1;
+        if (key === KEYBOARD.ARROW_DOWN) {
+          // 아래로: 현재 부모와 다른 부모를 가진 다음 요소 찾기
+          for (let i = currentIndex + 1; i < allFocusable.length; i++) {
+            const nextParent = allFocusable[i].closest('[data-tts-text]');
+            if (nextParent !== currentParent) {
+              targetIndex = i;
+              break;
+            }
+          }
+          // 마지막까지 찾지 못하면 첫 번째 요소로 (순환)
+          if (targetIndex === -1) {
+            targetIndex = 0;
+          }
+        } else {
+          // 위로: 현재 부모와 다른 부모를 가진 이전 요소 찾기
+          for (let i = currentIndex - 1; i >= 0; i--) {
+            const prevParent = allFocusable[i].closest('[data-tts-text]');
+            if (prevParent !== currentParent) {
+              targetIndex = i;
+              break;
+            }
+          }
+          // 처음까지 찾지 못하면 마지막 요소로 (순환)
+          if (targetIndex === -1) {
+            targetIndex = allFocusable.length - 1;
+          }
         }
         
-        if (buttons[nextIndex]) {
-          buttons[nextIndex].focus();
-          // TTS는 focusin 이벤트에서 처리
+        if (targetIndex !== -1 && allFocusable[targetIndex]) {
+          allFocusable[targetIndex].focus();
         }
       }
       
-      // Tab 키 섹션 이동
-      if (key === KEYBOARD.TAB) {
-        const sections = keyboardNavState.current.sections;
-        if (sections.length === 0) return;
-        
-        e.preventDefault();
-        const currentSectionIndex = keyboardNavState.current.currentSectionIndex;
-        const nextSectionIndex = e.shiftKey
-          ? (currentSectionIndex - 1 + sections.length) % sections.length
-          : (currentSectionIndex + 1) % sections.length;
-        
-        const nextSection = sections[nextSectionIndex]?.current;
-        if (nextSection) {
-          const firstButton = nextSection.querySelector('.button:not([aria-disabled="true"])');
-          if (firstButton) {
-            firstButton.focus();
-            keyboardNavState.current.currentSectionIndex = nextSectionIndex;
-          }
-        }
-      }
+      // 좌우 방향키: 브라우저 기본 Tab 동작과 동일 (가로채지 않음)
+      // Tab/Shift+Tab과 동일하게 동작하도록 preventDefault 하지 않음
       
       // Enter/Space 버튼 활성화
       if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) {
@@ -2264,6 +2292,8 @@ const useMultiModalButtonHandler = (options = {}) => {
           activeEl.click();
         }
       }
+      
+      // Tab 키는 브라우저 기본 동작 사용 (가로채지 않음)
     };
     
     document.addEventListener('keydown', handleKeyDown, true);
@@ -2854,14 +2884,184 @@ const ViewportInitializer = () => {
 };
 
 
-// useAppFocusTrap은 ContextProvider 내부에서 호출되므로 useContext(ContextBase)를 사용할 수 없음
-// 대신 ref를 직접 생성하도록 변경
+// 전체 앱 포커스 트랩 (body에 적용)
 const useAppFocusTrap = () => {
-  const containerRef = useRef(null);
-  useLayoutEffect(() => { 
-    containerRef.current = document.body; 
+  useEffect(() => {
+    // body에 tabindex="-1" 추가
+    if (document.body.getAttribute('tabindex') !== '-1') {
+      document.body.setAttribute('tabindex', '-1');
+    }
+    
+    // 포커스 가능한 요소 찾기
+    const getFocusableElements = () => {
+      return Array.from(document.querySelectorAll(CFG.FOCUSABLE))
+        .filter(el => {
+          const st = window.getComputedStyle(el);
+          return st.display !== 'none' && st.visibility !== 'hidden';
+        });
+    };
+    
+    // 모든 포커스 가능한 요소에 초기 --min-side 계산
+    const initializeFocusableMinSide = () => {
+      const focusableElements = getFocusableElements();
+      focusableElements.forEach(el => {
+        applyFocusableMinSide(el);
+      });
+    };
+    
+    // 초기 계산
+    initializeFocusableMinSide();
+    
+    // ResizeObserver로 포커스 가능한 요소 크기 변경 감지
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.target.matches && entry.target.matches(CFG.FOCUSABLE)) {
+          applyFocusableMinSide(entry.target);
+        }
+      });
+    });
+    
+    // 모든 포커스 가능한 요소 관찰
+    const observeFocusableElements = () => {
+      const focusableElements = getFocusableElements();
+      focusableElements.forEach(el => {
+        resizeObserver.observe(el);
+      });
+    };
+    
+    // MutationObserver로 새로운 포커스 가능한 요소 추가 감지
+    const mutationObserver = new MutationObserver(() => {
+      observeFocusableElements();
+    });
+    
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
+    // 초기 관찰 시작
+    observeFocusableElements();
+    
+    // 첫 번째 포커스 가능 요소로 이동
+    const focusFirst = () => {
+      const els = getFocusableElements();
+      if (els.length > 0) {
+        els[0].focus();
+      }
+    };
+    
+    // 마지막 포커스 가능 요소로 이동
+    const focusLast = () => {
+      const els = getFocusableElements();
+      if (els.length > 0) {
+        els[els.length - 1].focus();
+      }
+    };
+    
+    // Tab 키 가로채서 body 내부에서만 순환
+    const handleTabKey = (e) => {
+      if (e.key !== 'Tab') return;
+      
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      
+      const activeEl = document.activeElement;
+      const currentIndex = focusableElements.indexOf(activeEl);
+      
+      // 현재 포커스가 body 내부 요소가 아니면 첫 번째로
+      if (currentIndex === -1) {
+        e.preventDefault();
+        focusFirst();
+        return;
+      }
+      
+      // Shift+Tab: 이전 요소로 (마지막에서 첫 번째로 순환)
+      if (e.shiftKey) {
+        e.preventDefault();
+        const prevIndex = currentIndex === 0 ? focusableElements.length - 1 : currentIndex - 1;
+        focusableElements[prevIndex].focus();
+      } 
+      // Tab: 다음 요소로 (마지막에서 첫 번째로 순환)
+      else {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % focusableElements.length;
+        focusableElements[nextIndex].focus();
+      }
+    };
+    
+    // 포커스 이탈 방지
+    const handleFocusOut = (e) => {
+      // relatedTarget이 body 밖이면 첫 번째 요소로 이동
+      if (e.relatedTarget && !document.body.contains(e.relatedTarget)) {
+        e.preventDefault();
+        focusFirst();
+      }
+    };
+    
+    // body에 포커스가 가면 첫 번째 요소로
+    const handleBodyFocus = (e) => {
+      if (e.target === document.body || e.target === document.documentElement) {
+        e.preventDefault();
+        focusFirst();
+      }
+    };
+    
+    // 포커스가 body 밖으로 나갔는지 주기적으로 확인
+    const checkFocus = () => {
+      const active = document.activeElement;
+      if (active && active !== document.body && !document.body.contains(active)) {
+        focusFirst();
+      }
+    };
+    
+    // 포커스 가능한 요소에 포커스가 갈 때 --min-side 계산 및 pointed 클래스 추가
+    const handleFocusIn = (e) => {
+      const target = e.target;
+      if (!target) return;
+      
+      // 포커스 가능한 요소인지 확인
+      if (target.matches && target.matches(CFG.FOCUSABLE)) {
+        // --min-side 계산 (CSS 적용 전에 계산되어야 함)
+        // 동기적으로 계산하여 CSS가 적용되기 전에 값을 설정
+        applyFocusableMinSide(target);
+        
+        // pointed 클래스 추가
+        target.classList.add('pointed');
+      }
+    };
+    
+    // 포커스가 벗어날 때 pointed 클래스 제거
+    const handleFocusOutForPointed = (e) => {
+      const target = e.target;
+      if (target && target.classList) {
+        target.classList.remove('pointed');
+      }
+    };
+    
+    // Tab 키 이벤트 리스너 등록
+    document.addEventListener('keydown', handleTabKey, true);
+    document.body.addEventListener('focusout', handleFocusOut, true);
+    document.body.addEventListener('focusin', handleBodyFocus, true);
+    document.addEventListener('focusin', handleFocusIn, true);
+    document.addEventListener('focusout', handleFocusOutForPointed, true);
+    
+    // 주기적으로 포커스 확인 (강력한 보호)
+    const intervalId = setInterval(checkFocus, 100);
+    
+    return () => {
+      document.removeEventListener('keydown', handleTabKey, true);
+      document.body.removeEventListener('focusout', handleFocusOut, true);
+      document.body.removeEventListener('focusin', handleBodyFocus, true);
+      document.removeEventListener('focusin', handleFocusIn, true);
+      document.removeEventListener('focusout', handleFocusOutForPointed, true);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      clearInterval(intervalId);
+    };
   }, []);
-  return containerRef;
 };
 
 // ============================================================================
@@ -3864,8 +4064,9 @@ const ScreenDetails = memo(() => {
   }, [handlePrevPage, handleNextPage]);
 
   useEffect(() => {
-    updateFocusableSections(focusableSections);
-  }, [pageNumber, focusableSections, updateFocusableSections]);
+    // 동적 섹션 변경 시 sectionsRefs도 함께 업데이트
+    updateFocusableSections(focusableSections, sections);
+  }, [pageNumber, focusableSections, sections, updateFocusableSections]);
   
   // 아이템 없으면 메뉴선택으로 이동
   useEffect(() => {
@@ -4997,9 +5198,13 @@ const GlobalModals = () => {
 };
 
 // 메인 Run 컴포넌트 - Provider 레이어 구조 (의존성 순서에 따라)
-const Run = () => (
-  <>
-    <audio id="audioPlayer" src="" controls className="hidden" />
+const Run = () => {
+  // 전체 앱 포커스 트랩 적용
+  useAppFocusTrap();
+  
+  return (
+    <>
+      <audio id="audioPlayer" src="" controls className="hidden" />
     {/* Layer 1: TTS 기반 Provider */}
     <TTSDBProvider>
       {/* Layer 2: TTS State Provider (TTSDBProvider 의존) */}
@@ -5034,7 +5239,8 @@ const Run = () => (
       </TTSStateProvider>
     </TTSDBProvider>
   </>
-);
+  );
+};
 
 export default Run;
 
