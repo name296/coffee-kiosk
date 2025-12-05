@@ -6,7 +6,7 @@ import menuData from "./menuData";
 // Components
 
 import Icon, { 
-  TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon,   AddIcon, PayIcon, HomeIcon, WheelchairIcon, ToggleIcon, StepIcon, TimeIcon } from "./Icon";
+  TakeinIcon, TakeoutIcon, DeleteIcon, ResetIcon, OrderIcon,   AddIcon, PayIcon, HomeIcon, WheelchairIcon, StepIcon, TimeIcon } from "./Icon";
 
 // ============================================================================
 // 유틸리티
@@ -171,17 +171,6 @@ const CFG = {
 const WEBVIEW = { PAY: 'PAY', PRINT: 'PRINT', CANCEL: 'CANCEL' };
 const STORAGE = { ORDER_NUM: 'orderNumber' };
 
-// 키보드 상수
-const KEYBOARD = {
-  ARROW_UP: 'ArrowUp',
-  ARROW_DOWN: 'ArrowDown',
-  ARROW_LEFT: 'ArrowLeft',
-  ARROW_RIGHT: 'ArrowRight',
-  ENTER: 'Enter',
-  SPACE: ' ',
-  TAB: 'Tab',
-  ESCAPE: 'Escape'
-};
 const PLACEHOLDER_MENU = { id: 0, name: "추가예정", price: "0", img: "item-americano.png" };
 
 // TTS 스크립트
@@ -196,29 +185,11 @@ const TTS = {
   screenMobilePay: () => `안내, 모바일페이, 가운데 아래에 있는 카드리더기에 휴대전화의 모바일페이를 켜고 접근시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${TTS.replay}`,
   screenSimplePay: () => `안내, 심플 결제, 오른쪽 아래에 있는 QR리더기에 QR코드를 인식시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${TTS.replay}`,
   screenCardRemoval: () => `안내, 신용카드 제거, 신용카드를 뽑습니다, 정상적으로 결제되고 나서 카드가 제거되면, 자동으로 다음 작업, 인쇄 선택으로 이동합니다, ${TTS.replay}`,
-  screenOrderComplete: () => `안내, 인쇄 선택, 결제되었습니다, 주문번호, 100번, 왼쪽 아래의 프린터에서 주문표를 받으시고, 영수증 출력을 선택합니다, 육십초 동안 조작이 없을 경우, 출력없이 사용 종료합니다,${TTS.replay}`,
+  screenOrderComplete: () => `안내, 인쇄 선택, 결제되었습니다, 주문번호, 백 번, 왼쪽 아래의 프린터에서 주문표를 받으시고, 영수증 출력을 선택합니다, 육십초 동안 조작이 없을 경우, 출력없이 사용 종료합니다,${TTS.replay}`,
   screenReceiptPrint: () => `안내, 영수증 출력, 왼쪽 아래의 프린터에서 영수증을 받습니다, 마무리하기 버튼으로 사용을 종료할 수 있습니다,${TTS.replay}`,
   screenFinish: `안내, 사용종료, 이용해주셔서 감사합니다,`,
   errorNoProduct: '없는 상품입니다.',
 };
-
-// 결제 단계
-const PAY_STEP = { 
-  SELECT_METHOD: 0, 
-  CARD_INSERT: 1, 
-  MOBILE_PAY: 2, 
-  CARD_REMOVE: 3, 
-  PRINT_SELECT: 4, 
-  ORDER_PRINT: 5, 
-  RECEIPT_PRINT: 6, 
-  FINISH: 7 
-};
-
-// 타이머 (ms)
-const TIMER_CONFIG = { AUTO_FINISH: 60000, FINAL_PAGE: 4000, TTS_DELAY: CFG.TTS_DELAY, ACTION_DELAY: 100, INTERVAL: 1000, IDLE: CFG.IDLE_TIMEOUT };
-
-// 기본값
-const DEFAULT_SETTINGS = { VOLUME: 1, IS_DARK: false, IS_LARGE: false, IS_LOW: false, SELECTED_TAB: '전체메뉴' };
 
 // ============================================================================
 // Hooks
@@ -854,12 +825,12 @@ const usePaymentCountdown = ({
   setIsLow,
   setCurrentPage
 }) => {
-  // step에 따라 초기값 설정
+  // step(스크린 이름)에 따라 초기값 설정
   const getInitialCountdown = () => {
-    if (step === PAY_STEP.FINISH) {
-      return TIMER_CONFIG.FINAL_PAGE / 1000;
-    } else if (step === PAY_STEP.PRINT_SELECT || step === PAY_STEP.RECEIPT_PRINT) {
-      return TIMER_CONFIG.AUTO_FINISH / 1000;
+    if (step === 'ScreenFinish') {
+      return 4000 / 1000;
+    } else if (step === 'ScreenOrderComplete' || step === 'ScreenReceiptPrint') {
+      return 60000 / 1000;
     }
     return 60;
   };
@@ -885,8 +856,8 @@ const usePaymentCountdown = ({
     }
     
     // 인쇄 선택 또는 영수증 단계
-    if (step === PAY_STEP.PRINT_SELECT || step === PAY_STEP.RECEIPT_PRINT) {
-      const autoFinishSeconds = TIMER_CONFIG.AUTO_FINISH / 1000;
+    if (step === 'ScreenOrderComplete' || step === 'ScreenReceiptPrint') {
+      const autoFinishSeconds = 60000 / 1000;
       const resetCountdown = () => setCountdown(autoFinishSeconds);
       setCountdown(autoFinishSeconds);
       
@@ -902,7 +873,7 @@ const usePaymentCountdown = ({
           }
           return prev - 1;
         });
-      }, TIMER_CONFIG.INTERVAL);
+      }, 1000);
       
       // 사용자 입력 시 카운트다운 리셋
       window.addEventListener('keydown', resetCountdown);
@@ -919,8 +890,8 @@ const usePaymentCountdown = ({
     }
     
     // 완료 단계
-    if (step === PAY_STEP.FINISH) {
-      const finalPageSeconds = TIMER_CONFIG.FINAL_PAGE / 1000;
+    if (step === 'ScreenFinish') {
+      const finalPageSeconds = 4000 / 1000;
       setCountdown(finalPageSeconds);
       
       // 카운트다운 감소 함수
@@ -944,7 +915,7 @@ const usePaymentCountdown = ({
               cb.setIsLarge(false);
               cb.setIsLow(false);
               cb.setCurrentPage('ScreenStart');
-            }, TIMER_CONFIG.INTERVAL); // 1초(1000ms) 대기
+            }, 1000); // 1초(1000ms) 대기
             return 0;
           }
           return next;
@@ -952,7 +923,7 @@ const usePaymentCountdown = ({
       };
       
       // 1초 후 첫 감소 시작, 그 다음부터 1초마다 감소 (4→3→2→1→✓ 총 5초)
-      timerRef.current = setInterval(tick, TIMER_CONFIG.INTERVAL);
+      timerRef.current = setInterval(tick, 1000);
       
       return () => {
         if (timerRef.current) {
@@ -1514,16 +1485,7 @@ const Button = memo(({
   const [isPressing, setIsPressing] = useState(false);
   const prevParentRef = useRef(null);
   const prevButtonRef = useRef(null);
-  const [internalPointed, setInternalPointed] = useState(pointed);
   const isPressingRef = useRef(false);
-  // 호버를 포커스로 치환: 호버가 들어오면 포커스로 변환되므로 포커스만 관리
-  const [isFocused, setIsFocused] = useState(false);
-  const wasPointedBeforePressRef = useRef(false);
-  
-  // 전역 포인티드 관리를 위한 Context 사용
-  const pointedButtonContext = useContext(PointedButtonContext);
-  const buttonIdRef = useRef(Math.random().toString(36).substr(2, 9));
-  const buttonId = buttonIdRef.current;
   
   // pressed 계산: value와 selectedValue가 제공되면 자동 계산, 아니면 pressed prop 사용
   // useEffect보다 먼저 선언되어야 함
@@ -1534,76 +1496,10 @@ const Button = memo(({
     return pressedProp;
   }, [value, selectedValue, pressedProp]);
   
-  // pointed prop이 변경되면 내부 상태 동기화
-  useEffect(() => {
-    if (pointed) {
-      setInternalPointed(true);
-    }
-  }, [pointed]);
-  
   useEffect(() => {
     isPressingRef.current = isPressing;
   }, [isPressing]);
   
-  // 포인티드 상태 관리: 호버는 계속 입력이 들어오므로 자연스럽게 포인티드 유지
-  // 호버 입력이 없을 때만 포커스로 포인티드 가능
-  // press 입력을 해도 포인티드는 유지되어야 함
-  useEffect(() => {
-    if (!pointedButtonContext) return;
-    
-    // 호버를 포커스로 치환: 포커스가 있으면 포인티드
-    if (isFocused) {
-      wasPointedBeforePressRef.current = true;
-      
-      // 다른 버튼이 포인티드되어 있으면 해제
-      if (pointedButtonContext.pointedButtonId !== buttonId) {
-        if (pointedButtonContext.pointedButtonId) {
-          pointedButtonContext.clearPointed(pointedButtonContext.pointedButtonId);
-        }
-      }
-      pointedButtonContext.setPointed(buttonId);
-      setInternalPointed(true);
-      onPointed?.(true);
-      return;
-    }
-    
-    // 포커스가 없을 때: pressing/pressed 상태이고 이전에 포인티드였으면 포인티드 유지
-    if ((isPressing || pressed) && wasPointedBeforePressRef.current) {
-      if (pointedButtonContext.pointedButtonId !== buttonId) {
-        if (pointedButtonContext.pointedButtonId) {
-          pointedButtonContext.clearPointed(pointedButtonContext.pointedButtonId);
-        }
-      }
-      pointedButtonContext.setPointed(buttonId);
-      setInternalPointed(true);
-      onPointed?.(true);
-      return;
-    }
-    
-    // 포커스/pressing 모두 없으면 포인티드 해제
-    if (pointedButtonContext.pointedButtonId === buttonId) {
-      pointedButtonContext.clearPointed(buttonId);
-    }
-    setInternalPointed(false);
-    wasPointedBeforePressRef.current = false;
-    onPointed?.(false);
-  }, [isFocused, isPressing, pressed, onPointed, pointedButtonContext, buttonId]);
-  
-  // 다른 버튼이 포인티드되었을 때 이 버튼의 포인티드 해제
-  // Context의 pointedButtonId와 현재 buttonId를 비교하여 포인티드 여부 결정
-  useEffect(() => {
-    if (!pointedButtonContext) return;
-    const shouldBePointed = pointedButtonContext.pointedButtonId === buttonId;
-    if (!shouldBePointed && internalPointed) {
-      setInternalPointed(false);
-      wasPointedBeforePressRef.current = false;
-      onPointed?.(false);
-    } else if (shouldBePointed && !internalPointed) {
-      // Context에서 이 버튼이 포인티드로 설정되었지만 내부 상태가 아니면 동기화
-      setInternalPointed(true);
-      onPointed?.(true);
-    }
-  }, [pointedButtonContext?.pointedButtonId, buttonId, internalPointed, onPointed]);
   
   // svg에서 아이콘 이름 추출 (HomeIcon -> "Home")
   const getIconNameFromSvg = useMemo(() => {
@@ -1651,63 +1547,25 @@ const Button = memo(({
     return disabled ? `${cleanedText}, 비활성, ` : cleanedText;
   }, [ttsText, label, toggle, pressed, disabled]);
   
-  // 포인티드 상태일 때 TTS 및 사운드 재생 (부모 또는 버튼이 바뀔 때마다)
-  // Context를 통해 포인티드 여부 결정 (화면에 포인티드는 하나만)
-  const finalPointed = useMemo(() => {
-    if (!pointedButtonContext) return pointed || internalPointed;
-    return pointedButtonContext.pointedButtonId === buttonId;
-  }, [pointedButtonContext?.pointedButtonId, buttonId, pointed, internalPointed]);
-  useEffect(() => {
-    if (!finalPointed || !btnRef.current) return;
-    const btn = btnRef.current;
-    const parent = btn.parentElement;
-    const currentParent = parent?.closest('[data-tts-text]');
-    
-    // 부모도 안 바뀌고 버튼도 안 바뀌면 재생하지 않음
-    if (currentParent === prevParentRef.current && btn === prevButtonRef.current) return;
-    
-    prevParentRef.current = currentParent;
-    prevButtonRef.current = btn;
-    
-    // 사운드 재생
-    if (!disabled && typeof window !== 'undefined' && window.__playSound) {
-      window.__playSound('onPressed');
-    }
-    
-    // 전역 핸들러를 통해 TTS 재생
-    const parentTts = currentParent?.dataset?.ttsText || '';
-    const btnTts = finalTtsText || '';
-    if ((parentTts || btnTts) && typeof window !== 'undefined' && window.__finalHandleText) {
-      window.__finalHandleText(parentTts + btnTts);
-    }
-  }, [finalPointed, finalTtsText, disabled]);
 
-  // pressed: 눌린/선택된 상태 (토글 ON)
-  // pointed: 포커스/호버 상태 (강조 테두리) - 동시 적용 가능 (pressed 상태에서도 유지)
   const cls = useMemo(() => {
     const c = ['button'];
     if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
     if (toggle) c.push('toggle');
     if (pressed || (isPressing && !toggle)) c.push('pressed');
     if (isPressing) c.push('pressing'); // 누르는 순간에만 적용
-    if (finalPointed) c.push('pointed'); // pressed 상태에서도 포인티드 유지
     if (className) c.push(className);
     return c.join(' ');
-  }, [className, toggle, pressed, finalPointed, isPressing]);
+  }, [className, toggle, pressed, isPressing]);
 
   const onStart = useCallback((e) => {
     if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
     if (e.type === 'keydown') {
       e.preventDefault();
-      // 키보드 입력 시작 시 전역 플래그 설정 (포커스 보호용)
-      if (typeof window !== 'undefined') {
-        window.__isKeyboardInputActive = true;
-      }
     }
-    setIsPressing(true); // 모든 버튼에 적용
-    onPressed?.(true); // pressed 상태 시작
+    setIsPressing(true);
+    onPressed?.(true);
     
-    // onPressStart (mousedown/touchstart/keydown) 시 사운드 재생
     if (!disabled && typeof window !== 'undefined' && window.__playSound) {
       window.__playSound('onPressed');
     }
@@ -1716,10 +1574,9 @@ const Button = memo(({
   const onEnd = useCallback((e) => {
     if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
     if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
-    setIsPressing(false); // 모든 버튼에 적용
-    onPressed?.(false); // pressed 상태 해제
+    setIsPressing(false);
+    onPressed?.(false);
     
-    // onChange가 있고 selectedValue가 제공되면 onChange(selectedValue) 호출
     if (onChange && selectedValue !== undefined) {
       onChange(selectedValue);
     } else if (finalActionType) {
@@ -1727,25 +1584,18 @@ const Button = memo(({
     } else {
       onClick?.(e);
     }
-    
-    // 입력 후에도 포커스 유지 (키보드 입력의 경우)
-    if (e.type === 'keyup' && btnRef.current) {
-      // 키보드 입력 완료 시 전역 플래그 해제 (포커스 보호 해제)
-      if (typeof window !== 'undefined') {
-        window.__isKeyboardInputActive = false;
-      }
-      
-      // 포커스가 없으면 다시 포커스 설정
-      if (document.activeElement !== btnRef.current) {
-        requestAnimationFrame(() => {
-          if (btnRef.current && !disabled) {
-            btnRef.current.focus();
-            setIsFocused(true);
-          }
-        });
-      }
-    }
   }, [disabled, finalActionType, handleAction, onClick, onChange, selectedValue, onPressed]);
+
+  // click 이벤트 핸들러: 프로그래밍적 click() 호출 시에도 사운드 재생
+  const handleClick = useCallback((e) => {
+    if (disabled) return;
+    
+    // 프로그래밍적으로 호출된 click()인 경우 (isTrusted가 false)
+    // 일반 마우스 클릭은 onMouseDown에서 이미 사운드가 재생됨
+    if (!e.isTrusted && typeof window !== 'undefined' && window.__playSound) {
+      window.__playSound('onPressed');
+    }
+  }, [disabled]);
 
   return (
     <button
@@ -1757,38 +1607,9 @@ const Button = memo(({
       aria-disabled={disabled}
       aria-pressed={toggle ? pressed : undefined}
       tabIndex={disabled ? 0 : undefined}
+      onClick={handleClick}
       onMouseDown={onStart}
       onMouseUp={onEnd}
-      onMouseEnter={() => {
-        // 호버를 포커스로 치환: 탭 키 포커스와 동일한 브라우저 기본 메커니즘 사용
-        // 브라우저가 자동으로 이전 포커스를 해제하므로 하나만 존재하게 됨 (탭 포커스와 동일)
-        if (btnRef.current) {
-          const isKeyboardInputActive = typeof window !== 'undefined' ? window.__isKeyboardInputActive : false;
-          if (!isKeyboardInputActive) {
-            // 탭 키 포커스와 동일한 방식: 브라우저 기본 포커스 메커니즘 사용
-            // focus() 호출 = 탭 키와 동일하게 브라우저가 하나의 포커스만 유지
-            btnRef.current.focus();
-          }
-        }
-      }}
-      onMouseLeave={() => {
-        // 호버가 나가도 포커스는 유지 (호버를 포커스로 치환했으므로 포커스 유지)
-        // 다른 버튼으로 호버가 이동했다면 그 버튼의 onMouseEnter가 포커스를 설정할 것
-      }}
-      onFocus={() => setIsFocused(true)}
-      onBlur={(e) => {
-        // 다른 요소로 포커스가 이동한 경우에만 포커스 해제
-        const relatedTarget = e.relatedTarget;
-        const isFocusMovingToChild = relatedTarget && btnRef.current?.contains(relatedTarget);
-        
-        if (!isFocusMovingToChild) {
-          setIsFocused(false);
-          // 포커스 해제 시 Context에서 포커스 상태 해제
-          if (pointedButtonContext) {
-            pointedButtonContext.clearPointed(buttonId);
-          }
-        }
-      }}
       onTouchStart={onStart}
       onTouchEnd={onEnd}
       onKeyDown={onStart}
@@ -1803,9 +1624,7 @@ const Button = memo(({
       {label}
       {children}
       {toggle && (
-        <span className="icon pressed" aria-hidden="true">
-          <ToggleIcon />
-        </span>
+        <span className="icon pressed" aria-hidden="true"></span>
       )}
     </button>
   );
@@ -2226,7 +2045,7 @@ const useMultiModalButtonHandler = (options = {}) => {
       const { key } = e;
       
       // 상하 방향키: 부모 요소(섹션) 간 이동
-      if (key === KEYBOARD.ARROW_UP || key === KEYBOARD.ARROW_DOWN) {
+      if (key === 'ArrowUp' || key === 'ArrowDown') {
         e.preventDefault();
         const activeEl = document.activeElement;
         if (!activeEl) return;
@@ -2248,7 +2067,7 @@ const useMultiModalButtonHandler = (options = {}) => {
         
         // 부모가 바뀌는 지점 찾기
         let targetIndex = -1;
-        if (key === KEYBOARD.ARROW_DOWN) {
+        if (key === 'ArrowDown') {
           // 아래로: 현재 부모와 다른 부모를 가진 다음 요소 찾기
           for (let i = currentIndex + 1; i < allFocusable.length; i++) {
             const nextParent = allFocusable[i].closest('[data-tts-text]');
@@ -2284,14 +2103,8 @@ const useMultiModalButtonHandler = (options = {}) => {
       // 좌우 방향키: 브라우저 기본 Tab 동작과 동일 (가로채지 않음)
       // Tab/Shift+Tab과 동일하게 동작하도록 preventDefault 하지 않음
       
-      // Enter/Space 버튼 활성화
-      if (key === KEYBOARD.ENTER || key === KEYBOARD.SPACE) {
-        const activeEl = document.activeElement;
-        if (activeEl?.classList?.contains('button')) {
-          e.preventDefault();
-          activeEl.click();
-        }
-      }
+      // Enter/Space는 Button 컴포넌트의 onKeyUp 핸들러가 처리하므로 여기서는 가로채지 않음
+      // Button 컴포넌트에서 이미 포커스 유지 로직이 구현되어 있음
       
       // Tab 키는 브라우저 기본 동작 사용 (가로채지 않음)
     };
@@ -3666,10 +3479,10 @@ const ScreenStart = memo(() => {
 
   // 초기화 기능 (설정만 초기화)
   const handleIntroComplete = useCallback(() => {
-    setIsDark(DEFAULT_SETTINGS.IS_DARK);
-    setVolume(DEFAULT_SETTINGS.VOLUME);
-    setIsLarge(DEFAULT_SETTINGS.IS_LARGE);
-    setIsLow(DEFAULT_SETTINGS.IS_LOW);
+    setIsDark(false);
+    setVolume(1);
+    setIsLarge(false);
+    setIsLow(false);
   }, [setIsDark, setVolume, setIsLarge, setIsLow]);
 
   // 초기 포커스 설정 및 인트로 처리
@@ -3695,8 +3508,8 @@ const ScreenStart = memo(() => {
       // 인트로 재생 후 프로세스1 TTS 재생 (인트로 재생 완료 후 약간의 딜레이)
       process1Timer = setTimeout(() => {
         handleText(TTS.screenStart());
-      }, TIMER_CONFIG.TTS_DELAY);
-    }, TIMER_CONFIG.ACTION_DELAY * 2);
+      }, CFG.TTS_DELAY);
+    }, 100 * 2);
     return () => {
       clearTimeout(timer);
       if (process1Timer) clearTimeout(process1Timer);
@@ -3790,7 +3603,7 @@ const ScreenMenu = memo(() => {
 
   // 기본 탭 설정
   useEffect(() => {
-    const t = setTimeout(() => setSelectedTab(DEFAULT_SETTINGS.SELECTED_TAB), 0);
+    const t = setTimeout(() => setSelectedTab('전체메뉴'), 0);
     return () => clearTimeout(t);
   }, []); // eslint-disable-line
 
@@ -3800,7 +3613,7 @@ const ScreenMenu = memo(() => {
     blurActiveElement();
     const t = setTimeout(() => {
       const p = getActiveElementText();
-      if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY);
+      if (p) setTimeout(() => handleText(p), CFG.TTS_DELAY);
     }, 0);
     return () => clearTimeout(t);
   }, [handleText, blurActiveElement, getActiveElementText, stopIntroTimer]);
@@ -4084,7 +3897,7 @@ const ScreenDetails = memo(() => {
     blurActiveElement();
     const t = setTimeout(() => {
       const p = getActiveElementText();
-      if (p) setTimeout(() => handleText(p), TIMER_CONFIG.TTS_DELAY);
+      if (p) setTimeout(() => handleText(p), CFG.TTS_DELAY);
     }, 0);
     return () => clearTimeout(t);
   }, [handleText, blurActiveElement, getActiveElementText]);
@@ -4203,7 +4016,7 @@ const ScreenPayments = memo(() => {
   
   // TTS 안내
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenPayments(totalSum, formatNumber)), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenPayments(totalSum, formatNumber)), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [totalSum, handleText]);
   
@@ -4317,7 +4130,7 @@ const ScreenCardInsert = memo(() => {
   useWebViewMessage(setCurrentPage);
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenCardInsert()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenCardInsert()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4412,7 +4225,7 @@ const ScreenMobilePay = memo(() => {
   useWebViewMessage(setCurrentPage);
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenMobilePay()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenMobilePay()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4506,7 +4319,7 @@ const ScreenSimplePay = memo(() => {
   useWebViewMessage(setCurrentPage);
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenSimplePay()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenSimplePay()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4597,7 +4410,7 @@ const ScreenCardRemoval = memo(() => {
   }), []);
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenCardRemoval()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenCardRemoval()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4700,7 +4513,7 @@ const ScreenOrderComplete = memo(() => {
   }, [updateOrderNumber]);
   
   const countdown = usePaymentCountdown({
-    step: PAY_STEP.PRINT_SELECT,
+    step: 'ScreenOrderComplete',
     onTimeout: () => setCurrentPage('ScreenFinish'),
     ModalReturn, ModalAccessibility,
     setQuantities, totalMenuItems,
@@ -4709,7 +4522,7 @@ const ScreenOrderComplete = memo(() => {
   });
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenOrderComplete()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenOrderComplete()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4827,7 +4640,7 @@ const ScreenReceiptPrint = memo(() => {
   };
   
   const countdown = usePaymentCountdown({
-    step: PAY_STEP.RECEIPT_PRINT,
+    step: 'ScreenReceiptPrint',
     onTimeout: () => setCurrentPage('ScreenFinish'),
     ModalReturn, ModalAccessibility,
     setQuantities, totalMenuItems,
@@ -4836,7 +4649,7 @@ const ScreenReceiptPrint = memo(() => {
   });
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenReceiptPrint()), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenReceiptPrint()), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
   
@@ -4928,7 +4741,7 @@ const ScreenFinish = memo(() => {
   const { handleText } = useTextHandler(volume);
   
   const countdown = usePaymentCountdown({
-    step: PAY_STEP.FINISH,
+    step: 'ScreenFinish',
     onTimeout: () => {},
     ModalReturn, ModalAccessibility,
     setQuantities, totalMenuItems,
@@ -4936,7 +4749,7 @@ const ScreenFinish = memo(() => {
   });
   
   useEffect(() => {
-    const t = setTimeout(() => handleText(TTS.screenFinish), TIMER_CONFIG.TTS_DELAY);
+    const t = setTimeout(() => handleText(TTS.screenFinish), CFG.TTS_DELAY);
     return () => clearTimeout(t);
   }, [handleText]);
 
@@ -4993,7 +4806,6 @@ ScreenFinish.displayName = 'ScreenFinish';
 // ============================================================================
 // 접근성 모달 컴포넌트
 // ============================================================================
-
 
 // 접근성 모달
 const AccessibilityModal = memo(() => {

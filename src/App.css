@@ -1302,18 +1302,43 @@
       
       /* 상속 속성 (자식에게 전파) */
       color: var(--primary2-content-color-default);
-    
-      /* 토글 체크 아이콘 */
-      &.toggle .icon.pressed { display: none; }
-      &.toggle.pressed .icon.pressed { 
-        display: flex; 
-        position: absolute;
-        z-index: 1;
+      /* 토글 체크 아이콘 - CSS ::before로 처리 */
+      
+      &.toggle .icon.pressed {
+        display: none;        
+      }
+
+      &.toggle.pressed .icon.pressed {
+        display: block;
+        position: absolute;       
+        z-index: var(--content-icon-z-index-pressed);
+        /* --min-side 기반 크기 속성 */
         width: calc(var(--min-side) * 0.125);
         height: calc(var(--min-side) * 0.125);
         top: calc(var(--min-side) * 0.03125);
         right: calc(var(--min-side) * 0.03125);
+        
+        /* CSS mask-image로 SVG 지정하여 currentColor 적용 (JavaScript 인젝션 불필요) */
+        &::before {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 100%;
+          /* SVG를 mask로 사용하여 currentColor 적용 */
+          background-color: currentColor;
+          mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
+          mask-size: contain;
+          mask-repeat: no-repeat;
+          mask-position: center;
+          /* Webkit 브라우저 호환성 */
+          -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
+          -webkit-mask-size: contain;
+          -webkit-mask-repeat: no-repeat;
+          -webkit-mask-position: center;
+        }
       }
+
+
       
       /* 라벨 레이아웃 - 버튼에 직접 상속 */
       display: flex;
@@ -1335,10 +1360,9 @@
         }
       }
   
-      /* pointed는 비활성 버튼에서도 적용 가능 
+      /* pointed는 비활성 버튼에서도 적용 가능 */
       &:hover,
-      &:focus-visible,*/
-      &.pointed {
+      &:focus-visible{
         outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
       }
       
