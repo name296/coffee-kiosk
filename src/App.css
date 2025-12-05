@@ -1273,7 +1273,7 @@
 
     .button {
       --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
-      background: none;
+      background-color: var(--primary2-background-color-default);
       background-clip: padding-box;
       position: relative;
       display: flex;
@@ -1281,7 +1281,8 @@
       gap: var(--spacing-xs);
       min-width: 70px;
       min-height: 76px;
-      padding: calc(var(--min-side) * 0.135);
+      padding-left: calc(var(--min-side) * 0.135);
+      padding-right: calc(var(--min-side) * 0.135);
       outline-offset: calc(var(--min-side) * -0.03125);
       border-radius: calc(var(--min-side) * 0.0625);
       border: calc(var(--min-side) * 0.03125) solid var(--primary2-border-color-default);
@@ -1296,7 +1297,6 @@
       cursor: pointer;
       will-change: transform;
       contain: layout style;
-      background: var(--primary2-background-color-default);
       flex-flow: row nowrap;
       flex-shrink: 0;
       
@@ -1324,13 +1324,13 @@
       &[aria-disabled="true"] {
         border: calc(var(--min-side) * 0.03125) dashed var(--primary2-border-color-disabled);
         cursor: not-allowed;
-        background: var(--primary2-background-color-disabled);
+        background-color: var(--primary2-background-color-disabled);
         color: var(--primary2-content-color-disabled);
         pointer-events: auto; /* 탭 포커스를 받기 위해 auto */
         
         /* 비활성 버튼은 pressed 스타일 무시 */
         &.pressed {
-          background: var(--primary2-background-color-disabled);
+          background-color: var(--primary2-background-color-disabled);
           color: var(--primary2-content-color-disabled);
         }
       }
@@ -1353,84 +1353,84 @@
        ======================================== */
 
     &.primary1 {
-      background: var(--primary1-background-color-default);
+      background-color: var(--primary1-background-color-default);
       border-color: var(--primary1-border-color-default);
       color: var(--primary1-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--primary1-background-color-pressed);
+        background-color: var(--primary1-background-color-pressed);
         border-color: var(--primary1-border-color-pressed);
         color: var(--primary1-content-color-pressed);
       }
       &.toggle {
-        background: var(--primary1-background-color-default);
+        background-color: var(--primary1-background-color-default);
         border-color: var(--primary1-border-color-default);
         color: var(--primary1-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--primary1-background-color-pressed);
+        background-color: var(--primary1-background-color-pressed);
         border-color: var(--primary1-border-color-pressed);
         color: var(--primary1-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--primary1-background-color-disabled);
+        background-color: var(--primary1-background-color-disabled);
         border-color: var(--primary1-border-color-disabled);
         color: var(--primary1-content-color-disabled);
       }
     }
 
     &.primary2 {
-      background: var(--primary2-background-color-default);
+      background-color: var(--primary2-background-color-default);
       border-color: var(--primary2-border-color-default);
       color: var(--primary2-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--primary2-background-color-pressed);
+        background-color: var(--primary2-background-color-pressed);
         border-color: var(--primary2-border-color-pressed);
         color: var(--primary2-content-color-pressed);
       }
       &.toggle {
-        background: var(--primary2-background-color-default);
+        background-color: var(--primary2-background-color-default);
         border-color: var(--primary2-border-color-default);
         color: var(--primary2-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--primary2-background-color-pressed);
+        background-color: var(--primary2-background-color-pressed);
         border-color: var(--primary2-border-color-pressed);
         color: var(--primary2-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--primary2-background-color-disabled);
+        background-color: var(--primary2-background-color-disabled);
         border-color: var(--primary2-border-color-disabled);
         color: var(--primary2-content-color-disabled);
       }
     }
 
     &.primary3 {
-      background: var(--primary3-background1-color-default);
+      background-color: var(--primary3-background1-color-default);
       border-color: var(--primary3-border-color-default);
       color: var(--primary3-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--primary3-background1-color-pressed);
+        background-color: var(--primary3-background1-color-pressed);
         border-color: var(--primary3-border-color-pressed);
         color: var(--primary3-content-color-pressed);
       }
       &.toggle {
-        background: var(--primary3-background1-color-default);
+        background-color: var(--primary3-background1-color-default);
         border-color: var(--primary3-border-color-default);
         color: var(--primary3-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--primary3-background1-color-pressed);
+        background-color: var(--primary3-background1-color-pressed);
         border-color: var(--primary3-border-color-pressed);
         color: var(--primary3-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--primary3-background1-color-disabled);
+        background-color: var(--primary3-background1-color-disabled);
         border-color: var(--primary3-border-color-disabled);
         color: var(--primary3-content-color-disabled);
       }
@@ -1441,84 +1441,84 @@
        ======================================== */
 
     &.secondary1 {
-      background: var(--secondary1-background-color-default);
+      background-color: var(--secondary1-background-color-default);
       border-color: var(--secondary1-border-color-default);
       color: var(--secondary1-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--secondary1-background-color-pressed);
+        background-color: var(--secondary1-background-color-pressed);
         border-color: var(--secondary1-border-color-pressed);
         color: var(--secondary1-content-color-pressed);
       }
       &.toggle {
-        background: var(--secondary1-background-color-default);
+        background-color: var(--secondary1-background-color-default);
         border-color: var(--secondary1-border-color-default);
         color: var(--secondary1-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--secondary1-background-color-pressed);
+        background-color: var(--secondary1-background-color-pressed);
         border-color: var(--secondary1-border-color-pressed);
         color: var(--secondary1-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--secondary1-background-color-disabled);
+        background-color: var(--secondary1-background-color-disabled);
         border-color: var(--secondary1-border-color-disabled);
         color: var(--secondary1-content-color-disabled);
       }
     }
 
     &.secondary2 {
-      background: var(--secondary2-background-color-default);
+      background-color: var(--secondary2-background-color-default);
       border-color: var(--secondary2-border-color-default);
       color: var(--secondary2-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--secondary2-background-color-pressed);
+        background-color: var(--secondary2-background-color-pressed);
         border-color: var(--secondary2-border-color-pressed);
         color: var(--secondary2-content-color-pressed);
       }
       &.toggle {
-        background: var(--secondary2-background-color-default);
+        background-color: var(--secondary2-background-color-default);
         border-color: var(--secondary2-border-color-default);
         color: var(--secondary2-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--secondary2-background-color-pressed);
+        background-color: var(--secondary2-background-color-pressed);
         border-color: var(--secondary2-border-color-pressed);
         color: var(--secondary2-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--secondary2-background-color-disabled);
+        background-color: var(--secondary2-background-color-disabled);
         border-color: var(--secondary2-border-color-disabled);
         color: var(--secondary2-content-color-disabled);
       }
     }
 
     &.secondary3 {
-      background: var(--secondary3-background1-color-default);
+      background-color: var(--secondary3-background1-color-default);
       border-color: var(--secondary3-border-color-default);
       color: var(--secondary3-content-color-default);
       
       &.pressed:not(.toggle) {
-        background: var(--secondary3-background1-color-pressed);
+        background-color: var(--secondary3-background1-color-pressed);
         border-color: var(--secondary3-border-color-pressed);
         color: var(--secondary3-content-color-pressed);
       }
       &.toggle {
-        background: var(--secondary3-background1-color-default);
+        background-color: var(--secondary3-background1-color-default);
         border-color: var(--secondary3-border-color-default);
         color: var(--secondary3-content-color-default);
       }
       &.toggle.pressed {
-        background: var(--secondary3-background1-color-pressed);
+        background-color: var(--secondary3-background1-color-pressed);
         border-color: var(--secondary3-border-color-pressed);
         color: var(--secondary3-content-color-pressed);
         & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
       }
       &[aria-disabled="true"] {
-        background: var(--secondary3-background1-color-disabled);
+        background-color: var(--secondary3-background1-color-disabled);
         border-color: var(--secondary3-border-color-disabled);
         color: var(--secondary3-content-color-disabled);
       }
@@ -1526,17 +1526,17 @@
 
     /* Delete 아이템 버튼 (빨간색) */
     &.delete-item {
-      background: var(--delete-background-color-default);
+      background-color: var(--delete-background-color-default);
       border-color: var(--delete-border-color-default);
       color: var(--delete-content-color-default);
       
       &.pressed:not(.toggle), &.pressing {
-        background: var(--delete-background-color-pressed);
+        background-color: var(--delete-background-color-pressed);
         border-color: var(--delete-border-color-pressed);
         color: var(--delete-content-color-pressed);
       }
       &[aria-disabled="true"] {
-        background: var(--delete-background-color-disabled);
+        background-color: var(--delete-background-color-disabled);
         border-color: var(--delete-border-color-disabled);
         color: var(--delete-content-color-disabled);
       }
