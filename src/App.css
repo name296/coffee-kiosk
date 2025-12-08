@@ -981,7 +981,6 @@
       top: 0%;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 0; 
     }
     & .label { 
       position: absolute;
@@ -990,7 +989,6 @@
       bottom: 0%;
       left: 0%;
       padding-top: 2.5rem;
-      z-index: 1;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -1253,7 +1251,7 @@
        포커스 가능한 요소 공통 스타일
        ======================================== */
     
-    /* 포커스 가능한 모든 요소에 --min-side 및 pointed 스타일 적용 */
+    /* 포커스 가능한 모든 요소에 --min-side 적용 */
     button:not([disabled]),
     a[href],
     input:not([disabled]),
@@ -1261,10 +1259,6 @@
     textarea:not([disabled]),
     [tabindex]:not([tabindex="-1"]) {
       --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
-      
-      &.pointed {
-        outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
-      }
     }
 
     /* ========================================
@@ -1293,7 +1287,6 @@
       height: fit-content;
       justify-content: center;
       align-items: center;
-      z-index: 0;
       cursor: pointer;
       will-change: transform;
       contain: layout style;
@@ -1311,7 +1304,7 @@
       &.toggle.pressed .icon.pressed {
         display: block;
         position: absolute;       
-        z-index: var(--content-icon-z-index-pressed);
+
         /* --min-side 기반 크기 속성 */
         width: calc(var(--min-side) * 0.125);
         height: calc(var(--min-side) * 0.125);
@@ -1337,8 +1330,6 @@
           -webkit-mask-position: center;
         }
       }
-
-
       
       /* 라벨 레이아웃 - 버튼에 직접 상속 */
       display: flex;
@@ -1360,7 +1351,7 @@
         }
       }
   
-      /* pointed는 비활성 버튼에서도 적용 가능 */
+      /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
       &:hover,
       &:focus-visible{
         outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
