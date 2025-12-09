@@ -1028,11 +1028,25 @@ const useCategoryPagination = (items, isLarge = false) => {
   const prevIsLargeRef = useContext(RefContext).refs.useCategoryPagination.prevIsLargeRef;
   const lastWidthRef = useContext(RefContext).refs.useCategoryPagination.lastWidthRef; // 이전 버튼 폭 저장
   const isCalculatingRef = useContext(RefContext).refs.useCategoryPagination.isCalculatingRef; // 계산 중 플래그 (무한루프 방지)
+  const currentIsLargeRef = useRef(isLarge); // 현재 isLarge 값 저장 (calculate에서 사용)
   
   // 초기값 설정
   if (prevIsLargeRef && prevIsLargeRef.current === null) prevIsLargeRef.current = isLarge;
   if (lastWidthRef && lastWidthRef.current === null) lastWidthRef.current = 0;
   if (isCalculatingRef && isCalculatingRef.current === null) isCalculatingRef.current = false;
+  currentIsLargeRef.current = isLarge; // 항상 최신 값으로 업데이트
+  
+  // isLarge 변경 감지 및 prevIsLargeRef 업데이트
+  useEffect(() => {
+    if (prevIsLargeRef && prevIsLargeRef.current !== isLarge) {
+      prevIsLargeRef.current = isLarge;
+      currentIsLargeRef.current = isLarge;
+      // isLarge 변경 시 재계산 트리거
+      setCalcTrigger(t => t + 1);
+    } else {
+      currentIsLargeRef.current = isLarge;
+    }
+  }, [isLarge, prevIsLargeRef]);
   
   // 계산 함수
   // items를 ref로 저장하여 의존성 문제 해결 (자연스러운 동기식 처리)
@@ -1048,6 +1062,9 @@ const useCategoryPagination = (items, isLarge = false) => {
   }, [items]);
   
   const calculate = useCallback(() => {
+    // 계산 중이면 무시 (무한루프 방지)
+    if (isCalculatingRef?.current) return;
+    
     const currentItems = itemsRef.current;
     
     if (!measureRef.current || !containerRef.current) {
@@ -1058,8 +1075,13 @@ const useCategoryPagination = (items, isLarge = false) => {
       return;
     }
     
-    const isLargeChanged = prevIsLargeRef?.current !== isLarge;
-    if (prevIsLargeRef) prevIsLargeRef.current = isLarge;
+    // 계산 중 플래그 설정
+    if (isCalculatingRef) isCalculatingRef.current = true;
+    
+    // isLarge는 ref를 통해 접근 (의존성 제거)
+    const currentIsLarge = currentIsLargeRef.current;
+    const isLargeChanged = prevIsLargeRef?.current !== null && prevIsLargeRef?.current !== currentIsLarge;
+    if (prevIsLargeRef) prevIsLargeRef.current = currentIsLarge;
     
     // 새 계산 시작 - 숨기기만 (compact는 실제 측정 후 결정)
     setIsReady(false);
@@ -1116,7 +1138,10 @@ const useCategoryPagination = (items, isLarge = false) => {
     if (breakpoints.length > 0) {
       setIsReady(true);
     }
-  }, [isLarge]);
+    
+    // 계산 완료 후 플래그 해제
+    if (isCalculatingRef) isCalculatingRef.current = false;
+  }, []); // 의존성 제거: itemsRef, prevIsLargeRef, isCalculatingRef는 ref이므로 의존성 불필요
   
   // ResizeObserver로 버튼 크기 변경 감지
   useEffect(() => {
@@ -1147,13 +1172,8 @@ const useCategoryPagination = (items, isLarge = false) => {
       // 폭이 변경되었을 때만 재계산
       if (lastWidthRef && Math.abs(newWidth - (lastWidthRef.current || 0)) > 1) {
         lastWidthRef.current = newWidth;
-        
-        // 계산 중 플래그 설정
-        if (isCalculatingRef) isCalculatingRef.current = true;
-        // 직접 calculate 호출 (동기식)
+        // 직접 calculate 호출 (동기식, calculate 내부에서 플래그 관리)
         calculate();
-        // 계산 완료 후 플래그 해제
-        if (isCalculatingRef) isCalculatingRef.current = false;
       }
     });
     
@@ -1226,7 +1246,7 @@ const useCategoryPagination = (items, isLarge = false) => {
       const end = pageBreakpoints[idx + 1] ?? currentItems.length;
       return currentItems.slice(start, end);
     });
-  }, [pageBreakpoints, items]); // items는 itemsRef 업데이트 트리거용
+  }, [pageBreakpoints]); // items는 itemsRef를 통해 접근하므로 의존성 불필요
   
   // 현재 페이지 아이템
   const currentItems = pagedItems[currentPage] ?? [];
