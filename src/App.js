@@ -3999,7 +3999,16 @@ const ScreenDetails = memo(() => {
   useInteractiveTTSHandler(true, handleText);
   // 화면이 보일 때 main에 포커스는 RouteProvider에서 자동으로 처리됨 (중복 제거)
   
-  const rowRefs = [refsData.refs.ScreenDetails.row1Ref, refsData.refs.ScreenDetails.row2Ref, refsData.refs.ScreenDetails.row3Ref, refsData.refs.ScreenDetails.row4Ref, refsData.refs.ScreenDetails.row5Ref, refsData.refs.ScreenDetails.row6Ref];
+  // rowRefs를 useMemo로 메모이제이션 (무한루프 방지) - ref는 항상 같은 참조이므로 의존성 불필요
+  const rowRefs = useMemo(() => [
+    refsData.refs.ScreenDetails.row1Ref, 
+    refsData.refs.ScreenDetails.row2Ref, 
+    refsData.refs.ScreenDetails.row3Ref, 
+    refsData.refs.ScreenDetails.row4Ref, 
+    refsData.refs.ScreenDetails.row5Ref, 
+    refsData.refs.ScreenDetails.row6Ref
+  ], []); // ref는 항상 같은 참조이므로 의존성 불필요
+  
   const {
     pageNumber, totalPages, currentItems,
     handlePrevPage, handleNextPage, itemsPerPage
@@ -4022,14 +4031,15 @@ const ScreenDetails = memo(() => {
     }
   );
 
+  // currentItems.length만 의존성에 포함 (배열 참조가 아닌 길이만)
+  const currentItemsLength = currentItems?.length ?? 0;
   
-
   useEffect(() => {
     // 동적 섹션 변경 시 sectionsRefs도 함께 업데이트
     updateFocusableSections(
       [
         'hiddenPageButton',
-        ...Array.from({ length: (currentItems && currentItems.length) ? currentItems.length : 0 }, (_, i) => `row${i + 1}`),
+        ...Array.from({ length: currentItemsLength }, (_, i) => `row${i + 1}`),
         'actionBar', 'orderSummary', 'systemControls'
       ],
       {
@@ -4041,7 +4051,7 @@ const ScreenDetails = memo(() => {
         row4: rowRefs[3], row5: rowRefs[4], row6: rowRefs[5]
       }
     );
-  }, [pageNumber, currentItems, rowRefs, refsData.refs, updateFocusableSections]);
+  }, [pageNumber, currentItemsLength, rowRefs, updateFocusableSections]); // refsData.refs 제거, currentItems 대신 currentItemsLength 사용
   
   // 아이템 없으면 메뉴선택으로 이동
   useEffect(() => {
