@@ -42,6 +42,15 @@ const copyStatic = () => {
     const src = `./src/${dir}`;
     if (existsSync(src)) cpSync(src, `${config.outdir}/${dir}`, { recursive: true });
   });
+  
+  // 사운드 파일 복사 (개별 파일 - src 루트에 있는 경우)
+  if (existsSync("./src/SoundOnPressed.mp3")) {
+    cpSync("./src/SoundOnPressed.mp3", `${config.outdir}/SoundOnPressed.mp3`);
+  }
+  if (existsSync("./src/SoundNote.wav")) {
+    cpSync("./src/SoundNote.wav", `${config.outdir}/SoundNote.wav`);
+  }
+  
   if (existsSync("./src/index.html")) cpSync("./src/index.html", config.htmlEntry);
 };
 
@@ -109,7 +118,8 @@ const generateIcons = async () => {
 const startWatchers = () => {
   // 소스 파일 감시
   watch("./src", { recursive: true }, async (_, file) => {
-    if (file && config.watchExtensions.some((ext) => file.endsWith(ext))) {
+    if (file && (config.watchExtensions.some((ext) => file.endsWith(ext)) || 
+                 file.endsWith('.mp3') || file.endsWith('.wav'))) {
       console.log(`🔄 Changed: ${file}`);
       await bundle("watch");
     }
@@ -133,7 +143,31 @@ const startWatchers = () => {
 // ============================================================================
 const serveStatic = async (pathname) => {
   const file = Bun.file(`${config.outdir}${pathname}`);
-  return (await file.exists()) ? new Response(file) : null;
+  if (!(await file.exists())) return null;
+  
+  // MIME 타입 설정 (오디오 파일 등)
+  const ext = pathname.split('.').pop()?.toLowerCase();
+  const mimeTypes = {
+    'mp3': 'audio/mpeg',
+    'wav': 'audio/wav',
+    'css': 'text/css',
+    'js': 'application/javascript',
+    'json': 'application/json',
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'svg': 'image/svg+xml',
+    'otf': 'font/otf',
+    'ttf': 'font/ttf',
+    'woff': 'font/woff',
+    'woff2': 'font/woff2'
+  };
+  
+  const contentType = mimeTypes[ext] || file.type || 'application/octet-stream';
+  
+  return new Response(file, {
+    headers: { 'Content-Type': contentType }
+  });
 };
 
 const startServer = () => {

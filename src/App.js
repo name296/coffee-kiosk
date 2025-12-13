@@ -308,96 +308,6 @@ const TTSAudioPlayer = memo(() => {
   const shouldPlay = ttsState?.shouldPlay ?? false;
   const setIsPlaying = ttsState?.setIsPlaying;
   
-  // shouldPlay가 true면 autoplay 속성으로 재생 (play() 호출하지 않음)
-  useEffect(() => {
-    if (!audioPlayerRef?.current || !src) return;
-    
-    const audio = audioPlayerRef.current;
-    
-    // shouldPlay가 true면 autoplay 속성 추가, false면 제거
-    if (shouldPlay) {
-      audio.setAttribute('autoplay', 'autoplay');
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔊 [TTS] 오디오 autoplay 속성 설정: ${src.substring(0, 60)}...`);
-      }
-    } else {
-      audio.removeAttribute('autoplay');
-    }
-  }, [shouldPlay, src, audioPlayerRef]);
-  
-  // 재생 시작 감지 (autoplay로 재생 시작됨)
-  useEffect(() => {
-    if (!audioPlayerRef?.current || !src || !shouldPlay) return;
-    
-    const audio = audioPlayerRef.current;
-    
-    const handlePlay = () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔊 [TTS] 오디오 재생 시작 (autoplay)`);
-      }
-      if (setIsPlaying) setIsPlaying(true);
-    };
-    
-    const handleError = (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔊 [TTS] 오디오 재생 실패:`, error);
-      }
-      if (setIsPlaying) setIsPlaying(false);
-      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-    };
-    
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('error', handleError);
-  
-    return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('error', handleError);
-    };
-  }, [shouldPlay, src, audioPlayerRef, setIsPlaying, ttsState]);
-  
-  // 재생 완료 이벤트 처리 (React 방식)
-  useEffect(() => {
-    if (!audioPlayerRef?.current) return;
-    
-    const audio = audioPlayerRef.current;
-    
-    const handleEnded = () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔊 [TTS] 오디오 재생 완료`);
-      }
-      if (setIsPlaying) setIsPlaying(false);
-      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-    };
-    
-    audio.addEventListener('ended', handleEnded);
-    
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [audioPlayerRef, setIsPlaying, ttsState]);
-  
-  // playbackRate와 volume은 JS로 설정 (HTML 속성이 아님)
-  useEffect(() => {
-    if (!audioPlayerRef?.current) return;
-    const audio = audioPlayerRef.current;
-    audio.playbackRate = playbackRate;
-    audio.volume = volume;
-  }, [playbackRate, volume, audioPlayerRef]);
-  
-  // src가 변경되면 autoplay 속성 추가 (사용자 인터랙션 없이 재생)
-  useEffect(() => {
-    if (!audioPlayerRef?.current || !src) return;
-    
-    const audio = audioPlayerRef.current;
-    
-    // src가 설정되면 autoplay 속성 추가 (play() 호출하지 않음)
-    audio.setAttribute('autoplay', 'autoplay');
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`🔊 [TTS] 오디오 src 설정 및 autoplay 속성 추가: ${src.substring(0, 60)}...`);
-    }
-  }, [src, audioPlayerRef]);
-  
   // 포커스 기반 TTS는 Run 컴포넌트 최상위의 audioPlayer 사용 (과거 앱 방식)
   // TTSAudioPlayer는 ref만 연결하고 실제 audio 요소는 렌더링하지 않음
   useEffect(() => {
@@ -408,7 +318,7 @@ const TTSAudioPlayer = memo(() => {
     }
   }, [audioPlayerRef]);
   
-  // 포커스 기반 TTS: src, playbackRate, volume, shouldPlay 설정
+  // 통합된 Audio 제어: src, playbackRate, volume, shouldPlay 설정
   useEffect(() => {
     if (!audioPlayerRef?.current) return;
     const audio = audioPlayerRef.current;
@@ -422,7 +332,7 @@ const TTSAudioPlayer = memo(() => {
     audio.playbackRate = playbackRate;
     audio.volume = volume;
     
-    // shouldPlay가 true면 autoplay 속성 추가
+    // shouldPlay에 따라 autoplay 속성 설정
     if (shouldPlay && src) {
       audio.setAttribute('autoplay', 'autoplay');
       if (process.env.NODE_ENV === 'development') {
@@ -433,7 +343,7 @@ const TTSAudioPlayer = memo(() => {
     }
   }, [src, playbackRate, volume, shouldPlay, audioPlayerRef]);
   
-  // 재생 시작 감지 (autoplay로 재생 시작됨)
+  // 재생 시작/에러 감지 (autoplay로 재생 시작됨)
   useEffect(() => {
     if (!audioPlayerRef?.current || !src || !shouldPlay) return;
     
@@ -669,11 +579,40 @@ const useSound = () => {
       const audio = new Audio(src);
       audioRefs.current[name] = audio;
       globalAudioRefs.current.add(audio);
+      
+      // 에러 핸들러 추가 (개발 환경 디버깅용)
+      audio.addEventListener('error', (e) => {
+        console.error(`[사운드] ${name} 재생 실패`, {
+          src,
+          error: e,
+          audioError: audio.error,
+          networkState: audio.networkState,
+          readyState: audio.readyState
+        });
+      });
     }
     const a = audioRefs.current[name];
     a.volume = volumeRef.current;
     a.currentTime = 0;
-    a.play().catch(() => {});
+    
+    // play() 호출 및 에러 처리
+    const playPromise = a.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[사운드] ${name} 재생 시작`, { src });
+          }
+        })
+        .catch((error) => {
+          console.error(`[사운드] ${name} 재생 실패`, {
+            src,
+            error,
+            errorName: error.name,
+            errorMessage: error.message
+          });
+        });
+    }
   }, []);
   
   const setVolume = useCallback((v) => {
@@ -693,8 +632,20 @@ const useSound = () => {
 const focusMainElement = () => {
   if (typeof document === 'undefined') return;
   const mainElement = document.querySelector('.main');
-  if (mainElement && document.activeElement !== mainElement) {
-    // 포커스가 이미 .main에 있으면 포커스하지 않음 (TTS 중복 실행 방지)
+  if (mainElement) {
+    const prevActive = document.activeElement;
+    const prevActiveInfo = prevActive ? {
+      tagName: prevActive.tagName,
+      className: prevActive.className,
+      id: prevActive.id || null
+    } : null;
+    
+    console.log('[포커스] focusMainElement 호출', {
+      from: prevActiveInfo,
+      to: { tagName: mainElement.tagName, className: mainElement.className },
+      timestamp: new Date().toISOString()
+    });
+    
     mainElement.focus();
     // focusin 이벤트는 브라우저가 자동으로 발생시키므로 수동 트리거 불필요
   }
@@ -800,21 +751,7 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
   
       // 에러 처리는 TTSAudioPlayer의 이벤트 리스너에서 처리
       if (audioPlayerRef?.current) {
-        const errorHandler = () => {
-          if (!requestIdRef || requestIdRef.current !== currentRequestId) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`🔊 [TTS] 오디오 에러 핸들러: 요청 취소됨`);
-            }
-            return;
-          }
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`🔊 [TTS] 오디오 에러 발생 (캐시)`);
-          }
-          // React state 이니셜
-          if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
-          if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-          setIsPlaying(false);
-        };
+        const errorHandler = createTTSAudioErrorHandler(requestIdRef, currentRequestId, ttsState, setIsPlaying, '캐시');
         audioPlayerRef.current.addEventListener('error', errorHandler, { once: true });
       }
     } else {
@@ -847,18 +784,7 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
         
         // 에러 처리는 TTSAudioPlayer의 이벤트 리스너에서 처리
         if (audioPlayerRef.current) {
-          const errorHandler = () => {
-            if (!requestIdRef || requestIdRef.current !== currentRequestId) {
-              if (process.env.NODE_ENV === 'development') {
-                console.log(`🔊 [TTS] 오디오 에러 핸들러: 요청 취소됨`);
-              }
-              return;
-            }
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`🔊 [TTS] 오디오 에러 발생 (외부 엔진)`);
-            }
-            setIsPlaying(false);
-          };
+          const errorHandler = createTTSAudioErrorHandler(requestIdRef, currentRequestId, ttsState, setIsPlaying, '외부 엔진');
           audioPlayerRef.current.addEventListener('error', errorHandler, { once: true });
         }
       } else {
@@ -902,16 +828,14 @@ function useTextHandler(volume) {
     if (flag) ttsState?.setReplayText(txt);
     
     // 요구사항 5: 새 재생 시 이전 TTS 즉시 중단 및 재생
-    const volumeMap = { 0: 0, 1: 0.5, 2: 0.75, 3: 1 };
-    const vol = newVol !== -1 ? volumeMap[newVol] : volumeMap[volume];
+    const vol = newVol !== -1 ? VOLUME_MAP[newVol] : VOLUME_MAP[volume];
     playTTS(txt, 1, vol, ttsDB, ttsState, requestIdRef);
   }, [ttsState, ttsDB, volume, requestIdRef]);
   
   // TTS 재생 (replayText 재생)
   const handleReplayText = useCallback(() => {
     if (ttsState?.replayText) {
-      const volumeMap = { 0: 0, 1: 0.5, 2: 0.75, 3: 1 };
-      const vol = volumeMap[volume];
+      const vol = VOLUME_MAP[volume];
       playTTS(ttsState.replayText, 1, vol, ttsDB, ttsState, requestIdRef);
     }
   }, [ttsState, ttsDB, volume, requestIdRef]);
@@ -921,6 +845,27 @@ function useTextHandler(volume) {
 
 // TTS 재생 함수들 (단일책임원칙: 각 단계별로 분리)
 // ============================================================================
+
+// 볼륨 매핑 상수 (중복 제거)
+const VOLUME_MAP = { 0: 0, 1: 0.5, 2: 0.75, 3: 1 };
+
+// TTS 오디오 에러 핸들러 생성 (중복 제거)
+const createTTSAudioErrorHandler = (requestIdRef, currentRequestId, ttsState, setIsPlaying, source = '') => {
+  return () => {
+    if (!requestIdRef || requestIdRef.current !== currentRequestId) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 에러 핸들러: 요청 취소됨`);
+      }
+      return;
+    }
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 오디오 에러 발생${source ? ` (${source})` : ''}`);
+    }
+    if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
+    if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+    if (setIsPlaying) setIsPlaying(false);
+  };
+};
 
 // 외부 TTS 엔진 요청 (단일책임: 외부 엔진 전문 송수신만)
 const fetchTTSFromServer = async (text) => {
@@ -977,7 +922,7 @@ const formatRemainingTime = (ms) => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
+const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true, checkTimeoutModal = null) => {
   const timerRef = useRef(null);
   const intervalRef = useRef(null);
   const lastActivityRef = useRef(Date.now());
@@ -1012,10 +957,10 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
     }
     lastResetTimeRef.current = now;
     
-    // 모달이 열려있으면 20초로 리셋, 아니면 기본 타임아웃으로 리셋
-    const modalElement = document.querySelector('.main.modal');
-    const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
-    const resetTime = isModalOpen ? 20000 : timeoutRef.current;
+    // 타임아웃 모달이 열려있으면 20초로 리셋, 아니면 기본 타임아웃으로 리셋
+    // checkTimeoutModal은 Bottom 컴포넌트에서 전달하는 콜백 (accessibility.ModalTimeout?.isOpen 체크)
+    const isTimeoutModalOpen = checkTimeoutModal ? checkTimeoutModal() : false;
+    const resetTime = isTimeoutModalOpen ? 20000 : timeoutRef.current;
     
     // 사용자 입력 시 리셋
     const prevLastActivity = lastActivityRef.current;
@@ -1026,7 +971,7 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
     console.log('[타이머] resetTimer 호출됨', {
       now: new Date(now).toISOString(),
       resetTime,
-      isModalOpen,
+      isTimeoutModalOpen,
       prevLastActivity: new Date(prevLastActivity).toISOString(),
       prevCurrentTimeout,
       timeoutRef: timeoutRef.current
@@ -1067,12 +1012,11 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
     
     // 100ms마다 실행되는 카운트다운
     intervalRef.current = setInterval(() => {
-      // 모달 상태 확인
-      const modalElement = document.querySelector('.main.modal');
-      const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
+      // 타임아웃 모달 상태 확인
+      const isTimeoutModalOpen = checkTimeoutModal ? checkTimeoutModal() : false;
       
-      // 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
-      if (!isModalOpen && currentTimeoutRef.current === 20000) {
+      // 타임아웃 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
+      if (!isTimeoutModalOpen && currentTimeoutRef.current === 20000) {
         const resetTime = timeoutRef.current || timeout;
         const resetTimeMs = Date.now();
         lastActivityRef.current = resetTimeMs;
@@ -1165,9 +1109,9 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
     }
     lastResetTimeRef.current = now;
     
-    const modalElement = document.querySelector('.main.modal');
-    const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
-    const resetTime = isModalOpen ? 20000 : timeoutRef.current;
+    // 타임아웃 모달이 열려있으면 20초로 리셋, 아니면 기본 타임아웃으로 리셋
+    const isTimeoutModalOpen = checkTimeoutModal ? checkTimeoutModal() : false;
+    const resetTime = isTimeoutModalOpen ? 20000 : timeoutRef.current;
     
     const prevLastActivity = lastActivityRef.current;
     lastActivityRef.current = now;
@@ -1177,7 +1121,7 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
       eventType,
       now: new Date(now).toISOString(),
       resetTime,
-      isModalOpen,
+      isTimeoutModalOpen,
       prevLastActivity: new Date(prevLastActivity).toISOString(),
       timeoutRef: timeoutRef.current
     });
@@ -1252,6 +1196,10 @@ const initializeApp = (callbacks) => {
     console.log('[초기화] setCurrentPage 호출 전');
     callbacks.setCurrentPage('ScreenStart');
     console.log('[초기화] setCurrentPage 호출 완료 - ScreenStart로 이동');
+    // 모달이 닫힌 후 .main에 포커스 설정
+    requestAnimationFrame(() => {
+      focusMainElement();
+    });
   } else {
     console.error('[초기화] setCurrentPage가 없습니다!');
   }
@@ -1847,12 +1795,29 @@ const useFocusTrap = (isActive, options = {}) => {
         // 포커스가 main 내부의 다른 요소로 이동하는 경우는 허용
         const isRelatedTargetInMain = mainElement.contains(e.relatedTarget) || e.relatedTarget === mainElement;
     
+        // relatedTarget이 유효한 포커스 가능한 요소인 경우는 허용 (방향키 네비게이션 허용)
         // main 밖으로 포커스가 나가려고 하거나 포커스가 사라지면 main으로 포커스 이동
         // 단, main 내부의 버튼 등으로 포커스가 이동하는 경우는 허용
-        if (e.relatedTarget === null || !isRelatedTargetInMain) {
+        // 단, relatedTarget이 유효한 포커스 가능한 요소인 경우도 허용 (방향키로 이동한 경우)
+        if (e.relatedTarget === null) {
+          // 포커스가 사라지는 경우만 .main으로 되돌림
           e.preventDefault();
-          // 원천 함수 focusMainElement 사용 (일관성 유지)
           focusMainElement();
+        } else if (!isRelatedTargetInMain) {
+          // main 밖으로 이동하는 경우, relatedTarget이 포커스 가능한 요소인지 확인
+          const isFocusable = e.relatedTarget && (
+            e.relatedTarget.tagName === 'BUTTON' ||
+            e.relatedTarget.tagName === 'A' ||
+            e.relatedTarget.tagName === 'INPUT' ||
+            e.relatedTarget.tagName === 'SELECT' ||
+            e.relatedTarget.tagName === 'TEXTAREA' ||
+            e.relatedTarget.hasAttribute('tabindex')
+          );
+          // 포커스 가능한 요소로 이동하는 경우는 허용 (방향키 네비게이션)
+          if (!isFocusable) {
+            e.preventDefault();
+            focusMainElement();
+          }
         }
       } else {
         // 모달 모드: 특정 컨테이너 기준으로 포커스 이탈 방지
@@ -1861,8 +1826,20 @@ const useFocusTrap = (isActive, options = {}) => {
         if (containerRef.current && 
             !isRelatedTargetInContainer && 
             e.relatedTarget !== null) {
-          e.preventDefault();
-          focusFirst();
+          // relatedTarget이 포커스 가능한 요소인지 확인
+          const isFocusable = e.relatedTarget && (
+            e.relatedTarget.tagName === 'BUTTON' ||
+            e.relatedTarget.tagName === 'A' ||
+            e.relatedTarget.tagName === 'INPUT' ||
+            e.relatedTarget.tagName === 'SELECT' ||
+            e.relatedTarget.tagName === 'TEXTAREA' ||
+            e.relatedTarget.hasAttribute('tabindex')
+          );
+          // 포커스 가능한 요소로 이동하는 경우는 허용
+          if (!isFocusable) {
+            e.preventDefault();
+            focusFirst();
+          }
         }
       }
     };
@@ -2106,42 +2083,111 @@ const getFocusableElements = () => {
       return style.display !== 'none' && style.visibility !== 'hidden';
     });
   
-  // main을 포커스 루프에 항상 추가 (화면 전환 시 포커스 지정을 위해)
-  const mainElement = document.querySelector('.main');
-  if (mainElement) {
-    const mainStyle = window.getComputedStyle(mainElement);
-    if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
-      // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
-      elements.unshift(mainElement);
+  // 모달 상태 확인
+  const modalContentElement = document.querySelector('.main.modal');
+  const isModalOpen = modalContentElement && window.getComputedStyle(modalContentElement).display !== 'none';
+  
+  if (isModalOpen) {
+    // 모달이 열려있을 때: .main.modal을 포커스 루프에 추가
+    if (modalContentElement) {
+      const modalStyle = window.getComputedStyle(modalContentElement);
+      if (modalStyle.display !== 'none' && modalStyle.visibility !== 'hidden') {
+        // .main.modal에 tabindex가 없으면 추가
+        if (!modalContentElement.hasAttribute('tabindex')) {
+          modalContentElement.setAttribute('tabindex', '-1');
+        }
+        // .main.modal을 첫 번째 요소로 추가 (모달 열릴 때 .main.modal에 포커스가 가도록)
+        elements.unshift(modalContentElement);
+      }
+    }
+  } else {
+    // 모달이 닫혀있을 때: .main을 포커스 루프에 추가 (화면 전환 시 포커스 지정을 위해)
+    const mainElement = document.querySelector('.main');
+    if (mainElement && !mainElement.classList.contains('modal')) {
+      const mainStyle = window.getComputedStyle(mainElement);
+      if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
+        // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
+        elements.unshift(mainElement);
+      }
     }
   }
   
   return elements;
 };
 
-// 다음 섹션으로 이동할 요소 찾기 (단일책임: 다음 요소 찾기만)
+// 다음 섹션(부모)으로 이동할 요소 찾기 (단일책임: 다음 부모의 첫 요소 찾기만)
 const findNextSectionElement = (allFocusable, currentIndex, currentParent) => {
+  // 현재 부모와 다른 부모를 가진 첫 번째 요소 찾기
+  const seenParents = new Set();
+  seenParents.add(currentParent);
+  
   for (let i = currentIndex + 1; i < allFocusable.length; i++) {
     const nextParent = allFocusable[i].closest('[data-tts-text]');
-    if (nextParent !== currentParent) {
+    if (nextParent && nextParent !== currentParent && !seenParents.has(nextParent)) {
+      // 다른 부모를 찾았으면, 이 부모의 첫 번째 포커스 가능한 요소 반환
+      for (let j = i; j < allFocusable.length; j++) {
+        if (allFocusable[j].closest('[data-tts-text]') === nextParent) {
+          return j;
+        }
+      }
+    }
+  }
+  
+  // 마지막까지 찾지 못하면 첫 번째 다른 부모로 순환
+  for (let i = 0; i < currentIndex; i++) {
+    const nextParent = allFocusable[i].closest('[data-tts-text]');
+    if (nextParent && nextParent !== currentParent && !seenParents.has(nextParent)) {
       return i;
     }
   }
-  return 0; // 마지막까지 찾지 못하면 첫 번째 요소로 (순환)
+  
+  return -1; // 다른 부모가 없으면 -1 반환
 };
 
-// 이전 섹션으로 이동할 요소 찾기 (단일책임: 이전 요소 찾기만)
+// 이전 섹션(부모)으로 이동할 요소 찾기 (단일책임: 이전 부모의 첫 요소 찾기만)
 const findPrevSectionElement = (allFocusable, currentIndex, currentParent) => {
+  // 현재 부모와 다른 부모를 가진 첫 번째 요소 찾기
+  const seenParents = new Set();
+  seenParents.add(currentParent);
+  
   for (let i = currentIndex - 1; i >= 0; i--) {
     const prevParent = allFocusable[i].closest('[data-tts-text]');
-    if (prevParent !== currentParent) {
+    if (prevParent && prevParent !== currentParent && !seenParents.has(prevParent)) {
+      // 다른 부모를 찾았으면, 이 부모의 첫 번째 포커스 가능한 요소 반환
+      for (let j = i; j >= 0; j--) {
+        const checkParent = allFocusable[j].closest('[data-tts-text]');
+        if (checkParent === prevParent) {
+          // 이전 요소가 같은 부모면 계속, 다른 부모면 반환
+          if (j === 0 || allFocusable[j - 1].closest('[data-tts-text]') !== prevParent) {
+            return j;
+          }
+        }
+      }
       return i;
     }
   }
-  return allFocusable.length - 1; // 처음까지 찾지 못하면 마지막 요소로 (순환)
+  
+  // 처음까지 찾지 못하면 마지막 다른 부모로 순환
+  for (let i = allFocusable.length - 1; i > currentIndex; i--) {
+    const prevParent = allFocusable[i].closest('[data-tts-text]');
+    if (prevParent && prevParent !== currentParent && !seenParents.has(prevParent)) {
+      // 이 부모의 첫 번째 요소 찾기
+      for (let j = i; j >= 0; j--) {
+        if (allFocusable[j].closest('[data-tts-text]') === prevParent) {
+          if (j === 0 || allFocusable[j - 1].closest('[data-tts-text]') !== prevParent) {
+            return j;
+          }
+        }
+      }
+      return i;
+    }
+  }
+  
+  return -1; // 다른 부모가 없으면 -1 반환
 };
 
 // 키보드 네비게이션 핸들러 (단일책임: 방향키 네비게이션만)
+// 스크린과 모달 모두에서 일관된 포커스 이동 경로 제공
 const useKeyboardNavigationHandler = (enableGlobalHandlers, enableKeyboardNavigation) => {
   useEffect(() => {
     if (!enableKeyboardNavigation) return;
@@ -2149,99 +2195,186 @@ const useKeyboardNavigationHandler = (enableGlobalHandlers, enableKeyboardNaviga
     const handleKeyDown = (e) => {
       const { key } = e;
       
-      // 좌우 방향키: Tab/Shift+Tab과 동일한 로직 (스크린 및 모달 모두 지원)
+      // 방향키만 처리
+      if (key !== 'ArrowLeft' && key !== 'ArrowRight' && key !== 'ArrowUp' && key !== 'ArrowDown') {
+        return;
+      }
+      
+      e.preventDefault();
+      const activeEl = document.activeElement;
+      if (!activeEl) return;
+      
+      // 모달 상태 확인
+      const modalContentElement = document.querySelector('.main.modal');
+      const isModalOpen = modalContentElement && window.getComputedStyle(modalContentElement).display !== 'none';
+      
+      // 좌우 방향키: 모든 포커스 가능한 개체를 선형으로 탐색 (부모 관계 없이, .main 포함)
       if (key === 'ArrowLeft' || key === 'ArrowRight') {
-        e.preventDefault();
-        const activeEl = document.activeElement;
-        if (!activeEl) return;
-        
+        // 모달이 열려있으면 모달 안의 요소만, 아니면 전체 요소 (.main 포함)
         const allFocusable = getFocusableElements();
-        if (allFocusable.length === 0) return;
+        const focusableElements = isModalOpen 
+          ? allFocusable.filter(el => {
+              return modalContentElement.contains(el) || el === modalContentElement;
+            })
+          : allFocusable; // 스크린일 때는 전체 요소 (.main 포함)
         
-        const first = allFocusable[0];
-        const last = allFocusable[allFocusable.length - 1];
-        const mainElement = document.querySelector('.main');
-        const modalContentElement = document.querySelector('.main.modal');
-        const isActiveInMain = mainElement?.contains(activeEl) || activeEl === mainElement;
-        const isActiveInModal = modalContentElement?.contains(activeEl) || activeEl === modalContentElement;
-        
-        // main 또는 main.modal 밖으로 포커스가 나가려고 하면 해당 요소로 포커스 이동
-        if (!isActiveInMain && !isActiveInModal) {
-          if (modalContentElement && modalContentElement.classList.contains('main') && modalContentElement.classList.contains('modal')) {
-            if (!modalContentElement.hasAttribute('tabindex')) {
-              modalContentElement.setAttribute('tabindex', '-1');
-            }
-            modalContentElement.focus();
-          } else if (mainElement) {
-            // 원천 함수 focusMainElement 사용 (일관성 유지)
-            focusMainElement();
-          }
+        if (focusableElements.length === 0) {
+          console.log('[키보드] 좌우 방향키 스킵 (포커스 가능한 요소 없음)', {
+            container: isModalOpen ? 'modal' : 'screen'
+          });
           return;
         }
         
-        // main 또는 main.modal 내부에 있을 때 방향키 처리 (Tab/Shift+Tab과 동일한 로직)
-        const containerElement = isActiveInModal ? modalContentElement : mainElement;
+        const currentIndex = focusableElements.indexOf(activeEl);
+        if (currentIndex === -1) {
+          console.log('[키보드] 좌우 방향키 → 첫 번째 요소로 포커스 (현재 요소 없음)');
+          focusableElements[0]?.focus();
+          return;
+        }
+        
+        console.log('[키보드] 좌우 방향키 입력', {
+          key,
+          container: isModalOpen ? 'modal' : 'screen',
+          currentElement: {
+            tagName: activeEl.tagName,
+            className: activeEl.className
+          },
+          currentIndex,
+          totalElements: focusableElements.length,
+          timestamp: new Date().toISOString()
+        });
+        
         if (key === 'ArrowLeft') {
-          // 좌 방향키: Shift+Tab과 동일
-          if (activeEl === first) {
-            // container에서 ArrowLeft를 누르면 마지막 요소로 이동
-            last?.focus();
-          } else {
-            // 그 외의 경우는 이전 요소로 이동
-            const currentIndex = allFocusable.indexOf(activeEl);
-            if (currentIndex > 0) {
-              allFocusable[currentIndex - 1]?.focus();
-            } else {
-              first?.focus();
-            }
-          }
+          // 좌 방향키: 이전 요소로 이동 (순환)
+          const targetIndex = currentIndex > 0 ? currentIndex - 1 : focusableElements.length - 1;
+          const targetElement = focusableElements[targetIndex];
+          console.log('[키보드] ArrowLeft → 이전 요소로 이동', {
+            from: currentIndex,
+            to: targetIndex,
+            targetElement: { tagName: targetElement.tagName, className: targetElement.className }
+          });
+          targetElement?.focus();
         } else {
-          // 우 방향키: Tab과 동일
-          if (activeEl === containerElement) {
-            // container에서 ArrowRight를 누르면 첫 번째 버튼으로 이동 (container 다음 요소)
-            if (allFocusable.length > 1) {
-              allFocusable[1]?.focus();
-            }
-          } else if (activeEl === last) {
-            // 마지막 버튼에서 ArrowRight를 누르면 container로 순환
-            first?.focus();
-          } else {
-            // 그 외의 경우는 다음 요소로 이동
-            const currentIndex = allFocusable.indexOf(activeEl);
-            if (currentIndex < allFocusable.length - 1) {
-              allFocusable[currentIndex + 1]?.focus();
-            } else {
-              first?.focus();
-            }
-          }
+          // 우 방향키: 다음 요소로 이동 (순환)
+          const targetIndex = currentIndex < focusableElements.length - 1 ? currentIndex + 1 : 0;
+          const targetElement = focusableElements[targetIndex];
+          console.log('[키보드] ArrowRight → 다음 요소로 이동', {
+            from: currentIndex,
+            to: targetIndex,
+            targetElement: { tagName: targetElement.tagName, className: targetElement.className }
+          });
+          targetElement?.focus();
         }
         return;
       }
       
-      // 상하 방향키: 부모 요소(섹션) 간 이동
+      // 상하 방향키: 부모가 바뀌는 지점(data-tts-text가 있는 조건)만 확인해서 이동
       if (key === 'ArrowUp' || key === 'ArrowDown') {
-        e.preventDefault();
-        const activeEl = document.activeElement;
-        if (!activeEl) return;
-        
+        // 모달이 열려있으면 모달 안의 요소만, 아니면 전체 요소
         const allFocusable = getFocusableElements();
-        if (allFocusable.length === 0) return;
+        // .main 제외 (버튼들만)
+        const focusableButtons = (isModalOpen 
+          ? allFocusable.filter(el => {
+              return modalContentElement.contains(el) || el === modalContentElement;
+            })
+          : allFocusable).filter(el => !el.classList.contains('main'));
         
-        const currentIndex = allFocusable.indexOf(activeEl);
+        if (focusableButtons.length === 0) {
+          console.log('[키보드] 상하 방향키 스킵 (포커스 가능한 버튼 없음)');
+          return;
+        }
+        
+        const currentIndex = focusableButtons.indexOf(activeEl);
         if (currentIndex === -1) {
-          // 현재 포커스된 요소가 배열에 없으면 첫 번째 요소로 포커스
-          allFocusable[0]?.focus();
+          console.log('[키보드] 상하 방향키 → 첫 번째 버튼으로 포커스 (현재 요소 없음)');
+          focusableButtons[0]?.focus();
           return;
         }
         
         const currentParent = activeEl.closest('[data-tts-text]');
-        const targetIndex = key === 'ArrowDown' 
-          ? findNextSectionElement(allFocusable, currentIndex, currentParent)
-          : findPrevSectionElement(allFocusable, currentIndex, currentParent);
-        
-        if (targetIndex !== -1 && allFocusable[targetIndex]) {
-          allFocusable[targetIndex].focus();
+        if (!currentParent) {
+          console.log('[키보드] 상하 방향키 스킵 (현재 부모 섹션 없음)');
+          return;
         }
+        
+        console.log('[키보드] 상하 방향키 입력', {
+          key,
+          container: isModalOpen ? 'modal' : 'screen',
+          currentElement: {
+            tagName: activeEl.tagName,
+            className: activeEl.className
+          },
+          currentParent: {
+            className: currentParent.className
+          },
+          timestamp: new Date().toISOString()
+        });
+        
+        // 부모가 바뀌는 지점 찾기 (단순 로직)
+        let targetElement = null;
+        if (key === 'ArrowDown') {
+          // 다음 부모로 이동: 현재 인덱스 이후에서 부모가 다른 첫 번째 요소
+          for (let i = currentIndex + 1; i < focusableButtons.length; i++) {
+            const el = focusableButtons[i];
+            const elParent = el.closest('[data-tts-text]');
+            if (elParent && elParent !== currentParent) {
+              targetElement = el;
+              break;
+            }
+          }
+          // 마지막까지 찾지 못하면 첫 번째 다른 부모로 순환
+          if (!targetElement) {
+            for (let i = 0; i < currentIndex; i++) {
+              const el = focusableButtons[i];
+              const elParent = el.closest('[data-tts-text]');
+              if (elParent && elParent !== currentParent) {
+                targetElement = el;
+                break;
+              }
+            }
+          }
+        } else {
+          // 이전 부모로 이동: 현재 인덱스 이전에서 부모가 다른 첫 번째 요소
+          for (let i = currentIndex - 1; i >= 0; i--) {
+            const el = focusableButtons[i];
+            const elParent = el.closest('[data-tts-text]');
+            if (elParent && elParent !== currentParent) {
+              targetElement = el;
+              break;
+            }
+          }
+          // 처음까지 찾지 못하면 마지막 다른 부모로 순환
+          if (!targetElement) {
+            for (let i = focusableButtons.length - 1; i > currentIndex; i--) {
+              const el = focusableButtons[i];
+              const elParent = el.closest('[data-tts-text]');
+              if (elParent && elParent !== currentParent) {
+                targetElement = el;
+                break;
+              }
+            }
+          }
+        }
+        
+        if (!targetElement) {
+          console.log('[키보드] 상하 방향키 스킵 (다른 부모 섹션 없음)');
+          return;
+        }
+        
+        const targetParent = targetElement.closest('[data-tts-text]');
+        console.log('[키보드] 상하 방향키 → 부모(섹션) 간 이동', {
+          key,
+          from: {
+            element: { tagName: activeEl.tagName, className: activeEl.className },
+            parent: { className: currentParent.className }
+          },
+          to: {
+            element: { tagName: targetElement.tagName, className: targetElement.className },
+            parent: targetParent ? { className: targetParent.className } : null
+          }
+        });
+        
+        targetElement.focus();
       }
     };
     
@@ -2251,9 +2384,13 @@ const useKeyboardNavigationHandler = (enableGlobalHandlers, enableKeyboardNaviga
 };
 
 // 버튼 pressed 상태 추가 (단일책임: pressed 클래스 추가 및 사운드 재생만)
-const addButtonPressedState = (btn) => {
+const addButtonPressedState = (btn, playSoundFn) => {
   if (btn.dataset.reactHandler !== 'true') {
     btn.classList.add('pressed');
+    // 사운드 재생 (사용자 인터랙션마다)
+    if (playSoundFn && typeof playSoundFn === 'function') {
+      playSoundFn('onPressed');
+    }
   }
 };
 
@@ -2272,7 +2409,10 @@ const removeButtonPressedState = (btn) => {
 };
 
 // 마우스/터치 pressed 상태 관리 (단일책임: pressed 상태 관리만)
-const usePressStateHandler = (enableGlobalHandlers, playSoundOpt) => {
+const usePressStateHandler = (enableGlobalHandlers) => {
+  // useSound 훅을 사용하여 사운드 재생 함수 가져오기
+  const { play: playSound } = useSound();
+  
   useEffect(() => {
     if (!enableGlobalHandlers) return;
     
@@ -2286,7 +2426,7 @@ const usePressStateHandler = (enableGlobalHandlers, playSoundOpt) => {
       if (!btn || isButtonDisabled(btn) || isToggleButton(btn)) return;
       
       if (action === 'add') {
-        addButtonPressedState(btn, playSoundOpt);
+        addButtonPressedState(btn, playSound);
       } else if (action === 'remove') {
         removeButtonPressedState(btn);
       }
@@ -2835,11 +2975,26 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
   
   // 모달 열릴 때 main.modal에 포커스 (동기식)
   const { focusModalContent } = useDOM();
+  const route = useContext(RouteContext);
   useLayoutEffect(() => {
     if (isOpen) {
+      console.log('[포커스] BaseModal 열림 → focusModalContent 호출', {
+        type,
+        timestamp: new Date().toISOString()
+      });
       focusModalContent();
+    } else {
+      console.log('[포커스] BaseModal 닫힘', { type });
+      // 모달이 닫힐 때, 현재 페이지가 ScreenStart이면 .main에 포커스 설정
+      if (route?.currentPage === 'ScreenStart') {
+        console.log('[포커스] BaseModal 닫힘 → ScreenStart로 포커스 설정');
+        // 모달이 완전히 닫힌 후 포커스 설정
+        requestAnimationFrame(() => {
+          focusMainElement();
+        });
+      }
     }
-  }, [isOpen, focusModalContent]);
+  }, [isOpen, focusModalContent, type, route]);
   
   // 접근성 모달: 접근성 설정 요소들
   const accessibilityContent = isAccessibilityModal && currentSettings && getStatusText ? (
@@ -3240,12 +3395,28 @@ const useDOM = () => {
       // main.modal 클래스를 가진 첫 번째 요소 찾기
       const modalContentElement = document.querySelector('.main.modal');
       if (modalContentElement) {
+        const prevActive = document.activeElement;
+        const prevActiveInfo = prevActive ? {
+          tagName: prevActive.tagName,
+          className: prevActive.className,
+          id: prevActive.id || null
+        } : null;
+        
         // main.modal에 tabindex가 없으면 추가
         if (!modalContentElement.hasAttribute('tabindex')) {
           modalContentElement.setAttribute('tabindex', '-1');
         }
+        
+        console.log('[포커스] focusModalContent 호출', {
+          from: prevActiveInfo,
+          to: { tagName: modalContentElement.tagName, className: modalContentElement.className },
+          timestamp: new Date().toISOString()
+        });
+        
         // 항상 포커스 설정 (모달이 열릴 때)
         modalContentElement.focus();
+      } else {
+        console.log('[포커스] focusModalContent 스킵 (.main.modal 요소 없음)');
       }
     }
   }, []);
@@ -3321,20 +3492,27 @@ const RouteProvider = ({ children }) => {
   // useLayoutEffect는 자식이 부모보다 먼저 실행되므로, ScreenStart의 useInteractiveTTSHandler가
   // 이벤트 리스너를 등록하기 전에 focusMainElement()가 실행될 수 있음
   const lastPageRef = useRef(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     // 페이지가 실제로 변경되었을 때만 포커스 설정 (중복 방지)
-    if (lastPageRef.current === currentPage) return;
+    if (lastPageRef.current === currentPage) {
+      console.log('[포커스] RouteProvider 스킵 (페이지 변경 없음)', { currentPage });
+      return;
+    }
+    
+    const prevPage = lastPageRef.current;
     lastPageRef.current = currentPage;
     
+    console.log('[포커스] RouteProvider 페이지 변경 감지', {
+      from: prevPage,
+      to: currentPage,
+      timestamp: new Date().toISOString()
+    });
+    
     // 모든 화면에서 .main에 자동 포커스 설정 (포커스 TTS 로직 통일)
-    // 모달이 열려있지 않을 때만 .main에 포커스 설정
-    const modalElement = document.querySelector('.main.modal');
-    if (!modalElement || window.getComputedStyle(modalElement).display === 'none') {
-      // useInteractiveTTSHandler의 useEffect (이벤트 리스너 등록) 이후에 실행
-      requestAnimationFrame(() => {
-        focusMainElement();
-      });
-    }
+    // useLayoutEffect는 DOM 업데이트 후 동기적으로 실행되므로 .main 요소가 확실히 존재함
+    // focusMainElement 내부에서 이미 포커스가 있으면 스킵하므로 여기서는 항상 호출
+    console.log('[포커스] RouteProvider → focusMainElement 실행 (동기 처리)');
+    focusMainElement();
   }, [currentPage]);
   
   const value = useMemo(() => ({
@@ -4131,10 +4309,16 @@ const Bottom = memo(({ systemControlsRef }) => {
     });
   }, [accessibility, order, route]);
   
+  // 타임아웃 모달 상태 체크 함수 (useIdleTimeout에 전달)
+  const checkTimeoutModal = useCallback(() => {
+    return accessibility.ModalTimeout?.isOpen ?? false;
+  }, [accessibility.ModalTimeout]);
+  
   const { remainingTimeFormatted, remainingTime, resetTimer } = useIdleTimeout(
     onTimeout,
     120000, // 2분 (120초)
-    isTimeoutEnabled
+    isTimeoutEnabled,
+    checkTimeoutModal
   );
   
   // 전역 타이머 remainingTime을 AccessibilityContext에 전달 (TimeoutModal에서 사용)
@@ -4909,8 +5093,25 @@ const ScreenFinish = memo(() => {
   
   // ScreenFinish 전용 카운트다운 훅 (단일책임: ScreenFinish 카운트다운만)
   const useFinishCountdown = () => {
-    const [countdown, setCountdown] = useState(4);
+    const [countdown, setCountdown] = useState(3);
     const timerRef = useRef(null);
+    const callbacksRef = useRef(null);
+    
+    // callbacks를 ref로 저장하여 의존성 배열에서 제거
+    useEffect(() => {
+      callbacksRef.current = {
+        ModalRestart: accessibility.ModalRestart,
+        ModalAccessibility: accessibility.ModalAccessibility,
+        ModalTimeout: accessibility.ModalTimeout,
+        setQuantities: order.setQuantities,
+        totalMenuItems: order.totalMenuItems,
+        setIsDark: accessibility.setIsDark,
+        setVolume: accessibility.setVolume,
+        setIsLarge: accessibility.setIsLarge,
+        setIsLow: accessibility.setIsLow,
+        setCurrentPage: route.setCurrentPage
+      };
+    }, [accessibility, order, route]);
     
     useEffect(() => {
       if (timerRef.current) {
@@ -4918,29 +5119,25 @@ const ScreenFinish = memo(() => {
         timerRef.current = null;
       }
       
-      setCountdown(4);
+      setCountdown(3);
       
       const tick = () => {
         setCountdown(prev => {
           const next = prev - 1;
-          if (next <= 0) {
+          if (next === 0) {
+            // 체크 표시를 위해 0으로 설정하고, 1초 후 초기화
+            setTimeout(() => {
+              if (callbacksRef.current) {
+                initializeApp(callbacksRef.current);
+              }
+            }, 1000);
+            return 0;
+          } else if (next < 0) {
+            // 이미 초기화가 진행 중이므로 타이머 정리만
             if (timerRef.current) {
               clearInterval(timerRef.current);
               timerRef.current = null;
             }
-            // 모든 이니셜은 initializeApp로 통일
-            const callbacks = {
-              ModalRestart: accessibility.ModalRestart,
-              ModalAccessibility: accessibility.ModalAccessibility,
-              setQuantities: order.setQuantities,
-              totalMenuItems: order.totalMenuItems,
-              setIsDark: accessibility.setIsDark,
-              setVolume: accessibility.setVolume,
-              setIsLarge: accessibility.setIsLarge,
-              setIsLow: accessibility.setIsLow,
-              setCurrentPage: route.setCurrentPage
-            };
-            setTimeout(() => initializeApp(callbacks), 1000);
             return 0;
           }
           return next;
@@ -4955,7 +5152,7 @@ const ScreenFinish = memo(() => {
           timerRef.current = null;
         }
       };
-    }, [accessibility, order, route]);
+    }, []); // 의존성 배열을 빈 배열로 변경하여 컴포넌트 마운트 시 한 번만 실행
     
     return countdown;
   };
@@ -5033,6 +5230,54 @@ const ModalContainer = () => {
 // 실행 순서: 외부 Provider → 내부 Provider (의존성이 없는 Provider는 순서 무관)
 // ============================================================================
 const Run = () => {
+  // 전역 포커스 이동 추적 (관측성)
+  useEffect(() => {
+    const handleFocusIn = (e) => {
+      const target = e.target;
+      const targetInfo = target ? {
+        tagName: target.tagName,
+        className: target.className,
+        id: target.id || null,
+        isMain: target.classList.contains('main'),
+        isModal: target.classList.contains('modal')
+      } : null;
+      
+      console.log('[포커스] focusin 이벤트 발생', {
+        target: targetInfo,
+        timestamp: new Date().toISOString()
+      });
+    };
+    
+    const handleFocusOut = (e) => {
+      const target = e.target;
+      const relatedTarget = e.relatedTarget;
+      const targetInfo = target ? {
+        tagName: target.tagName,
+        className: target.className,
+        id: target.id || null
+      } : null;
+      const relatedInfo = relatedTarget ? {
+        tagName: relatedTarget.tagName,
+        className: relatedTarget.className,
+        id: relatedTarget.id || null
+      } : null;
+      
+      console.log('[포커스] focusout 이벤트 발생', {
+        from: targetInfo,
+        to: relatedInfo,
+        timestamp: new Date().toISOString()
+      });
+    };
+    
+    document.addEventListener('focusin', handleFocusIn, true);
+    document.addEventListener('focusout', handleFocusOut, true);
+    
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn, true);
+      document.removeEventListener('focusout', handleFocusOut, true);
+    };
+  }, []);
+  
   return (
     <>
       {/* 과거 앱 방식: audioPlayer를 Provider 체인 밖 최상위에 직접 렌더링 (가장 빠른 마운트) */}
