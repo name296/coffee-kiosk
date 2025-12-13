@@ -612,6 +612,7 @@
   /* ========================================
      메인 영역 (.main)
      ======================================== */
+  /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
   .main {
     width: 100%;
     height: 100%;
@@ -704,6 +705,11 @@
             color: var(--body1-content-primary-color);
             font-weight: var(--font-weight-semibold);
           }
+          
+          & .primary {
+            color: var(--body1-content-primary-color);
+            font-weight: var(--font-weight-semibold);
+          }
         }
         
         & .setting-row {
@@ -722,6 +728,11 @@
           width: 100%;
           height: 10rem;
           gap: var(--spacing-sm);
+          
+          & .primary {
+            color: var(--body1-content-primary-color);
+            font-weight: var(--font-weight-semibold);
+          }
         }
 
         /* 작업관리 버튼 (공통) */
@@ -856,20 +867,6 @@
     height: 0; 
     background-color: black;
     &.low { height: 1020px; }
-  }
-
-  .hidden {
-    width: fit-content;
-    height: fit-content;
-    position: absolute;
-    left: 0;
-    top: 0;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
   }
 
   .short-colline {
@@ -1171,18 +1168,6 @@
 /* ========================================
    전체 컴포넌트 (Components) - 버튼
    ======================================== */
-    .hidden-div {
-      position: absolute;
-      width: 0;
-      height: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-  
-    .hidden-btn:focus {
-      outline: none;
-      border: none;
-    }
 
     /* ========================================
        페이지네이션 스타일

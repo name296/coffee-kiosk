@@ -205,11 +205,10 @@ const usePagination = (items, itemsPerPageNormal, itemsPerPageLow, isLow) => {
   const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : p), [totalPages]);
   const goToPage = useCallback((p) => { if (p >= 1 && p <= totalPages) setPageNumber(p); }, [totalPages]);
   const resetPage = useCallback(() => setPageNumber(1), []);
-  const resetOnChange = useCallback(() => setPageNumber(1), []);
   
   return {
     pageNumber, totalPages, currentItems, itemsPerPage,
-    handlePrevPage, handleNextPage, goToPage, resetPage, resetOnChange, setPageNumber
+    handlePrevPage, handleNextPage, goToPage, resetPage, setPageNumber
   };
 };
 
@@ -290,6 +289,206 @@ const createOrderItems = (items, quantities) =>
 // 사용처: useTextHandler, usePlayText
 const TTSDBContext = createContext();
 
+// TTS State Context - TTS 재생 상태 관리 (isPlaying, replayText, requestIdRef, audioSrc, audioPlaybackRate, audioVolume)
+// 의존성: 없음 (독립, 하지만 useTextHandler가 TTSDBContext와 함께 사용)
+// 사용처: useTextHandler, usePlayText, useStopAllAudio, TTSAudioPlayer
+const TTSStateContext = createContext();
+
+// TTS Audio Player 컴포넌트 (React 방식으로 TTS 재생 관리)
+// 의존성: TTSStateContext
+// 사용처: TTSStateProvider 내부 (Provider 안에서 Context 사용, JSX 방식)
+const TTSAudioPlayer = memo(() => {
+  const ttsState = useContext(TTSStateContext);
+  const audioPlayerRef = ttsState?.audioPlayerRef;
+  
+  // React state로 Audio 제어
+  const src = ttsState?.audioSrc ?? '';
+  const playbackRate = ttsState?.audioPlaybackRate ?? 1;
+  const volume = ttsState?.audioVolume ?? 1;
+  const shouldPlay = ttsState?.shouldPlay ?? false;
+  const setIsPlaying = ttsState?.setIsPlaying;
+  
+  // shouldPlay가 true면 autoplay 속성으로 재생 (play() 호출하지 않음)
+  useEffect(() => {
+    if (!audioPlayerRef?.current || !src) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    // shouldPlay가 true면 autoplay 속성 추가, false면 제거
+    if (shouldPlay) {
+      audio.setAttribute('autoplay', 'autoplay');
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 autoplay 속성 설정: ${src.substring(0, 60)}...`);
+      }
+    } else {
+      audio.removeAttribute('autoplay');
+    }
+  }, [shouldPlay, src, audioPlayerRef]);
+  
+  // 재생 시작 감지 (autoplay로 재생 시작됨)
+  useEffect(() => {
+    if (!audioPlayerRef?.current || !src || !shouldPlay) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    const handlePlay = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 시작 (autoplay)`);
+      }
+      if (setIsPlaying) setIsPlaying(true);
+    };
+    
+    const handleError = (error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 실패:`, error);
+      }
+      if (setIsPlaying) setIsPlaying(false);
+      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+    };
+    
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('error', handleError);
+  
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [shouldPlay, src, audioPlayerRef, setIsPlaying, ttsState]);
+  
+  // 재생 완료 이벤트 처리 (React 방식)
+  useEffect(() => {
+    if (!audioPlayerRef?.current) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    const handleEnded = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 완료`);
+      }
+      if (setIsPlaying) setIsPlaying(false);
+      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+    };
+    
+    audio.addEventListener('ended', handleEnded);
+    
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [audioPlayerRef, setIsPlaying, ttsState]);
+  
+  // playbackRate와 volume은 JS로 설정 (HTML 속성이 아님)
+  useEffect(() => {
+    if (!audioPlayerRef?.current) return;
+    const audio = audioPlayerRef.current;
+    audio.playbackRate = playbackRate;
+    audio.volume = volume;
+  }, [playbackRate, volume, audioPlayerRef]);
+  
+  // src가 변경되면 autoplay 속성 추가 (사용자 인터랙션 없이 재생)
+  useEffect(() => {
+    if (!audioPlayerRef?.current || !src) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    // src가 설정되면 autoplay 속성 추가 (play() 호출하지 않음)
+    audio.setAttribute('autoplay', 'autoplay');
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 오디오 src 설정 및 autoplay 속성 추가: ${src.substring(0, 60)}...`);
+    }
+  }, [src, audioPlayerRef]);
+  
+  // 포커스 기반 TTS는 Run 컴포넌트 최상위의 audioPlayer 사용 (과거 앱 방식)
+  // TTSAudioPlayer는 ref만 연결하고 실제 audio 요소는 렌더링하지 않음
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const existingAudio = document.getElementById('audioPlayer');
+    if (existingAudio && audioPlayerRef) {
+      audioPlayerRef.current = existingAudio;
+    }
+  }, [audioPlayerRef]);
+  
+  // 포커스 기반 TTS: src, playbackRate, volume, shouldPlay 설정
+  useEffect(() => {
+    if (!audioPlayerRef?.current) return;
+    const audio = audioPlayerRef.current;
+    
+    // src 설정
+    if (src) {
+      audio.src = src;
+    }
+    
+    // playbackRate와 volume 설정
+    audio.playbackRate = playbackRate;
+    audio.volume = volume;
+    
+    // shouldPlay가 true면 autoplay 속성 추가
+    if (shouldPlay && src) {
+      audio.setAttribute('autoplay', 'autoplay');
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 autoplay 속성 설정: ${src.substring(0, 60)}...`);
+      }
+    } else {
+      audio.removeAttribute('autoplay');
+    }
+  }, [src, playbackRate, volume, shouldPlay, audioPlayerRef]);
+  
+  // 재생 시작 감지 (autoplay로 재생 시작됨)
+  useEffect(() => {
+    if (!audioPlayerRef?.current || !src || !shouldPlay) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    const handlePlay = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 시작 (autoplay)`);
+      }
+      if (setIsPlaying) setIsPlaying(true);
+    };
+    
+    const handleError = (error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 실패:`, error);
+      }
+      if (setIsPlaying) setIsPlaying(false);
+      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+    };
+    
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('error', handleError);
+    
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [shouldPlay, src, audioPlayerRef, setIsPlaying, ttsState]);
+  
+  // 재생 완료 이벤트 처리
+  useEffect(() => {
+    if (!audioPlayerRef?.current) return;
+    
+    const audio = audioPlayerRef.current;
+    
+    const handleEnded = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 오디오 재생 완료`);
+      }
+      if (setIsPlaying) setIsPlaying(false);
+      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+    };
+    
+    audio.addEventListener('ended', handleEnded);
+    
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [audioPlayerRef, setIsPlaying, ttsState]);
+  
+  // TTSAudioPlayer는 실제 audio 요소를 렌더링하지 않음 (Run 컴포넌트의 audioPlayer 사용)
+  return null;
+});
+TTSAudioPlayer.displayName = 'TTSAudioPlayer';
+
 const TTSDBProvider = ({ children }) => {
   const [db, setDb] = useState(null);
   const dbName = 'TTSDatabase';
@@ -358,10 +557,6 @@ const useTTSDB = () => {
   };
 };
 
-// TTS State Context - TTS 재생 상태 관리 (isPlaying, replayText, requestIdRef, audioSrc, audioPlaybackRate, audioVolume)
-// 의존성: 없음 (독립, 하지만 useTextHandler가 TTSDBContext와 함께 사용)
-// 사용처: useTextHandler, usePlayText, useStopAllAudio, TTSAudioPlayer
-const TTSStateContext = createContext();
 const TTSStateProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [replayText, setReplayText] = useState('');
@@ -370,9 +565,12 @@ const TTSStateProvider = ({ children }) => {
   const [audioPlaybackRate, setAudioPlaybackRate] = useState(1);
   const [audioVolume, setAudioVolume] = useState(1);
   const [shouldPlay, setShouldPlay] = useState(false);
+  // 사용자 인터랙션 플래그 (브라우저 자동 재생 정책 대응)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   // 비동기 요청 취소를 위한 요청 ID 추적 (모달과 스크린 간 공유)
   const requestIdRef = useRef(null);
   const audioPlayerRef = useRef(null);
+  
   
   const value = useMemo(() => ({
     isPlaying,
@@ -388,11 +586,17 @@ const TTSStateProvider = ({ children }) => {
     setAudioVolume,
     shouldPlay,
     setShouldPlay,
-    audioPlayerRef
-  }), [isPlaying, replayText, audioSrc, audioPlaybackRate, audioVolume, shouldPlay]);
+    audioPlayerRef,
+    hasUserInteracted,
+    setHasUserInteracted
+  }), [isPlaying, replayText, audioSrc, audioPlaybackRate, audioVolume, shouldPlay, hasUserInteracted]);
+  
+  // 오디오 플레이어 ref 연결은 TTSAudioPlayer 컴포넌트에서 처리
   
   return (
     <TTSStateContext.Provider value={value}>
+      {/* TTSAudioPlayer는 포커스 기반 TTS용 (이니셜 TTS는 Run 컴포넌트 최상위의 audioPlayer 사용) */}
+      <TTSAudioPlayer />
       {children}
     </TTSStateContext.Provider>
   );
@@ -412,70 +616,12 @@ const useTTSState = () => {
     setAudioVolume: context?.setAudioVolume ?? (() => {}),
     shouldPlay: context?.shouldPlay ?? false,
     setShouldPlay: context?.setShouldPlay ?? (() => {}),
-    audioPlayerRef: context?.audioPlayerRef
+    audioPlayerRef: context?.audioPlayerRef,
+    hasUserInteracted: context?.hasUserInteracted ?? false,
+    setHasUserInteracted: context?.setHasUserInteracted ?? (() => {})
   };
 };
 
-// TTS Audio Player 컴포넌트 (React 방식으로 TTS 재생 관리)
-// 의존성: TTSStateContext
-// 사용처: Run 컴포넌트 (항상 렌더링)
-const TTSAudioPlayer = memo(() => {
-  const ttsState = useContext(TTSStateContext);
-  const audioPlayerRef = ttsState?.audioPlayerRef;
-  
-  // React state로 Audio 제어
-  const src = ttsState?.audioSrc ?? '';
-  const playbackRate = ttsState?.audioPlaybackRate ?? 1;
-  const volume = ttsState?.audioVolume ?? 1;
-  const shouldPlay = ttsState?.shouldPlay ?? false;
-  const setIsPlaying = ttsState?.setIsPlaying;
-  
-  // src가 변경되면 재생 준비
-  useEffect(() => {
-    if (!audioPlayerRef?.current || !src) return;
-    
-    const audio = audioPlayerRef.current;
-    audio.playbackRate = playbackRate;
-    audio.volume = volume;
-    
-    // shouldPlay가 true면 재생
-    if (shouldPlay) {
-      audio.play().catch(() => {
-        if (setIsPlaying) setIsPlaying(false);
-        if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-      });
-    }
-  }, [src, playbackRate, volume, shouldPlay, audioPlayerRef, setIsPlaying, ttsState]);
-  
-  // 재생 완료 이벤트 처리 (React 방식)
-  useEffect(() => {
-    if (!audioPlayerRef?.current) return;
-    
-    const audio = audioPlayerRef.current;
-    
-    const handleEnded = () => {
-      if (setIsPlaying) setIsPlaying(false);
-      if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-    };
-    
-    audio.addEventListener('ended', handleEnded);
-    
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [audioPlayerRef, setIsPlaying, ttsState]);
-  
-  return (
-    <audio 
-      ref={audioPlayerRef} 
-      id="audioPlayer" 
-      src={src} 
-      controls 
-      className="hidden" 
-    />
-  );
-});
-TTSAudioPlayer.displayName = 'TTSAudioPlayer';
 
 // ============================================================================
 // Sound Hook (TTSContext 사용)
@@ -547,13 +693,10 @@ const useSound = () => {
 const focusMainElement = () => {
   if (typeof document === 'undefined') return;
   const mainElement = document.querySelector('.main');
-  if (mainElement) {
-    // main에 tabindex가 없으면 추가
-    if (!mainElement.hasAttribute('tabindex')) {
-      mainElement.setAttribute('tabindex', '-1');
-    }
-    // 항상 포커스 설정
+  if (mainElement && document.activeElement !== mainElement) {
+    // 포커스가 이미 .main에 있으면 포커스하지 않음 (TTS 중복 실행 방지)
     mainElement.focus();
+    // focusin 이벤트는 브라우저가 자동으로 발생시키므로 수동 트리거 불필요
   }
 };
 
@@ -572,15 +715,11 @@ const stopAllTTS = (ttsState) => {
     audioPlayer.currentTime = 0;
   }
   
-  // React state 초기화
+  // React state 이니셜
   if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
   if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
   if (ttsState?.setIsPlaying) ttsState.setIsPlaying(false);
   
-  // 브라우저 TTS 중단
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-  }
 };
 
 // ============================================================================
@@ -591,11 +730,17 @@ const stopAllTTS = (ttsState) => {
 // 요구사항:
 // 1. 캐시 우선 사용
 // 2. 캐시 없으면 외부 엔진 → 캐시 저장
-// 3. 외부 엔진 실패 시 브라우저 TTS
+// 3. 외부 엔진 실패 시 재생 중단
 // 4. 단일 재생 보장 (isPlaying 플래그)
 // 5. 비동기 요청 취소 메커니즘 (빠른 포커스/호버 변경 시 이전 요청 취소)
 const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
   if (!text) return;
+  
+  // TTS 재생 관측성: 재생 시작 로그
+  if (process.env.NODE_ENV === 'development') {
+    const textPreview = text.length > 50 ? text.substring(0, 50) + '...' : text;
+    console.log(`🔊 [TTS] 재생 시작: "${textPreview}" (속도: ${speed}, 볼륨: ${vol})`);
+  }
   
   const { isPlaying, setIsPlaying } = ttsState || {};
   const { getFromDB, saveToDB } = ttsDB || {};
@@ -603,7 +748,7 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
   // 요구사항 5: 새 재생 시 이전 TTS 즉시 중단
   stopAllTTS(ttsState);
   // 이전 재생 상태 해제 (새 재생을 위해)
-  setIsPlaying(false);
+      setIsPlaying(false);
   
   // 요구사항 4: 단일 재생 보장 (중복 재생 방지)
   // stopAllTTS() 후 즉시 재생 시작하므로 isPlaying 체크는 제거
@@ -618,10 +763,12 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
   const audioPlayerRef = ttsState?.audioPlayerRef;
   const cacheKey = `audio_${text}`;
   
-  // audioPlayerRef가 없으면 재생 불가능하므로 브라우저 TTS 폴백
-  // 단, 캐시/외부 엔진이 실패할 때만 폴백해야 하므로 audioPlayerRef가 없을 때는 재생을 시도하지 않음
+  // audioPlayerRef가 없으면 재생 불가능
   if (!audioPlayerRef) {
-    playBrowserTTS(text, speed, vol, setIsPlaying);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 재생 불가능 (audioPlayerRef 없음)`);
+    }
+    setIsPlaying(false);
     return;
   }
   
@@ -636,50 +783,61 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
     
     if (cachedAudio) {
       // 캐시 있으면 캐시 재생
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 캐시에서 재생 (캐시 키: ${cacheKey})`);
+      }
+      
       // 요청이 취소되었는지 다시 확인
       if (requestIdRef && requestIdRef.current !== currentRequestId) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔊 [TTS] 요청 취소됨 (새 요청 들어옴)`);
+        }
         return;
       }
       
       // React 방식으로 Audio 재생
-      playAudio(ttsState, cachedAudio, speed, vol, () => {
-        // 재생 실패 시 브라우저 TTS 폴백
-        if (!requestIdRef || requestIdRef.current === currentRequestId) {
-          playBrowserTTS(text, speed, vol, setIsPlaying);
-        }
-      });
-      
+      playAudio(ttsState, cachedAudio, speed, vol);
+  
       // 에러 처리는 TTSAudioPlayer의 이벤트 리스너에서 처리
-      // 재생 실패 시 브라우저 TTS 폴백을 위해 audioPlayerRef에 에러 핸들러 설정 (React 방식과 함께 사용)
       if (audioPlayerRef?.current) {
         const errorHandler = () => {
-          if (!requestIdRef || requestIdRef.current === currentRequestId) {
-            // React state 초기화
-            if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
-            if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
-            // 브라우저 TTS 폴백
-            playBrowserTTS(text, speed, vol, setIsPlaying);
+          if (!requestIdRef || requestIdRef.current !== currentRequestId) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`🔊 [TTS] 오디오 에러 핸들러: 요청 취소됨`);
+            }
+            return;
           }
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`🔊 [TTS] 오디오 에러 발생 (캐시)`);
+          }
+          // React state 이니셜
+          if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
+          if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
+          setIsPlaying(false);
         };
         audioPlayerRef.current.addEventListener('error', errorHandler, { once: true });
       }
     } else {
       // 요구사항 2: 캐시 없으면 외부 엔진 시도
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 캐시 없음 → 외부 엔진 요청 중...`);
+      }
       const audioUrl = await fetchTTSFromServer(text);
       
       // 요청이 취소되었는지 확인 (외부 엔진 응답 후)
       if (requestIdRef && requestIdRef.current !== currentRequestId) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔊 [TTS] 요청 취소됨 (새 요청 들어옴)`);
+        }
         return;
       }
       
       if (audioUrl) {
         // 외부 엔진 성공: 재생 및 캐시 저장
-        playAudio(ttsState, audioUrl, speed, vol, () => {
-          // 재생 실패 시 브라우저 TTS 폴백
-          if (!requestIdRef || requestIdRef.current === currentRequestId) {
-            playBrowserTTS(text, speed, vol, setIsPlaying);
-          }
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔊 [TTS] 외부 엔진 성공 → 오디오 재생 및 캐시 저장`);
+        }
+        playAudio(ttsState, audioUrl, speed, vol);
         
         // 요구사항 2: 캐시에 저장 (비동기)
         fetch(audioUrl)
@@ -688,26 +846,38 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
           .catch(() => {});
         
         // 에러 처리는 TTSAudioPlayer의 이벤트 리스너에서 처리
-        // 재생 실패 시 브라우저 TTS 폴백을 위해 audioPlayerRef에 에러 핸들러 설정
         if (audioPlayerRef.current) {
           const errorHandler = () => {
-            if (!requestIdRef || requestIdRef.current === currentRequestId) {
-              playBrowserTTS(text, speed, vol, setIsPlaying);
+            if (!requestIdRef || requestIdRef.current !== currentRequestId) {
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`🔊 [TTS] 오디오 에러 핸들러: 요청 취소됨`);
+              }
+              return;
             }
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`🔊 [TTS] 오디오 에러 발생 (외부 엔진)`);
+            }
+            setIsPlaying(false);
           };
           audioPlayerRef.current.addEventListener('error', errorHandler, { once: true });
         }
       } else {
-        // 요구사항 3: 외부 엔진 실패 시 브라우저 TTS
+        // 요구사항 3: 외부 엔진 실패 시 재생 중단
         if (!requestIdRef || requestIdRef.current === currentRequestId) {
-          playBrowserTTS(text, speed, vol, setIsPlaying);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`🔊 [TTS] 외부 엔진 실패`);
+          }
+        setIsPlaying(false);
         }
       }
     }
   } catch (error) {
-    // 에러 시 브라우저 TTS 폴백 (요청이 취소되지 않은 경우만)
+    // 에러 시 재생 중단 (요청이 취소되지 않은 경우만)
     if (!requestIdRef || requestIdRef.current === currentRequestId) {
-      playBrowserTTS(text, speed, vol, setIsPlaying);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 에러 발생`, error);
+      }
+      setIsPlaying(false);
     }
   }
 };
@@ -752,26 +922,7 @@ function useTextHandler(volume) {
 // TTS 재생 함수들 (단일책임원칙: 각 단계별로 분리)
 // ============================================================================
 
-// 브라우저 내장 TTS 재생 (단일책임: 브라우저 TTS 재생만)
-const playBrowserTTS = (text, speed, volume, setIsPlaying) => {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR';
-    utterance.rate = speed;
-    utterance.volume = volume;
-    
-    // 재생 완료/에러 시 isPlaying 해제
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
-    
-    window.speechSynthesis.speak(utterance);
-  } else {
-    setIsPlaying(false);
-  }
-};
-
-// TTS 서버에서 오디오 가져오기 (단일책임: 서버 요청만)
+// 외부 TTS 엔진 요청 (단일책임: 외부 엔진 전문 송수신만)
 const fetchTTSFromServer = async (text) => {
   try {
     const response = await fetch('http://gtts.tovair.com:5000/api/tts', {
@@ -780,42 +931,28 @@ const fetchTTSFromServer = async (text) => {
       body: JSON.stringify({ text })
     });
     
-    if (response.status === 201) {
-      const data = await response.json();
-      const fileResponse = await fetch(`http://gtts.tovair.com:5000/api/download/${data.filename}`);
-      const blob = await fileResponse.blob();
-      return URL.createObjectURL(blob);
-    }
-    return null;
-  } catch {
+    if (response.status !== 201) return null;
+    
+    const data = await response.json();
+    const fileResponse = await fetch(`http://gtts.tovair.com:5000/api/download/${data.filename}`);
+    
+    if (!fileResponse.ok) return null;
+    
+    const blob = await fileResponse.blob();
+    return URL.createObjectURL(blob);
+  } catch (error) {
     return null;
   }
 };
 
-// 오디오 플레이어에 오디오 재생 (단일책임: 오디오 재생만)
-// React 방식: TTSStateContext를 통해 Audio 제어
-const playAudio = (ttsState, audioUrl, speed, volume, onError) => {
-  if (!ttsState || !audioUrl) {
-    if (onError) onError();
-    return;
-  }
+// 오디오 재생 (단일책임: 오디오 재생만)
+const playAudio = (ttsState, audioUrl, speed, volume) => {
+  if (!ttsState || !audioUrl) return;
   
-  // React state 업데이트로 Audio 제어
-  if (ttsState.setAudioSrc) ttsState.setAudioSrc(audioUrl);
-  if (ttsState.setAudioPlaybackRate) ttsState.setAudioPlaybackRate(speed);
-  if (ttsState.setAudioVolume) ttsState.setAudioVolume(volume);
-  
-  // 재생 시작 (TTSAudioPlayer의 useEffect에서 자동으로 재생됨)
-  if (ttsState.setShouldPlay) {
-    ttsState.setShouldPlay(true);
-  }
-  
-  // 에러 처리는 TTSAudioPlayer의 이벤트 리스너에서 처리
-  // onError는 TTSAudioPlayer의 handleError에서 호출되도록 해야 함
-  // 하지만 현재 구조상 onError를 직접 호출할 수 없으므로,
-  // playTTS에서 audioPlayerRef를 통해 직접 처리하거나
-  // TTSAudioPlayer에서 에러 발생 시 콜백을 호출하도록 해야 함
-  // 일단은 기존 방식 유지하되, React state로 제어
+  ttsState.setAudioSrc?.(audioUrl);
+  ttsState.setAudioPlaybackRate?.(speed);
+  ttsState.setAudioVolume?.(volume);
+  ttsState.setShouldPlay?.(true);
 };
 
 // 오디오를 DB에 저장 (단일책임: DB 저장만)
@@ -831,13 +968,13 @@ const saveAudioToDB = async (saveToDB, key, blob) => {
 };
 
 // 활성 요소 TTS 재생 훅 (단일책임: 활성 요소 TTS 재생만)
-// 남은 시간 포맷팅 (단일책임: 시간 포맷팅만)
+// 남은 시간 포맷팅 (단일책임: 시간 포맷팅만) - MM:SS 형식
 const formatRemainingTime = (ms) => {
   if (ms <= 0) return "00:00";
-  const s = Math.ceil(ms / 1000);
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  const totalSeconds = Math.ceil(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
@@ -846,39 +983,211 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
   const lastActivityRef = useRef(Date.now());
   const onTimeoutRef = useRef(null);
   const timeoutRef = useRef(null);
+  const currentTimeoutRef = useRef(null); // 현재 적용된 타임아웃 시간 저장
+  const prevLogSecondRef = useRef(-1); // 로그 중복 방지용
   const [remainingTime, setRemainingTime] = useState(timeout);
   
   // 초기값 설정
   if (lastActivityRef.current === null) lastActivityRef.current = Date.now();
   if (onTimeoutRef.current === null) onTimeoutRef.current = onTimeout;
   if (timeoutRef.current === null) timeoutRef.current = timeout;
+  if (currentTimeoutRef.current === null) currentTimeoutRef.current = timeout;
   
   useEffect(() => {
     onTimeoutRef.current = onTimeout;
     timeoutRef.current = timeout;
   }, [onTimeout, timeout]);
   
+  // 마지막 resetTimer 호출 시간 추적 (너무 자주 호출되는 것 방지)
+  const lastResetTimeRef = useRef(0);
+  
   const resetTimer = useCallback(() => {
-    lastActivityRef.current = Date.now();
-    setRemainingTime(timeoutRef.current);
+    const now = Date.now();
+    // 100ms 이내에 중복 호출 방지
+    if (now - lastResetTimeRef.current < 100) {
+      console.log('[타이머] resetTimer 중복 호출 방지', { 
+        timeSinceLastReset: now - lastResetTimeRef.current 
+      });
+      return;
+    }
+    lastResetTimeRef.current = now;
+    
+    // 모달이 열려있으면 20초로 리셋, 아니면 기본 타임아웃으로 리셋
+    const modalElement = document.querySelector('.main.modal');
+    const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
+    const resetTime = isModalOpen ? 20000 : timeoutRef.current;
+    
+    // 사용자 입력 시 리셋
+    const prevLastActivity = lastActivityRef.current;
+    const prevCurrentTimeout = currentTimeoutRef.current;
+    lastActivityRef.current = now;
+    currentTimeoutRef.current = resetTime;
+    
+    console.log('[타이머] resetTimer 호출됨', {
+      now: new Date(now).toISOString(),
+      resetTime,
+      isModalOpen,
+      prevLastActivity: new Date(prevLastActivity).toISOString(),
+      prevCurrentTimeout,
+      timeoutRef: timeoutRef.current
+    });
+    
+    // setRemainingTime은 setInterval에서만 호출하여 충돌 방지
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
+      console.log('[타이머] setTimeout 콜백 실행 (타임아웃)');
       if (onTimeoutRef.current) onTimeoutRef.current();
-    }, timeoutRef.current);
+    }, resetTime);
   }, []);
   
   useEffect(() => {
     if (!enabled) {
+      console.log('[타이머] 비활성화됨');
       setRemainingTime(timeout);
+      currentTimeoutRef.current = timeout;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       return;
     }
+    
+    // 초기 타이머 설정
+    const initialTime = timeoutRef.current || timeout;
+    const initialTimeMs = Date.now();
+    lastActivityRef.current = initialTimeMs;
+    currentTimeoutRef.current = initialTime;
+    setRemainingTime(initialTime);
+    console.log('[타이머] 초기화', {
+      initialTime,
+      initialTimeMs,
+      timeout: timeoutRef.current,
+      enabled
+    });
+    
+    // 100ms마다 실행되는 카운트다운
     intervalRef.current = setInterval(() => {
-      setRemainingTime(Math.max(0, timeout - (Date.now() - lastActivityRef.current)));
-    }, 1000);
+      // 모달 상태 확인
+      const modalElement = document.querySelector('.main.modal');
+      const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
+      
+      // 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
+      if (!isModalOpen && currentTimeoutRef.current === 20000) {
+        const resetTime = timeoutRef.current || timeout;
+        const resetTimeMs = Date.now();
+        lastActivityRef.current = resetTimeMs;
+        currentTimeoutRef.current = resetTime;
+        console.log('[타이머] 모달 닫힘 → 기본 타임아웃으로 리셋', { resetTime, resetTimeMs });
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+        timerRef.current = setTimeout(() => {
+          if (onTimeoutRef.current) onTimeoutRef.current();
+        }, resetTime);
+      }
+      
+      // 경과 시간 계산 및 남은 시간 업데이트 (항상 실행)
+      const now = Date.now();
+      const elapsed = now - lastActivityRef.current;
+      const remaining = Math.max(0, currentTimeoutRef.current - elapsed);
+      
+      // 관측성: 1초마다 로그 출력 (중복 방지)
+      const currentSecond = Math.floor(remaining / 1000);
+      if (currentSecond !== prevLogSecondRef.current && currentSecond >= 0) {
+        prevLogSecondRef.current = currentSecond;
+        console.log('[타이머] 카운트다운', {
+          remaining: currentSecond + '초',
+          remainingMs: remaining,
+          elapsed: Math.ceil(elapsed / 1000) + '초',
+          elapsedMs: elapsed,
+          currentTimeout: currentTimeoutRef.current,
+          lastActivity: new Date(lastActivityRef.current).toISOString(),
+          now: new Date(now).toISOString()
+        });
+      }
+      
+      // 상태 업데이트 (항상 업데이트하여 카운트다운이 정상 작동하도록)
+      setRemainingTime(remaining);
+      
+      // 0초가 되면 초기화
+      if (remaining <= 0 && onTimeoutRef.current) {
+        console.log('[타이머] 타임아웃 발생! 초기화 실행', {
+          onTimeoutRef: !!onTimeoutRef.current,
+          remaining,
+          currentTimeout: currentTimeoutRef.current
+        });
+        // onTimeout 호출 전에 타이머 리셋하지 않음 (초기화가 완료된 후 리셋)
+        const timeoutCallback = onTimeoutRef.current;
+        if (timeoutCallback) {
+          try {
+            timeoutCallback();
+            console.log('[타이머] onTimeout 콜백 실행 완료');
+          } catch (error) {
+            console.error('[타이머] onTimeout 콜백 실행 중 에러', error);
+          }
+        }
+        // 초기화 후 타이머 리셋 (초기화가 완료된 후)
+        const resetTime = timeoutRef.current || timeout;
+        const resetTimeMs = Date.now();
+        lastActivityRef.current = resetTimeMs;
+        currentTimeoutRef.current = resetTime;
+        setRemainingTime(resetTime);
+        console.log('[타이머] 자동 리셋', { resetTime, resetTimeMs });
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+        timerRef.current = setTimeout(() => {
+          if (onTimeoutRef.current) onTimeoutRef.current();
+        }, resetTime);
+      }
+    }, 100);
+    
+    console.log('[타이머] setInterval 시작됨', { intervalId: intervalRef.current });
+    
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      console.log('[타이머] cleanup - setInterval 정리', { intervalId: intervalRef.current });
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [enabled, timeout]);
+  }, [enabled]); // timeout 의존성 제거 - timeoutRef.current 사용
+  
+  // 이벤트 핸들러를 useCallback으로 정의하여 의존성 문제 해결
+  const handleUserActivity = useCallback((eventType = 'unknown') => {
+    const now = Date.now();
+    if (now - lastResetTimeRef.current < 100) {
+      console.log('[타이머] handleUserActivity 중복 호출 방지', { 
+        eventType,
+        timeSinceLastReset: now - lastResetTimeRef.current 
+      });
+      return;
+    }
+    lastResetTimeRef.current = now;
+    
+    const modalElement = document.querySelector('.main.modal');
+    const isModalOpen = modalElement && window.getComputedStyle(modalElement).display !== 'none';
+    const resetTime = isModalOpen ? 20000 : timeoutRef.current;
+    
+    const prevLastActivity = lastActivityRef.current;
+    lastActivityRef.current = now;
+    currentTimeoutRef.current = resetTime;
+    
+    console.log('[타이머] handleUserActivity 호출됨', {
+      eventType,
+      now: new Date(now).toISOString(),
+      resetTime,
+      isModalOpen,
+      prevLastActivity: new Date(prevLastActivity).toISOString(),
+      timeoutRef: timeoutRef.current
+    });
+    
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      console.log('[타이머] setTimeout 콜백 실행 (타임아웃)', { eventType });
+      if (onTimeoutRef.current) onTimeoutRef.current();
+    }, resetTime);
+  }, []); // 의존성 없음 - ref 사용
   
   useEffect(() => {
     if (!enabled) {
@@ -888,38 +1197,65 @@ const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true) => {
       }
       return;
     }
-    // 이벤트 리스너를 명시적으로 분리 (Step 컴포넌트 패턴)
-    document.addEventListener('mousedown', resetTimer, { passive: true });
-    document.addEventListener('keydown', resetTimer, { passive: true });
-    document.addEventListener('touchstart', resetTimer, { passive: true });
-    document.addEventListener('click', resetTimer, { passive: true });
-    resetTimer();
+    
+    // 이벤트 리스너 등록
+    const keydownHandler = () => handleUserActivity('keydown');
+    const touchstartHandler = () => handleUserActivity('touchstart');
+    const clickHandler = () => handleUserActivity('click');
+    
+    document.addEventListener('keydown', keydownHandler, { passive: true });
+    document.addEventListener('touchstart', touchstartHandler, { passive: true });
+    document.addEventListener('click', clickHandler, { passive: true });
+    
+    console.log('[타이머] 이벤트 리스너 등록됨', { enabled, onTimeout: !!onTimeoutRef.current });
+    
     return () => {
+      console.log('[타이머] cleanup - 이벤트 리스너 제거', { 
+        timerRef: !!timerRef.current,
+        enabled 
+      });
       if (timerRef.current) clearTimeout(timerRef.current);
-      document.removeEventListener('mousedown', resetTimer);
-      document.removeEventListener('keydown', resetTimer);
-      document.removeEventListener('touchstart', resetTimer);
-      document.removeEventListener('click', resetTimer);
+      document.removeEventListener('keydown', keydownHandler);
+      document.removeEventListener('touchstart', touchstartHandler);
+      document.removeEventListener('click', clickHandler);
     };
-  }, [enabled, resetTimer]);
+  }, [enabled, handleUserActivity]); // handleUserActivity는 useCallback으로 안정화됨
   
-  return { resetTimer, remainingTime, remainingTimeFormatted: formatRemainingTime(remainingTime) };
+  // remainingTime이 변경될 때마다 포맷팅된 시간 재계산
+  const remainingTimeFormatted = useMemo(() => formatRemainingTime(remainingTime), [remainingTime]);
+  
+  return { resetTimer, remainingTime, remainingTimeFormatted, onTimeoutRef };
 };
 
 // ============================================================================
 // 결제 카운트다운 훅 (단일책임원칙: 각 단계별로 분리)
 // ============================================================================
 
-// 상태 초기화 함수 (단일책임: 상태 초기화만)
-const resetAppState = (callbacks) => {
-  callbacks.ModalReturn.close();
-  callbacks.ModalAccessibility.close();
-  callbacks.setQuantities(callbacks.totalMenuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {}));
-  callbacks.setIsDark(false);
-  callbacks.setVolume(1);
-  callbacks.setIsLarge(false);
-  callbacks.setIsLow(false);
-  callbacks.setCurrentPage('ScreenStart');
+// 이니셜 함수 (단일책임: 이니셜만)
+const initializeApp = (callbacks) => {
+  console.log('[초기화] initializeApp 시작', { 
+    callbacks: Object.keys(callbacks),
+    setCurrentPage: !!callbacks.setCurrentPage
+  });
+  // 모든 모달 닫기
+  callbacks.ModalRestart?.close();
+  callbacks.ModalAccessibility?.close();
+  callbacks.ModalTimeout?.close(); // 타임아웃 모달 닫기
+  callbacks.setQuantities?.(callbacks.totalMenuItems.reduce((acc, item) => ({ ...acc, [item.id]: 0 }), {}));
+  callbacks.setIsDark?.(false);
+  callbacks.setVolume?.(1);
+  callbacks.setIsLarge?.(false);
+  callbacks.setIsLow?.(false);
+  
+  // 시작화면으로 이동 (가장 중요)
+  if (callbacks.setCurrentPage) {
+    console.log('[초기화] setCurrentPage 호출 전');
+    callbacks.setCurrentPage('ScreenStart');
+    console.log('[초기화] setCurrentPage 호출 완료 - ScreenStart로 이동');
+  } else {
+    console.error('[초기화] setCurrentPage가 없습니다!');
+  }
+  console.log('[초기화] initializeApp 완료');
 };
 
 // 자동 완료 카운트다운 관리 (단일책임: 자동 완료 카운트다운만)
@@ -1124,7 +1460,7 @@ const useCategoryPagination = (items, isLarge = false) => {
     
     // 로그는 개발 환경에서만 출력 (불필요한 로그 제거)
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📊 버튼폭=${btnWidths.slice(0,3).join(',')}... → ${breakpoints.length}페이지`, breakpoints);
+    console.log(`📊 버튼폭=${btnWidths.slice(0,3).join(',')}... → ${breakpoints.length}페이지`, breakpoints);
     }
     
     setPageBreakpoints(breakpoints);
@@ -1181,7 +1517,7 @@ const useCategoryPagination = (items, isLarge = false) => {
     
     // 초기 계산 - ref가 연결되면 즉시 계산 (동기식)
     if (measureRef.current && containerRef.current) {
-      calculate();
+    calculate();
     }
     
     // 윈도우 리사이즈도 감지 (동기식)
@@ -1202,27 +1538,27 @@ const useCategoryPagination = (items, isLarge = false) => {
     }
     
     // 동기식 측정
-    if (!containerRef.current) {
-      setIsReady(true);
-      return;
-    }
-    
-    const renderedButtons = containerRef.current.querySelectorAll('.button');
-    if (renderedButtons.length <= 1) {
-      setIsReady(true);
-      return;
-    }
-    
+        if (!containerRef.current) {
+          setIsReady(true);
+          return;
+        }
+        
+        const renderedButtons = containerRef.current.querySelectorAll('.button');
+        if (renderedButtons.length <= 1) {
+          setIsReady(true);
+          return;
+        }
+        
     // 실제 간격 측정 (동기식)
-    let maxGap = 0;
-    for (let i = 0; i < renderedButtons.length - 1; i++) {
-      const rect1 = renderedButtons[i].getBoundingClientRect();
-      const rect2 = renderedButtons[i + 1].getBoundingClientRect();
-      const actualGap = rect2.left - rect1.right;
-      maxGap = Math.max(maxGap, actualGap);
-    }
-    
-    const shouldCompact = maxGap > ACTUAL_GAP_THRESHOLD;
+        let maxGap = 0;
+        for (let i = 0; i < renderedButtons.length - 1; i++) {
+          const rect1 = renderedButtons[i].getBoundingClientRect();
+          const rect2 = renderedButtons[i + 1].getBoundingClientRect();
+          const actualGap = rect2.left - rect1.right;
+          maxGap = Math.max(maxGap, actualGap);
+        }
+        
+        const shouldCompact = maxGap > ACTUAL_GAP_THRESHOLD;
     // 상태가 실제로 변경될 때만 업데이트 (불필요한 재렌더링 방지)
     setIsCompact(prev => {
       if (prev !== shouldCompact) {
@@ -1308,10 +1644,6 @@ const useFocusTrap = (isActive, options = {}) => {
       // main을 포커스 루프에 항상 추가 (화면 전환 시 포커스 지정을 위해)
       const mainElement = document.querySelector('.main');
       if (mainElement) {
-        // 원천 함수와 동일한 로직으로 tabindex 설정 (일관성 유지)
-        if (!mainElement.hasAttribute('tabindex')) {
-          mainElement.setAttribute('tabindex', '-1');
-        }
         const mainStyle = window.getComputedStyle(mainElement);
         if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
           // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
@@ -1322,12 +1654,12 @@ const useFocusTrap = (isActive, options = {}) => {
       return elements;
     } else {
       // 모달 모드: 특정 컨테이너 내부에서만 포커스 가능한 요소 찾기
-      if (!containerRef.current) return [];
+    if (!containerRef.current) return [];
       const elements = Array.from(containerRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
-        .filter(el => {
-          const st = window.getComputedStyle(el);
-          return st.display !== 'none' && st.visibility !== 'hidden';
-        });
+      .filter(el => {
+        const st = window.getComputedStyle(el);
+        return st.display !== 'none' && st.visibility !== 'hidden';
+      });
       
       // main.modal을 포커스 루프에 항상 추가 (모달 열릴 때 포커스 지정을 위해)
       const modalContentElement = containerRef.current;
@@ -1394,7 +1726,7 @@ const useFocusTrap = (isActive, options = {}) => {
           } else if (active === first) {
             // main에서 Shift+Tab을 누르면 마지막 요소로 이동
             last?.focus();
-          } else {
+      } else {
             // 이전 요소로 이동
             const prevIndex = currentIndex > 0 ? currentIndex - 1 : els.length - 1;
             els[prevIndex]?.focus();
@@ -1492,12 +1824,12 @@ const useFocusTrap = (isActive, options = {}) => {
     
     document.addEventListener('keydown', hkd);
     if (!isAppMode) {
-      document.addEventListener('keydown', hesc);
+    document.addEventListener('keydown', hesc);
     }
     return () => {
       document.removeEventListener('keydown', hkd);
       if (!isAppMode) {
-        document.removeEventListener('keydown', hesc);
+      document.removeEventListener('keydown', hesc);
       }
     };
   }, [isActive, isAppMode, getFocusableElements, focusFirst, focusLast]);
@@ -1511,10 +1843,10 @@ const useFocusTrap = (isActive, options = {}) => {
         // 앱 모드: .main 기준으로 포커스 이탈 방지
         const mainElement = document.querySelector('.main');
         if (!mainElement) return;
-        
+    
         // 포커스가 main 내부의 다른 요소로 이동하는 경우는 허용
         const isRelatedTargetInMain = mainElement.contains(e.relatedTarget) || e.relatedTarget === mainElement;
-        
+    
         // main 밖으로 포커스가 나가려고 하거나 포커스가 사라지면 main으로 포커스 이동
         // 단, main 내부의 버튼 등으로 포커스가 이동하는 경우는 허용
         if (e.relatedTarget === null || !isRelatedTargetInMain) {
@@ -1578,35 +1910,6 @@ const useAccessibilitySettings = (initialSettings = { isDark: false, isLow: fals
     setVolume: setVolumeVal, resetToDefault, updateAll, getStatusText
   };
 };
-
-class IntroTimerSingleton {
-  #intervalId = null;
-  #intervalTime = 0;
-  
-  startIntroTimer(scriptText, handleText, onInitSetting) {
-    this.cleanup();
-    this.#intervalId = setInterval(() => {
-      this.#intervalTime++;
-      if (this.#intervalTime >= 180) {
-        handleText(scriptText);
-        this.#intervalTime = 0;
-        if (onInitSetting) onInitSetting();
-      }
-    }, 1000);
-  }
-  
-  stopIntroTimer() {
-    this.cleanup();
-  }
-  
-  cleanup() {
-    if (this.#intervalId) {
-      clearInterval(this.#intervalId);
-      this.#intervalId = null;
-    }
-    this.#intervalTime = 0;
-  }
-}
 
 // ============================================================================
 // 버튼 액션 핸들러 (단일책임원칙: 각 액션 타입별로 분리)
@@ -1806,10 +2109,6 @@ const getFocusableElements = () => {
   // main을 포커스 루프에 항상 추가 (화면 전환 시 포커스 지정을 위해)
   const mainElement = document.querySelector('.main');
   if (mainElement) {
-    // main에 tabindex가 없으면 추가
-    if (!mainElement.hasAttribute('tabindex')) {
-      mainElement.setAttribute('tabindex', '-1');
-    }
     const mainStyle = window.getComputedStyle(mainElement);
     if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
       // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
@@ -2032,15 +2331,40 @@ const usePressStateHandler = (enableGlobalHandlers, playSoundOpt) => {
 
 // 이전 버튼의 부모 요소를 저장하는 전역 ref (같은 부모 안에서 버튼 변경 시 부모 TTS 재생 방지)
 const prevButtonParentRef = { current: null };
+// 이전 TTS 텍스트 저장 (중복 실행 방지)
+const prevTtsTextRef = { current: '' };
+const lastTtsTimeRef = { current: 0 };
 
 // 포커스 인 및 마우스 엔터 시 TTS 재생 핸들러 (단일책임: 포커스 인 및 마우스 엔터 시 TTS 재생만)
 const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
+  const ttsState = useContext(TTSStateContext);
+  
   useEffect(() => {
     if (!enableGlobalHandlers) return;
+    
+    // 사용자 인터랙션 감지 (키보드, 마우스, 터치)
+    const handleUserInteraction = () => {
+      if (ttsState && !ttsState.hasUserInteracted && ttsState.setHasUserInteracted) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔊 [TTS] 사용자 인터랙션 감지 → TTS 활성화`);
+        }
+        ttsState.setHasUserInteracted(true);
+      }
+    };
+    
+    // 사용자 인터랙션 이벤트 리스너 등록
+    document.addEventListener('keydown', handleUserInteraction, { once: true, passive: true });
+    document.addEventListener('mousedown', handleUserInteraction, { once: true, passive: true });
+    document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
     
     const handleTTS = (e) => {
       const target = e.target;
       if (!target) return;
+      
+      // 같은 요소에 대한 중복 실행 방지 (200ms 이내)
+      const now = Date.now();
+      if (now - lastTtsTimeRef.current < 200) return;
+      lastTtsTimeRef.current = now;
       
       // 버튼인 경우
       const btn = target.closest?.('.button');
@@ -2052,9 +2376,12 @@ const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
         // 같은 부모 안에서 버튼이 바뀌면 부모 TTS 재생하지 않음
         const parentTts = isSameParent ? '' : (currentParent?.dataset?.ttsText || '');
         const btnTts = btn.dataset?.ttsText || '';
+        const ttsText = parentTts + btnTts;
         
-        if (parentTts || btnTts) {
-          finalHandleText(parentTts + btnTts);
+        // 이전과 같은 텍스트면 재생하지 않음
+        if (ttsText && ttsText !== prevTtsTextRef.current) {
+          prevTtsTextRef.current = ttsText;
+          finalHandleText(ttsText);
         }
         
         // 현재 부모를 이전 부모로 저장
@@ -2064,7 +2391,8 @@ const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
       
       // 버튼이 아닌 경우: data-tts-text가 있는 요소인지 확인 (예: .main)
       const elementTts = target.dataset?.ttsText || '';
-      if (elementTts) {
+      if (elementTts && elementTts !== prevTtsTextRef.current) {
+        prevTtsTextRef.current = elementTts;
         finalHandleText(elementTts);
         // .main 같은 경우는 부모가 없으므로 prevButtonParentRef를 null로 설정
         prevButtonParentRef.current = null;
@@ -2077,10 +2405,13 @@ const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
     document.addEventListener('mouseenter', handleTTS, true);
     
     return () => {
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('mousedown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('focusin', handleTTS, true);
       document.removeEventListener('mouseenter', handleTTS, true);
     };
-  }, [enableGlobalHandlers, finalHandleText]);
+  }, [enableGlobalHandlers, finalHandleText, ttsState]);
 };
 
 // 섹션 업데이트 관리 (단일책임: 포커스 가능 섹션 관리만)
@@ -2300,6 +2631,12 @@ Button.displayName = 'Button';
 const H = memo(({ children }) => <span className="highlight">{children}</span>); // ModalHighlight 축약
 H.displayName = 'H';
 
+// Highlight 컴포넌트 (BaseModal보다 앞에 정의되어야 함)
+const Highlight = memo(({ children }) => (
+  <span className="primary">{children}</span>
+));
+Highlight.displayName = 'Highlight';
+
 // 모달 설정 (컨텍스트 기반 생성)
 const MODAL_CONFIG = {
   deleteCheck: {
@@ -2332,15 +2669,15 @@ const MODAL_CONFIG = {
     confirmLabel: "초기화",
     message: (H) => <><p>주문 내역을 <H>초기화</H>합니다</p><p>계속 진행하시려면 <H>초기화</H> 버튼을 누릅니다</p></>,
   },
-  return: {
-    tts: "알림, 처음으로, 시작화면으로 이동합니다, 계속 진행하시려면 처음으로 버튼을 누릅니다,",
+  restart: {
+    tts: "알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
     icon: "GraphicHome",
-    title: "처음으로",
+    title: "시작화면",
     cancelIcon: "Cancel",
     cancelLabel: "취소",
     confirmIcon: "Ok",
-    confirmLabel: "처음으로",
-    message: (H) => <><p><H>시작화면</H>으로 이동합니다</p><p>계속 진행하시려면 <H>처음으로</H> 버튼을 누릅니다</p></>,
+    confirmLabel: "시작화면",
+    message: (H) => <><p><H>시작화면</H>으로 이동합니다</p><p>계속 진행하시려면 <H>시작화면</H> 버튼을 누릅니다</p></>,
   },
   call: {
     tts: "알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
@@ -2360,7 +2697,7 @@ const MODAL_CONFIG = {
     cancelLabel: "시작화면",
     confirmIcon: "Extention",
     confirmLabel: "연장",
-    message: (H) => <><p>사용시간이 <H>20초</H> 남았습니다</p><p>계속 사용하시려면 <H>연장</H> 버튼을 누릅니다</p></>,
+    message: (H, countdown) => <><p>사용시간이 <H>{countdown !== undefined ? `${countdown}초` : '20초'}</H> 남았습니다</p><p>계속 사용하시려면 <H>연장</H> 버튼을 누릅니다</p></>,
   },
   paymentError: {
     tts: "알림, 결제 경고, 카드가 잘못 삽입되었습니다, 카드를 제거하시고 다시결제 버튼을 누릅니다, ",
@@ -2386,7 +2723,7 @@ const MODAL_CONFIG = {
 };
 
 // 공통 모달 베이스 (컨텍스트 기반)
-const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancelIcon, confirmIcon, confirmLabel, customContent, customTts, icon: customIcon, title: customTitle }) => {
+const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancelIcon, confirmIcon, confirmLabel, customContent, customTts, icon: customIcon, title: customTitle, countdown }) => {
   // RefContext에서 값 가져오기
   const refsData = useContext(RefContext);
   const accessibility = useContext(AccessibilityContext);
@@ -2410,7 +2747,6 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
   const isAccessibilityModal = type === 'accessibility';
   const originalSettingsRef = isAccessibilityModal ? refsData.refs.AccessibilityModal.originalSettingsRef : null;
   const { setAudioVolume } = useDOM();
-  const readCurrentPage = useReadCurrentPage();
   
   // 접근성 모달: 현재 접근성 설정 상태 관리 (Hook은 항상 호출해야 함)
   const accessibilitySettings = useAccessibilitySettings({ isDark: accessibility.isDark, isLow: accessibility.isLow, isLarge: accessibility.isLarge, volume: accessibility.volume });
@@ -2485,8 +2821,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
       setAudioVolume('audioPlayer', ({ 0: 0, 1: 0.5, 2: 0.75, 3: 1 })[original.volume]);
     }
     accessibility.ModalAccessibility.close();
-    readCurrentPage();
-  }, [isAccessibilityModal, originalSettingsRef, accessibility, setAudioVolume, onCancel, readCurrentPage]);
+  }, [isAccessibilityModal, originalSettingsRef, accessibility, setAudioVolume, onCancel]);
   
   // 접근성 모달: 적용하기 핸들러
   const handleConfirmPress = useCallback(() => {
@@ -2496,8 +2831,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
     }
     accessibility.setAccessibility(currentSettings);
     accessibility.ModalAccessibility.close();
-    readCurrentPage(currentSettings.volume);
-  }, [isAccessibilityModal, currentSettings, accessibility, onConfirm, readCurrentPage]);
+  }, [isAccessibilityModal, currentSettings, accessibility, onConfirm]);
   
   // 모달 열릴 때 main.modal에 포커스 (동기식)
   const { focusModalContent } = useDOM();
@@ -2517,7 +2851,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
       </div>
       {/* 초기설정 */}
       <div className="setting-row" data-tts-text="초기설정으로 일괄선택, 버튼 한 개, ">
-        <span className="setting-name">초기설정으로 일괄선택</span>
+        <span className="setting-name"><Highlight>초기설정</Highlight>으로 일괄선택</span>
         <div className="task-manager">
           <Button className="w242h076" svg={<Icon name="Restart" />} label="초기설정" onClick={handleInitialSettingsPress} />
         </div>
@@ -2566,7 +2900,7 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
   return (
     <>
       <div className="modal-overlay">
-        <div className="main modal" ref={containerRef} data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}>
+        <div className="main modal" ref={containerRef} data-tts-text={finalTts ? (finalTts + TTS.replay) : ''} tabIndex={-1}>
           <div className="up-content">
             {finalIcon && <Icon name={finalIcon} className="modal-image" />}
             {finalTitle && <div className="modal-title">{finalTitle}</div>}
@@ -2584,23 +2918,23 @@ const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancel
                   </>
                 ) : (
                   <>
-                    <div className="modal-message">{config.message(H)}</div>
-                    <div data-tts-text={finalCancelLabel ? "작업관리, 버튼 두 개," : "작업관리, 버튼 한 개,"} ref={refsData.refs.BaseModal.modalConfirmButtonsRef} className="task-manager">
-                      {finalCancelLabel && (
-                        <Button 
-                          className="w285h090" 
-                          svg={<Icon name={finalCancelIcon} />} 
-                          label={finalCancelLabel} 
-                          onClick={onCancel} 
-                        />
-                      )}
-                      <Button 
-                        className={`w285h090 ${config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}`} 
-                        svg={<Icon name={finalConfirmIcon} />} 
-                        label={finalConfirmLabel} 
-                        onClick={onConfirm} 
-                      />
-                    </div>
+                    <div className="modal-message">{config.message(H, countdown)}</div>
+                <div data-tts-text={finalCancelLabel ? "작업관리, 버튼 두 개," : "작업관리, 버튼 한 개,"} ref={refsData.refs.BaseModal.modalConfirmButtonsRef} className="task-manager">
+                  {finalCancelLabel && (
+                    <Button 
+                      className="w285h090" 
+                      svg={<Icon name={finalCancelIcon} />} 
+                      label={finalCancelLabel} 
+                      onClick={onCancel} 
+                    />
+                  )}
+                  <Button 
+                    className={`w285h090 ${config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}`} 
+                    svg={<Icon name={finalConfirmIcon} />} 
+                    label={finalConfirmLabel} 
+                    onClick={onConfirm} 
+                  />
+            </div>
                   </>
                 )}
               </>
@@ -2625,20 +2959,6 @@ const useResetQuantities = () => {
   }, [order]);
 };
 
-// readCurrentPage helper hook - Context에서 값 읽고 useTextHandler 사용
-// 의존성: RouteContext, AccessibilityContext, OrderContext, useTextHandler
-// 주의: 이 훅은 각 스크린 컴포넌트에서 직접 TTS를 정의하므로 더 이상 사용되지 않을 수 있음
-const useReadCurrentPage = () => {
-  const route = useContext(RouteContext);
-  const accessibility = useContext(AccessibilityContext);
-  const order = useContext(OrderContext);
-  const { handleText } = useTextHandler(accessibility.volume);
-  
-  return useCallback(() => {
-    // 각 스크린 컴포넌트에서 자신의 TTS를 직접 관리하므로 빈 함수로 유지
-    // 필요시 각 스크린 컴포넌트 내부에서 직접 TTS 재생 처리
-  }, []);
-};
 
 // resetOrder helper hook
 const useResetOrder = () => {
@@ -2649,7 +2969,7 @@ const useResetOrder = () => {
     order.totalMenuItems.forEach(item => { reset[item.id] = 0; });
     order.setQuantities(reset);
     accessibility.setIsDark(false);
-    accessibility.setVolume(0.5);
+    accessibility.setVolume(1); // 0, 1, 2, 3 중 하나만 허용 (1 = "약" = 0.5 볼륨)
     accessibility.setIsLarge(false);
     accessibility.setIsLow(false);
   }, [order, accessibility]);
@@ -2659,19 +2979,17 @@ const useResetOrder = () => {
 const DeleteCheckModal = ({ handleDelete, id }) => {
   const accessibility = useContext(AccessibilityContext);
   const route = useContext(RouteContext);
-  const readCurrentPage = useReadCurrentPage();
   const ModalDeleteCheck = accessibility?.ModalDeleteCheck || { isOpen: false, close: () => {} };
-  const close = useCallback(() => { ModalDeleteCheck.close(); readCurrentPage(); }, [ModalDeleteCheck, readCurrentPage]);
+  const close = useCallback(() => { ModalDeleteCheck.close(); }, [ModalDeleteCheck]);
   const confirm = useCallback(() => { handleDelete(id); ModalDeleteCheck.close(); route?.setCurrentPage?.('ScreenDetails'); }, [id, handleDelete, ModalDeleteCheck, route]);
   return <BaseModal isOpen={ModalDeleteCheck.isOpen} type="deleteCheck" onCancel={close} onConfirm={confirm} />;
 };
 
 const DeleteModal = ({ handleDelete, id }) => {
   const accessibility = useContext(AccessibilityContext);
-  const readCurrentPage = useReadCurrentPage();
   const ModalDelete = accessibility?.ModalDelete || { isOpen: false, close: () => {} };
-  const close = useCallback(() => { ModalDelete.close(); readCurrentPage(); }, [ModalDelete, readCurrentPage]);
-  const confirm = useCallback(() => { handleDelete(id); ModalDelete.close(); readCurrentPage(); }, [id, handleDelete, ModalDelete, readCurrentPage]);
+  const close = useCallback(() => { ModalDelete.close(); }, [ModalDelete]);
+  const confirm = useCallback(() => { handleDelete(id); ModalDelete.close(); }, [id, handleDelete, ModalDelete]);
   return <BaseModal isOpen={ModalDelete.isOpen} type="delete" onCancel={close} onConfirm={confirm} />;
 };
 
@@ -2679,62 +2997,91 @@ const ResetModal = () => {
   const accessibility = useContext(AccessibilityContext);
   const route = useContext(RouteContext);
   const resetQty = useResetQuantities();
-  const readCurrentPage = useReadCurrentPage();
   const ModalReset = accessibility?.ModalReset || { isOpen: false, close: () => {} };
-  const close = useCallback(() => { ModalReset.close(); readCurrentPage(); }, [ModalReset, readCurrentPage]);
-  const confirm = useCallback(() => { resetQty(); ModalReset.close(); route?.setCurrentPage?.('ScreenMenu'); readCurrentPage(); }, [resetQty, ModalReset, route, readCurrentPage]);
+  const close = useCallback(() => { ModalReset.close(); }, [ModalReset]);
+  const confirm = useCallback(() => { resetQty(); ModalReset.close(); route?.setCurrentPage?.('ScreenMenu'); }, [resetQty, ModalReset, route]);
   return <BaseModal isOpen={ModalReset.isOpen} type="reset" onCancel={close} onConfirm={confirm} />;
 };
 
-const ReturnModal = () => {
+const RestartModal = () => {
   const accessibility = useContext(AccessibilityContext);
   const route = useContext(RouteContext);
-  const resetQty = useResetQuantities();
-  const ModalReturn = accessibility?.ModalReturn || { isOpen: false, close: () => {}, buttonLabel: null, buttonIcon: null };
-  const close = useCallback(() => { ModalReturn.close(); }, [ModalReturn]);
-  const confirm = useCallback(() => { resetQty(); ModalReturn.close(); route?.setCurrentPage?.('ScreenStart'); }, [resetQty, ModalReturn, route]);
-  const buttonLabel = ModalReturn.buttonLabel;
-  const buttonIcon = ModalReturn.buttonIcon;
-  const config = MODAL_CONFIG.return;
-  return <BaseModal isOpen={ModalReturn.isOpen} type="return" icon={buttonIcon || undefined} title={buttonLabel || undefined} confirmIcon={config.confirmIcon} confirmLabel={config.confirmLabel} onCancel={close} onConfirm={confirm} />;
+  const order = useContext(OrderContext);
+  const ModalRestart = accessibility?.ModalRestart || { isOpen: false, close: () => {}, buttonLabel: null, buttonIcon: null };
+  const close = useCallback(() => { ModalRestart.close(); }, [ModalRestart]);
+  const confirm = useCallback(() => {
+    // 모든 이니셜은 initializeApp로 통일
+    const callbacks = {
+      ModalRestart: accessibility.ModalRestart,
+      ModalAccessibility: accessibility.ModalAccessibility,
+      setQuantities: order.setQuantities,
+      totalMenuItems: order.totalMenuItems,
+      setIsDark: accessibility.setIsDark,
+      setVolume: accessibility.setVolume,
+      setIsLarge: accessibility.setIsLarge,
+      setIsLow: accessibility.setIsLow,
+      setCurrentPage: route.setCurrentPage
+    };
+    initializeApp(callbacks);
+  }, [ModalRestart, accessibility, order, route]);
+  const config = MODAL_CONFIG.restart;
+  return <BaseModal isOpen={ModalRestart.isOpen} type="restart" icon={ModalRestart.buttonIcon || undefined} title={ModalRestart.buttonLabel || undefined} confirmIcon={config.confirmIcon} confirmLabel={config.confirmLabel} onCancel={close} onConfirm={confirm} />;
 };
 
 const CallModal = () => {
   const accessibility = useContext(AccessibilityContext);
-  const readCurrentPage = useReadCurrentPage();
   const ModalCall = accessibility?.ModalCall || { isOpen: false, close: () => {} };
-  const close = useCallback(() => { ModalCall.close(); readCurrentPage(); }, [ModalCall, readCurrentPage]);
+  const close = useCallback(() => { ModalCall.close(); }, [ModalCall]);
   return <BaseModal isOpen={ModalCall.isOpen} type="call" onCancel={close} onConfirm={close} />;
 };
 
 const TimeoutModal = () => {
   const accessibility = useContext(AccessibilityContext);
   const route = useContext(RouteContext);
-  const resetOrder = useResetOrder();
-  const readCurrentPage = useReadCurrentPage();
+  const order = useContext(OrderContext);
   const ModalTimeout = accessibility?.ModalTimeout || { isOpen: false, close: () => {} };
+  
+  // 전역 타이머의 remainingTime을 초 단위로 변환 (모달 표시용)
+  const globalRemainingTime = accessibility?.globalRemainingTime ?? 0;
+  const countdown = Math.ceil(globalRemainingTime / 1000); // 밀리초를 초로 변환
+  
+  // 모든 이니셜은 initializeApp로 통일
+  const handleReset = useCallback(() => {
+    const callbacks = {
+      ModalRestart: accessibility.ModalRestart,
+      ModalAccessibility: accessibility.ModalAccessibility,
+      setQuantities: order.setQuantities,
+      totalMenuItems: order.totalMenuItems,
+      setIsDark: accessibility.setIsDark,
+      setVolume: accessibility.setVolume,
+      setIsLarge: accessibility.setIsLarge,
+      setIsLow: accessibility.setIsLow,
+      setCurrentPage: route.setCurrentPage
+    };
+    initializeApp(callbacks);
+  }, [accessibility, order, route]);
+  
   const close = useCallback(() => { 
     ModalTimeout.close(); 
-    resetOrder();
-    route?.setCurrentPage?.('ScreenStart');
-  }, [ModalTimeout, resetOrder, route]);
+    // 이니셜 실행 (initializeApp로 통일)
+    handleReset();
+  }, [ModalTimeout, handleReset]);
+  
   const extend = useCallback(() => { 
     ModalTimeout.close(); 
-    readCurrentPage(); 
-  }, [ModalTimeout, readCurrentPage]);
-  return <BaseModal isOpen={ModalTimeout.isOpen} type="timeout" onCancel={close} onConfirm={extend} />;
+  }, [ModalTimeout]);
+  
+  return <BaseModal isOpen={ModalTimeout.isOpen} type="timeout" onCancel={close} onConfirm={extend} countdown={countdown} />;
 };
 
 const PaymentErrorModal = () => {
   const accessibility = useContext(AccessibilityContext);
   const route = useContext(RouteContext);
-  const readCurrentPage = useReadCurrentPage();
   const ModalPaymentError = accessibility?.ModalPaymentError || { isOpen: false, close: () => {} };
   const handleRePayment = useCallback(() => { 
     ModalPaymentError.close(); 
     route?.setCurrentPage?.('ScreenPayments');
-    readCurrentPage();
-  }, [ModalPaymentError, route, readCurrentPage]);
+  }, [ModalPaymentError, route]);
   return <BaseModal isOpen={ModalPaymentError.isOpen} type="paymentError" cancelLabel={null} onCancel={handleRePayment} onConfirm={handleRePayment} />;
 };
 
@@ -2800,7 +3147,7 @@ const AccessibilityProvider = ({ children }) => {
   
   // 모달 상태 관리
   const [modals, setModals] = useState({
-    return: false,
+    restart: false,
     accessibility: false,
     reset: false,
     delete: false,
@@ -2811,6 +3158,7 @@ const AccessibilityProvider = ({ children }) => {
   });
   const [deleteItemId, setDeleteItemId] = useState(0);
   const [modalButtonInfo, setModalButtonInfo] = useState({});
+  const [globalRemainingTime, setGlobalRemainingTime] = useState(null);
   
   const createModalHandlers = useCallback((key) => ({
     isOpen: modals[key],
@@ -2835,7 +3183,7 @@ const AccessibilityProvider = ({ children }) => {
     accessibility,
     setAccessibility: setAccessibilityState,
     // 모달 상태
-    ModalReturn: createModalHandlers('return'),
+    ModalRestart: createModalHandlers('restart'),
     ModalAccessibility: createModalHandlers('accessibility'),
     ModalReset: createModalHandlers('reset'),
     ModalDelete: createModalHandlers('delete'),
@@ -2844,8 +3192,11 @@ const AccessibilityProvider = ({ children }) => {
     ModalTimeout: createModalHandlers('timeout'),
     ModalPaymentError: createModalHandlers('paymentError'),
     ModalDeleteItemId: deleteItemId,
-    setModalDeleteItemId: setDeleteItemId
-  }), [isDark, isLow, isLarge, volume, accessibility, modals, deleteItemId, createModalHandlers]);
+    setModalDeleteItemId: setDeleteItemId,
+    // 전역 타이머 (TimeoutModal에서 사용)
+    globalRemainingTime,
+    setGlobalRemainingTime
+  }), [isDark, isLow, isLarge, volume, accessibility, modals, deleteItemId, createModalHandlers, globalRemainingTime]);
   
   return (
     <AccessibilityContext.Provider value={value}>
@@ -2922,10 +3273,10 @@ const useDOM = () => {
       }
     } else {
       // 다른 오디오 요소는 기존 방식 유지
-      const audio = getElementById(id);
-      if (audio && audio instanceof HTMLAudioElement) {
-        audio.volume = Math.max(0, Math.min(1, vol));
-      }
+    const audio = getElementById(id);
+    if (audio && audio instanceof HTMLAudioElement) {
+      audio.volume = Math.max(0, Math.min(1, vol));
+    }
     }
   }, [getElementById, ttsState, audioPlayerRef]);
   
@@ -2955,16 +3306,34 @@ const RouteProvider = ({ children }) => {
   const [currentPage, setCurrentPageState] = useState('ScreenStart');
   
   const setCurrentPage = useCallback((p) => {
-      setCurrentPageState(p);
-  }, []);
+    console.log('[라우팅] setCurrentPage 호출', { 
+      from: currentPage, 
+      to: p,
+      timestamp: new Date().toISOString()
+    });
+    setCurrentPageState(p);
+    console.log('[라우팅] setCurrentPage 완료', { newPage: p });
+  }, [currentPage]);
   
-  // 스크린 전환 시 자동으로 .main에 포커스 설정 (원천적 통일)
+  // 스크린 전환 시 자동으로 .main에 포커스 설정 및 TTS 재생 (원천적 통일)
   // 모든 Screen 컴포넌트에서 개별적으로 focusMain을 호출할 필요 없음
-  useLayoutEffect(() => {
+  // useEffect로 변경하여 useInteractiveTTSHandler의 useEffect (이벤트 리스너 등록) 이후에 실행
+  // useLayoutEffect는 자식이 부모보다 먼저 실행되므로, ScreenStart의 useInteractiveTTSHandler가
+  // 이벤트 리스너를 등록하기 전에 focusMainElement()가 실행될 수 있음
+  const lastPageRef = useRef(null);
+  useEffect(() => {
+    // 페이지가 실제로 변경되었을 때만 포커스 설정 (중복 방지)
+    if (lastPageRef.current === currentPage) return;
+    lastPageRef.current = currentPage;
+    
+    // 모든 화면에서 .main에 자동 포커스 설정 (포커스 TTS 로직 통일)
     // 모달이 열려있지 않을 때만 .main에 포커스 설정
     const modalElement = document.querySelector('.main.modal');
     if (!modalElement || window.getComputedStyle(modalElement).display === 'none') {
-      focusMainElement();
+      // useInteractiveTTSHandler의 useEffect (이벤트 리스너 등록) 이후에 실행
+      requestAnimationFrame(() => {
+        focusMainElement();
+      });
     }
   }, [currentPage]);
   
@@ -3080,7 +3449,7 @@ const OrderProvider = ({ children }) => {
     setSelectedTab(tabs[i]);
   }, [tabs, selectedTab]);
   
-  // 카테고리 페이지 네비게이션 - 로컬 ref 사용 (초기화 순서 문제 해결)
+  // 카테고리 페이지 네비게이션 - 로컬 ref 사용 (이니셜 순서 문제 해결)
   const categoryPageNavRef = useRef(null);
   const handleCategoryPageNav = useCallback((dir) => {
     if (categoryPageNavRef.current) categoryPageNavRef.current(dir);
@@ -3211,10 +3580,10 @@ const useButtonGroup = () => {
 
 
 // ============================================================================
-// 초기화 컴포넌트 (단일책임원칙: 각 초기화 로직 분리)
+// 이니셜 컴포넌트 (단일책임원칙: 각 이니셜 로직 분리)
 // ============================================================================
 
-// 버튼 핸들러 초기화
+// 버튼 핸들러 이니셜
 const ButtonHandlerInitializer = () => {
   useToggleButtonClickHandler(true);
   useDisabledButtonBlocker(true);
@@ -3222,7 +3591,7 @@ const ButtonHandlerInitializer = () => {
   return null;
 };
 
-// 사이즈 컨트롤 초기화
+// 사이즈 컨트롤 이니셜
 const SizeControlInitializer = () => {
   useLayoutEffect(() => {
     SizeControlManager.init();
@@ -3230,7 +3599,7 @@ const SizeControlInitializer = () => {
   return null;
 };
   
-// 뷰포트 초기화
+// 뷰포트 이니셜
 const ViewportInitializer = () => {
   useLayoutEffect(() => {
     setViewportZoom();
@@ -3239,7 +3608,7 @@ const ViewportInitializer = () => {
   return null;
 };
 
-// 전체 앱 포커스 트랩 초기화 (useFocusTrap의 앱 모드 사용)
+// 전체 앱 포커스 트랩 이니셜 (useFocusTrap의 앱 모드 사용)
 const AppFocusTrapInitializer = () => {
   useFocusTrap(true, { mode: 'app' });
   return null;
@@ -3268,7 +3637,6 @@ const RefProvider = ({ children }) => {
   const useIdleTimeout_timeoutRef = useRef(null);
   
   
-  
   const useCategoryPagination_containerRef = useRef(null);
   const useCategoryPagination_measureRef = useRef(null);
   const useCategoryPagination_prevIsLargeRef = useRef(null);
@@ -3279,19 +3647,19 @@ const RefProvider = ({ children }) => {
   const useSound_audioRefs = useRef({});
   
   const BaseModal_modalConfirmButtonsRef = useRef(null);
-
+  
   const CategoryNav_categoryPageNavRef = useRef(null);
   const Summary_categoryPageNavRef = useRef(null);
-
+  
   // Screen Components ref
   const ScreenStart_mainContentRef = useRef(null);
-
+  
   const ScreenMenu_categoryNavRef = useRef(null);
   const ScreenMenu_mainContentRef = useRef(null);
   const ScreenMenu_actionBarRef = useRef(null);
   const ScreenMenu_orderSummaryRef = useRef(null);
   const ScreenMenu_systemControlsRef = useRef(null);
-
+  
   const ScreenDetails_actionBarRef = useRef(null);
   const ScreenDetails_orderSummaryRef = useRef(null);
   const ScreenDetails_systemControlsRef = useRef(null);
@@ -3301,33 +3669,31 @@ const RefProvider = ({ children }) => {
   const ScreenDetails_row4Ref = useRef(null);
   const ScreenDetails_row5Ref = useRef(null);
   const ScreenDetails_row6Ref = useRef(null);
-
+  
   const ScreenPayments_mainContentRef = useRef(null);
   const ScreenPayments_actionBarRef = useRef(null);
   const ScreenPayments_systemControlsRef = useRef(null);
-
+  
   const ScreenCardInsert_actionBarRef = useRef(null);
   const ScreenCardInsert_systemControlsRef = useRef(null);
-
+  
   const ScreenMobilePay_actionBarRef = useRef(null);
   const ScreenMobilePay_systemControlsRef = useRef(null);
-
+  
   const ScreenSimplePay_actionBarRef = useRef(null);
   const ScreenSimplePay_systemControlsRef = useRef(null);
-
+  
   const ScreenCardRemoval_systemControlsRef = useRef(null);
-
+  
   const ScreenOrderComplete_actionBarRef = useRef(null);
   const ScreenOrderComplete_systemControlsRef = useRef(null);
-
+  
   const ScreenReceiptPrint_actionBarRef = useRef(null);
   const ScreenReceiptPrint_systemControlsRef = useRef(null);
-
-  const ScreenFinish_systemControlsRef = useRef(null);
-
-  const AccessibilityModal_originalSettingsRef = useRef(null);
   
-  const useTextHandler_volumeRef = useRef(0.5);
+  const ScreenFinish_systemControlsRef = useRef(null);
+  
+  const AccessibilityModal_originalSettingsRef = useRef(null);
   
   // Context value - refs만 제공
   const contextValue = useMemo(() => ({
@@ -3336,7 +3702,6 @@ const RefProvider = ({ children }) => {
       useIdleTimeout: { timerRef: useIdleTimeout_timerRef, intervalRef: useIdleTimeout_intervalRef, lastActivityRef: useIdleTimeout_lastActivityRef, onTimeoutRef: useIdleTimeout_onTimeoutRef, timeoutRef: useIdleTimeout_timeoutRef },
       useCategoryPagination: { containerRef: useCategoryPagination_containerRef, measureRef: useCategoryPagination_measureRef, prevIsLargeRef: useCategoryPagination_prevIsLargeRef, lastWidthRef: useCategoryPagination_lastWidthRef, isCalculatingRef: useCategoryPagination_isCalculatingRef },
       useSound: { timerInstanceRef: useSound_timerInstanceRef, audioRefs: useSound_audioRefs },
-      useTextHandler: { volumeRef: useTextHandler_volumeRef },
       // Component refs
       BaseModal: { modalConfirmButtonsRef: BaseModal_modalConfirmButtonsRef },
       CategoryNav: { categoryPageNavRef: CategoryNav_categoryPageNavRef },
@@ -3530,10 +3895,7 @@ const PageTitle = memo(({ children }) => <div className="title">{children}</div>
 PageTitle.displayName = 'PageTitle';
 
 // 하이라이트 텍스트 (.title .primary 스타일 사용)
-const Highlight = memo(({ children }) => (
-  <span className="primary">{children}</span>
-));
-Highlight.displayName = 'Highlight';
+// Highlight는 BaseModal보다 앞에 정의되어 있음 (2470번 라인 근처)
 
 // ============================================================================
 // 프레임 컴포넌트 (상단/하단 네비게이션)
@@ -3727,21 +4089,84 @@ Summary.displayName = 'Summary';
 const Bottom = memo(({ systemControlsRef }) => {
   const route = useContext(RouteContext);
   const accessibility = useContext(AccessibilityContext);
+  const order = useContext(OrderContext);
   
-  // ScreenStart에서는 타임아웃 기능만 비활성화 (버튼은 항상 표시)
-  const isTimeoutEnabled = route.currentPage !== 'ScreenStart';
+  // ScreenStart에서는 타임아웃이 모달 없이 실행됨 (이니셜 TTS 재생)
+  // 다른 화면에서는 타임아웃 모달 표시
+  const isTimeoutEnabled = true; // 모든 화면에서 타임아웃 활성화
   
   const onTimeout = useCallback(() => {
-    if (accessibility.ModalTimeout) {
-      accessibility.ModalTimeout.open();
-    }
-  }, [accessibility.ModalTimeout]);
+    console.log('[타이머] onTimeout 호출됨', { currentPage: route.currentPage });
+    
+    // 타임아웃 발생 시 항상 초기화 실행 (모든 화면에서 시작화면으로 이동)
+    const callbacks = {
+      ModalRestart: accessibility.ModalRestart,
+      ModalAccessibility: accessibility.ModalAccessibility,
+      ModalTimeout: accessibility.ModalTimeout, // 타임아웃 모달 닫기용
+      setQuantities: order.setQuantities,
+      totalMenuItems: order.totalMenuItems,
+      setIsDark: accessibility.setIsDark,
+      setVolume: accessibility.setVolume,
+      setIsLarge: accessibility.setIsLarge,
+      setIsLow: accessibility.setIsLow,
+      setCurrentPage: route.setCurrentPage
+    };
+    console.log('[타이머] initializeApp 호출 시작', { 
+      callbacks: Object.keys(callbacks),
+      currentPage: route.currentPage 
+    });
+    initializeApp(callbacks);
+    console.log('[타이머] initializeApp 호출 완료');
+    
+    // ScreenStart로 이동 후 포커스 갱신하여 TTS 재생 트리거
+    requestAnimationFrame(() => {
+      const mainElement = document.querySelector('.main.first');
+      if (mainElement) {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement !== mainElement) {
+          activeElement.blur();
+        }
+        mainElement.focus();
+      }
+    });
+  }, [accessibility, order, route]);
   
-  const { remainingTimeFormatted } = useIdleTimeout(
+  const { remainingTimeFormatted, remainingTime, resetTimer } = useIdleTimeout(
     onTimeout,
-    300000,
+    120000, // 2분 (120초)
     isTimeoutEnabled
   );
+  
+  // 전역 타이머 remainingTime을 AccessibilityContext에 전달 (TimeoutModal에서 사용)
+  useEffect(() => {
+    if (accessibility.setGlobalRemainingTime) {
+      accessibility.setGlobalRemainingTime(remainingTime);
+    }
+  }, [remainingTime, accessibility.setGlobalRemainingTime]);
+  
+  // 잔여시간이 20초 남았을 때 처리
+  const hasShownWarningRef = useRef(false);
+  useEffect(() => {
+    // 20초 이하이고 아직 경고를 표시하지 않았을 때만 실행
+    if (remainingTime > 0 && remainingTime <= 20000 && !hasShownWarningRef.current && !accessibility.ModalTimeout?.isOpen) {
+      hasShownWarningRef.current = true;
+      
+      if (route.currentPage === 'ScreenStart') {
+        // ScreenStart: 모달 없이 포커스 기반 TTS 재생
+        // 20초 경고 시 TTS 재생하지 않음 (초기화 시에만 TTS 재생)
+        console.log('[타이머] ScreenStart 20초 경고 - TTS 재생하지 않음');
+      } else {
+        // ScreenStart 외의 화면: 타임아웃 모달 표시
+        if (accessibility.ModalTimeout) {
+          accessibility.ModalTimeout.open();
+        }
+      }
+    }
+    // remainingTime이 20초를 넘어가면 경고 플래그 리셋
+    if (remainingTime > 20000) {
+      hasShownWarningRef.current = false;
+    }
+  }, [remainingTime, accessibility.ModalTimeout, route.currentPage]);
   
   const openModalManually = useCallback(() => {
     if (accessibility.ModalTimeout) {
@@ -3754,9 +4179,9 @@ const Bottom = memo(({ systemControlsRef }) => {
       <Button
         className="down-footer-button btn-home"
         svg={<HomeIcon />}
-        label="처음으로"
+        label="시작화면"
         actionType="modal"
-        actionTarget="Return"
+        actionTarget="Restart"
       />
       <Button
         className="down-footer-button"
@@ -3783,32 +4208,18 @@ const ScreenStart = memo(() => {
   // 개별 Context에서 직접 가져오기
   const route = useContext(RouteContext);
   const accessibility = useContext(AccessibilityContext);
+  const ttsDB = useContext(TTSDBContext);
   
   // 로컬 ref 생성
   const mainContentRef = useRef(null);
+  const hasInitializedRef = useRef(false);
   
   const { handleText } = useTextHandler((accessibility.volume ?? 1));
   
-  // IntroTimer 직접 사용
-  const timerInstanceRef = useRef(null);
-  useEffect(() => {
-    if (!timerInstanceRef.current) {
-      timerInstanceRef.current = new IntroTimerSingleton();
-    }
-    return () => {
-      if (timerInstanceRef.current) {
-        timerInstanceRef.current.stopIntroTimer();
-      }
-    };
-  }, []);
-  const startIntroTimer = useCallback((s, h, o) => {
-    if (timerInstanceRef.current) {
-      timerInstanceRef.current.startIntroTimer(s, h, o);
-    }
-  }, []);
-  
   const { blurActiveElement } = useDOM();
   const { play: playSound } = useSound();
+
+  // ScreenStart의 포커스는 RouteProvider에서 처리하므로 여기서는 제거 (중복 방지)
 
   // 화면이 보일 때 main에 포커스는 RouteProvider에서 자동으로 처리됨 (중복 제거)
 
@@ -3820,12 +4231,11 @@ const ScreenStart = memo(() => {
   useInteractiveTTSHandler(true, handleText);
   const { updateFocusableSections } = useFocusableSectionsManager(['mainContent'], { mainContent: mainContentRef });
 
-
   return (
     <>
       <div className="black"></div>
       <div className="top"></div>
-      <div className="main first" data-tts-text={TTS_SCREEN_START}>
+      <div className="main first" data-tts-text={TTS_SCREEN_START} tabIndex={-1}>
         <img src="./images/poster.png" className="poster" alt="커피포스터" />
         <div className="hero">
           <p>화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</p>
@@ -3872,7 +4282,7 @@ const ScreenMenu = memo(() => {
   const { blurActiveElement, getActiveElementText } = useDOM();
   
   // 화면이 보일 때 main에 포커스는 RouteProvider에서 자동으로 처리됨 (중복 제거)
-  
+
   // 기본 탭 설정
   useEffect(() => {
     const t = setTimeout(() => order.setSelectedTab('전체메뉴'), 0);
@@ -3891,7 +4301,7 @@ const ScreenMenu = memo(() => {
 
   const {
     pageNumber, totalPages, currentItems,
-    handlePrevPage, handleNextPage, resetOnChange
+    handlePrevPage, handleNextPage, resetPage
   } = usePagination(
     order.menuItems,
     PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL,
@@ -3901,9 +4311,9 @@ const ScreenMenu = memo(() => {
   
   // 탭 변경 시 페이지 리셋
   useEffect(() => {
-    const t = setTimeout(() => resetOnChange(), 0);
+    const t = setTimeout(() => resetPage(), 0);
     return () => clearTimeout(t);
-  }, [order.selectedTab, resetOnChange]); // eslint-disable-line
+  }, [order.selectedTab, resetPage]); // eslint-disable-line
 
 
 
@@ -3938,7 +4348,7 @@ const ScreenMenu = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div className="main second" data-tts-text={TTS_SCREEN_MENU}>
+      <div className="main second" data-tts-text={TTS_SCREEN_MENU} tabIndex={-1}>
         <CategoryNav 
           categories={useMemo(() => (order.categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [order.categoryInfo])}
           selectedTab={order.selectedTab}
@@ -4022,18 +4432,18 @@ const ScreenDetails = memo(() => {
       'actionBar', 'orderSummary', 'systemControls'
     ],
     {
-      actionBar: refsData.refs.ScreenDetails.actionBarRef,
-      orderSummary: refsData.refs.ScreenDetails.orderSummaryRef,
-      systemControls: refsData.refs.ScreenDetails.systemControlsRef,
-      rows: rowRefs,
-      row1: rowRefs[0], row2: rowRefs[1], row3: rowRefs[2],
-      row4: rowRefs[3], row5: rowRefs[4], row6: rowRefs[5]
+    actionBar: refsData.refs.ScreenDetails.actionBarRef,
+    orderSummary: refsData.refs.ScreenDetails.orderSummaryRef,
+    systemControls: refsData.refs.ScreenDetails.systemControlsRef,
+    rows: rowRefs,
+    row1: rowRefs[0], row2: rowRefs[1], row3: rowRefs[2],
+    row4: rowRefs[3], row5: rowRefs[4], row6: rowRefs[5]
     }
   );
 
   // currentItems.length만 의존성에 포함 (배열 참조가 아닌 길이만)
   const currentItemsLength = currentItems?.length ?? 0;
-  
+
   useEffect(() => {
     // 동적 섹션 변경 시 sectionsRefs도 함께 업데이트
     updateFocusableSections(
@@ -4074,7 +4484,7 @@ const ScreenDetails = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div className="main third" data-tts-text={TTS_SCREEN_DETAILS}>
+      <div className="main third" data-tts-text={TTS_SCREEN_DETAILS} tabIndex={-1}>
         <PageTitle>
           <span><Highlight isDark={accessibility.isDark}>내역</Highlight>을 확인하시고</span>
           <span><Highlight isDark={accessibility.isDark}>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
@@ -4162,7 +4572,7 @@ const ScreenPayments = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div className="main forth" data-tts-text={paymentTts}>
+      <div className="main forth" data-tts-text={paymentTts} tabIndex={-1}>
         <PageTitle><span><span className="primary">결제방법</span>을 선택합니다</span></PageTitle>
         <div className="banner price" onClick={(e) => { e.preventDefault(); e.target.focus(); order.updateOrderNumber(); route.setCurrentPage('ScreenOrderComplete'); }}>
           <span>결제금액</span><span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
@@ -4215,7 +4625,7 @@ const ScreenCardInsert = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_CARD_INSERT} ref={refsData.refs.ScreenCardInsert.actionBarRef} className="main forth">
+      <div data-tts-text={TTS_SCREEN_CARD_INSERT} ref={refsData.refs.ScreenCardInsert.actionBarRef} className="main forth" tabIndex={-1}>
         <PageTitle>
           <div>가운데 아래에 있는 <span className="primary">카드리더기</span>{accessibility.isLow && !accessibility.isLarge ? <><br /><div className="flex center">에</div></> : "에"}</div>
           <div><span className="primary">신용카드</span>를 끝까지 넣으세요</div>
@@ -4262,7 +4672,7 @@ const ScreenMobilePay = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_MOBILE_PAY} ref={refsData.refs.ScreenMobilePay.actionBarRef} className="main forth">
+      <div data-tts-text={TTS_SCREEN_MOBILE_PAY} ref={refsData.refs.ScreenMobilePay.actionBarRef} className="main forth" tabIndex={-1}>
         <PageTitle>
           <div>가운데 아래에 있는 <span className="primary">카드리더기</span>에</div>
           <div><span className="primary">모바일페이</span>를 켜고 접근시키세요</div>
@@ -4309,7 +4719,7 @@ const ScreenSimplePay = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_SIMPLE_PAY} ref={refsData.refs.ScreenSimplePay.actionBarRef} className="main forth">
+      <div data-tts-text={TTS_SCREEN_SIMPLE_PAY} ref={refsData.refs.ScreenSimplePay.actionBarRef} className="main forth" tabIndex={-1}>
         <PageTitle>
           <div>오른쪽 아래에 있는 <span className="primary">QR리더기</span>에</div>
           <div><span className="primary">QR코드</span>를 인식시킵니다</div>
@@ -4351,7 +4761,7 @@ const ScreenCardRemoval = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_CARD_REMOVAL} className="main forth card-remove">
+      <div data-tts-text={TTS_SCREEN_CARD_REMOVAL} className="main forth card-remove" tabIndex={-1}>
         <PageTitle><span><span className="primary">카드</span>를 뽑으세요.</span></PageTitle>
         <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" onClick={() => accessibility.ModalPaymentError.open()} />
       </div>
@@ -4411,7 +4821,7 @@ const ScreenOrderComplete = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_ORDER_COMPLETE} className="main forth">
+      <div data-tts-text={TTS_SCREEN_ORDER_COMPLETE} className="main forth" tabIndex={-1}>
         <PageTitle>
           <div>왼쪽 아래의 프린터에서 <span className="primary">주문표</span>를</div>
           <div>받으시고 <span className="primary">영수증 출력</span>을 선택합니다</div>
@@ -4460,13 +4870,12 @@ const ScreenReceiptPrint = memo(() => {
     systemControls: refsData.refs.ScreenReceiptPrint.systemControlsRef
   });
 
-
   return (
     <>
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div data-tts-text={TTS_SCREEN_RECEIPT_PRINT} className="main forth" ref={refsData.refs.ScreenReceiptPrint.actionBarRef}>
+      <div data-tts-text={TTS_SCREEN_RECEIPT_PRINT} className="main forth" ref={refsData.refs.ScreenReceiptPrint.actionBarRef} tabIndex={-1}>
         <PageTitle>
           <div>왼쪽 아래의 <span className="primary">프린터</span>에서 <span className="primary">영수증</span>을</div>
           <div>받으시고 <span className="primary">마무리</span>&nbsp;버튼을 누르세요</div>
@@ -4502,22 +4911,6 @@ const ScreenFinish = memo(() => {
   const useFinishCountdown = () => {
     const [countdown, setCountdown] = useState(4);
     const timerRef = useRef(null);
-    const callbacksRef = useRef({});
-    
-    // 콜백 refs 업데이트
-    useEffect(() => {
-      callbacksRef.current = {
-        ModalReturn: accessibility.ModalReturn,
-        ModalAccessibility: accessibility.ModalAccessibility,
-        setQuantities: order.setQuantities,
-        totalMenuItems: order.totalMenuItems,
-        setIsDark: accessibility.setIsDark,
-        setVolume: accessibility.setVolume,
-        setIsLarge: accessibility.setIsLarge,
-        setIsLow: accessibility.setIsLow,
-        setCurrentPage: route.setCurrentPage
-      };
-    }, [accessibility.ModalReturn, accessibility.ModalAccessibility, order.setQuantities, order.totalMenuItems, accessibility.setIsDark, accessibility.setVolume, accessibility.setIsLarge, accessibility.setIsLow, route]);
     
     useEffect(() => {
       if (timerRef.current) {
@@ -4535,7 +4928,19 @@ const ScreenFinish = memo(() => {
               clearInterval(timerRef.current);
               timerRef.current = null;
             }
-            setTimeout(() => resetAppState(callbacksRef.current), 1000);
+            // 모든 이니셜은 initializeApp로 통일
+            const callbacks = {
+              ModalRestart: accessibility.ModalRestart,
+              ModalAccessibility: accessibility.ModalAccessibility,
+              setQuantities: order.setQuantities,
+              totalMenuItems: order.totalMenuItems,
+              setIsDark: accessibility.setIsDark,
+              setVolume: accessibility.setVolume,
+              setIsLarge: accessibility.setIsLarge,
+              setIsLow: accessibility.setIsLow,
+              setCurrentPage: route.setCurrentPage
+            };
+            setTimeout(() => initializeApp(callbacks), 1000);
             return 0;
           }
           return next;
@@ -4550,7 +4955,7 @@ const ScreenFinish = memo(() => {
           timerRef.current = null;
         }
       };
-    }, []);
+    }, [accessibility, order, route]);
     
     return countdown;
   };
@@ -4564,7 +4969,7 @@ const ScreenFinish = memo(() => {
       <div className="black"></div>
       <div className="top"></div>
       <Step />
-      <div className="main forth">
+      <div className="main forth" data-tts-text={TTS_SCREEN_FINISH} tabIndex={-1}>
         <PageTitle>이용해 주셔서 감사합니다</PageTitle>
         <div className="end-countdown">
             <span>
@@ -4589,7 +4994,7 @@ const ModalContainer = () => {
 
   return (
     <>
-      {(accessibility?.ModalReturn || { isOpen: false }).isOpen && <ReturnModal />}
+      {(accessibility?.ModalRestart || { isOpen: false }).isOpen && <RestartModal />}
       {(accessibility?.ModalReset || { isOpen: false }).isOpen && <ResetModal />}
       {(accessibility?.ModalAccessibility || { isOpen: false }).isOpen && (
         <BaseModal
@@ -4630,11 +5035,13 @@ const ModalContainer = () => {
 const Run = () => {
   return (
     <>
+      {/* 과거 앱 방식: audioPlayer를 Provider 체인 밖 최상위에 직접 렌더링 (가장 빠른 마운트) */}
+      <audio id="audioPlayer" src=""/>
       {/* Layer 1: TTS Database Provider (독립) - IndexedDB 관리 */}
-      <TTSDBProvider>
+    <TTSDBProvider>
         {/* Layer 2: TTS State Provider (독립) - TTS 재생 상태 관리
             주의: useTextHandler가 TTSDBContext와 TTSStateContext를 모두 사용하므로 함께 필요 */}
-        <TTSStateProvider>
+      <TTSStateProvider>
           {/* Layer 3: Accessibility Provider (독립) - 접근성 설정 */}
           <AccessibilityProvider>
             {/* Layer 4: Order Provider (독립) - 주문 상태 관리
@@ -4653,22 +5060,20 @@ const Run = () => {
                         내부 컴포넌트: ScreenStart, ScreenMenu, ScreenDetails 등
                         사용 Context: RefContext, AccessibilityContext, OrderContext, RouteContext, ButtonStateContext, ButtonGroupContext */}
                     <RouteProvider>
-                      {/* 초기화 컴포넌트들 (의존성 없음, 순서 무관) */}
-                      <ButtonHandlerInitializer />
-                      <SizeControlInitializer />
-                      <ViewportInitializer />
+                      {/* 이니셜 컴포넌트들 (의존성 없음, 순서 무관) */}
+                    <ButtonHandlerInitializer />
+                    <SizeControlInitializer />
+                    <ViewportInitializer />
                       <AppFocusTrapInitializer />
-                      {/* TTS Audio Player (항상 렌더링, React 방식으로 TTS 재생) */}
-                      <TTSAudioPlayer />
                     </RouteProvider>
                   </ButtonGroupProvider>
                 </ButtonStateProvider>
               </RefProvider>
             </OrderProvider>
           </AccessibilityProvider>
-        </TTSStateProvider>
-      </TTSDBProvider>
-    </>
+      </TTSStateProvider>
+    </TTSDBProvider>
+  </>
   );
 };
 
