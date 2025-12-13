@@ -484,34 +484,6 @@
     /* 텍스트 하이라이트 색상 (Dark 테마) */
     --highlight-color: #FFE100FF;
   }
-
-  /* ========================================
-     저시력 모드 레이아웃 오버라이드 (.low)
-     ======================================== */
-  .low {
-    & .summary {
-      width: 100%;
-      height: 122px;
-      background-color: var(--layout-background-color);
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 50px;
-      border-top: 2px solid var(--body1-border-color);
-      flex-shrink: 0;
-    
-      & .summary-label {
-        color: #FFFFFFFF;
-        font-weight: var(--font-weight-semibold);
-      }
-      
-      & .summary-text {
-        color: #FFFFFFFF;
-        font-weight: var(--font-weight-semibold);
-      }
-    }
-  }
 }
 
 /* ========================================
@@ -599,14 +571,61 @@
   body:has(.main.first) .top,
   body:has(.main.first) .step { display: none; }
 
+  /* ========================================
+     Step Progress Bar
+     구조: .step > .step-num + .step-name + .separator
+     상태: .standby (대기) / .progress (진행) / .progress.current (현재)
+     ======================================== */
+  
   .step {
-    width: 100%;
-    height: var(--height-step);
-    color: var(--layout-color);
+  width: 100%;
+  height: var(--height-step);
+  color: var(--layout-color);
+  display: flex;
+  border-bottom: 2px solid var(--body1-border-color);
+  flex-shrink: 0;
+  height: 120px;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-evenly;
+
+  /* 단계 번호 */
+  & .step-num {
+    width: 74px;
+    height: 74px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-bottom: 2px solid var(--body1-border-color);
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 8px solid transparent;
+    box-sizing: border-box;
+    background-clip: padding-box;
+    background-color: var(--body2-progress-background-standby-color);
+    color: var(--body2-secondary2-color);
+
+    /* 진행 상태 */
+    &.progress {
+      background-color: var(--body2-primary1-color);
+      color: var(--body2-progress-content-complete-color);
+
+      /* 현재 위치 (보더 투명도 해제) */
+      &.current {
+        border-color: var(--body2-primary2-color);
+      }
+    }
+  }
+
+  /* 공통: 대기 상태 색상 */
+  & .step-name, .separator {
+    flex-shrink: 0;
+    color: var(--body2-secondary2-color);
+    
+    /* 진행 상태 색상 */
+    &.progress {
+      color: var(--body2-primary1-color);
+    }
+  }
   }
 
   /* ========================================
@@ -813,8 +832,7 @@
   .summary {
     width: 100%;
     height: var(--height-summary);
-    background-color: var(--layout-background-color);
-    color: #fff;
+    background-color: var(--body1-background-color);
     display: flex;
     flex-shrink: 0;
     gap: var(--spacing-sm);
@@ -827,15 +845,18 @@
     
     & .summary-label {
       font-weight: var(--font-weight-semibold);
+      color: var(--body2-secondary1-color);
     }
     
     & .summary-text {
       font-weight: var(--font-weight-semibold);
+      color: var(--body2-primary1-color);
     }
-    
-    & .summary-btn-icon {
-      width: 1.5em;
-      height: 1.5em;
+
+    & .short-colline {
+      width: 2px;
+      height: 41px;
+      background: var(--body1-border-color);
     }
   }
 
@@ -844,7 +865,7 @@
     height: var(--height-bottom);
     flex-shrink: 0;
     border-top: 2px solid var(--body1-border-color);
-    background-color: var(--layout-background-color);
+    background-color: var(--body1-background-color);
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -873,58 +894,6 @@
     width: 2px;
     height: 41px;
     background: var(--body1-content-secondary-color);
-  }
-
-  /* ========================================
-     Step Progress Bar
-     구조: .step > .step-num + .step-name + .separator
-     상태: .standby (대기) / .progress (진행) / .progress.current (현재)
-     ======================================== */
-  .step {
-    display: flex;
-    flex-shrink: 0;
-    height: 120px;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-evenly;
-
-    /* 단계 번호 */
-    & .step-num {
-      width: 74px;
-      height: 74px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      box-sizing: border-box;
-      background-clip: padding-box;
-      background-color: var(--body2-progress-background-standby-color);
-      color: var(--body2-secondary2-color);
-
-      /* 진행 상태 */
-      &.progress {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-
-        /* 현재 위치 (보더 투명도 해제) */
-        &.current {
-          border-color: var(--body2-primary2-color);
-        }
-      }
-    }
-
-    /* 공통: 대기 상태 색상 */
-    & .step-name, .separator {
-      flex-shrink: 0;
-      color: var(--body2-secondary2-color);
-      
-      /* 진행 상태 색상 */
-      &.progress {
-        color: var(--body2-primary1-color);
-      }
-    }
   }
 } /* @layer layout */
 
