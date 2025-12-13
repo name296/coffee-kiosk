@@ -666,6 +666,11 @@ const stopAllTTS = (ttsState) => {
     audioPlayer.currentTime = 0;
   }
   
+  // 로컬 TTS 중단 (speechSynthesis)
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  
   // React state 이니셜
   if (ttsState?.setAudioSrc) ttsState.setAudioSrc('');
   if (ttsState?.setShouldPlay) ttsState.setShouldPlay(false);
@@ -788,12 +793,23 @@ const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) => {
           audioPlayerRef.current.addEventListener('error', errorHandler, { once: true });
         }
       } else {
-        // 요구사항 3: 외부 엔진 실패 시 재생 중단
+        // 요구사항 3: 외부 엔진 실패 시 로컬 엔진 폴백
         if (!requestIdRef || requestIdRef.current === currentRequestId) {
           if (process.env.NODE_ENV === 'development') {
-            console.log(`🔊 [TTS] 외부 엔진 실패`);
+            console.log(`🔊 [TTS] 외부 엔진 실패 → 로컬 엔진 폴백 시도`);
           }
-        setIsPlaying(false);
+          
+          // 로컬 TTS 엔진으로 폴백
+          const localTTSSuccess = playLocalTTS(text, speed, vol, setIsPlaying);
+          
+          if (!localTTSSuccess) {
+            // 로컬 TTS도 실패하면 재생 중단
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`🔊 [TTS] 로컬 엔진도 실패 → 재생 중단`);
+            }
+            setIsPlaying(false);
+          }
+          // 로컬 TTS 재생 성공 시 isPlaying은 utterance.onend에서 해제됨
         }
       }
     }
@@ -887,6 +903,57 @@ const fetchTTSFromServer = async (text) => {
     return URL.createObjectURL(blob);
   } catch (error) {
     return null;
+  }
+};
+
+// 로컬 TTS 엔진 (브라우저 speechSynthesis API 사용) (단일책임: 로컬 TTS 재생만)
+const playLocalTTS = (text, speed, volume, setIsPlaying) => {
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 로컬 엔진 사용 불가능 (speechSynthesis 없음)`);
+    }
+    return false;
+  }
+  
+  try {
+    // 이전 로컬 TTS 중단
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = speed;
+    utterance.volume = volume;
+    utterance.lang = 'ko-KR'; // 한국어 설정
+    
+    // 재생 완료 시 isPlaying 해제
+    utterance.onend = () => {
+      if (setIsPlaying) setIsPlaying(false);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 로컬 엔진 재생 완료`);
+      }
+    };
+    
+    // 에러 시 isPlaying 해제
+    utterance.onerror = (error) => {
+      if (setIsPlaying) setIsPlaying(false);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔊 [TTS] 로컬 엔진 에러:`, error);
+      }
+    };
+    
+    // 로컬 TTS 재생
+    window.speechSynthesis.speak(utterance);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 로컬 엔진 재생 시작: "${text.substring(0, 50)}..." (속도: ${speed}, 볼륨: ${volume})`);
+    }
+    
+    return true;
+  } catch (error) {
+    if (setIsPlaying) setIsPlaying(false);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔊 [TTS] 로컬 엔진 에러:`, error);
+    }
+    return false;
   }
 };
 
