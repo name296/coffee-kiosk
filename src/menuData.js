@@ -46,11 +46,11 @@ const categories = [
     items: [],
   },
   {
-    name: "주스주스주스스",
+    name: "주스1",
     items: [],
   },
   {
-    name: "라떼",
+    name: "라떼1",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },
@@ -79,7 +79,7 @@ const categories = [
     ],
   },
   {
-    name: "라떼",
+    name: "라떼2",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },
@@ -108,7 +108,7 @@ const categories = [
     ],
   },
   {
-    name: "라떼",
+    name: "라떼3",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },
@@ -137,7 +137,7 @@ const categories = [
     ],
   },
   {
-    name: "라떼",
+    name: "라떼4",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },
@@ -166,7 +166,7 @@ const categories = [
     ],
   },
   {
-    name: "라떼",
+    name: "라떼5",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },
@@ -195,7 +195,7 @@ const categories = [
     ],
   },
   {
-    name: "라떼",
+    name: "라떼6",
     items: [
       { name: "바닐라라떼 (아이스)", price: "2500", img: "item-vanilla-latte.png" },
       { name: "흑당라떼", price: "2500", img: "item-brown-sugar-latte.png" },

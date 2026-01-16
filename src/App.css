@@ -964,7 +964,7 @@
       display: flex;
       flex-direction: column;
       background: var(--primary3-background2-color-default);
-      border-radius: 0 0 calc(var(--min-side) * 0.03125) calc(var(--min-side) * 0.03125);
+      border-radius: 0 0 calc(var(--min-side) * 0.0625) calc(var(--min-side) * 0.0625);
       
       & p:nth-child(1) {
         flex: 1;
@@ -998,7 +998,7 @@
   }
 }
 
-  .details {
+  .order-list {
     display: flex;
     width: 100%;
     height: 100%;
@@ -1010,7 +1010,7 @@
     flex-grow: 1;
   }
 
-  .order-item {
+  .order-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1023,34 +1023,34 @@
     background-color: lightgray;
   }
 
-  .order-index {
-    width: 43px;
-    height: 43px;
-    background-color: var(--color-gray-01);
-    border: 1px solid var(--color-gray-09);
-    color: var(--color-gray-13);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
   .order-image-div {
     position: relative;
-    width: 105px;
-    height: 110px;
+    width: 113px;
+    height: 113px;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 2px solid var(--body1-border-color);
-  }
 
-  .order-image {
-    width: 100%;
-    height: 100%;
-  }
+    .order-index {
+      width: 56px;
+      height: 56px;
+      background-color: var(--color-gray-01);
+      border: 1px solid var(--color-gray-09);
+      color: var(--color-gray-13);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .order-image {
+      width: 100%;
+      height: 100%;
+    }
+  } 
 
   .order-name {
     position: absolute;
@@ -1234,11 +1234,11 @@
       gap: var(--spacing-xs);
       min-width: 70px;
       min-height: 76px;
-      padding-left: calc(var(--min-side) * 0.135);
-      padding-right: calc(var(--min-side) * 0.135);
-      outline-offset: calc(var(--min-side) * -0.03125);
+      padding-left: calc(var(--min-side) * 0.0625 * 2);
+      padding-right: calc(var(--min-side) * 0.0625 * 2);
+      outline-offset: calc(var(--min-side) * 0.0625 * -0.5);
       border-radius: calc(var(--min-side) * 0.0625);
-      border: calc(var(--min-side) * 0.03125) solid var(--primary2-border-color-default);
+      border: calc(var(--min-side) * 0.0625 * 0.5) solid var(--primary2-border-color-default);
       box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.12);
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
@@ -1265,10 +1265,10 @@
         position: absolute;       
 
         /* --min-side 기반 크기 속성 */
-        width: calc(var(--min-side) * 0.125);
-        height: calc(var(--min-side) * 0.125);
-        top: calc(var(--min-side) * 0.03125);
-        right: calc(var(--min-side) * 0.03125);
+        width: calc(var(--min-side) * 0.0625 * 2);
+        height: calc(var(--min-side) * 0.0625 * 2);
+        top: calc(var(--min-side) * 0.0625 * 0.5);
+        right: calc(var(--min-side) * 0.0625 * 0.5);
         
         /* CSS mask-image로 SVG 지정하여 currentColor 적용 (JavaScript 인젝션 불필요) */
         &::before {
@@ -1500,6 +1500,8 @@
 
     /* Delete 아이템 버튼 (빨간색) */
     &.delete-item {
+      width: 70px;
+      height: 70px;
       background-color: var(--delete-background-color-default);
       border-color: var(--delete-border-color-default);
       color: var(--delete-content-color-default);
@@ -1534,7 +1536,7 @@
     }
     &.w080h080 { width: 80px; height: 80px; }
     &.w076h076 { width: 76px; height: 76px; }
-    &.w070h070 { width: 70px; height: 70px; }
+    &.w070h076 { width: 70px; height: 76px; }
     
     /* 메뉴/카드 */
     &.w328h460 { width: 328px; height: 460px; flex-direction: column; & .icon { width: 25.6rem; height: 25.6rem; } }
@@ -1549,7 +1551,7 @@
     &.w199h090 { min-width: 199px; width: fit-content; height: 90px; }
     &.w113h076 { width: 113px; height: 76px; }
     &.w080h076 { width: 80px; height: 76px; }
-    &.w070h076 { width: 70px; height: 76px; }
+
     
     /* 동적 크기 */
     &.w-fit-h070 { width: fit-content; height: 76px; }  
@@ -1656,7 +1658,7 @@
   } 
 
   .banner {
-    width: 100%;
+    width: 100vw;
     background-color: var(--body3-background-color);
     border-top: 2px solid var(--body1-border-color);
     border-bottom: 2px solid var(--body1-border-color);
@@ -1681,18 +1683,12 @@
       height: 70px;
       justify-content: space-around;
       flex-flow: row nowrap;
-      
-      /* 주문 내역 헤더 컬럼 (저시력 모드) */
-      & .one { flex: 1; text-align: center; }
-      & .one.qty { flex: 0 0 240px; }
-      & .one.price { flex: 0 0 180px; }
-      & .one.delete { flex: 0 0 80px; }
-      
-      /* 주문 내역 헤더 컬럼 (기본 모드) */
+      /*
       & .one-normal { flex: 1; text-align: center; }
       & .one-qty-normal { flex: 0 0 240px; text-align: center; }
       & .one-price-normal { flex: 0 0 180px; text-align: center; }
       & .one-delete-normal { flex: 0 0 80px; text-align: center; }
+      */
     }
   }
 
