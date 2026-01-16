@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 // 
 // [중요] 이 훅은 가변 너비 버튼의 페이지네이션을 처리합니다.
 // 
-const ACTUAL_GAP_THRESHOLD = 50; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
+const ACTUAL_GAP_THRESHOLD = 128; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
 
 export const useCategoryPagination = (items, isLarge = false) => {
     const containerRef = useRef(null);  // 실제 표시 컨테이너

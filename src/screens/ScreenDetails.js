@@ -2,7 +2,6 @@ import React, { memo, useContext, useMemo, useEffect, useRef } from "react";
 import Step from "../components/ui/Step";
 
 import Highlight from "../components/ui/Highlight";
-import OrderHeader from "../components/ui/OrderHeader";
 import OrderList from "../components/ui/OrderList";
 import Pagination from "../components/ui/Pagination";
 import Summary from "../components/ui/Summary";
@@ -141,8 +140,14 @@ const ScreenDetails = memo(() => {
                 <div className="title">
                     <span><Highlight>내역</Highlight>을 확인하시고</span>
                     <span><Highlight>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
+                </div>                    
+                <div className="banner field">
+                    <p className="one-num">순서</p>
+                    <p className="one-normal">상품명</p>
+                    <p className="one-qty-normal">수량</p>
+                    <p className="one-price-normal">가격</p>
+                    <p className="one-delete-normal">삭제</p>
                 </div>
-                <OrderHeader isLow={accessibility.isLow} />
                 <OrderList
                     currentItems={currentItems}
                     pageNumber={pageNumber}
@@ -153,7 +158,7 @@ const ScreenDetails = memo(() => {
                     onIncrease={handleItemIncrease}
                     onDelete={handleItemDelete}
                     convertToKoreanQuantity={convertToKoreanQuantity}
-                />
+                />                
                 <Pagination
                     pageNumber={pageNumber}
                     totalPages={totalPages}
@@ -162,7 +167,7 @@ const ScreenDetails = memo(() => {
                     isDark={accessibility.isDark}
                     ttsPrefix="주문목록"
                     sectionRef={actionBarRef}
-                />
+                />                
             </div>
             <Summary orderSummaryRef={orderSummaryRef} />
             <Bottom systemControlsRef={systemControlsRef} />

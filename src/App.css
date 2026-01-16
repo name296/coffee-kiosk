@@ -1005,95 +1005,88 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    padding-left: 32px;
-    padding-right: 32px;
+    padding-left: 43px;
+    padding-right: 43px;
     flex-grow: 1;
-  }
 
-  .order-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 157px;
-  }
-
-  .row-line {
-    width: 100%;
-    height: 2px;
-    background-color: lightgray;
-  }
-
-  .order-image-div {
-    position: relative;
-    width: 113px;
-    height: 113px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid var(--body1-border-color);
-
-    .order-index {
-      width: 56px;
-      height: 56px;
-      background-color: var(--color-gray-01);
-      border: 1px solid var(--color-gray-09);
-      color: var(--color-gray-13);
+    & .order-row {
       display: flex;
-      justify-content: center;
       align-items: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .order-image {
+      justify-content: space-between;
       width: 100%;
-      height: 100%;
+      height: fit-content;
+      padding-top: 25px;
+      padding-bottom: 25px;
+
+      & .order-image-div {
+        position: relative;
+        width: 113px;
+        height: 113px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid var(--body1-border-color);
+    
+        & .order-index {
+          width: 56px;
+          height: 56px;
+          background-color: var(--color-gray-01);
+          border: 1px solid var(--color-gray-09);
+          color: var(--color-gray-13);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+    
+        & .order-image {
+          width: 100%;
+          height: 100%;
+        }
+      } 
+    
+      & .order-name {
+        position: relative;
+        width: 236px;
+        /*word-break: keep-all;*/
+        color: var(--body1-content-secondary-color);
+      }
+    
+      & .order-quantity {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+
+        & .qty {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          width: 82px;
+          height: 76px;
+        }
+      }
+      
+      & .order-price {        
+        position: relative;
+        width: 236px;
+        justify-content: right;
+        border: none;
+        background: none;
+        
+      }
     }
-  } 
 
-  .order-name {
-    position: absolute;
-    left: 220px;
-    width: 190px;
-    word-break: keep-all;
-    color: var(--body1-content-secondary-color);
+    & .row-line {
+      width: 100%;
+      height: 2px;
+      background-color: var(--body1-border-color);
+    }  
   }
 
-  .order-quantity {
-    position: absolute;
-    left: 450px;
-    display: flex;
-    align-items: center;
-  }
-
-  .qty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: var(--font-size-b1);
-    text-align: center;
-    border-top: 2px solid var(--body1-border-color);
-    border-bottom: 2px solid var(--body1-border-color);
-    width: 75px;
-    color: var(--body1-content-primary-color);
-    height: 73px;
-  }
-
-  .order-price {
-      position: absolute;
-      left: 720px;
-      color: var(--body1-content-secondary-color);
-      font-size: 4rem;
-      margin-left: 10px;
-      min-width: 80px;
-      text-align: right;
-  }
-  
-  .low .order-price {
-      left: 600px;
-  }
-  
   .credit-pay-image {
       position: relative;
       width: 762px;
@@ -1658,7 +1651,7 @@
   } 
 
   .banner {
-    width: 100vw;
+    width: 1080px;
     background-color: var(--body3-background-color);
     border-top: 2px solid var(--body1-border-color);
     border-bottom: 2px solid var(--body1-border-color);
@@ -1681,14 +1674,17 @@
     
     &.field {
       height: 70px;
-      justify-content: space-around;
+      justify-content: space-between;
       flex-flow: row nowrap;
-      /*
-      & .one-normal { flex: 1; text-align: center; }
-      & .one-qty-normal { flex: 0 0 240px; text-align: center; }
-      & .one-price-normal { flex: 0 0 180px; text-align: center; }
-      & .one-delete-normal { flex: 0 0 80px; text-align: center; }
-      */
+      justify-self: center;
+      padding-left: 75px;
+      padding-right: 75px;
+      
+      & .one-num { width: 113px; text-align: center; }
+      & .one-normal { width: 236px; text-align: center; }
+      & .one-qty-normal { width: 242px; text-align: center;}
+      & .one-price-normal { width: 236px; text-align: center;}
+      & .one-delete-normal { width: 76px; overflow:auto; white-space: nowrap; overflow: visible;}
     }
   }
 
