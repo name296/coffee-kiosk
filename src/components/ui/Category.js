@@ -16,18 +16,14 @@ CategoryTab.displayName = 'CategoryTab';
 // 카테고리 네비게이션
 const CategorySeparator = () => <span className="category-separator" aria-hidden="true" />;
 
-const CategoryNav = memo(({ categories, selectedTab, pagination, containerRef, measureRef, convertToKoreanQuantity, categoryNavRef }) => {
+const Category = memo(({ categories, selectedTab, pagination, containerRef, measureRef, convertToKoreanQuantity, categoryNavRef }) => {
     const { catPage, catTotal, catItems, catHasPrev, catHasNext, isCompact, isReady } = pagination;
 
     // category 클래스 메모이제이션 (isCompact 변경 시에만 재계산)
     const categoryClassName = useMemo(() => `category${isCompact ? ' compact' : ''}`, [isCompact]);
 
     return (
-        <div
-            className="category-full"
-            ref={categoryNavRef}
-            data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 총 버튼 ${convertToKoreanQuantity(catItems.length)}개,`}
-        >
+        <div className="category-full" ref={categoryNavRef} data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 총 버튼 ${convertToKoreanQuantity(catItems.length)}개,`}>
             {/* 숨겨진 측정용 컨테이너 (실제 구조와 동일하게 구분선 포함) */}
             <div ref={measureRef} className="category measure" aria-hidden="true" inert="true">
                 {categories.map((tab, idx) => (
@@ -54,6 +50,6 @@ const CategoryNav = memo(({ categories, selectedTab, pagination, containerRef, m
         </div>
     );
 });
-CategoryNav.displayName = 'CategoryNav';
+Category.displayName = 'Category';
 
-export default CategoryNav;
+export default Category;

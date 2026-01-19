@@ -91,16 +91,16 @@ const Button = memo(({
 
     // TTS 텍스트 생성 (단일책임: TTS 텍스트 생성만)
     const finalTtsText = useMemo(() => {
-        const baseText = ttsText || label || '';
-        if (!baseText) return '';
+        const baseText = (ttsText !== undefined && ttsText !== null) ? ttsText : (label !== undefined && label !== null) ? label : '';
+        if (baseText === '') return '';
 
-        let cleanedText = baseText.replace(/\s*비활성\s*,?\s* /g, '').trim();
+        let cleanedText = String(baseText).replace(/\s*비활성\s*,?\s*/g, '').trim();
 
         if (toggle) {
             const statusText = pressed ? '선택됨, ' : '선택가능, ';
             cleanedText = cleanedText
-                .replace(/\s*선택됨\s*,\s* /g, '')
-                .replace(/\s*선택가능\s*,\s* /g, '')
+                .replace(/\s*선택됨\s*,\s*/g, '')
+                .replace(/\s*선택가능\s*,\s*/g, '')
                 .trim();
             const result = cleanedText ? `${cleanedText}, ${statusText}` : statusText;
             return disabled ? `${result}비활성, ` : result;

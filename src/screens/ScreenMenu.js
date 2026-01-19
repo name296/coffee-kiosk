@@ -1,6 +1,6 @@
 import React, { memo, useContext, useMemo, useEffect, useLayoutEffect, useRef } from "react";
 import Step from "../components/ui/Step";
-import CategoryNav from "../components/ui/CategoryNav";
+import Category from "../components/ui/Category";
 import MenuGrid from "../components/ui/MenuGrid";
 import Pagination from "../components/ui/Pagination";
 import Summary from "../components/ui/Summary";
@@ -108,7 +108,7 @@ const ScreenMenu = memo(() => {
             <div className="top"></div>
             <Step />
             <div className="main second" data-tts-text={TTS_SCREEN_MENU} tabIndex={-1}>
-                <CategoryNav
+                <Category
                     categories={useMemo(() => (order.categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [order.categoryInfo])}
                     selectedTab={order.selectedTab}
                     pagination={{ catPage, catTotal, catItems, catHasPrev, catHasNext, catPrev, catNext, isCompact: catIsCompact, isReady: catIsReady }}

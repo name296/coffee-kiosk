@@ -227,11 +227,11 @@ export const useCategoryPagination = (items, isLarge = false) => {
 
     // 페이지 변경
     const prevPage = useCallback(() => {
-        setCurrentPage(p => Math.max(0, p - 1));
-    }, []);
+        setCurrentPage(p => p > 0 ? p - 1 : totalPages - 1);
+    }, [totalPages]);
 
     const nextPage = useCallback(() => {
-        setCurrentPage(p => Math.min(totalPages - 1, p + 1));
+        setCurrentPage(p => p < totalPages - 1 ? p + 1 : 0);
     }, [totalPages]);
 
     return {
@@ -242,8 +242,8 @@ export const useCategoryPagination = (items, isLarge = false) => {
         currentItems,        // 현재 페이지 아이템
         pagedItems,          // 모든 페이지별 아이템 배열
         pageBreakpoints,     // 페이지별 시작 인덱스
-        hasPrev: currentPage > 0,
-        hasNext: currentPage < totalPages - 1,
+        hasPrev: totalPages > 1,
+        hasNext: totalPages > 1,
         prevPage,
         nextPage,
         recalculate,

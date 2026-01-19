@@ -24,7 +24,7 @@ export const RefProvider = ({ children }) => {
 
     const BaseModal_modalConfirmButtonsRef = useRef(null);
 
-    const CategoryNav_categoryPageNavRef = useRef(null);
+    const Category_categoryPageNavRef = useRef(null);
     const Summary_categoryPageNavRef = useRef(null);
 
     const AccessibilityModal_originalSettingsRef = useRef(null);
@@ -37,7 +37,7 @@ export const RefProvider = ({ children }) => {
             useSound: { timerInstanceRef: useSound_timerInstanceRef, audioRefs: useSound_audioRefs },
             // Component refs
             BaseModal: { modalConfirmButtonsRef: BaseModal_modalConfirmButtonsRef },
-            CategoryNav: { categoryPageNavRef: CategoryNav_categoryPageNavRef },
+            Category: { categoryPageNavRef: Category_categoryPageNavRef },
             Summary: { categoryPageNavRef: Summary_categoryPageNavRef },
             AccessibilityModal: { originalSettingsRef: AccessibilityModal_originalSettingsRef }
         }

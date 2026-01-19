@@ -1,17 +1,9 @@
 import React, { memo, useContext, useRef } from "react";
-import Step from "../components/ui/Step";
-
+import Page from "../components/ui/Page";
 import Button from "../components/ui/Button";
-import Bottom from "../components/ui/Bottom";
 
-import { RefContext } from "../contexts/RefContext";
 import { ScreenRouteContext } from "../contexts/ScreenRouteContext";
-import { OrderContext } from "../contexts/OrderContext";
-import { AccessibilityContext } from "../contexts/AccessibilityContext";
-import { useTextHandler } from "../hooks/useTTS";
-import { useInteractiveTTSHandler } from "../hooks/useTTSInteraction";
 import { useWebViewMessage } from "../hooks/useWebViewMessage";
-import { useKeyboardNavigationHandler } from "../hooks/useKeyboardNavigation";
 import { useFocusableSectionsManager } from "../hooks/useFocusManagement";
 import { TTS } from "../constants/constants";
 
@@ -19,18 +11,8 @@ const ScreenSimplePay = memo(() => {
     // ScreenSimplePay 전용 TTS 스크립트
     const TTS_SCREEN_SIMPLE_PAY = `안내, 심플 결제, 오른쪽 아래에 있는 QR리더기에 QR코드를 인식시킵니다, 취소 버튼을 눌러 이전 작업, 결제 선택으로 돌아갈 수 있습니다, ${TTS.replay}`;
 
-    // 개별 Context에서 값 가져오기
-    // 개별 Context에서 값 가져오기
-    // const refsData = useContext(RefContext);
     const route = useContext(ScreenRouteContext);
-    const order = useContext(OrderContext);
-    const accessibility = useContext(AccessibilityContext);
-    const { handleText } = useTextHandler(accessibility.volume);
-    useInteractiveTTSHandler(true, handleText);
     useWebViewMessage();
-
-    useKeyboardNavigationHandler(false, true);
-    useKeyboardNavigationHandler(false, true);
 
     const actionBarRef = useRef(null);
     const systemControlsRef = useRef(null);
@@ -41,20 +23,20 @@ const ScreenSimplePay = memo(() => {
     });
 
     return (
-        <>
-            <div className="black"></div>
-            <div className="top"></div>
-            <Step />
-            <div data-tts-text={TTS_SCREEN_SIMPLE_PAY} ref={actionBarRef} className="main forth" tabIndex={-1}>
-                <div className="title">
-                    <div>오른쪽 아래에 있는 <span className="primary">QR리더기</span>에</div>
-                    <div><span className="primary">QR코드</span>를 인식시킵니다</div>
-                </div>
-                <img src="./images/device-codeReader-simple.png" alt="" className="credit-pay-image" onClick={() => route.setCurrentPage('ScreenOrderComplete')} />
-                <Button className="w500h120" navigate="ScreenPayments" label="취소" />
+        <Page
+            className="forth"
+            ttsText={TTS_SCREEN_SIMPLE_PAY}
+            mainRef={actionBarRef}
+            systemControlsRef={systemControlsRef}
+        >
+            <div className="title">
+                <div>오른쪽 아래에 있는 <span className="primary">QR리더기</span>에</div>
+                <div><span className="primary">QR코드</span>를 인식시킵니다</div>
             </div>
-            <Bottom systemControlsRef={systemControlsRef} />
-        </>
+            {/* 임시 이미지 클릭 시 완료 화면 이동 유지 */}
+            <img src="./images/device-codeReader-simple.png" alt="" className="credit-pay-image" onClick={() => route.setCurrentPage('ScreenOrderComplete')} />
+            <Button className="w500h120" navigate="ScreenPayments" label="취소" />
+        </Page>
     );
 });
 ScreenSimplePay.displayName = 'ScreenSimplePay';

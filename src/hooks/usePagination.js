@@ -15,8 +15,8 @@ export const usePagination = (items, itemsPerPageNormal, itemsPerPageLow, isLow)
         return items.slice(s, s + itemsPerPage);
     }, [items, pageNumber, itemsPerPage]);
 
-    const handlePrevPage = useCallback(() => setPageNumber(p => p > 1 ? p - 1 : p), []);
-    const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : p), [totalPages]);
+    const handlePrevPage = useCallback(() => setPageNumber(p => p > 1 ? p - 1 : totalPages), [totalPages]);
+    const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : 1), [totalPages]);
     const goToPage = useCallback((p) => { if (p >= 1 && p <= totalPages) setPageNumber(p); }, [totalPages]);
     const resetPage = useCallback(() => setPageNumber(1), []);
 

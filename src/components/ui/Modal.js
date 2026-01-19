@@ -296,12 +296,7 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
                                         <div className="modal-message">{config.message(H, countdown)}</div>
                                         <div data-tts-text={finalCancelLabel ? "작업관리, 버튼 두 개," : "작업관리, 버튼 한 개,"} ref={refsData.refs.BaseModal.modalConfirmButtonsRef} className="task-manager">
                                             {finalCancelLabel && (
-                                                <Button
-                                                    className="w285h090"
-                                                    svg={<Icon name={finalCancelIcon} />}
-                                                    label={finalCancelLabel}
-                                                    onClick={onCancel}
-                                                />
+                                                <Button className="w285h090" svg={<Icon name={finalCancelIcon} />} label={finalCancelLabel} onClick={onCancel} />
                                             )}
                                             <Button
                                                 className={`w285h090 ${config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}`}
@@ -358,7 +353,7 @@ export const DeleteCheckModal = memo(({ handleDelete, id }) => {
             isOpen={accessibility.ModalDeleteCheck.isOpen}
             type="deleteCheck"
             onCancel={() => accessibility.ModalDeleteCheck.close()}
-            onConfirm={() => { accessibility.ModalDeleteCheck.close(); }} // 그냥 닫기 (메뉴 유지)
+            onConfirm={() => { handleDelete(id); accessibility.ModalDeleteCheck.close(); }}
         />
     );
 });
@@ -459,8 +454,7 @@ export const ModalContainer = () => {
             {(accessibility?.ModalDelete || { isOpen: false }).isOpen && <DeleteModal handleDelete={order?.handleDelete || (() => { })} id={accessibility?.ModalDeleteItemId || 0} />}
             {(accessibility?.ModalDeleteCheck || { isOpen: false }).isOpen && <DeleteCheckModal handleDelete={order?.handleDelete || (() => { })} id={accessibility?.ModalDeleteItemId || 0} />}
 
-            {/* TimeoutModal과 PaymentErrorModal은 App에서 렌더링되거나 여기서 렌더링되거나. 
-          App.js에서는 ModalContainer에 포함되어 있음. */}
+            {/* TimeoutModal과 PaymentErrorModal은 App에서 렌더링되거나 여기서 렌더링되거나, App.js에서는 ModalContainer에 포함되어 있음. */}
             {accessibility.ModalTimeout.isOpen && <TimeoutModal onExtend={() => { }} onEnd={() => route.setCurrentPage('ScreenStart')} />}
             {accessibility.ModalPaymentError.isOpen && <PaymentErrorModal />}
         </>

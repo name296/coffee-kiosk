@@ -62,7 +62,7 @@ const Summary = memo(({ orderSummaryRef }) => {
                         <Button
                             className="w199h090"
                             svg={<AddIcon className="summary-btn-icon" />}
-                            label="추가"
+                            label="메뉴"
                             actionType="navigate"
                             actionTarget="ScreenMenu"
                         />

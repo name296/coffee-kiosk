@@ -17,7 +17,12 @@ export const handleSelectTabAction = (setSelectedTab, selectedTab, actionTarget)
 export const handlePaymentAction = (sendOrderDataToApp, setCurrentPage, actionMethod) => {
     if (actionMethod) {
         sendOrderDataToApp(actionMethod);
-        const targetPage = actionMethod === "card" ? 'ScreenCardInsert' : 'ScreenMobilePay';
+        const pageMap = {
+            card: 'ScreenCardInsert',
+            mobile: 'ScreenMobilePay',
+            simple: 'ScreenSimplePay'
+        };
+        const targetPage = pageMap[actionMethod] || 'ScreenCardInsert';
         setCurrentPage(targetPage);
     }
 };
@@ -48,7 +53,7 @@ export const handleTabNavAction = (handlePreviousTab, handleNextTab, actionTarge
 };
 
 // 카테고리 네비게이션 액션 (단일책임: 카테고리 페이지 이동만)
-export const handleCategoryNavAction = (handleCategoryPageNav, actionTarget) => {
+export const handleCategoryAction = (handleCategoryPageNav, actionTarget) => {
     handleCategoryPageNav(actionTarget);
 };
 

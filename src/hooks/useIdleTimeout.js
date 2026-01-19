@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 // 활성 요소 TTS 재생 훅 (단일책임: 활성 요소 TTS 재생만)
 // 남은 시간 포맷팅 (단일책임: 시간 포맷팅만) - MM:SS 형식
 const formatRemainingTime = (ms) => {
-    if (ms <= 0) return "00:00";
+    //if (ms <= 0) return "00:00";
     const totalSeconds = Math.ceil(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -103,7 +103,7 @@ export const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true, chec
             // 타임아웃 모달 상태 확인
             const isTimeoutModalOpen = checkTimeoutModalRef.current ? checkTimeoutModalRef.current() : false;
 
-            // 타임아웃 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
+            /* 타임아웃 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
             if (!isTimeoutModalOpen && currentTimeoutRef.current === 20000) {
                 const resetTime = timeoutRef.current || timeout;
                 const resetTimeMs = Date.now();
@@ -117,6 +117,7 @@ export const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true, chec
                     if (onTimeoutRef.current) onTimeoutRef.current();
                 }, resetTime);
             }
+            */
 
             // 경과 시간 계산 및 남은 시간 업데이트 (항상 실행)
             const now = Date.now();

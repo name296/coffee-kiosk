@@ -84,14 +84,15 @@
   전체 CSS Reset & Base
   ============================== */
 @layer reset {
-  *, 
-  *::before, 
-  *::after { 
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  
+
   html {
     font-size: calc(62.5% * var(--font-size-scale));
     font-family: var(--font-family);
@@ -108,11 +109,11 @@
    전체 디자인 시스템(Design System)
    ======================================== */
 @layer design-system {
-:root { 
+  :root {
     /* === 전체 타이포그래피 시스템=== */
     --font-family: 'Pretendard GOV', sans-serif;
     --font-size-scale: 1;
-    
+
     /* === font / size (rem 단위 - html font-size에서 스케일 적용됨) === */
     --font-size-xs: 1.2rem;
     --font-size-sm: 1.4rem;
@@ -125,29 +126,38 @@
     --font-size-d2: 8.3rem;
     --font-size-d3: 12.8rem;
     --font-size-d4: 18rem;
-    
+
     /* === 접근성 모달 버튼 크기 === */
     /* 접근성 모달 버튼 크기 */
     --acc-btn-height: 64px;
     --acc-btn-height-action: 80px;
     --acc-btn-font-size: 2rem;
-    --acc-btn-width: 100px;        /* 기본 (토글) */
-    --acc-btn-width-reset: 200px;  /* 초기설정 */
-    --acc-btn-width-volume: 64px;  /* 음량 */
-    --acc-btn-width-action: 220px; /* 작업관리 */
-    
+    --acc-btn-width: 100px;
+    /* 기본 (토글) */
+    --acc-btn-width-reset: 200px;
+    /* 초기설정 */
+    --acc-btn-width-volume: 64px;
+    /* 음량 */
+    --acc-btn-width-action: 220px;
+    /* 작업관리 */
+
     /* === font / weight === */
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
-    
+
     /* === spacing === */
     --spacing-base: 1rem;
-    --spacing-xs: calc(var(--spacing-base) * 0.5);   /* 0.5rem = 8px */
-    --spacing-sm: calc(var(--spacing-base) * 1);     /* 1rem = 16px */
-    --spacing-md: calc(var(--spacing-base) * 1.5);   /* 1.5rem = 24px */
-    --spacing-lg: calc(var(--spacing-base) * 2);     /* 2rem = 32px */
-    --spacing-xl: calc(var(--spacing-base) * 2.25);  /* 2.25rem = 36px */
-        
+    --spacing-xs: calc(var(--spacing-base) * 0.5);
+    /* 0.5rem = 8px */
+    --spacing-sm: calc(var(--spacing-base) * 1);
+    /* 1rem = 16px */
+    --spacing-md: calc(var(--spacing-base) * 1.5);
+    /* 1.5rem = 24px */
+    --spacing-lg: calc(var(--spacing-base) * 2);
+    /* 2rem = 32px */
+    --spacing-xl: calc(var(--spacing-base) * 2.25);
+    /* 2.25rem = 36px */
+
     /* 테마/팔레트 독립 속성 */
     --border-color-pointed: var(--color-system-01);
 
@@ -159,13 +169,13 @@
     --color-brown-04: #C4895FFF;
     --color-brown-05: #EB9B63FF;
     --color-brown-06: #EEDCD2FF;
-    
+
     /* Yellow */
     --color-yellow-01: #241F00FF;
     --color-yellow-02: #807000FF;
     --color-yellow-03: #FFE100FF;
     --color-yellow-04: #FFEF80FF;
-    
+
     /* Gray */
     --color-gray-01: #000000FF;
     --color-gray-02: #1F1F1FFF;
@@ -181,7 +191,7 @@
     --color-gray-12: #F2F2F2FF;
     --color-gray-13: #FAFAFAFF;
     --color-gray-14: #FFFFFFFF;
-    
+
     /* System */
     --color-system-01: #FF00E1FF;
     --color-system-02: #B81A00FF;
@@ -195,17 +205,17 @@
     --body1-border-color: var(--color-gray-09);
     --body1-content-primary-color: var(--color-brown-02);
     --body1-content-secondary-color: var(--color-gray-02);
-    
+
     --body2-background-color: #FAFAFAFF;
     --body2-primary1-color: var(--color-brown-05);
     --body2-primary2-color: var(--color-brown-03);
     --body2-secondary1-color: var(--color-gray-14);
     --body2-secondary2-color: var(--color-gray-08);
-    
+
     --body2-progress-background-standby-color: var(--color-gray-01);
     --body2-progress-content-complete-color: var(--color-gray-01);
     --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
-    
+
     --body3-background-color: var(--color-gray-11);
     --body3-content-color: var(--color-gray-02);
 
@@ -218,121 +228,121 @@
     --primary1-background-color-default: var(--color-brown-03);
     --primary1-background-color-pressed: var(--color-brown-06);
     --primary1-background-color-disabled: transparent;
-    
+
     --primary1-border-color-default: var(--color-brown-03);
     --primary1-border-color-pressed: var(--color-brown-02);
     --primary1-border-color-disabled: var(--body2-primary1-color);
-    
-    --primary1-content-color-default: var(--color-gray-14); 
-    --primary1-content-color-pressed: var(--color-brown-02); 
+
+    --primary1-content-color-default: var(--color-gray-14);
+    --primary1-content-color-pressed: var(--color-brown-02);
     --primary1-content-color-disabled: var(--body2-primary1-color);
-    
+
     /* Primary2 팔레트*/
     --primary2-background-color-default: var(--color-gray-11);
     --primary2-background-color-pressed: var(--color-brown-03);
     --primary2-background-color-disabled: transparent;
-    
+
     --primary2-border-color-default: var(--color-gray-09);
     --primary2-border-color-pressed: var(--color-brown-03);
     --primary2-border-color-disabled: var(--color-gray-06);
-    
-    --primary2-content-color-default: var(--color-gray-03); 
-    --primary2-content-color-pressed: var(--color-gray-14); 
+
+    --primary2-content-color-default: var(--color-gray-03);
+    --primary2-content-color-pressed: var(--color-gray-14);
     --primary2-content-color-disabled: var(--color-gray-06);
-    
+
     /* Primary3 팔레트(중첩 배경 시스템) */
     /* Background1 (중첩 배경) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-14);
     --primary3-background1-color-disabled: var(--color-gray-14);
-    
+
     /* Border (테두리) */
     --primary3-border-color-default: var(--color-gray-09);
     --primary3-border-color-pressed: var(--color-brown-03);
     --primary3-border-color-disabled: var(--color-gray-09);
-    
+
     /* Background2 그라디언트 레이어 */
     --primary3-background2-color-default: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
     --primary3-background2-color-pressed: linear-gradient(180deg, #A4693F00 0%, #A4693FE6 15%, #A4693FFF 43%, #A4693FFF 100%);
     --primary3-background2-color-disabled: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
-    
+
     /* Content2 (background2 위의 HTML 요소) */
     --primary3-content2-color-default1: var(--color-gray-03);
     --primary3-content2-color-default2: var(--color-brown-02);
     --primary3-content2-color-pressed: var(--color-gray-14);
     --primary3-content2-color-disabled1: var(--color-gray-03);
     --primary3-content2-color-disabled2: var(--color-brown-02);
-    
+
     /* Content3 (별도 구분 HTML 요소) */
     --primary3-content3-color-disabled: var(--color-system-02);
-    
+
     /* Content (버튼 기본 콘텐츠) */
     --primary3-content-color-default: var(--color-gray-03);
     --primary3-content-color-pressed: var(--color-gray-14);
     --primary3-content-color-disabled: var(--color-gray-07);
-    
+
     /* Secondary1 팔레트*/
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-11);
     --secondary1-background-color-disabled: transparent;
-    
+
     --secondary1-border-color-default: var(--color-gray-07);
     --secondary1-border-color-pressed: var(--color-gray-09);
     --secondary1-border-color-disabled: var(--color-gray-06);
-    
-    --secondary1-content-color-default: var(--color-gray-14); 
-    --secondary1-content-color-pressed: var(--color-gray-03); 
+
+    --secondary1-content-color-default: var(--color-gray-14);
+    --secondary1-content-color-pressed: var(--color-gray-03);
     --secondary1-content-color-disabled: var(--color-gray-06);
-    
+
     /* Secondary2 팔레트*/
     --secondary2-background-color-default: var(--color-gray-11);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
-    
+
     --secondary2-border-color-default: var(--color-gray-09);
     --secondary2-border-color-pressed: var(--color-gray-07);
     --secondary2-border-color-disabled: var(--color-gray-06);
-    
-    --secondary2-content-color-default: var(--color-gray-03); 
-    --secondary2-content-color-pressed: var(--color-gray-14); 
+
+    --secondary2-content-color-default: var(--color-gray-03);
+    --secondary2-content-color-pressed: var(--color-gray-14);
     --secondary2-content-color-disabled: var(--color-gray-06);
-    
+
     /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
-    
+
     --secondary3-border-color-default: var(--color-gray-09);
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-06);
-    
+
     /* Content1 (background1 위의 HTML 요소) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-06);
-    
+
     /* Background2 (레이어 적용 배경) */
     --secondary3-background2-color-default: var(--color-gray-01);
-    
+
     /* Content2 (background2 위의 HTML 요소 - 레이어) */
     --secondary3-content2-color-default: var(--color-gray-14);
-    
+
     /* Delete 버튼 팔레트 */
     --delete-background-color-default: var(--color-system-02);
     --delete-background-color-pressed: var(--color-system-03);
     --delete-background-color-disabled: transparent;
-    
+
     --delete-border-color-default: var(--color-system-02);
     --delete-border-color-pressed: var(--color-system-02);
     --delete-border-color-disabled: var(--color-gray-06);
-    
+
     --delete-content-color-default: var(--color-gray-14);
     --delete-content-color-pressed: var(--color-gray-14);
     --delete-content-color-disabled: var(--color-gray-06);
-    
+
     /* 텍스트 하이라이트 색상 */
     --highlight-color: #8C532CFF;
-}
+  }
 
   /* ========================================
      전체 고대비 모드 (Dark Theme - 27 구조)
@@ -343,17 +353,17 @@
     --body1-border-color: var(--color-gray-07);
     --body1-content-primary-color: var(--color-yellow-03);
     --body1-content-secondary-color: var(--color-gray-14);
-    
+
     --body2-background-color: var(--color-gray-01);
     --body2-primary1-color: var(--color-yellow-03);
     --body2-primary2-color: var(--color-yellow-02);
     --body2-secondary1-color: var(--color-gray-14);
     --body2-secondary2-color: var(--color-gray-14);
-    
+
     --body2-progress-background-standby-color: var(--color-gray-07);
     --body2-progress-content-complete-color: var(--color-gray-01);
     --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
-    
+
     --body3-background-color: var(--color-gray-03);
     --body3-content-color: var(--color-gray-14);
 
@@ -366,121 +376,121 @@
     --primary1-background-color-default: var(--color-yellow-03);
     --primary1-background-color-pressed: var(--color-yellow-01);
     --primary1-background-color-disabled: transparent;
-    
+
     --primary1-border-color-default: var(--color-yellow-03);
     --primary1-border-color-pressed: var(--color-yellow-04);
     --primary1-border-color-disabled: var(--body2-primary1-color);
-    
-    --primary1-content-color-default: var(--color-gray-01); 
-    --primary1-content-color-pressed: var(--color-yellow-04); 
+
+    --primary1-content-color-default: var(--color-gray-01);
+    --primary1-content-color-pressed: var(--color-yellow-04);
     --primary1-content-color-disabled: var(--body2-primary1-color);
-    
+
     /* Primary2 팔레트*/
     --primary2-background-color-default: var(--color-gray-03);
     --primary2-background-color-pressed: var(--color-yellow-03);
     --primary2-background-color-disabled: transparent;
-    
+
     --primary2-border-color-default: var(--color-gray-07);
     --primary2-border-color-pressed: var(--color-yellow-03);
     --primary2-border-color-disabled: var(--color-gray-07);
-    
-    --primary2-content-color-default: var(--color-gray-12); 
-    --primary2-content-color-pressed: var(--color-gray-01); 
+
+    --primary2-content-color-default: var(--color-gray-12);
+    --primary2-content-color-pressed: var(--color-gray-01);
     --primary2-content-color-disabled: var(--color-gray-07);
-    
+
     /* Primary3 팔레트(중첩 배경 시스템) */
     /* Background1 (중첩 배경) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-01);
     --primary3-background1-color-disabled: var(--color-gray-14);
-    
+
     /* Border (테두리) */
     --primary3-border-color-default: var(--color-gray-07);
     --primary3-border-color-pressed: var(--color-yellow-03);
     --primary3-border-color-disabled: var(--color-gray-07);
-    
+
     /* Background2 그라디언트 레이어 */
     --primary3-background2-color-default: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
     --primary3-background2-color-pressed: linear-gradient(180deg, #FFE10000 0%, #FFE100E6 15%, #FFE100FF 43%, #FFE100FF 100%);
     --primary3-background2-color-disabled: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
-    
+
     /* Content2 (background2 위의 HTML 요소) */
     --primary3-content2-color-default1: var(--color-gray-12);
     --primary3-content2-color-default2: var(--color-yellow-03);
     --primary3-content2-color-pressed: var(--color-gray-01);
     --primary3-content2-color-disabled1: var(--color-gray-12);
     --primary3-content2-color-disabled2: var(--color-yellow-03);
-    
+
     /* Content3 (별도 구분 HTML 요소) */
     --primary3-content3-color-disabled: var(--color-system-04);
-    
+
     /* Content (버튼 기본 콘텐츠) */
     --primary3-content-color-default: var(--color-gray-13);
     --primary3-content-color-pressed: var(--color-gray-01);
     --primary3-content-color-disabled: var(--color-gray-07);
-    
+
     /* Secondary1 팔레트*/
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-03);
     --secondary1-background-color-disabled: transparent;
-    
+
     --secondary1-border-color-default: var(--color-gray-07);
     --secondary1-border-color-pressed: var(--color-gray-07);
     --secondary1-border-color-disabled: var(--color-gray-07);
-    
-    --secondary1-content-color-default: var(--color-gray-14); 
-    --secondary1-content-color-pressed: var(--color-gray-12); 
+
+    --secondary1-content-color-default: var(--color-gray-14);
+    --secondary1-content-color-pressed: var(--color-gray-12);
     --secondary1-content-color-disabled: var(--color-gray-07);
-    
+
     /* Secondary2 팔레트*/
     --secondary2-background-color-default: var(--color-gray-03);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
-    
+
     --secondary2-border-color-default: var(--color-gray-07);
     --secondary2-border-color-pressed: var(--color-gray-07);
     --secondary2-border-color-disabled: var(--color-gray-07);
-    
-    --secondary2-content-color-default: var(--color-gray-12); 
-    --secondary2-content-color-pressed: var(--color-gray-14); 
+
+    --secondary2-content-color-default: var(--color-gray-12);
+    --secondary2-content-color-pressed: var(--color-gray-14);
     --secondary2-content-color-disabled: var(--color-gray-07);
     --secondary2-border-color-pointed: var(--color-system-01);
-    
+
     /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
     /* Background1  */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
-    
+
     /* Border1 */
     --secondary3-border-color-default: var(--color-gray-09);
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-07);
-    
+
     /* Content1 (background1 위의 HTML 요소) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-07);
-    
+
     /* Background2 (레이어 적용 배경) */
     --secondary3-background2-color-default: var(--color-gray-01);
-    
+
     /* Content2 (background2 위의 HTML 요소 - 레이어) */
     --secondary3-content2-color-default: var(--color-gray-14);
-    
+
     /* Delete 버튼 팔레트 (Dark 테마) */
     --delete-background-color-default: var(--color-system-02);
     --delete-background-color-pressed: var(--color-system-03);
     --delete-background-color-disabled: transparent;
-    
+
     --delete-border-color-default: var(--color-system-02);
     --delete-border-color-pressed: var(--color-system-02);
     --delete-border-color-disabled: var(--color-gray-07);
-    
+
     --delete-content-color-default: var(--color-gray-14);
     --delete-content-color-pressed: var(--color-gray-14);
     --delete-content-color-disabled: var(--color-gray-07);
-    
+
     /* 텍스트 하이라이트 색상 (Dark 테마) */
     --highlight-color: #FFE100FF;
   }
@@ -490,6 +500,7 @@
    전체 레이아웃 (Layout)
    ======================================== */
 @layer layout {
+
   /* ========================================
      레이아웃 변수 (Layout Variables)
      ======================================== */
@@ -497,8 +508,9 @@
     --layout-width: 1080px;
     --layout-height: 1920px;
     --layout-padding-x: 32px;
-    --layout-gap: var(--spacing-sm);  /* 1rem = 16px */
-    
+    --layout-gap: var(--spacing-sm);
+    /* 1rem = 16px */
+
     /* 섹션 높이 */
     --height-top: 70px;
     --height-step: 120px;
@@ -513,8 +525,14 @@
      공용 레이아웃 유틸리티
      ======================================== */
   /* Flex 컨테이너 */
-  .flex { display: flex; }
-  .center { justify-content: center; align-items: center; }
+  .flex {
+    display: flex;
+  }
+
+  .center {
+    justify-content: center;
+    align-items: center;
+  }
 
   /* ========================================
      Body 레이아웃
@@ -528,7 +546,7 @@
     width: var(--layout-width);
     height: var(--layout-height);
     contain: size;
-    
+
     /* 상속 속성 (자식에게 전파) */
     /* 기본 타이포: b1-bold = 4rem(40px) + 500 */
     font-family: var(--font-family);
@@ -544,12 +562,12 @@
     border-color: var(--body1-border-color);
 
     /* 자식 공통 */
-    & > * {
+    &>* {
       padding-left: var(--layout-padding-x);
       padding-right: var(--layout-padding-x);
       box-sizing: border-box;
     }
-    
+
     /* 모든 자손 트랜지션 */
     & * {
       transition: background-color 0.05s, color 0.05s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
@@ -569,63 +587,66 @@
 
   /* 첫 페이지에서 Top, Step 숨기기 */
   body:has(.main.first) .top,
-  body:has(.main.first) .step { display: none; }
+  body:has(.main.first) .step {
+    display: none;
+  }
 
   /* ========================================
      Step Progress Bar
      구조: .step > .step-num + .step-name + .separator
      상태: .standby (대기) / .progress (진행) / .progress.current (현재)
      ======================================== */
-  
+
   .step {
-  width: 100%;
-  height: var(--height-step);
-  color: var(--layout-color);
-  display: flex;
-  border-bottom: 2px solid var(--body1-border-color);
-  flex-shrink: 0;
-  height: 120px;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-evenly;
-
-  /* 단계 번호 */
-  & .step-num {
-    width: 74px;
-    height: 74px;
+    width: 100%;
+    height: var(--height-step);
+    color: var(--layout-color);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    border-bottom: 2px solid var(--body1-border-color);
     flex-shrink: 0;
-    border-radius: 50%;
-    border: 8px solid transparent;
-    box-sizing: border-box;
-    background-clip: padding-box;
-    background-color: var(--body2-progress-background-standby-color);
-    color: var(--body2-secondary2-color);
+    height: 120px;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-evenly;
 
-    /* 진행 상태 */
-    &.progress {
-      background-color: var(--body2-primary1-color);
-      color: var(--body2-progress-content-complete-color);
+    /* 단계 번호 */
+    & .step-num {
+      width: 74px;
+      height: 74px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: 8px solid transparent;
+      box-sizing: border-box;
+      background-clip: padding-box;
+      background-color: var(--body2-progress-background-standby-color);
+      color: var(--body2-secondary2-color);
 
-      /* 현재 위치 (보더 투명도 해제) */
-      &.current {
-        border-color: var(--body2-primary2-color);
+      /* 진행 상태 */
+      &.progress {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+
+        /* 현재 위치 (보더 투명도 해제) */
+        &.current {
+          border-color: var(--body2-primary2-color);
+        }
       }
     }
-  }
 
-  /* 공통: 대기 상태 색상 */
-  & .step-name, .separator {
-    flex-shrink: 0;
-    color: var(--body2-secondary2-color);
-    
-    /* 진행 상태 색상 */
-    &.progress {
-      color: var(--body2-primary1-color);
+    /* 공통: 대기 상태 색상 */
+    & .step-name,
+    .separator {
+      flex-shrink: 0;
+      color: var(--body2-secondary2-color);
+
+      /* 진행 상태 색상 */
+      &.progress {
+        color: var(--body2-primary1-color);
+      }
     }
-  }
   }
 
   /* ========================================
@@ -709,7 +730,8 @@
         flex-flow: column nowrap;
         border-top: 2px solid var(--body1-border-color);
         justify-content: center;
-        align-items: center;  /* 가로 중앙 */
+        align-items: center;
+        /* 가로 중앙 */
         padding: var(--spacing-xl);
         gap: var(--spacing-xl);
 
@@ -719,18 +741,18 @@
           flex-flow: column nowrap;
           align-items: center;
           gap: 8px;
-  
+
           & .highlight {
             color: var(--body1-content-primary-color);
             font-weight: var(--font-weight-semibold);
           }
-          
+
           & .primary {
             color: var(--body1-content-primary-color);
             font-weight: var(--font-weight-semibold);
           }
         }
-        
+
         & .setting-row {
           display: flex;
           flex-flow: row nowrap;
@@ -739,6 +761,7 @@
           width: 100%;
           height: 10rem;
         }
+
         /* 설정 항목명 (접근성 모달) */
         & .setting-name {
           display: flex;
@@ -747,7 +770,7 @@
           width: 100%;
           height: 10rem;
           gap: var(--spacing-sm);
-          
+
           & .primary {
             color: var(--body1-content-primary-color);
             font-weight: var(--font-weight-semibold);
@@ -786,19 +809,23 @@
       align-items: center;
       color: var(--body1-content-secondary-color);
       white-space: nowrap;
-      
-      & .primary { color: var(--body1-content-primary-color); }
+
+      & .primary {
+        color: var(--body1-content-primary-color);
+      }
     }
 
     /* 페이지별 변형 */
-    &.first { 
+    &.first {
       position: relative;
       height: 100%;
-      & .poster { 
+
+      & .poster {
         width: var(--layout-width);
-        height: auto; 
-        object-fit: contain; 
+        height: auto;
+        object-fit: contain;
       }
+
       & p {
         letter-spacing: inherit;
         line-height: inherit;
@@ -810,7 +837,7 @@
       justify-content: space-evenly;
     }
 
-    &.third { 
+    &.third {
       padding-bottom: 100px;
     }
 
@@ -819,10 +846,21 @@
       font-size: var(--font-size-b1);
       padding-top: var(--height-title);
       padding-bottom: 182px;
-      &.card-remove { padding-bottom: 454px; }
-      
-      & .payment { width: 100%; height: 100%; flex-grow: 1; }
-      & .task-manager { width: fit-content; height: fit-content; }
+
+      &.card-remove {
+        padding-bottom: 454px;
+      }
+
+      & .payment {
+        width: 100%;
+        height: 100%;
+        flex-grow: 1;
+      }
+
+      & .task-manager {
+        width: fit-content;
+        height: fit-content;
+      }
     }
   }
 
@@ -841,13 +879,16 @@
     align-items: center;
     border-top: 2px solid var(--body1-border-color);
 
-    & .task-manager { width: 560px; justify-content: space-between; }
-    
+    & .task-manager {
+      width: 560px;
+      justify-content: space-between;
+    }
+
     & .summary-label {
       font-weight: var(--font-weight-semibold);
       color: var(--body2-secondary1-color);
     }
-    
+
     & .summary-text {
       font-weight: var(--font-weight-semibold);
       color: var(--body2-primary1-color);
@@ -870,7 +911,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
   }
 
   .countdown {
@@ -883,11 +924,14 @@
   }
 
   /* 낮은화면 상단 여백 */
-  .black { 
-    width: 100%; 
-    height: 0; 
+  .black {
+    width: 100%;
+    height: 0;
     background-color: black;
-    &.low { height: 1020px; }
+
+    &.low {
+      height: 1020px;
+    }
   }
 
   .short-colline {
@@ -895,7 +939,9 @@
     height: 41px;
     background: var(--body1-content-secondary-color);
   }
-} /* @layer layout */
+}
+
+/* @layer layout */
 
 /* ==============================
    컴포넌트 스타일 (Components)
@@ -906,7 +952,7 @@
      - 레이아웃 배색: --body* 변수 사용
      - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
      ============================== */
-  
+
   /* ==============================
      모달 시스템
      스크림 < 콘텐츠 < 업/다운 < ...
@@ -916,7 +962,8 @@
     inset: 0;
     display: flex;
     justify-content: center;
-    align-items: center;  /* 화면 중앙 */
+    align-items: center;
+    /* 화면 중앙 */
     padding: 0 var(--layout-padding-x);
     background: #00000099;
     backdrop-filter: blur(4px);
@@ -928,75 +975,83 @@
     }
   }
 
-.menu {
-  position: relative;
-  width: 100%;
-  height: fit-content;
-  grid-gap: var(--spacing-sm);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4x4 그리드*/
-  grid-template-rows: repeat(4, 1fr); /* 4x4 배열 강제 설정 */
-  grid-auto-flow: row; /* 가로방향으로 자동 배치 */
-  justify-items: center;
-  align-items: center;
-  
-  /* 메뉴 아이템 버튼 (레이어 배치) */
-  & .button { 
-    width: 242px; 
-    height: 280px; 
+  .menu {
     position: relative;
-    & .icon { 
-      width: 14rem; 
-      height: 14rem; 
-      position: absolute;
-      top: 0%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    & .label { 
-      position: absolute;
-      width: 100%;
-      min-height: 75%;
-      bottom: 0%;
-      left: 0%;
-      padding-top: 2.5rem;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      background: var(--primary3-background2-color-default);
-      border-radius: 0 0 calc(var(--min-side) * 0.0625) calc(var(--min-side) * 0.0625);
-      
-      & p:nth-child(1) {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: var(--font-size-b1);
-        color: var(--primary3-content2-color-default1);
-      }
-      
-      & p:nth-child(2) {
-        flex-shrink: 0;
-        font-size: var(--font-size-b1);
-        color: var(--primary3-content2-color-default2);
-        font-weight: var(--font-weight-medium);
-      }
-    }
-    
-    /* pressed 상태 */
-    &.pressed .label {
-      background: var(--primary3-background2-color-pressed);      
-      & p { color: var(--primary3-content2-color-pressed); }
-    }
-  }
-
-  &.low {
-    width: fit-content;
+    width: 100%;
     height: fit-content;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(1, 1fr);
+    grid-gap: var(--spacing-sm);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4x4 그리드*/
+    grid-template-rows: repeat(4, 1fr);
+    /* 4x4 배열 강제 설정 */
+    grid-auto-flow: row;
+    /* 가로방향으로 자동 배치 */
+    justify-items: center;
+    align-items: center;
+
+    /* 메뉴 아이템 버튼 (레이어 배치) */
+    & .button {
+      width: 242px;
+      height: 280px;
+      position: relative;
+
+      & .icon {
+        width: 14rem;
+        height: 14rem;
+        position: absolute;
+        top: 0%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      & .label {
+        position: absolute;
+        width: 100%;
+        min-height: 75%;
+        bottom: 0%;
+        left: 0%;
+        padding-top: 2.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        background: var(--primary3-background2-color-default);
+        border-radius: 0 0 calc(var(--min-side) * 0.0625 * 0.5) calc(var(--min-side) * 0.0625 * 0.5);
+
+        & p:nth-child(1) {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: var(--font-size-b1);
+          color: var(--primary3-content2-color-default1);
+        }
+
+        & p:nth-child(2) {
+          flex-shrink: 0;
+          font-size: var(--font-size-b1);
+          color: var(--primary3-content2-color-default2);
+          font-weight: var(--font-weight-medium);
+        }
+      }
+
+      /* pressed 상태 */
+      &.pressed .label {
+        background: var(--primary3-background2-color-pressed);
+
+        & p {
+          color: var(--primary3-content2-color-pressed);
+        }
+      }
+    }
+
+    &.low {
+      width: fit-content;
+      height: fit-content;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(1, 1fr);
+    }
   }
-}
 
   .order-list {
     display: flex;
@@ -1026,7 +1081,7 @@
         justify-content: center;
         align-items: center;
         border: 2px solid var(--body1-border-color);
-    
+
         & .order-index {
           width: 56px;
           height: 56px;
@@ -1040,20 +1095,20 @@
           top: 0;
           left: 0;
         }
-    
+
         & .order-image {
           width: 100%;
           height: 100%;
         }
-      } 
-    
+      }
+
       & .order-name {
         position: relative;
         width: 236px;
         /*word-break: keep-all;*/
         color: var(--body1-content-secondary-color);
       }
-    
+
       & .order-quantity {
         position: relative;
         display: flex;
@@ -1069,14 +1124,14 @@
           height: 76px;
         }
       }
-      
-      & .order-price {        
+
+      & .order-price {
         position: relative;
         width: 236px;
         justify-content: right;
         border: none;
         background: none;
-        
+
       }
     }
 
@@ -1084,26 +1139,27 @@
       width: 100%;
       height: 2px;
       background-color: var(--body1-border-color);
-    }  
+    }
   }
 
   .credit-pay-image {
-      position: relative;
-      width: 762px;
-      height: 612px;
+    position: relative;
+    width: 762px;
+    height: 612px;
   }
 
-  .order-num{
+  .order-num {
     position: absolute;
     top: 677px;
-    left: 707px;  /* 기존 중심점 (635 + 콘텐츠폭/2) */
+    left: 707px;
+    /* 기존 중심점 (635 + 콘텐츠폭/2) */
     transform: translateX(-50%);
     width: fit-content;
     height: fit-content;
     font-size: var(--font-size-d2);
     display: flex;
     flex-flow: column nowrap;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     color: #000000FF;
     font-weight: var(--font-weight-semibold);
@@ -1119,7 +1175,7 @@
     line-height: 1;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); 
+    transform: translate(-50%, -50%);
     align-items: center;
     background-color: var(--body2-primary1-color);
     border: 9px solid var(--body2-primary2-color);
@@ -1127,193 +1183,198 @@
     font-weight: var(--font-weight-medium);
     font-size: var(--font-size-d4);
   }
-/* ========================================
+
+  /* ========================================
    전체 컴포넌트 (Components) - 버튼
    ======================================== */
 
-    /* ========================================
+  /* ========================================
        페이지네이션 스타일
        ======================================== */
-    .pagination {
-      position: relative;
-      width: fit-content;
-      height: fit-content;
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: center;
-      align-items: center;
-      gap: 24px;
+  .pagination {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
 
-      & .button {
-        width: 184px;
-        height: 64px;
-        cursor: pointer;
-      }
+    & .button {
+      width: 184px;
+      height: 64px;
+      cursor: pointer;
     }
+  }
 
-    .pagination-page-current {
-      color: var(--body1-content-primary-color);
-    }
+  .pagination-page-current {
+    color: var(--body1-content-primary-color);
+  }
 
-    .pagination-separator {
-      color: var(--body1-border-color);
-    }
+  .pagination-separator {
+    color: var(--body1-border-color);
+  }
 
-    .pagination-page-total {
-      color: var(--body1-content-secondary-color);
-    }
-    /* ========================================
+  .pagination-page-total {
+    color: var(--body1-content-secondary-color);
+  }
+
+  /* ========================================
        카테고리 탭 스타일
        ======================================== */
-    .category-full {
-      position: relative;
-      width: 100%;
-      height: fit-content;
-      display: flex;
-      flex-flow: row nowrap;
-      gap: var(--spacing-lg);
-      align-items: center;
-    }
+  .category-full {
+    position: relative;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: var(--spacing-lg);
+    align-items: center;
+  }
 
-  
-    /* ========================================
+
+  /* ========================================
        아이콘 시스템 (Icon System)
        ======================================== */
-    .icon {
-      display: flex;
-      width: 1em;
-      height: 1em;
-  
-      & svg {
-        display: block;
-        width: 100%;
-        height: 100%;
-        fill: currentColor;
-      }
+  .icon {
+    display: flex;
+    width: 1em;
+    height: 1em;
 
-      & img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-    }  
-  
-    /* ========================================
-       포커스 가능한 요소 공통 스타일
-       ======================================== */
-    
-    /* 포커스 가능한 모든 요소에 --min-side 적용 */
-    button:not([disabled]),
-    a[href],
-    input:not([disabled]),
-    select:not([disabled]),
-    textarea:not([disabled]),
-    [tabindex]:not([tabindex="-1"]) {
-      --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+    & svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
     }
 
-    /* ========================================
+    & img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  /* ========================================
+       포커스 가능한 요소 공통 스타일
+       ======================================== */
+
+  /* 포커스 가능한 모든 요소에 --min-side 적용 */
+  button:not([disabled]),
+  a[href],
+  input:not([disabled]),
+  select:not([disabled]),
+  textarea:not([disabled]),
+  [tabindex]:not([tabindex="-1"]) {
+    --min-side: ;
+    /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+  }
+
+  /* ========================================
        전체 버튼 컴포넌트 스타일
        ======================================== */
 
-    .button {
-      --min-side: ; /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
-      background-color: var(--primary2-background-color-default);
-      background-clip: padding-box;
-      position: relative;
-      display: flex;
-      box-sizing: border-box;
-      gap: var(--spacing-xs);
-      min-width: 70px;
-      min-height: 76px;
-      padding-left: calc(var(--min-side) * 0.0625 * 2);
-      padding-right: calc(var(--min-side) * 0.0625 * 2);
-      outline-offset: calc(var(--min-side) * 0.0625 * -0.5);
-      border-radius: calc(var(--min-side) * 0.0625);
-      border: calc(var(--min-side) * 0.0625 * 0.5) solid var(--primary2-border-color-default);
-      box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.12);
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      width: fit-content;
-      height: fit-content;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      will-change: transform;
-      contain: layout style;
-      flex-flow: row nowrap;
-      flex-shrink: 0;
-      
-      /* 상속 속성 (자식에게 전파) */
-      color: var(--primary2-content-color-default);
-      /* 토글 체크 아이콘 - CSS ::before로 처리 */
-      
-      &.toggle .icon.pressed {
-        display: none;        
-      }
+  .button {
+    --min-side: ;
+    /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+    background-color: var(--primary2-background-color-default);
+    background-clip: padding-box;
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    gap: var(--spacing-xs);
+    min-width: 70px;
+    min-height: 76px;
+    padding-left: calc(var(--min-side) * 0.0625 * 2);
+    padding-right: calc(var(--min-side) * 0.0625 * 2);
+    outline-offset: calc(var(--min-side) * 0.0625 * -0.5);
+    border-radius: calc(var(--min-side) * 0.0625);
+    border: calc(var(--min-side) * 0.0625 * 0.5) solid var(--primary2-border-color-default);
+    box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.12);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    width: fit-content;
+    height: fit-content;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    will-change: transform;
+    contain: layout style;
+    flex-flow: row nowrap;
+    flex-shrink: 0;
 
-      &.toggle.pressed .icon.pressed {
+    /* 상속 속성 (자식에게 전파) */
+    color: var(--primary2-content-color-default);
+    /* 토글 체크 아이콘 - CSS ::before로 처리 */
+
+    &.toggle .icon.pressed {
+      display: none;
+    }
+
+    &.toggle.pressed .icon.pressed {
+      display: block;
+      position: absolute;
+
+      /* --min-side 기반 크기 속성 */
+      width: calc(var(--min-side) * 0.0625 * 2);
+      height: calc(var(--min-side) * 0.0625 * 2);
+      top: calc(var(--min-side) * 0.0625 * 0.5);
+      right: calc(var(--min-side) * 0.0625 * 0.5);
+
+      /* CSS mask-image로 SVG 지정하여 currentColor 적용 (JavaScript 인젝션 불필요) */
+      &::before {
+        content: '';
         display: block;
-        position: absolute;       
-
-        /* --min-side 기반 크기 속성 */
-        width: calc(var(--min-side) * 0.0625 * 2);
-        height: calc(var(--min-side) * 0.0625 * 2);
-        top: calc(var(--min-side) * 0.0625 * 0.5);
-        right: calc(var(--min-side) * 0.0625 * 0.5);
-        
-        /* CSS mask-image로 SVG 지정하여 currentColor 적용 (JavaScript 인젝션 불필요) */
-        &::before {
-          content: '';
-          display: block;
-          width: 100%;
-          height: 100%;
-          /* SVG를 mask로 사용하여 currentColor 적용 */
-          background-color: currentColor;
-          mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
-          mask-size: contain;
-          mask-repeat: no-repeat;
-          mask-position: center;
-          /* Webkit 브라우저 호환성 */
-          -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
-          -webkit-mask-size: contain;
-          -webkit-mask-repeat: no-repeat;
-          -webkit-mask-position: center;
-        }
+        width: 100%;
+        height: 100%;
+        /* SVG를 mask로 사용하여 currentColor 적용 */
+        background-color: currentColor;
+        mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
+        mask-size: contain;
+        mask-repeat: no-repeat;
+        mask-position: center;
+        /* Webkit 브라우저 호환성 */
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
+        -webkit-mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
       }
-      
-      /* 라벨 레이아웃 - 버튼에 직접 상속 */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    
-      &[aria-disabled="true"] {
-        border: calc(var(--min-side) * 0.03125) dashed var(--primary2-border-color-disabled);
-        cursor: not-allowed;
+    }
+
+    /* 라벨 레이아웃 - 버튼에 직접 상속 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    &[aria-disabled="true"] {
+      border: calc(var(--min-side) * 0.03125) dashed var(--primary2-border-color-disabled);
+      cursor: not-allowed;
+      background-color: var(--primary2-background-color-disabled);
+      color: var(--primary2-content-color-disabled);
+      pointer-events: auto;
+      /* 탭 포커스를 받기 위해 auto */
+
+      /* 비활성 버튼은 pressed 스타일 무시 */
+      &.pressed {
         background-color: var(--primary2-background-color-disabled);
         color: var(--primary2-content-color-disabled);
-        pointer-events: auto; /* 탭 포커스를 받기 위해 auto */
-        
-        /* 비활성 버튼은 pressed 스타일 무시 */
-        &.pressed {
-          background-color: var(--primary2-background-color-disabled);
-          color: var(--primary2-content-color-disabled);
-        }
       }
-  
-      /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
-      &:hover,
-      &:focus-visible{
-        outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
-      }
-      
-      /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
-      &.pressing:not([aria-disabled="true"]) {
-        box-shadow: inset 0 0 6px 1px rgba(0, 0, 0, 0.15);
-        transform: translateY(1px) scale(0.95);
-      }
+    }
+
+    /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
+    &:hover,
+    &:focus-visible {
+      outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
+    }
+
+    /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
+    &.pressing:not([aria-disabled="true"]) {
+      box-shadow: inset 0 0 6px 1px rgba(0, 0, 0, 0.15);
+      transform: translateY(1px) scale(0.95);
+    }
 
     /* ========================================
        팔레트 클래스 - Primary
@@ -1323,23 +1384,29 @@
       background-color: var(--primary1-background-color-default);
       border-color: var(--primary1-border-color-default);
       color: var(--primary1-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--primary1-background-color-pressed);
         border-color: var(--primary1-border-color-pressed);
         color: var(--primary1-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--primary1-background-color-default);
         border-color: var(--primary1-border-color-default);
         color: var(--primary1-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--primary1-background-color-pressed);
         border-color: var(--primary1-border-color-pressed);
         color: var(--primary1-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--primary1-background-color-disabled);
         border-color: var(--primary1-border-color-disabled);
@@ -1351,23 +1418,29 @@
       background-color: var(--primary2-background-color-default);
       border-color: var(--primary2-border-color-default);
       color: var(--primary2-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--primary2-background-color-pressed);
         border-color: var(--primary2-border-color-pressed);
         color: var(--primary2-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--primary2-background-color-default);
         border-color: var(--primary2-border-color-default);
         color: var(--primary2-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--primary2-background-color-pressed);
         border-color: var(--primary2-border-color-pressed);
         color: var(--primary2-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--primary2-background-color-disabled);
         border-color: var(--primary2-border-color-disabled);
@@ -1379,23 +1452,29 @@
       background-color: var(--primary3-background1-color-default);
       border-color: var(--primary3-border-color-default);
       color: var(--primary3-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--primary3-background1-color-pressed);
         border-color: var(--primary3-border-color-pressed);
         color: var(--primary3-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--primary3-background1-color-default);
         border-color: var(--primary3-border-color-default);
         color: var(--primary3-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--primary3-background1-color-pressed);
         border-color: var(--primary3-border-color-pressed);
         color: var(--primary3-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--primary3-background1-color-disabled);
         border-color: var(--primary3-border-color-disabled);
@@ -1411,23 +1490,29 @@
       background-color: var(--secondary1-background-color-default);
       border-color: var(--secondary1-border-color-default);
       color: var(--secondary1-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--secondary1-background-color-pressed);
         border-color: var(--secondary1-border-color-pressed);
         color: var(--secondary1-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--secondary1-background-color-default);
         border-color: var(--secondary1-border-color-default);
         color: var(--secondary1-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--secondary1-background-color-pressed);
         border-color: var(--secondary1-border-color-pressed);
         color: var(--secondary1-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--secondary1-background-color-disabled);
         border-color: var(--secondary1-border-color-disabled);
@@ -1439,23 +1524,29 @@
       background-color: var(--secondary2-background-color-default);
       border-color: var(--secondary2-border-color-default);
       color: var(--secondary2-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--secondary2-background-color-pressed);
         border-color: var(--secondary2-border-color-pressed);
         color: var(--secondary2-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--secondary2-background-color-default);
         border-color: var(--secondary2-border-color-default);
         color: var(--secondary2-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--secondary2-background-color-pressed);
         border-color: var(--secondary2-border-color-pressed);
         color: var(--secondary2-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--secondary2-background-color-disabled);
         border-color: var(--secondary2-border-color-disabled);
@@ -1467,23 +1558,29 @@
       background-color: var(--secondary3-background1-color-default);
       border-color: var(--secondary3-border-color-default);
       color: var(--secondary3-content-color-default);
-      
+
       &.pressed:not(.toggle) {
         background-color: var(--secondary3-background1-color-pressed);
         border-color: var(--secondary3-border-color-pressed);
         color: var(--secondary3-content-color-pressed);
       }
+
       &.toggle {
         background-color: var(--secondary3-background1-color-default);
         border-color: var(--secondary3-border-color-default);
         color: var(--secondary3-content-color-default);
       }
+
       &.toggle.pressed {
         background-color: var(--secondary3-background1-color-pressed);
         border-color: var(--secondary3-border-color-pressed);
         color: var(--secondary3-content-color-pressed);
-        & .icon.pressed { display: var(--content-icon-display-pressed-toggle); }
+
+        & .icon.pressed {
+          display: var(--content-icon-display-pressed-toggle);
+        }
       }
+
       &[aria-disabled="true"] {
         background-color: var(--secondary3-background1-color-disabled);
         border-color: var(--secondary3-border-color-disabled);
@@ -1498,77 +1595,138 @@
       background-color: var(--delete-background-color-default);
       border-color: var(--delete-border-color-default);
       color: var(--delete-content-color-default);
-      
-      &.pressed:not(.toggle), &.pressing {
+
+      &.pressed:not(.toggle),
+      &.pressing {
         background-color: var(--delete-background-color-pressed);
         border-color: var(--delete-border-color-pressed);
         color: var(--delete-content-color-pressed);
       }
+
       &[aria-disabled="true"] {
         background-color: var(--delete-background-color-disabled);
         border-color: var(--delete-border-color-disabled);
         color: var(--delete-content-color-disabled);
       }
     }
-  
+
     /* ========================================
        버튼 크기 (w가로h세로)
        - 색상: 팔레트 클래스 (primary1~3, secondary1~3)
        - 외관: --min-side 비례 자동 계산
        ======================================== */
-    
+
     /* 정사각형 */
-    &.w285h285 { 
-      width: 285px; 
-      height: 285px; 
+    &.w285h285 {
+      width: 285px;
+      height: 285px;
       white-space: nowrap;
       flex-direction: column;
       font-size: var(--font-size-h2);
       font-weight: var(--font-weight-semibold);
-      & .icon { width: 9.6rem; height: 9.6rem; }
-    }
-    &.w080h080 { width: 80px; height: 80px; }
-    &.w076h076 { width: 76px; height: 76px; }
-    &.w070h076 { width: 70px; height: 76px; }
-    
-    /* 메뉴/카드 */
-    &.w328h460 { width: 328px; height: 460px; flex-direction: column; & .icon { width: 25.6rem; height: 25.6rem; } }
-    
-    /* 액션 버튼 */
-    &.w500h120 { width: 500px; height: 120px; }
-    &.w371h120 { width: 371px; height: 120px; }
-    &.w285h090 { width: 285px; height: 90px; }
-    
-    /* 기능 버튼 */
-    &.w242h076 { width: 242px; height: 76px; }
-    &.w199h090 { min-width: 199px; width: fit-content; height: 90px; }
-    &.w113h076 { width: 113px; height: 76px; }
-    &.w080h076 { width: 80px; height: 76px; }
 
-    
+      & .icon {
+        width: 9.6rem;
+        height: 9.6rem;
+      }
+    }
+
+    &.w080h080 {
+      width: 80px;
+      height: 80px;
+    }
+
+    &.w076h076 {
+      width: 76px;
+      height: 76px;
+    }
+
+    &.w070h076 {
+      width: 70px;
+      height: 76px;
+    }
+
+    /* 메뉴/카드 */
+    &.w328h460 {
+      width: 328px;
+      height: 460px;
+      flex-direction: column;
+
+      & .icon {
+        width: 25.6rem;
+        height: 25.6rem;
+      }
+    }
+
+    /* 액션 버튼 */
+    &.w500h120 {
+      width: 500px;
+      height: 120px;
+    }
+
+    &.w371h120 {
+      width: 371px;
+      height: 120px;
+    }
+
+    &.w285h090 {
+      width: 285px;
+      height: 90px;
+    }
+
+    /* 기능 버튼 */
+    &.w242h076 {
+      width: 242px;
+      height: 76px;
+    }
+
+    &.w199h090 {
+      min-width: 199px;
+      width: fit-content;
+      height: 90px;
+    }
+
+    &.w113h076 {
+      width: 113px;
+      height: 76px;
+    }
+
+    &.w080h076 {
+      width: 80px;
+      height: 76px;
+    }
+
+
     /* 동적 크기 */
-    &.w-fit-h070 { width: fit-content; height: 76px; }  
+    &.w-fit-h070 {
+      width: fit-content;
+      height: 76px;
+    }
   }
 
   /* 카테고리 탭 버튼 */
   .category-full {
     & .category {
       position: relative;
-      flex: 1;              /* width: 100% 대신 flex: 1로 남은 공간 차지 */
-      min-width: 0;         /* flex item 축소 허용 */
+      flex: 1;
+      /* width: 100% 대신 flex: 1로 남은 공간 차지 */
+      min-width: 0;
+      /* flex item 축소 허용 */
       height: fit-content;
       display: flex;
       flex-flow: row nowrap;
-      gap: 7px;  /* 최소 7px, 최대 11px */
+      gap: 7px;
+      /* 최소 7px, 최대 11px */
       align-items: center;
-      justify-content: space-between;  /* 기본: 균등 분배 */
-      
+      justify-content: space-between;
+      /* 기본: 균등 분배 */
+
       /* gap이 최대값에 도달하면 왼쪽 정렬 */
       &.compact {
         justify-content: flex-start;
         gap: 11px;
       }
-      
+
       /* 숨겨진 측정용 컨테이너 */
       &.measure {
         position: absolute;
@@ -1576,14 +1734,14 @@
         visibility: hidden;
         pointer-events: none;
       }
-      
+
       & .button {
         position: relative;
         flex: 0 0 auto;
-        
+
         white-space: nowrap;
       }
-      
+
       & .category-separator {
         width: 2px;
         height: 40px;
@@ -1593,7 +1751,9 @@
       }
     }
   }
-} /* @layer components */
+}
+
+/* @layer components */
 
 /* ========================================
    전체 유틸리티 (Utilities)
@@ -1604,15 +1764,20 @@
      Body 팔레트 유틸리티 클래스
      - 테마(Light/Dark) 자동 전환
      ======================================== */
-  
+
   /* Body1: 메인 배경 팔레트 */
   .body1 {
     background-color: var(--body1-background-color);
     border-color: var(--body1-border-color);
     color: var(--body1-content-secondary-color);
 
-    & .primary { color: var(--body1-content-primary-color); }
-    & .secondary { color: var(--body1-content-secondary-color); }
+    & .primary {
+      color: var(--body1-content-primary-color);
+    }
+
+    & .secondary {
+      color: var(--body1-content-secondary-color);
+    }
   }
 
   /* Body2: 콘텐츠 영역 팔레트 */
@@ -1620,10 +1785,21 @@
     background-color: var(--body2-background-color);
     color: var(--body2-secondary2-color);
 
-    & .primary1 { color: var(--body2-primary1-color); }
-    & .primary2 { color: var(--body2-primary2-color); }
-    & .secondary1 { color: var(--body2-secondary1-color); }
-    & .secondary2 { color: var(--body2-secondary2-color); }
+    & .primary1 {
+      color: var(--body2-primary1-color);
+    }
+
+    & .primary2 {
+      color: var(--body2-primary2-color);
+    }
+
+    & .secondary1 {
+      color: var(--body2-secondary1-color);
+    }
+
+    & .secondary2 {
+      color: var(--body2-secondary2-color);
+    }
   }
 
   /* Body3: 배너/강조 영역 팔레트 */
@@ -1648,7 +1824,7 @@
     justify-content: center;
     align-items: center;
     gap: var(--spacing-md);
-  } 
+  }
 
   .banner {
     width: 1080px;
@@ -1671,7 +1847,7 @@
         font-size: 8rem;
       }
     }
-    
+
     &.field {
       height: 70px;
       justify-content: space-between;
@@ -1679,12 +1855,33 @@
       justify-self: center;
       padding-left: 75px;
       padding-right: 75px;
-      
-      & .one-num { width: 113px; text-align: center; }
-      & .one-normal { width: 236px; text-align: center; }
-      & .one-qty-normal { width: 242px; text-align: center;}
-      & .one-price-normal { width: 236px; text-align: center;}
-      & .one-delete-normal { width: 76px; overflow:auto; white-space: nowrap; overflow: visible;}
+
+      & .one-num {
+        width: 113px;
+        text-align: center;
+      }
+
+      & .one-normal {
+        width: 236px;
+        text-align: center;
+      }
+
+      & .one-qty-normal {
+        width: 242px;
+        text-align: center;
+      }
+
+      & .one-price-normal {
+        width: 236px;
+        text-align: center;
+      }
+
+      & .one-delete-normal {
+        width: 76px;
+        overflow: auto;
+        white-space: nowrap;
+        overflow: visible;
+      }
     }
   }
 
@@ -1693,13 +1890,36 @@
      버튼 크기 오버라이드
      ======================================== */
   .low {
+
     /* 주문 목록 레이아웃 */
-    & .order-item { height: 97.5px; justify-content: start; }
-    & .row-line { width: 820px; max-width: 100%; height: 1px; }
-    & .order-image-div { width: 80px; height: 80px; }
-    & .order-image { width: 30px; height: 70px; }
-    & .order-name { left: 145px; }
-    & .order-quantity { left: 360px; }
+    & .order-item {
+      height: 97.5px;
+      justify-content: start;
+    }
+
+    & .row-line {
+      width: 820px;
+      max-width: 100%;
+      height: 1px;
+    }
+
+    & .order-image-div {
+      width: 80px;
+      height: 80px;
+    }
+
+    & .order-image {
+      width: 30px;
+      height: 70px;
+    }
+
+    & .order-name {
+      left: 145px;
+    }
+
+    & .order-quantity {
+      left: 360px;
+    }
   }
 
   /* Hero 섹션 (첫 화면 메인 콘텐츠) */
@@ -1708,6 +1928,9 @@
     flex-flow: column nowrap;
     justify-content: space-evenly;
     align-items: center;
-    flex: 1;  /* 남은 공간 채우기 */
+    flex: 1;
+    /* 남은 공간 채우기 */
   }
-} /* @layer utilities */
+}
+
+/* @layer utilities */

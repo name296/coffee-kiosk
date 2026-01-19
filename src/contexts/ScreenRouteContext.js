@@ -8,6 +8,7 @@ export const ScreenRouteContext = createContext();
 
 export const ScreenRouteProvider = ({ children }) => {
     const [currentPage, setCurrentPageState] = useState('ScreenStart');
+    const [transitionCount, setTransitionCount] = useState(0);
 
     const accessibility = React.useContext(AccessibilityContext); // using React.useContext to avoid adding import if not there
     const order = React.useContext(OrderContext);
@@ -18,6 +19,9 @@ export const ScreenRouteProvider = ({ children }) => {
             to: p,
             timestamp: new Date().toISOString()
         });
+
+        // 페이지 전환 강제 트리거 (동일 페이지 이동 시에도 포커스/TTS 보장)
+        setTransitionCount(c => c + 1);
 
         // 'ScreenStart'로 이동 시 앱 초기화 로직 실행 (사용자 요구사항: 모든 스타트 이동은 초기화와 동등)
         if (p === 'ScreenStart') {
@@ -51,25 +55,21 @@ export const ScreenRouteProvider = ({ children }) => {
     // 스크린 전환 시 자동으로 .main에 포커스 설정 및 TTS 재생 (원천적 통일)
     const lastPageRef = useRef(null);
     useLayoutEffect(() => {
-        // 페이지가 실제로 변경되었을 때만 포커스 설정 (중복 방지)
-        if (lastPageRef.current === currentPage) {
-            console.log('[포커스] ScreenRouteProvider 스킵 (페이지 변경 없음)', { currentPage });
-            return;
-        }
-
+        // transitionCount가 변경되면 무조건 실행 (동일 페이지 이동 포함)
         const prevPage = lastPageRef.current;
         lastPageRef.current = currentPage;
 
-        console.log('[포커스] ScreenRouteProvider 페이지 변경 감지', {
+        console.log('[포커스] ScreenRouteProvider 페이지 상태 확인', {
             from: prevPage,
             to: currentPage,
+            transitionCount,
             timestamp: new Date().toISOString()
         });
 
         // 모든 화면에서 .main에 자동 포커스 설정 (포커스 TTS 로직 통일)
         console.log('[포커스] ScreenRouteProvider → focusMainElement 실행 (동기 처리)');
         focusMainElement();
-    }, [currentPage]);
+    }, [currentPage, transitionCount]);
 
     const value = useMemo(() => ({
         currentPage,

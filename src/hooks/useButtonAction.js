@@ -9,7 +9,7 @@ import {
     handleCancelAction,
     handleReceiptAction,
     handleTabNavAction,
-    handleCategoryNavAction,
+    handleCategoryAction,
     handleModalAction
 } from "../utils/actionUtils";
 
@@ -46,7 +46,7 @@ export const useButtonAction = (actionType, actionTarget, actionMethod, disabled
                 handleTabNavAction(order.handlePreviousTab, order.handleNextTab, actionTarget);
                 break;
             case 'categoryNav':
-                handleCategoryNavAction(order.handleCategoryPageNav, actionTarget);
+                handleCategoryAction(order.handleCategoryPageNav, actionTarget);
                 break;
             case 'modal':
                 handleModalAction(accessibility, actionTarget, buttonLabel, buttonIcon);
