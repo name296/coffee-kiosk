@@ -1,14 +1,14 @@
 import React, { memo, useContext, useCallback, useRef, useEffect } from "react";
 import Button from "./Button";
 import { HomeIcon, TimeIcon, WheelchairIcon } from "../../Icon";
-import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
 import { AccessibilityContext } from "../../contexts/AccessibilityContext";
+import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
 import { OrderContext } from "../../contexts/OrderContext";
 import { useIdleTimeout } from "../../hooks/useIdleTimeout";
 import { initializeApp } from "../../utils/appUtils";
 
 const Bottom = memo(({ systemControlsRef }) => {
-    const route = useContext(ScreenRouteContext);
+    const { currentPage, navigateTo } = useContext(ScreenRouteContext);
     const accessibility = useContext(AccessibilityContext);
     const order = useContext(OrderContext);
 
@@ -17,7 +17,7 @@ const Bottom = memo(({ systemControlsRef }) => {
     const isTimeoutEnabled = true; // 모든 화면에서 타임아웃 활성화
 
     const onTimeout = useCallback(() => {
-        console.log('[타이머] onTimeout 호출됨', { currentPage: route.currentPage });
+        console.log('[타이머] onTimeout 호출됨', { currentPage });
 
         // 타임아웃 발생 시 항상 초기화 실행 (모든 화면에서 시작화면으로 이동)
         const callbacks = {
@@ -30,11 +30,11 @@ const Bottom = memo(({ systemControlsRef }) => {
             setVolume: accessibility.setVolume,
             setIsLarge: accessibility.setIsLarge,
             setIsLow: accessibility.setIsLow,
-            setCurrentPage: route.setCurrentPage
+            setCurrentPage: (p) => navigateTo(p)
         };
         console.log('[타이머] initializeApp 호출 시작', {
             callbacks: Object.keys(callbacks),
-            currentPage: route.currentPage
+            currentPage
         });
         initializeApp(callbacks);
         console.log('[타이머] initializeApp 호출 완료');
@@ -55,7 +55,7 @@ const Bottom = memo(({ systemControlsRef }) => {
                 }
             }
         });
-    }, [accessibility, order, route]);
+    }, [accessibility, order, currentPage, navigateTo]);
 
     // 타임아웃 모달 상태 체크 함수 (useIdleTimeout에 전달)
     const checkTimeoutModal = useCallback(() => {
@@ -83,7 +83,7 @@ const Bottom = memo(({ systemControlsRef }) => {
         if (remainingTime > 0 && remainingTime <= 20000 && !hasShownWarningRef.current && !accessibility.ModalTimeout?.isOpen) {
             hasShownWarningRef.current = true;
 
-            if (route.currentPage === 'ScreenStart') {
+            if (currentPage === 'ScreenStart') {
                 // ScreenStart: 모달 없이 포커스 기반 TTS 재생
                 // 20초 경고 시 TTS 재생하지 않음 (초기화 시에만 TTS 재생)
                 console.log('[타이머] ScreenStart 20초 경고 - TTS 재생하지 않음');
@@ -98,7 +98,7 @@ const Bottom = memo(({ systemControlsRef }) => {
         if (remainingTime > 20000) {
             hasShownWarningRef.current = false;
         }
-    }, [remainingTime, accessibility.ModalTimeout, route.currentPage]);
+    }, [remainingTime, accessibility.ModalTimeout, currentPage]);
 
     const openModalManually = useCallback(() => {
         if (accessibility.ModalTimeout) {
@@ -112,8 +112,7 @@ const Bottom = memo(({ systemControlsRef }) => {
                 className="down-footer-button btn-home"
                 svg={<HomeIcon />}
                 label="시작화면"
-                actionType="modal"
-                actionTarget="Restart"
+                modal="Restart"
             />
             <Button
                 className="down-footer-button"
@@ -122,7 +121,7 @@ const Bottom = memo(({ systemControlsRef }) => {
                 onClick={openModalManually}
                 disabled={!isTimeoutEnabled}
             />
-            <Button className="down-footer-button" svg={<WheelchairIcon />} label="접근성" actionType="modal" actionTarget="Accessibility" />
+            <Button className="down-footer-button" svg={<WheelchairIcon />} label="접근성" modal="Accessibility" />
         </div>
     );
 });

@@ -7,10 +7,9 @@ import { formatNumber, convertToKoreanQuantity } from "../../utils/format";
 
 const Summary = memo(({ orderSummaryRef }) => {
     const order = useContext(OrderContext);
-    const route = useContext(ScreenRouteContext);
+    const { currentPage } = useContext(ScreenRouteContext);
     const totalCount = order?.totalCount || 0;
     const totalSum = order?.totalSum || 0;
-    const currentPage = route?.currentPage || 'ScreenStart';
 
     const [isDisabledBtn, setIsDisabledBtn] = useState(true);
 
@@ -44,16 +43,14 @@ const Summary = memo(({ orderSummaryRef }) => {
                             className="w199h090"
                             svg={<ResetIcon className="summary-btn-icon" />}
                             label="초기화"
-                            actionType="modal"
-                            actionTarget="Reset"
+                            modal="Reset"
                         />
                         <Button
                             className="w199h090 primary1"
                             svg={<OrderIcon className="summary-btn-icon" />}
                             label="주문"
                             disabled={isDisabledBtn}
-                            actionType="navigate"
-                            actionTarget="ScreenDetails"
+                            navigate="ScreenDetails"
                         />
                     </>
                 )}
@@ -63,15 +60,13 @@ const Summary = memo(({ orderSummaryRef }) => {
                             className="w199h090"
                             svg={<AddIcon className="summary-btn-icon" />}
                             label="메뉴"
-                            actionType="navigate"
-                            actionTarget="ScreenMenu"
+                            navigate="ScreenMenu"
                         />
                         <Button
                             className="w199h090 primary1"
                             svg={<PayIcon className="summary-btn-icon" />}
                             label="결제"
-                            actionType="navigate"
-                            actionTarget="ScreenPayments"
+                            navigate="ScreenPayments"
                         />
                     </>
                 )}

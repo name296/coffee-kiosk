@@ -2,12 +2,11 @@ import React, { memo, useMemo } from "react";
 import Button from "./Button";
 
 // 카테고리 탭 버튼
-const CategoryTab = memo(({ tab, isSelected }) => (
+const CategoryTab = memo(({ tab, isSelected, onSelect }) => (
     <Button
         toggle
         pressed={isSelected}
-        actionType="selectTab"
-        actionTarget={tab.name}
+        onClick={() => onSelect(tab.name)}
         label={tab.name}
     />
 ));
@@ -16,8 +15,8 @@ CategoryTab.displayName = 'CategoryTab';
 // 카테고리 네비게이션
 const CategorySeparator = () => <span className="category-separator" aria-hidden="true" />;
 
-const Category = memo(({ categories, selectedTab, pagination, containerRef, measureRef, convertToKoreanQuantity, categoryNavRef }) => {
-    const { catPage, catTotal, catItems, catHasPrev, catHasNext, isCompact, isReady } = pagination;
+const Category = memo(({ categories, selectedTab, onSelectTab, pagination, containerRef, measureRef, convertToKoreanQuantity, categoryNavRef }) => {
+    const { catPage, catTotal, catItems, catHasPrev, catHasNext, catPrev, catNext, isCompact, isReady } = pagination;
 
     // category 클래스 메모이제이션 (isCompact 변경 시에만 재계산)
     const categoryClassName = useMemo(() => `category${isCompact ? ' compact' : ''}`, [isCompact]);
@@ -33,7 +32,7 @@ const Category = memo(({ categories, selectedTab, pagination, containerRef, meas
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="이전" className="w113h076 secondary1" disabled={!catHasPrev} actionType="categoryNav" actionTarget="prev" ttsText="이전" />
+            <Button toggle label="이전" className="w113h076 secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
             <div
                 className={categoryClassName}
                 ref={containerRef}
@@ -41,12 +40,12 @@ const Category = memo(({ categories, selectedTab, pagination, containerRef, meas
             >
                 {catItems.map((tab, idx) => (
                     <React.Fragment key={tab.id}>
-                        <CategoryTab tab={tab} isSelected={selectedTab === tab.name} />
+                        <CategoryTab tab={tab} isSelected={selectedTab === tab.name} onSelect={onSelectTab} />
                         {idx < catItems.length - 1 && <CategorySeparator />}
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="다음" className="w113h076 secondary1" disabled={!catHasNext} actionType="categoryNav" actionTarget="next" ttsText="다음" />
+            <Button toggle label="다음" className="w113h076 secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
         </div>
     );
 });

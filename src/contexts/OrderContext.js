@@ -1,7 +1,7 @@
 import React, { createContext, useState, useCallback, useMemo, useRef } from "react";
 import { useMenuData } from "../hooks/useMenuData";
+import { categorizeMenu } from "../utils/menuUtils";
 import {
-    categorizeMenu,
     calculateSum,
     calculateTotal,
     createOrderItems,
@@ -114,7 +114,7 @@ export const OrderProvider = ({ children }) => {
         tabs, totalMenuItems, categoryInfo, menuItems, selectedTab, setSelectedTab, menuLoading,
         // 주문 상태
         quantities, setQuantities, handleIncrease, handleDecrease, handleDelete,
-        totalCount, totalSum, filterMenuItems, createOrderItems,
+        totalCount, totalSum, orderItems, filterMenuItems, createOrderItems,
         convertToKoreanQuantity, calculateSum, calculateTotal,
         // 결제
         sendOrderDataToApp, sendPrintReceiptToApp, sendCancelPayment, updateOrderNumber,

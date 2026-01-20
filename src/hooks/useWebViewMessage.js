@@ -2,7 +2,7 @@ import { useEffect, useContext } from "react";
 import { ScreenRouteContext } from "../contexts/ScreenRouteContext";
 
 export const useWebViewMessage = () => {
-    const route = useContext(ScreenRouteContext);
+    const { navigateTo } = useContext(ScreenRouteContext);
 
     useEffect(() => {
         if (!window.chrome?.webview) return;
@@ -10,8 +10,8 @@ export const useWebViewMessage = () => {
         const hm = (e) => {
             let d = e.data;
             if (d.arg.result === 'SUCCESS') {
-                if (d.Command === 'PAY') route.setCurrentPage('ScreenCardRemoval');
-                if (d.Command === 'PRINT') route.setCurrentPage('ScreenOrderComplete');
+                if (d.Command === 'PAY') navigateTo('ScreenCardRemoval');
+                if (d.Command === 'PRINT') navigateTo('ScreenOrderComplete');
             } else {
                 console.log(d.arg.errorMessage);
             }
@@ -23,5 +23,5 @@ export const useWebViewMessage = () => {
                 window.chrome.webview.removeEventListener("message", hm);
             }
         };
-    }, [route]);
+    }, [navigateTo]);
 };

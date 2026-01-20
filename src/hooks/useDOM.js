@@ -1,7 +1,37 @@
 import { useCallback, useContext } from "react";
 import { RefContext } from "../contexts/RefContext";
 import { TTSStateContext } from "../contexts/TTSContext";
-import { safeQuerySelector, focusMainElement } from "../utils/dom";
+
+/**
+ * DOM 유틸리티 (에러 방지 및 일관된 포커스 제어)
+ */
+export const safeQuerySelector = (s, c = null) => {
+    try {
+        if (typeof document === 'undefined') return null;
+        return (c || document).querySelector(s);
+    } catch { return null; }
+};
+
+export const focusMainElement = () => {
+    if (typeof document === 'undefined') return;
+    const mainElement = document.querySelector('.main');
+    if (mainElement) {
+        const prevActive = document.activeElement;
+        const prevActiveInfo = prevActive ? {
+            tagName: prevActive.tagName,
+            className: prevActive.className,
+            id: prevActive.id || null
+        } : null;
+
+        console.log('[포커스] focusMainElement 호출', {
+            from: prevActiveInfo,
+            to: { tagName: mainElement.tagName, className: mainElement.className },
+            timestamp: new Date().toISOString()
+        });
+
+        mainElement.focus();
+    }
+};
 
 export const useDOM = () => {
     const refsData = useContext(RefContext) || {};

@@ -1,6 +1,9 @@
-import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect } from "react";
+import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
 import { useSound } from "../../hooks/useSound";
-import { useButtonAction, isActionKey } from "../../hooks/useButtonAction";
+import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
+import { AccessibilityContext } from "../../contexts/AccessibilityContext";
+
+export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
 // 포커스 가능한 요소에 --min-side 계산
 const applyFocusableMinSide = (el) => {
@@ -25,25 +28,22 @@ const Button = memo(({
     selectedValue,
     onChange,
     navigate,
-    payment,
-    actionType,
-    actionTarget,
-    actionMethod,
+    modal,
     onClick,
     onPressed,
     onPointed,
     ttsText,
     ...rest
 }) => {
-    // 공통 패턴 프롭화: navigate와 payment를 actionType/actionTarget으로 변환
-    const finalActionType = navigate ? 'navigate' : payment ? 'payment' : actionType;
-    const finalActionTarget = navigate || actionTarget;
-    const finalActionMethod = payment || actionMethod;
     // 각 Button 인스턴스마다 자체 ref 생성
     const btnRef = useRef(null);
     const [isPressing, setIsPressing] = useState(false);
     const isPressingRef = useRef(false);
     const { play: playSound } = useSound();
+
+    // Context 직접 주입 (Zero-Abstraction)
+    const { navigateTo } = useContext(ScreenRouteContext);
+    const accessibility = useContext(AccessibilityContext);
 
     // pressed 계산: value와 selectedValue가 제공되면 자동 계산, 아니면 pressed prop 사용
     const pressed = useMemo(() => {
@@ -57,8 +57,7 @@ const Button = memo(({
         isPressingRef.current = isPressing;
     }, [isPressing]);
 
-
-    // SVG에서 아이콘 이름 추출 (단일책임: 아이콘 이름 추출만)
+    // SVG에서 아이콘 이름 추출
     const getIconNameFromSvg = useMemo(() => {
         if (!svg || typeof svg !== 'object') return null;
         const componentName = svg.type?.name || '';
@@ -69,27 +68,20 @@ const Button = memo(({
     }, [svg]);
 
     const buttonIcon = getIconNameFromSvg;
-    const buttonLabel = label;
 
-    // 버튼 액션 핸들러
-    const handleAction = useButtonAction(finalActionType, finalActionTarget, finalActionMethod, disabled, buttonLabel, buttonIcon);
-
-    // 버튼 최소 크기 적용 (단일책임: 크기 적용만)
+    // 버튼 최소축-> 최소축 비례 스타일 적용
     useLayoutEffect(() => {
         if (btnRef.current) {
             applyFocusableMinSide(btnRef.current);
-            // ResizeObserver로 크기 변경 감지
             const resizeObserver = new ResizeObserver(() => {
-                if (btnRef.current) {
-                    applyFocusableMinSide(btnRef.current);
-                }
+                if (btnRef.current) applyFocusableMinSide(btnRef.current);
             });
             resizeObserver.observe(btnRef.current);
             return () => resizeObserver.disconnect();
         }
     }, []);
 
-    // TTS 텍스트 생성 (단일책임: TTS 텍스트 생성만)
+    // TTS 텍스트 생성
     const finalTtsText = useMemo(() => {
         const baseText = (ttsText !== undefined && ttsText !== null) ? ttsText : (label !== undefined && label !== null) ? label : '';
         if (baseText === '') return '';
@@ -109,7 +101,7 @@ const Button = memo(({
         return disabled ? `${cleanedText}, 비활성, ` : cleanedText;
     }, [ttsText, label, toggle, pressed, disabled]);
 
-    // 버튼 클래스명 생성 (단일책임: 클래스명 생성만)
+    // 버튼 클래스명 생성
     const cls = useMemo(() => {
         const c = ['button'];
         if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
@@ -120,12 +112,11 @@ const Button = memo(({
         return c.join(' ');
     }, [className, toggle, pressed, isPressing]);
 
-    // 버튼 시작 이벤트 핸들러 (단일책임: pressed 상태 설정 및 사운드 재생만)
+    // 버튼 시작 이벤트 핸들러
     const onStart = useCallback((e) => {
         if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
-        if (e.type === 'keydown') {
-            e.preventDefault();
-        }
+        if (e.type === 'keydown') e.preventDefault();
+
         setIsPressing(true);
         onPressed?.(true);
 
@@ -134,21 +125,33 @@ const Button = memo(({
         }
     }, [disabled, onPressed, playSound]);
 
-    // 버튼 종료 이벤트 핸들러 (단일책임: pressed 상태 해제 및 액션 실행만)
+    // 버튼 종료 이벤트 핸들러
     const onEnd = useCallback((e) => {
         if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
         if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
+
         setIsPressing(false);
         onPressed?.(false);
 
         if (onChange && selectedValue !== undefined) {
             onChange(selectedValue);
-        } else if (finalActionType) {
-            handleAction(e);
         } else {
-            onClick?.(e);
+            // 프레임워크 액션 직접 실행
+            if (navigate) {
+                navigateTo(navigate);
+            }
+            if (modal) {
+                const modalInstance = accessibility[`Modal${modal}`];
+                if (modalInstance) {
+                    modalInstance.open(label, buttonIcon);
+                }
+            }
+            // 사용자 정의 핸들러 병렬 실행
+            if (onClick) {
+                onClick(e);
+            }
         }
-    }, [disabled, finalActionType, handleAction, onClick, onChange, selectedValue, onPressed]);
+    }, [disabled, navigate, modal, navigateTo, accessibility, label, buttonIcon, onClick, onChange, selectedValue, onPressed]);
 
     return (
         <button

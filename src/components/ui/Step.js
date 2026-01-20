@@ -84,8 +84,7 @@ const Step5 = () => (
 );
 
 const Step = memo(() => {
-    const route = useContext(ScreenRouteContext);
-    const currentPage = route?.currentPage || 'ScreenStart';
+    const { currentPage } = useContext(ScreenRouteContext);
 
     if (currentPage === 'ScreenMenu') {
         return <Step1 />;

@@ -13,13 +13,12 @@ import { ScreenRouteProvider } from "./contexts/ScreenRouteContext";
 // Initializers
 import {
   ButtonHandlerInitializer,
-  SizeControlInitializer,
   ViewportInitializer,
   AppFocusTrapInitializer
 } from "./components/initializers/Initializers";
 
 // Components
-import { ScreenRenderer } from "./components/ScreenRenderer";
+import Screen from "./components/ui/Screen";
 import { ModalContainer } from "./components/ui/Modal";
 
 // ============================================================================
@@ -87,10 +86,9 @@ const App = () => {
                   <ButtonGroupProvider>
                     <ScreenRouteProvider>
                       <ButtonHandlerInitializer />
-                      <SizeControlInitializer />
                       <ViewportInitializer />
                       <AppFocusTrapInitializer />
-                      <ScreenRenderer />
+                      <Screen />
                       <ModalContainer />
                     </ScreenRouteProvider>
                   </ButtonGroupProvider>
