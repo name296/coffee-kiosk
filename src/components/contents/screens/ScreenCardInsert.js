@@ -19,13 +19,6 @@ const ScreenCardInsert = memo(() => {
         systemControls: systemControlsRef
     });
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            navigateTo('ScreenCardRemoval');
-        }, 5000);
-        return () => clearTimeout(timer);
-    }, [navigateTo]);
-
     return (
         <>
             <div className="title">
@@ -33,10 +26,10 @@ const ScreenCardInsert = memo(() => {
                 <div><span className="primary">신용카드</span>를 끝까지 넣으세요</div>
             </div>
             <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
-            <div ref={actionBarRef} className="task-manager">
-                <Button className="w500h120" navigate="ScreenPayments" label="취소" />
-                <Button className="w500h120" modal="ModalPaymentError" label="가상, 결제오류" />
-                <Button className="w500h120" navigate="ScreenCardRemoval" label="가상, 카드제거" />
+            <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리. 버튼 세 개,">
+                <Button className="w371h120" navigate="ScreenPayments" label="취소" />
+                <Button style={{ height: "120px" }} modal="ModalPaymentError" label="가상오류" />
+                <Button style={{ height: "120px" }} navigate="ScreenCardRemoval" label="가상투입" />
             </div>
         </>
     );

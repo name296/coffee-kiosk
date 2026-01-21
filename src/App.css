@@ -853,10 +853,6 @@
       padding-top: var(--height-title);
       padding-bottom: 182px;
 
-      &.card-remove {
-        padding-bottom: 454px;
-      }
-
       & .payment {
         width: 100%;
         height: 100%;
