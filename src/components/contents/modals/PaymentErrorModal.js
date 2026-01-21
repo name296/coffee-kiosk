@@ -1,16 +1,16 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "../../ui/Modal";
-import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 
 export const PaymentErrorModal = memo(({ onConfirm }) => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     return (
         <BaseModal
-            isOpen={accessibility.ModalPaymentError.isOpen}
+            isOpen={modal.ModalPaymentError.isOpen}
             type="paymentError"
             onCancel={() => { }} // 취소 없음
             onConfirm={() => {
-                accessibility.ModalPaymentError.close();
+                modal.ModalPaymentError.close();
                 onConfirm?.();
             }}
         />

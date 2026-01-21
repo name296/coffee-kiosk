@@ -664,6 +664,12 @@
     border-color: var(--body2-border-color);
     color: var(--body1-content-secondary-color);
 
+    &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+    &:focus-visible {
+      outline: 12px dashed var(--border-color-pointed);
+      outline-offset: -12px;
+    }
+
     /* 모달 변형 (SCSS 네스티드) */
     &.modal {
       position: relative;

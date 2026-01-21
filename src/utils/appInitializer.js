@@ -1,6 +1,4 @@
-
 // 애플리케이션 초기화 유틸리티
-// (타임아웃, 초기화 버튼 등에서 사용)
 export const initializeApp = (callbacks) => {
     if (!callbacks) return;
 
@@ -37,11 +35,7 @@ export const initializeApp = (callbacks) => {
 
     // 접근성 설정 초기화
     setIsDark?.(false);
-    setVolume?.(1); // 기본 볼륨 1 (최대) -> 요구사항에 따라 0.5(1) 또는 1(3) 확인 필요. 
-    // 기존 코드에서는 handleInitialSettingsPress에서 1로 설정함.
-    // volume 1은 "약"? 아니면 인덱스? 
-    // useAccessibilitySettings.js: volume state is 0, 1, 2, 3. 
-    // 1 is default?
+    setVolume?.(1);
     setIsLarge?.(false);
     setIsLow?.(false);
 

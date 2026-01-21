@@ -1,15 +1,15 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "../../ui/Modal";
-import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 
 export const CallModal = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     return (
         <BaseModal
-            isOpen={accessibility.ModalCall.isOpen}
+            isOpen={modal.ModalCall.isOpen}
             type="call"
-            onCancel={() => accessibility.ModalCall.close()}
-            onConfirm={() => accessibility.ModalCall.close()}
+            onCancel={() => modal.ModalCall.close()}
+            onConfirm={() => modal.ModalCall.close()}
         />
     );
 });

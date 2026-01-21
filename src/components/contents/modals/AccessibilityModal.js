@@ -4,15 +4,17 @@ import Button from "../../ui/Button";
 import Icon from "../../../Icon";
 import Highlight from "../../ui/Highlight";
 import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 import { RefContext } from "../../../contexts/RefContext";
 import { useAccessibilitySettings } from "../../../hooks/useAccessibilitySettings";
 import { useDOM } from "../../../hooks/useDOM";
 
 export const AccessibilityModal = memo(() => {
     const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     const refsData = useContext(RefContext);
     const { setAudioVolume } = useDOM();
-    const isOpen = accessibility.ModalAccessibility.isOpen;
+    const isOpen = modal.ModalAccessibility.isOpen;
 
     // 접근성 설정 로직 (Hook)
     const {
@@ -82,13 +84,13 @@ export const AccessibilityModal = memo(() => {
             accessibility.setIsLow(original.isLow);
             setAudioVolume('audioPlayer', ({ 0: 0, 1: 0.5, 2: 0.75, 3: 1 })[original.volume]);
         }
-        accessibility.ModalAccessibility.close();
-    }, [originalSettingsRef, accessibility, setAudioVolume]);
+        modal.ModalAccessibility.close();
+    }, [originalSettingsRef, accessibility, modal, setAudioVolume]);
 
     const handleConfirmPress = useCallback(() => {
         accessibility.setAccessibility(currentSettings);
-        accessibility.ModalAccessibility.close();
-    }, [currentSettings, accessibility]);
+        modal.ModalAccessibility.close();
+    }, [currentSettings, accessibility, modal]);
 
     if (!isOpen) return null;
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
 import { useSound } from "../../hooks/useSound";
 import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
-import { AccessibilityContext } from "../../contexts/AccessibilityContext";
+import { ModalContext } from "../../contexts/ModalContext";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
@@ -43,7 +43,7 @@ const Button = memo(({
 
     // Context 직접 주입 (Zero-Abstraction)
     const { navigateTo } = useContext(ScreenRouteContext);
-    const accessibility = useContext(AccessibilityContext);
+    const modalContext = useContext(ModalContext);
 
     // pressed 계산: value와 selectedValue가 제공되면 자동 계산, 아니면 pressed prop 사용
     const pressed = useMemo(() => {
@@ -141,7 +141,7 @@ const Button = memo(({
                 navigateTo(navigate);
             }
             if (modal) {
-                const modalInstance = accessibility[`Modal${modal}`];
+                const modalInstance = modalContext?.[`Modal${modal}`];
                 if (modalInstance) {
                     modalInstance.open(label, buttonIcon);
                 }
@@ -151,7 +151,7 @@ const Button = memo(({
                 onClick(e);
             }
         }
-    }, [disabled, navigate, modal, navigateTo, accessibility, label, buttonIcon, onClick, onChange, selectedValue, onPressed]);
+    }, [disabled, navigate, modal, navigateTo, modalContext, label, buttonIcon, onClick, onChange, selectedValue, onPressed]);
 
     return (
         <button

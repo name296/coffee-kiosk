@@ -10,7 +10,7 @@ const formatRemainingTime = (ms) => {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-export const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true, checkTimeoutModal = null) => {
+export const useIdleTimeout = (onTimeout, timeout, enabled = true, checkTimeoutModal = null) => {
     const timerRef = useRef(null);
     const intervalRef = useRef(null);
     const lastActivityRef = useRef(Date.now());
@@ -102,22 +102,6 @@ export const useIdleTimeout = (onTimeout, timeout = 300000, enabled = true, chec
         intervalRef.current = setInterval(() => {
             // 타임아웃 모달 상태 확인
             const isTimeoutModalOpen = checkTimeoutModalRef.current ? checkTimeoutModalRef.current() : false;
-
-            /* 타임아웃 모달이 닫혔는데 20초로 설정되어 있으면 기본 타임아웃(2분)으로 리셋
-            if (!isTimeoutModalOpen && currentTimeoutRef.current === 20000) {
-                const resetTime = timeoutRef.current || timeout;
-                const resetTimeMs = Date.now();
-                lastActivityRef.current = resetTimeMs;
-                currentTimeoutRef.current = resetTime;
-                console.log('[타이머] 모달 닫힘 → 기본 타임아웃으로 리셋', { resetTime, resetTimeMs });
-                if (timerRef.current) {
-                    clearTimeout(timerRef.current);
-                }
-                timerRef.current = setTimeout(() => {
-                    if (onTimeoutRef.current) onTimeoutRef.current();
-                }, resetTime);
-            }
-            */
 
             // 경과 시간 계산 및 남은 시간 업데이트 (항상 실행)
             const now = Date.now();

@@ -5,6 +5,7 @@ import Pagination from "../../ui/Pagination";
 
 import { OrderContext } from "../../../contexts/OrderContext";
 import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 import { ScreenRouteContext } from "../../../contexts/ScreenRouteContext";
 import { useFocusableSectionsManager } from "../../../hooks/useFocusManagement";
 import { usePagination } from "../../../hooks/usePagination";
@@ -13,6 +14,7 @@ import { convertToKoreanQuantity } from "../../../utils/format";
 const ScreenDetails = memo(() => {
     const order = useContext(OrderContext);
     const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     const { navigateTo } = useContext(ScreenRouteContext);
 
     const actionBarRef = useRef(null);
@@ -65,8 +67,8 @@ const ScreenDetails = memo(() => {
     const handleItemDecrease = (itemId, currentItemsLength) => (e) => {
         e.preventDefault(); e.currentTarget.focus();
         if (order.quantities[itemId] === 1) {
-            accessibility.setModalDeleteItemId(itemId);
-            (order.orderItems.length > 1) ? accessibility.ModalDelete.open() : accessibility.ModalDeleteCheck.open();
+            modal.setModalDeleteItemId(itemId);
+            (order.orderItems.length > 1) ? modal.ModalDelete.open() : modal.ModalDeleteCheck.open();
         } else {
             order.handleDecrease(itemId);
         }
@@ -79,8 +81,8 @@ const ScreenDetails = memo(() => {
 
     const handleItemDelete = (itemId, currentItemsLength) => (e) => {
         e.preventDefault(); e.currentTarget.focus();
-        accessibility.setModalDeleteItemId(itemId);
-        (order.orderItems.length > 1) ? accessibility.ModalDelete.open() : accessibility.ModalDeleteCheck.open();
+        modal.setModalDeleteItemId(itemId);
+        (order.orderItems.length > 1) ? modal.ModalDelete.open() : modal.ModalDeleteCheck.open();
     };
 
     return (

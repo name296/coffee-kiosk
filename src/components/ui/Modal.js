@@ -5,6 +5,7 @@ import Highlight, { H } from "./Highlight";
 import { TTS } from "../../constants/constants";
 import { RefContext } from "../../contexts/RefContext";
 import { AccessibilityContext } from "../../contexts/AccessibilityContext";
+import { ModalContext } from "../../contexts/ModalContext";
 import { OrderContext } from "../../contexts/OrderContext";
 import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
@@ -164,31 +165,31 @@ BaseModal.displayName = 'BaseModal';
 
 // 모달 컨테이너 (전역 프레임 주입부)
 export const ModalContainer = () => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
 
-    if (!accessibility) return null;
+    if (!modal) return null;
 
     const isAnyModalOpen = [
-        accessibility.ModalRestart.isOpen,
-        accessibility.ModalAccessibility.isOpen,
-        accessibility.ModalReset.isOpen,
-        accessibility.ModalDelete.isOpen,
-        accessibility.ModalDeleteCheck.isOpen,
-        accessibility.ModalCall.isOpen,
-        accessibility.ModalTimeout.isOpen,
-        accessibility.ModalPaymentError.isOpen
+        modal.ModalRestart.isOpen,
+        modal.ModalAccessibility.isOpen,
+        modal.ModalReset.isOpen,
+        modal.ModalDelete.isOpen,
+        modal.ModalDeleteCheck.isOpen,
+        modal.ModalCall.isOpen,
+        modal.ModalTimeout.isOpen,
+        modal.ModalPaymentError.isOpen
     ].some(Boolean);
 
     return (
         <div className={`modal-overlay ${isAnyModalOpen ? 'active' : ''}`} aria-hidden="true">
-            {accessibility.ModalRestart.isOpen && <RestartModal />}
-            {accessibility.ModalReset.isOpen && <ResetModal />}
-            {accessibility.ModalCall.isOpen && <CallModal />}
-            {accessibility.ModalAccessibility.isOpen && <AccessibilityModal />}
-            {accessibility.ModalDelete.isOpen && <DeleteModal />}
-            {accessibility.ModalDeleteCheck.isOpen && <DeleteCheckModal />}
-            {accessibility.ModalTimeout.isOpen && <TimeoutModal />}
-            {accessibility.ModalPaymentError.isOpen && <PaymentErrorModal />}
+            {modal.ModalRestart.isOpen && <RestartModal />}
+            {modal.ModalReset.isOpen && <ResetModal />}
+            {modal.ModalCall.isOpen && <CallModal />}
+            {modal.ModalAccessibility.isOpen && <AccessibilityModal />}
+            {modal.ModalDelete.isOpen && <DeleteModal />}
+            {modal.ModalDeleteCheck.isOpen && <DeleteCheckModal />}
+            {modal.ModalTimeout.isOpen && <TimeoutModal />}
+            {modal.ModalPaymentError.isOpen && <PaymentErrorModal />}
         </div>
     );
 };

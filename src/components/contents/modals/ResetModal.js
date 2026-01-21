@@ -1,19 +1,19 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "../../ui/Modal";
-import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 import { OrderContext } from "../../../contexts/OrderContext";
 
 export const ResetModal = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     const order = useContext(OrderContext);
 
     return (
         <BaseModal
-            isOpen={accessibility.ModalReset.isOpen}
+            isOpen={modal.ModalReset.isOpen}
             type="reset"
-            onCancel={() => accessibility.ModalReset.close()}
+            onCancel={() => modal.ModalReset.close()}
             onConfirm={() => {
-                accessibility.ModalReset.close();
+                modal.ModalReset.close();
                 order?.setQuantities?.({});
             }}
         />

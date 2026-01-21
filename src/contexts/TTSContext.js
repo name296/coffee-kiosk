@@ -1,24 +1,12 @@
 import React, { createContext, useState, useCallback, useMemo, useRef, useContext, useEffect, memo } from "react";
 
 // TTS Database Context - IndexedDB 관리 (TTS 오디오 파일 캐싱)
-// 레벨: 서버 상태/데이터 레벨
-// 의존성: 없음 (독립)
-// 사용처: useTextHandler, ScreenStart (직접), Screen 컴포넌트들 (간접)
-// 제공 값: db, initDB, getFromDB, saveToDB
-// Provider 위치: 최상위, ScreenRouteProvider보다 바깥 (TTSDBProvider)
 export const TTSDBContext = createContext();
 
 // TTS State Context - TTS 재생 상태 관리
-// 레벨: 서버 상태/데이터 레벨
-// 의존성: 없음 (독립, 하지만 useTextHandler가 TTSDBContext와 함께 사용)
-// 사용처: useTextHandler, TTSAudioPlayer, Screen 컴포넌트들 (간접)
-// 제공 값: isPlaying, setIsPlaying, replayText, setReplayText, requestIdRef, audioSrc, setAudioSrc, audioPlaybackRate, setAudioPlaybackRate, audioVolume, setAudioVolume, shouldPlay, setShouldPlay, audioPlayerRef, hasUserInteracted, setHasUserInteracted
-// Provider 위치: TTSDBProvider 내부, ScreenRouteProvider보다 바깥 (TTSStateProvider)
 export const TTSStateContext = createContext();
 
 // TTS Audio Player 컴포넌트 (React 방식으로 TTS 재생 관리)
-// 의존성: TTSStateContext
-// 사용처: TTSStateProvider 내부 (Provider 안에서 Context 사용, JSX 방식)
 const TTSAudioPlayer = memo(() => {
     const ttsState = useContext(TTSStateContext);
     const audioPlayerRef = ttsState?.audioPlayerRef;
@@ -233,6 +221,7 @@ export const TTSStateProvider = ({ children }) => {
         </TTSStateContext.Provider>
     );
 };
+
 export const useTTSState = () => {
     const context = useContext(TTSStateContext);
     return {

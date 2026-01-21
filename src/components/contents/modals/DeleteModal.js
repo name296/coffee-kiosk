@@ -1,22 +1,22 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "../../ui/Modal";
-import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
+import { ModalContext } from "../../../contexts/ModalContext";
 import { OrderContext } from "../../../contexts/OrderContext";
 
 // 삭제 확인 모달 (DeleteCheck - 내역 없음)
 export const DeleteCheckModal = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     const order = useContext(OrderContext);
-    const id = accessibility.ModalDeleteItemId;
+    const id = modal.ModalDeleteItemId;
 
     return (
         <BaseModal
-            isOpen={accessibility.ModalDeleteCheck.isOpen}
+            isOpen={modal.ModalDeleteCheck.isOpen}
             type="deleteCheck"
-            onCancel={() => accessibility.ModalDeleteCheck.close()}
+            onCancel={() => modal.ModalDeleteCheck.close()}
             onConfirm={() => {
                 order?.handleDelete?.(id);
-                accessibility.ModalDeleteCheck.close();
+                modal.ModalDeleteCheck.close();
             }}
         />
     );
@@ -25,18 +25,18 @@ DeleteCheckModal.displayName = 'DeleteCheckModal';
 
 // 삭제 모달 (Delete - 실제 삭제)
 export const DeleteModal = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+    const modal = useContext(ModalContext);
     const order = useContext(OrderContext);
-    const id = accessibility.ModalDeleteItemId;
+    const id = modal.ModalDeleteItemId;
 
     return (
         <BaseModal
-            isOpen={accessibility.ModalDelete.isOpen}
+            isOpen={modal.ModalDelete.isOpen}
             type="delete"
-            onCancel={() => accessibility.ModalDelete.close()}
+            onCancel={() => modal.ModalDelete.close()}
             onConfirm={() => {
                 order?.handleDelete?.(id);
-                accessibility.ModalDelete.close();
+                modal.ModalDelete.close();
             }}
         />
     );

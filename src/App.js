@@ -5,6 +5,8 @@ import "./App.css";
 // Contexts
 import { TTSDBProvider, TTSStateProvider } from "./contexts/TTSContext";
 import { AccessibilityProvider } from "./contexts/AccessibilityContext";
+import { ModalProvider } from "./contexts/ModalContext";
+import { TimeoutProvider } from "./contexts/TimeoutContext";
 import { OrderProvider } from "./contexts/OrderContext";
 import { RefProvider } from "./contexts/RefContext";
 import { ButtonStateProvider, ButtonGroupProvider } from "./contexts/ButtonContext";
@@ -80,21 +82,25 @@ const App = () => {
       <TTSDBProvider>
         <TTSStateProvider>
           <AccessibilityProvider>
-            <OrderProvider>
-              <RefProvider>
-                <ButtonStateProvider>
-                  <ButtonGroupProvider>
-                    <ScreenRouteProvider>
-                      <ButtonHandlerInitializer />
-                      <ViewportInitializer />
-                      <AppFocusTrapInitializer />
-                      <Screen />
-                      <ModalContainer />
-                    </ScreenRouteProvider>
-                  </ButtonGroupProvider>
-                </ButtonStateProvider>
-              </RefProvider>
-            </OrderProvider>
+            <ModalProvider>
+              <TimeoutProvider>
+                <OrderProvider>
+                  <RefProvider>
+                    <ButtonStateProvider>
+                      <ButtonGroupProvider>
+                        <ScreenRouteProvider>
+                          <ButtonHandlerInitializer />
+                          <ViewportInitializer />
+                          <AppFocusTrapInitializer />
+                          <Screen />
+                          <ModalContainer />
+                        </ScreenRouteProvider>
+                      </ButtonGroupProvider>
+                    </ButtonStateProvider>
+                  </RefProvider>
+                </OrderProvider>
+              </TimeoutProvider>
+            </ModalProvider>
           </AccessibilityProvider>
         </TTSStateProvider>
       </TTSDBProvider>
