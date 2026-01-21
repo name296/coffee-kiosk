@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useToggleButtonClickHandler, useDisabledButtonBlocker, usePressStateHandler } from "../../hooks/useButtonEvents";
+import { useUserActivityBroadcast } from "../../hooks/useUserActivity";
 import { setViewportZoom, setupViewportResize } from "../../utils/viewport";
 
 // 버튼 핸들러 초기화 (전역)
@@ -7,6 +8,7 @@ export const ButtonHandlerInitializer = () => {
     useToggleButtonClickHandler(true);
     useDisabledButtonBlocker(true);
     usePressStateHandler(true);
+    useUserActivityBroadcast(true);
     return null;
 };
 

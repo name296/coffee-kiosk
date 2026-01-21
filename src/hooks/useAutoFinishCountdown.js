@@ -1,9 +1,32 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+
+const DEFAULT_COUNTDOWN_SECONDS = 60;
+const DEFAULT_RESET_EVENTS = ['keydown', 'click'];
 
 // 자동 완료 카운트다운 관리 (단일책임: 자동 완료 카운트다운만)
-export const useAutoFinishCountdown = (onTimeout) => {
-    const [countdown, setCountdown] = useState(60);
+export const useAutoFinishCountdown = (optionsOrOnTimeout = {}) => {
+    const options = typeof optionsOrOnTimeout === 'function'
+        ? { onTimeout: optionsOrOnTimeout }
+        : (optionsOrOnTimeout || {});
+
+    const {
+        onTimeout,
+        enabled = true,
+        initialSeconds = DEFAULT_COUNTDOWN_SECONDS,
+        resetEvents = DEFAULT_RESET_EVENTS
+    } = options;
+
+    const [countdown, setCountdown] = useState(initialSeconds);
     const timerRef = useRef(null);
+    const onTimeoutRef = useRef(onTimeout);
+
+    useEffect(() => {
+        onTimeoutRef.current = onTimeout;
+    }, [onTimeout]);
+
+    const resetCountdown = useCallback(() => {
+        setCountdown(initialSeconds);
+    }, [initialSeconds]);
 
     useEffect(() => {
         if (timerRef.current) {
@@ -11,9 +34,12 @@ export const useAutoFinishCountdown = (onTimeout) => {
             timerRef.current = null;
         }
 
-        const resetCountdown = () => setCountdown(60);
-        setCountdown(60);
+        if (!enabled) {
+            resetCountdown();
+            return;
+        }
 
+        resetCountdown();
         timerRef.current = setInterval(() => {
             setCountdown(prev => {
                 if (prev <= 0) {
@@ -21,25 +47,27 @@ export const useAutoFinishCountdown = (onTimeout) => {
                         clearInterval(timerRef.current);
                         timerRef.current = null;
                     }
-                    if (onTimeout) onTimeout();
+                    if (onTimeoutRef.current) onTimeoutRef.current();
                     return 0;
                 }
                 return prev - 1;
             });
         }, 1000);
 
-        window.addEventListener('keydown', resetCountdown);
-        window.addEventListener('click', resetCountdown);
+        resetEvents.forEach((eventName) => {
+            window.addEventListener(eventName, resetCountdown);
+        });
 
         return () => {
-            window.removeEventListener('keydown', resetCountdown);
-            window.removeEventListener('click', resetCountdown);
+            resetEvents.forEach((eventName) => {
+                window.removeEventListener(eventName, resetCountdown);
+            });
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
         };
-    }, [onTimeout]);
+    }, [enabled, resetCountdown, resetEvents]);
 
-    return countdown;
+    return { countdown, resetCountdown };
 };

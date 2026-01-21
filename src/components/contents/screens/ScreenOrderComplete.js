@@ -3,7 +3,7 @@ import Button from "../../ui/Button";
 
 import { OrderContext } from "../../../contexts/OrderContext";
 import { useFocusableSectionsManager } from "../../../hooks/useFocusManagement";
-import { useAutoFinishCountdown } from "../../../hooks/useAutoFinishCountdown";
+import { useAppTimeouts } from "../../../hooks/useAppTimeouts";
 import { ScreenRouteContext } from "../../../contexts/ScreenRouteContext";
 
 const ScreenOrderComplete = memo(() => {
@@ -18,7 +18,16 @@ const ScreenOrderComplete = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const countdown = useAutoFinishCountdown(() => navigateTo('ScreenFinish'));
+    const { autoFinishCountdown } = useAppTimeouts({
+        setCurrentPage: (p) => navigateTo(p),
+        idle: { enabled: false },
+        autoFinish: {
+            enabled: true,
+            onTimeout: () => navigateTo('ScreenFinish')
+        }
+    });
+
+    const { countdown } = autoFinishCountdown;
 
     return (
         <>

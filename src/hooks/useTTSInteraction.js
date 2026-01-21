@@ -5,7 +5,6 @@ import { TTSStateContext } from "../contexts/TTSContext";
 const prevButtonParentRef = { current: null };
 // 이전 TTS 텍스트 저장 (중복 실행 방지)
 const prevTtsTextRef = { current: '' };
-const lastTtsTimeRef = { current: 0 };
 
 // 포커스 인 및 마우스 엔터 시 TTS 재생 핸들러 (단일책임: 포커스 인 및 마우스 엔터 시 TTS 재생만)
 export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
@@ -29,14 +28,60 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
         document.addEventListener('mousedown', handleUserInteraction, { once: true, passive: true });
         document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
 
+        const getHoverTtsTarget = (target) => {
+            if (!target) return null;
+
+            const btn = target.closest?.('.button');
+            if (btn) {
+                return { type: 'button', element: btn };
+            }
+
+            const main = target.closest?.('.main');
+            if (main) {
+                const hasHoveringInteractive = main.querySelector('.button:hover, img:hover, [role="button"]:hover');
+                if (hasHoveringInteractive) return null;
+                return { type: 'main', element: main };
+            }
+
+            return null;
+        };
+
         const handleTTS = (e) => {
             const target = e.target;
             if (!target) return;
 
-            // 같은 요소에 대한 중복 실행 방지 (200ms 이내)
-            const now = Date.now();
-            if (now - lastTtsTimeRef.current < 200) return;
-            lastTtsTimeRef.current = now;
+            // 호버 이벤트: 호버 스타일 대상에 대해서만 TTS 재생
+            if (e.type === 'mouseover') {
+                const hoverTarget = getHoverTtsTarget(target);
+                if (!hoverTarget) return;
+
+                if (hoverTarget.type === 'button') {
+                    const btn = hoverTarget.element;
+                    const currentParent = btn.parentElement?.closest('[data-tts-text]');
+                    const isSameParent = prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
+                    const parentTts = isSameParent ? '' : (currentParent?.dataset?.ttsText || '');
+                    const btnTts = btn.dataset?.ttsText || '';
+                    const ttsText = parentTts + btnTts;
+
+                    if (ttsText && ttsText !== prevTtsTextRef.current) {
+                        prevTtsTextRef.current = ttsText;
+                        finalHandleText(ttsText);
+                    }
+
+                    prevButtonParentRef.current = currentParent;
+                    return;
+                }
+
+                if (hoverTarget.type === 'main') {
+                    const elementTts = hoverTarget.element.dataset?.ttsText || '';
+                    if (elementTts && elementTts !== prevTtsTextRef.current) {
+                        prevTtsTextRef.current = elementTts;
+                        finalHandleText(elementTts);
+                        prevButtonParentRef.current = null;
+                    }
+                    return;
+                }
+            }
 
             // 버튼인 경우
             const btn = target.closest?.('.button');
@@ -73,15 +118,15 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
 
         // 포커스 인 이벤트 (키보드 네비게이션)
         document.addEventListener('focusin', handleTTS, true);
-        // 마우스 엔터 이벤트 (마우스 호버)
-        document.addEventListener('mouseenter', handleTTS, true);
+        // 마우스 오버 이벤트 (마우스 호버)
+        document.addEventListener('mouseover', handleTTS, true);
 
         return () => {
             document.removeEventListener('keydown', handleUserInteraction);
             document.removeEventListener('mousedown', handleUserInteraction);
             document.removeEventListener('touchstart', handleUserInteraction);
             document.removeEventListener('focusin', handleTTS, true);
-            document.removeEventListener('mouseenter', handleTTS, true);
+            document.removeEventListener('mouseover', handleTTS, true);
         };
     }, [enableGlobalHandlers, finalHandleText, ttsState]);
 };

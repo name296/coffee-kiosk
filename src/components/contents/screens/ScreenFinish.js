@@ -1,26 +1,24 @@
-import React, { memo, useContext, useState, useRef, useEffect } from "react";
+import React, { memo, useContext } from "react";
 import { ScreenRouteContext } from "../../../contexts/ScreenRouteContext";
+import { useAppTimeouts } from "../../../hooks/useAppTimeouts";
+
+const NO_RESET_EVENTS = [];
 
 const ScreenFinish = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
-    const [countdown, setCountdown] = useState(3);
-    const timerRef = useRef(null);
 
-    useEffect(() => {
-        // 타이머 설정
-        if (countdown <= -1) {
-            clearInterval(timerRef.current);
-            navigateTo('ScreenStart');
+    const { autoFinishCountdown } = useAppTimeouts({
+        setCurrentPage: (p) => navigateTo(p),
+        idle: { enabled: false },
+        autoFinish: {
+            enabled: true,
+            initialSeconds: 3,
+            resetEvents: NO_RESET_EVENTS,
+            onTimeout: () => navigateTo('ScreenStart')
         }
+    });
 
-        timerRef.current = setInterval(() => {
-            setCountdown(time => time - 1)
-        }, 1000);
-
-        return () => {
-            clearInterval(timerRef.current);
-        };
-    }, [countdown]);
+    const { countdown } = autoFinishCountdown;
 
     return (
         <>

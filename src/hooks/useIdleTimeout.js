@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { USER_ACTIVITY_EVENT } from "./useUserActivity";
 
 // 활성 요소 TTS 재생 훅 (단일책임: 활성 요소 TTS 재생만)
 // 남은 시간 포맷팅 (단일책임: 시간 포맷팅만) - MM:SS 형식
@@ -215,14 +216,15 @@ export const useIdleTimeout = (onTimeout, timeout, enabled = true, checkTimeoutM
             return;
         }
 
-        // 이벤트 리스너 등록
-        const keydownHandler = () => handleUserActivity('keydown');
-        const touchstartHandler = () => handleUserActivity('touchstart');
-        const clickHandler = () => handleUserActivity('click');
+        // 통합 사용자 활동 이벤트 리스너 등록
+        const activityHandler = (e) => {
+            const sourceEventType = e?.detail?.sourceEventType || 'activity';
+            handleUserActivity(sourceEventType);
+        };
 
-        document.addEventListener('keydown', keydownHandler, { passive: true });
-        document.addEventListener('touchstart', touchstartHandler, { passive: true });
-        document.addEventListener('click', clickHandler, { passive: true });
+        if (typeof window !== 'undefined') {
+            window.addEventListener(USER_ACTIVITY_EVENT, activityHandler);
+        }
 
         console.log('[타이머] 이벤트 리스너 등록됨', { enabled, onTimeout: !!onTimeoutRef.current });
 
@@ -232,9 +234,9 @@ export const useIdleTimeout = (onTimeout, timeout, enabled = true, checkTimeoutM
                 enabled
             });
             if (timerRef.current) clearTimeout(timerRef.current);
-            document.removeEventListener('keydown', keydownHandler);
-            document.removeEventListener('touchstart', touchstartHandler);
-            document.removeEventListener('click', clickHandler);
+            if (typeof window !== 'undefined') {
+                window.removeEventListener(USER_ACTIVITY_EVENT, activityHandler);
+            }
         };
     }, [enabled, handleUserActivity]); // handleUserActivity는 useCallback으로 안정화됨
 

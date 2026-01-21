@@ -1,60 +1,42 @@
 import React, { memo, useContext, useCallback, useRef, useEffect } from "react";
 import Button from "./Button";
 import { HomeIcon, TimeIcon, WheelchairIcon } from "../../Icon";
-import { AccessibilityContext } from "../../contexts/AccessibilityContext";
 import { ModalContext } from "../../contexts/ModalContext";
 import { TimeoutContext } from "../../contexts/TimeoutContext";
 import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
-import { OrderContext } from "../../contexts/OrderContext";
-import { useIdleTimeout } from "../../hooks/useIdleTimeout";
-import { initializeApp } from "../../utils/appInitializer";
+import { useAppTimeouts } from "../../hooks/useAppTimeouts";
 
 const Bottom = memo(({ systemControlsRef }) => {
     const { currentPage, navigateTo } = useContext(ScreenRouteContext);
-    const accessibility = useContext(AccessibilityContext);
     const modal = useContext(ModalContext);
     const timeout = useContext(TimeoutContext);
-    const order = useContext(OrderContext);
 
     // ScreenStart에서는 타임아웃이 모달 없이 실행됨 (이니셜 TTS 재생)
     // 다른 화면에서는 타임아웃 모달 표시
     const isTimeoutEnabled = true; // 모든 화면에서 타임아웃 활성화
-
-    const onTimeout = useCallback(() => {
-        // 타임아웃 발생 시 항상 초기화 실행 (모든 화면에서 시작화면으로 이동)
-        console.log('[타이머] onTimeout 호출됨', { currentPage });
-        const callbacks = {
-            ModalRestart: modal?.ModalRestart,
-            ModalAccessibility: modal?.ModalAccessibility,
-            ModalTimeout: modal?.ModalTimeout, // 타임아웃 모달 닫기용
-            setQuantities: order.setQuantities,
-            totalMenuItems: order.totalMenuItems,
-            setIsDark: accessibility.setIsDark,
-            setVolume: accessibility.setVolume,
-            setIsLarge: accessibility.setIsLarge,
-            setIsLow: accessibility.setIsLow,
-            setCurrentPage: (p) => navigateTo(p)
-        };
-
-        console.log('[타이머] initializeApp 호출 시작', {
-            callbacks: Object.keys(callbacks),
-            currentPage
-        });
-        initializeApp(callbacks);        
-        console.log('[타이머] initializeApp 호출 완료');
-    }, [accessibility, modal, order, currentPage, navigateTo]);
 
     // 타임아웃 모달 상태 체크 함수 (useIdleTimeout에 전달)
     const checkTimeoutModal = useCallback(() => {
         return modal?.ModalTimeout?.isOpen ?? false;
     }, [modal]);
 
-    const { remainingTimeFormatted, remainingTime, resetTimer } = useIdleTimeout(
-        onTimeout,
-        120000, // 2분 (120초)
-        isTimeoutEnabled,
-        checkTimeoutModal
-    );
+    const { idleTimeout } = useAppTimeouts({
+        setCurrentPage: (p) => navigateTo(p),
+        idle: {
+            timeoutMs: 120000, // 2분 (120초)
+            enabled: isTimeoutEnabled,
+            checkTimeoutModal,
+            onTimeout: ({ resetApp }) => {
+                // 타임아웃 발생 시 항상 초기화 실행 (모든 화면에서 시작화면으로 이동)
+                console.log('[타이머] onTimeout 호출됨', { currentPage });
+                console.log('[타이머] resetApp 실행 시작', { currentPage });
+                resetApp();
+                console.log('[타이머] resetApp 실행 완료');
+            }
+        }
+    });
+
+    const { remainingTimeFormatted, remainingTime } = idleTimeout;
 
     // 전역 타이머 remainingTime을 TimeoutModal에 전달
     useEffect(() => {

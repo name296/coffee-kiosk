@@ -5,7 +5,7 @@ import { RefContext } from "../../../contexts/RefContext";
 import { AccessibilityContext } from "../../../contexts/AccessibilityContext";
 import { OrderContext } from "../../../contexts/OrderContext";
 import { useFocusableSectionsManager } from "../../../hooks/useFocusManagement";
-import { useAutoFinishCountdown } from "../../../hooks/useAutoFinishCountdown";
+import { useAppTimeouts } from "../../../hooks/useAppTimeouts";
 import { ScreenRouteContext } from "../../../contexts/ScreenRouteContext";
 import { TTS } from "../../../constants/constants";
 
@@ -24,7 +24,16 @@ const ScreenReceiptPrint = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const countdown = useAutoFinishCountdown(() => navigateTo('ScreenFinish'));
+    const { autoFinishCountdown } = useAppTimeouts({
+        setCurrentPage: (p) => navigateTo(p),
+        idle: { enabled: false },
+        autoFinish: {
+            enabled: true,
+            onTimeout: () => navigateTo('ScreenFinish')
+        }
+    });
+
+    const { countdown } = autoFinishCountdown;
 
     return (
         <>{/* Screen component handles the frame */}
