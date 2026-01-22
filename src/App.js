@@ -3,25 +3,25 @@ import ReactDOM from "react-dom/client";
 import "./App.css";
 
 // Contexts
-import { TTSDBProvider, TTSStateProvider } from "./contexts/TTSContext";
-import { AccessibilityProvider } from "./contexts/AccessibilityContext";
-import { ModalProvider } from "./contexts/ModalContext";
-import { TimeoutProvider } from "./contexts/TimeoutContext";
-import { OrderProvider } from "./contexts/OrderContext";
-import { RefProvider } from "./contexts/RefContext";
-import { ButtonStateProvider, ButtonGroupProvider } from "./contexts/ButtonContext";
-import { ScreenRouteProvider } from "./contexts/ScreenRouteContext";
+import { TTSDBProvider, TTSStateProvider } from "./shared/contexts/TTSContext";
+import { AccessibilityProvider } from "./shared/contexts/AccessibilityContext";
+import { ModalProvider } from "./shared/contexts/ModalContext";
+import { TimeoutProvider } from "./shared/contexts/TimeoutContext";
+import { OrderProvider } from "./shared/contexts/OrderContext";
+import { RefProvider } from "./shared/contexts/RefContext";
+import { ButtonStateProvider, ButtonGroupProvider } from "./shared/contexts/ButtonContext";
+import { ScreenRouteProvider } from "./shared/contexts/ScreenRouteContext";
 
 // Initializers
 import {
   ButtonHandlerInitializer,
   ViewportInitializer,
   AppFocusTrapInitializer
-} from "./components/initializers/Initializers";
+} from "./shared/initializers/Initializers";
 
 // Components
-import Screen from "./components/ui/Screen";
-import { ModalContainer } from "./components/ui/Modal";
+import Screen from "./shared/ui/Screen";
+import { ModalContainer } from "./shared/ui/Modal";
 
 // ============================================================================
 // 메인 App 컴포넌트
