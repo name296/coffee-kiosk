@@ -7,7 +7,7 @@ const NO_RESET_EVENTS = [];
 const ScreenFinish = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
-    const { autoFinishCountdown } = useAppTimeouts({
+    const { countdown } = useAppTimeouts({
         setCurrentPage: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
@@ -17,8 +17,6 @@ const ScreenFinish = memo(() => {
             onTimeout: () => navigateTo('ScreenStart')
         }
     });
-
-    const { countdown } = autoFinishCountdown;
 
     return (
         <>

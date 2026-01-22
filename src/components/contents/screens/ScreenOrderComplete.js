@@ -18,7 +18,7 @@ const ScreenOrderComplete = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const { autoFinishCountdown } = useAppTimeouts({
+    const { countdown } = useAppTimeouts({
         setCurrentPage: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
@@ -26,8 +26,6 @@ const ScreenOrderComplete = memo(() => {
             onTimeout: () => navigateTo('ScreenFinish')
         }
     });
-
-    const { countdown } = autoFinishCountdown;
 
     return (
         <>
@@ -41,8 +39,8 @@ const ScreenOrderComplete = memo(() => {
                 <h1>{order.orderNumber || 100}</h1>
             </div>
             <div className="task-manager" ref={actionBarRef}>
-                <Button className="w371h120" onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp(); navigateTo('ScreenReceiptPrint'); }} label="영수증 출력" />
-                <Button ttsText="출력 안함," className="w371h120" onClick={() => navigateTo('ScreenFinish')} label={`출력 안함${countdown}`} />
+                <Button className="w371h120" onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp();}} navigate="ScreenReceiptPrint" label="영수증 출력" />
+                <Button ttsText="출력 안함," className="w371h120" navigate="ScreenFinish" label={`출력 안함${countdown}`} />
             </div>
         </>
     );

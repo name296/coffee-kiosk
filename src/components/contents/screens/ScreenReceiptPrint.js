@@ -24,7 +24,7 @@ const ScreenReceiptPrint = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const { autoFinishCountdown } = useAppTimeouts({
+    const { countdown } = useAppTimeouts({
         setCurrentPage: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
@@ -32,8 +32,6 @@ const ScreenReceiptPrint = memo(() => {
             onTimeout: () => navigateTo('ScreenFinish')
         }
     });
-
-    const { countdown } = autoFinishCountdown;
 
     return (
         <>{/* Screen component handles the frame */}
