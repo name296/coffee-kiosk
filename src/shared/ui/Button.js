@@ -1,7 +1,6 @@
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
-import { useSound } from "../hooks/useSound";
-import { ScreenRouteContext } from "../contexts/ScreenRouteContext";
-import { ModalContext } from "../contexts/ModalContext";
+import { useSound } from "../hooks";
+import { ScreenRouteContext, ModalContext } from "../contexts";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
@@ -33,6 +32,7 @@ const Button = memo(({
     onPressed,
     onPointed,
     ttsText,
+    iconFirst = true,
     ...rest
 }) => {
     // 각 Button 인스턴스마다 자체 ref 생성
@@ -171,12 +171,25 @@ const Button = memo(({
             onKeyUp={onEnd}
             {...rest}
         >
-            {(svg || img) && (
-                <span className="icon" aria-hidden="true">
-                    {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
-                </span>
+            {iconFirst ? (
+                <>
+                    {(svg || img) && (
+                        <span className="icon" aria-hidden="true">
+                            {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
+                        </span>
+                    )}
+                    {label}
+                </>
+            ) : (
+                <>
+                    {label}
+                    {(svg || img) && (
+                        <span className="icon" aria-hidden="true">
+                            {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
+                        </span>
+                    )}
+                </>
             )}
-            {label}
             {children}
             {toggle && (
                 <span className="icon pressed" aria-hidden="true"></span>

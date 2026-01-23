@@ -913,7 +913,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
   }
 
   .countdown {
@@ -928,12 +927,8 @@
   /* 낮은화면 상단 여백 */
   .black {
     width: 100%;
-    height: 0;
-    background-color: black;
-
-    &.low {
-      height: 1020px;
-    }
+    height: 0px;
+    background-color: var(--color-gray-01);
   }
 
   .short-colline {
@@ -1004,8 +999,8 @@
     justify-items: center;
     align-items: center;
 
-    /* 메뉴 아이템 버튼 (레이어 배치) */
-    & .button {
+    /* 메뉴 아이템 버튼 (레이어 배치) - 직접 자식만 적용 */
+    & > .button {
       width: 242px;
       height: 280px;
       position: relative;
@@ -1057,13 +1052,6 @@
           color: var(--primary3-content2-color-pressed);
         }
       }
-    }
-
-    &.low {
-      width: fit-content;
-      height: fit-content;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(1, 1fr);
     }
   }
 
@@ -1220,6 +1208,11 @@
       height: 64px;
       cursor: pointer;
     }
+
+    /* vertical 방향 스타일 */
+    &.pagination-vertical {
+      flex-flow: column nowrap;
+    }
   }
 
   .pagination-page-current {
@@ -1245,6 +1238,7 @@
     flex-flow: row nowrap;
     gap: var(--spacing-lg);
     align-items: center;
+    flex-shrink: 1;
   }
 
 
@@ -1904,6 +1898,27 @@
      버튼 크기 오버라이드
      ======================================== */
   .low {
+    & .main.third .title {
+      font-size: var(--font-size-h1);
+      height: 100px;
+    }
+
+    & .menu {
+      width: fit-content;
+      height: fit-content;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(1, 1fr);
+      /* .low 모드에서는 1행만 있으므로 페이지네이션을 마지막 칸(4번째 열, 1번째 행)에 배치 */
+      & .menu-pagination {
+        grid-row: 1;
+        grid-column: 4;
+      }
+    }
+
+    & .black {
+      height: 1020px;
+      flex-shrink: 0;
+    }
 
     /* 주문 목록 레이아웃 */
     & .order-item {

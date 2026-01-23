@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ModalContext } from "../../contexts/ModalContext";
+import { ModalContext } from "../../contexts";
 import {
     RestartModal,
     ResetModal,
@@ -7,9 +7,9 @@ import {
     DeleteCheckModal,
     CallModal,
     TimeoutModal
-} from "../../../features/system/modals";
-import { PaymentErrorModal } from "../../../features/payment/modals";
-import { AccessibilityModal } from "../../../features/accessibility/modals";
+} from "@features/system";
+import { PaymentErrorModal } from "@features/payment";
+import { AccessibilityModal } from "@features/accessibility";
 
 // 모달 컨테이너 (전역 프레임 주입부)
 export const ModalContainer = () => {

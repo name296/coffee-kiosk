@@ -1,5 +1,5 @@
 import React, { createContext, useState, useMemo, useEffect } from "react";
-import { useBodyClass, useHtmlClass } from "../hooks/useTheme";
+import { useBodyClass, useHtmlClass } from "../hooks";
 
 // Accessibility Context - 접근성 설정 및 모달 상태 관리
 

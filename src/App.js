@@ -3,25 +3,29 @@ import ReactDOM from "react-dom/client";
 import "./App.css";
 
 // Contexts
-import { TTSDBProvider, TTSStateProvider } from "./shared/contexts/TTSContext";
-import { AccessibilityProvider } from "./shared/contexts/AccessibilityContext";
-import { ModalProvider } from "./shared/contexts/ModalContext";
-import { TimeoutProvider } from "./shared/contexts/TimeoutContext";
-import { OrderProvider } from "./shared/contexts/OrderContext";
-import { RefProvider } from "./shared/contexts/RefContext";
-import { ButtonStateProvider, ButtonGroupProvider } from "./shared/contexts/ButtonContext";
-import { ScreenRouteProvider } from "./shared/contexts/ScreenRouteContext";
+import {
+  TTSDBProvider,
+  TTSStateProvider,
+  AccessibilityProvider,
+  ModalProvider,
+  TimeoutProvider,
+  OrderProvider,
+  RefProvider,
+  ButtonStateProvider,
+  ButtonGroupProvider,
+  ScreenRouteProvider
+} from "@shared/contexts";
 
 // Initializers
 import {
   ButtonHandlerInitializer,
   ViewportInitializer,
-  AppFocusTrapInitializer
-} from "./shared/initializers/Initializers";
+  AppFocusTrapInitializer,
+  GlobalTimeoutInitializer
+} from "@shared/initializers";
 
 // Components
-import Screen from "./shared/ui/Screen";
-import { ModalContainer } from "./shared/ui/Modal";
+import { Screen, ModalContainer } from "@shared/ui";
 
 // ============================================================================
 // 메인 App 컴포넌트
@@ -92,6 +96,7 @@ const App = () => {
                           <ButtonHandlerInitializer />
                           <ViewportInitializer />
                           <AppFocusTrapInitializer />
+                          <GlobalTimeoutInitializer />
                           <Screen />
                           <ModalContainer />
                         </ScreenRouteProvider>

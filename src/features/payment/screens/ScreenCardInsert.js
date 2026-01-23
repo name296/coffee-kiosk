@@ -1,8 +1,8 @@
 import React, { memo, useContext, useRef } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 
-import { AccessibilityContext } from "../../../shared/contexts/AccessibilityContext";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
+import { AccessibilityContext } from "@shared/contexts";
+import { useFocusableSectionsManager } from "@shared/hooks";
 
 const ScreenCardInsert = memo(() => {
     const accessibility = useContext(AccessibilityContext);
@@ -24,7 +24,7 @@ const ScreenCardInsert = memo(() => {
             <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
             <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리. 버튼 세 개,">
                 <Button className="w371h120" navigate="ScreenPayments" label="취소" />
-                <Button style={{ height: "120px" }} modal="ModalPaymentError" label="가상오류" />
+                <Button style={{ height: "120px" }} modal="PaymentError" label="가상오류" />
                 <Button style={{ height: "120px" }} navigate="ScreenCardRemoval" label="가상투입" />
             </div>
         </>

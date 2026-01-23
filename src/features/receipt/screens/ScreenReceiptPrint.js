@@ -1,9 +1,8 @@
 import React, { memo, useContext, useRef } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
-import { useAppTimeouts } from "../../../shared/hooks/useAppTimeouts";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
+import { useFocusableSectionsManager, useAppTimeouts } from "@shared/hooks";
+import { ScreenRouteContext } from "@shared/contexts";
 
 const ScreenReceiptPrint = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);

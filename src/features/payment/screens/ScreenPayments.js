@@ -1,9 +1,8 @@
 import React, { memo, useContext, useRef } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 
-import { OrderContext } from "../../../shared/contexts/OrderContext";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
+import { OrderContext, ScreenRouteContext } from "@shared/contexts";
+import { useFocusableSectionsManager } from "@shared/hooks";
 
 const ScreenPayments = memo(() => {
     const order = useContext(OrderContext);

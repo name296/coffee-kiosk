@@ -1,4 +1,4 @@
-import { SCREEN } from "../constants/constants";
+import { SCREEN } from "../constants";
 
 export function setViewportZoom() {
     const { WIDTH: bw, HEIGHT: bh } = SCREEN;

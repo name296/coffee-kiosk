@@ -1,9 +1,8 @@
 import React, { memo, useContext, useState, useEffect } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 import { OrderIcon, ResetIcon, AddIcon, PayIcon } from "../../../Icon";
-import { OrderContext } from "../../../shared/contexts/OrderContext";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
-import { formatNumber, convertToKoreanQuantity } from "../../../shared/utils/format";
+import { OrderContext, ScreenRouteContext } from "@shared/contexts";
+import { formatNumber, convertToKoreanQuantity } from "@shared/utils";
 
 const Summary = memo(({ orderSummaryRef }) => {
     const order = useContext(OrderContext);

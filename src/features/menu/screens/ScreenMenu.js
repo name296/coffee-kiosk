@@ -1,14 +1,13 @@
 import React, { memo, useContext, useMemo, useEffect, useLayoutEffect, useRef } from "react";
-import Category from "../components/Category";
-import MenuGrid from "../components/MenuGrid";
-import Pagination from "../components/Pagination";
+import { Category, MenuGrid, Pagination } from "../components";
 
-import { AccessibilityContext } from "../../../shared/contexts/AccessibilityContext";
-import { OrderContext } from "../../../shared/contexts/OrderContext";
-import { usePagination } from "../../../shared/hooks/usePagination";
-import { useCategoryPagination } from "../../../shared/hooks/useCategoryPagination";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
-import { convertToKoreanQuantity } from "../../../shared/utils/format";
+import { AccessibilityContext, OrderContext } from "@shared/contexts";
+import {
+    usePagination,
+    useCategoryAssemble,
+    useFocusableSectionsManager
+} from "@shared/hooks";
+import { convertToKoreanQuantity } from "@shared/utils";
 
 const ScreenMenu = memo(() => {
     const accessibility = useContext(AccessibilityContext);
@@ -62,7 +61,7 @@ const ScreenMenu = memo(() => {
         nextPage: catNext,
         isCompact: catIsCompact,
         isReady: catIsReady
-    } = useCategoryPagination(
+    } = useCategoryAssemble(
         useMemo(() => (order.categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })), [order.categoryInfo]),
         accessibility.isLarge
     );
@@ -96,15 +95,15 @@ const ScreenMenu = memo(() => {
                 selectedTab={order.selectedTab}
                 convertToKoreanQuantity={convertToKoreanQuantity}
                 mainContentRef={mainContentRef}
-            />
-            <Pagination
-                pageNumber={pageNumber}
-                totalPages={totalPages}
-                onPrev={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
-                onNext={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
-                isDark={accessibility.isDark}
-                ttsPrefix="메뉴"
-                sectionRef={actionBarRef}
+                isLow={accessibility.isLow}
+                paginationProps={{
+                    pageNumber,
+                    totalPages,
+                    onPrev: (e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); },
+                    onNext: (e) => { e.preventDefault(); e.target.focus(); handleNextPage(); },
+                    isDark: accessibility.isDark,
+                    ttsPrefix: "메뉴"
+                }}
             />
         </>
     );

@@ -1,5 +1,5 @@
 import React, { memo, useContext } from "react";
-import { ScreenRouteContext } from "../contexts/ScreenRouteContext";
+import { ScreenRouteContext } from "../contexts";
 import { StepIcon } from "../../Icon";
 
 // 단계 표시 아이템 컴포넌트

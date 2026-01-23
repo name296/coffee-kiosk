@@ -1,13 +1,8 @@
 import React, { memo, useContext, useCallback, useEffect } from "react";
-import { BaseModal } from "../../../shared/ui/Modal";
-import Button from "../../../shared/ui/Button";
+import { BaseModal, Button, Highlight } from "@shared/ui";
 import Icon from "../../../Icon";
-import Highlight from "../../../shared/ui/Highlight";
-import { AccessibilityContext } from "../../../shared/contexts/AccessibilityContext";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { RefContext } from "../../../shared/contexts/RefContext";
-import { useAccessibilitySettings } from "../../../shared/hooks/useAccessibilitySettings";
-import { useDOM } from "../../../shared/hooks/useDOM";
+import { AccessibilityContext, ModalContext, RefContext } from "@shared/contexts";
+import { useAccessibilitySettings, useDOM } from "@shared/hooks";
 
 export const AccessibilityModal = memo(() => {
     const accessibility = useContext(AccessibilityContext);

@@ -1,7 +1,6 @@
 import React, { memo, useContext } from "react";
-import { BaseModal } from "../../../shared/ui/Modal";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
+import { BaseModal } from "@shared/ui";
+import { ModalContext, ScreenRouteContext } from "@shared/contexts";
 
 export const RestartModal = memo(() => {
     const modal = useContext(ModalContext);

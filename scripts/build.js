@@ -2,9 +2,58 @@
 // src/ 폴더를 dist/로 복사 + JS/CSS 번들링
 
 import { build } from 'bun';
-import { cpSync, mkdirSync, rmSync, readFileSync, writeFileSync, existsSync } from 'fs';
+import { cpSync, mkdirSync, rmSync, readFileSync, writeFileSync, existsSync, statSync } from 'fs';
+import { resolve } from 'path';
 
 const nodeEnv = process.env.NODE_ENV || 'production';
+
+const resolveAliasPath = (basePath, aliasSuffix) => {
+  const resolvedBase = resolve(process.cwd(), basePath, aliasSuffix);
+  const fileCandidates = [
+    resolvedBase,
+    `${resolvedBase}.js`,
+    `${resolvedBase}.jsx`,
+    `${resolvedBase}.ts`,
+    `${resolvedBase}.tsx`,
+  ];
+
+  for (const candidate of fileCandidates) {
+    if (existsSync(candidate) && !statSync(candidate).isDirectory()) {
+      return candidate;
+    }
+  }
+
+  if (existsSync(resolvedBase) && statSync(resolvedBase).isDirectory()) {
+    const indexCandidates = ['index.js', 'index.jsx', 'index.ts', 'index.tsx'];
+    for (const indexFile of indexCandidates) {
+      const indexPath = resolve(resolvedBase, indexFile);
+      if (existsSync(indexPath)) {
+        return indexPath;
+      }
+    }
+  }
+
+  return resolvedBase;
+};
+
+const aliasPlugin = {
+  name: 'alias',
+  setup(builder) {
+    const aliases = [
+      { prefix: '@shared', path: 'src/shared' },
+      { prefix: '@features', path: 'src/features' },
+    ];
+
+    aliases.forEach((aliasConfig) => {
+      const filter = new RegExp(`^${aliasConfig.prefix}(\\/.*)?$`);
+      builder.onResolve({ filter }, (args) => {
+        const suffix = args.path.slice(aliasConfig.prefix.length);
+        const cleanSuffix = suffix.startsWith('/') ? suffix.slice(1) : suffix;
+        return { path: resolveAliasPath(aliasConfig.path, cleanSuffix) };
+      });
+    });
+  },
+};
 
 console.log('🏗️  Building...');
 console.log(`   NODE_ENV: ${nodeEnv}`);
@@ -66,7 +115,8 @@ try {
     sourcemap: 'external',
     define: {
       'process.env.NODE_ENV': JSON.stringify(nodeEnv)
-    }
+    },
+    plugins: [aliasPlugin],
   });
 
   if (!buildResult.success) {

@@ -1,17 +1,17 @@
-import { TTS } from "../../constants/constants";
-import { ScreenStart, ScreenMenu, ScreenDetails } from "../../../features/menu/screens";
+import { TTS } from "../../constants";
+import { ScreenStart, ScreenMenu, ScreenDetails } from "@features/menu";
 import {
     ScreenPayments,
     ScreenCardInsert,
     ScreenMobilePay,
     ScreenSimplePay,
     ScreenCardRemoval
-} from "../../../features/payment/screens";
+} from "@features/payment";
 import {
     ScreenOrderComplete,
     ScreenReceiptPrint,
     ScreenFinish
-} from "../../../features/receipt/screens";
+} from "@features/receipt";
 
 /**
  * 전역 스크린 레지스트리

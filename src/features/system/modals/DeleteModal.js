@@ -1,7 +1,6 @@
 import React, { memo, useContext } from "react";
-import { BaseModal } from "../../../shared/ui/Modal";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { OrderContext } from "../../../shared/contexts/OrderContext";
+import { BaseModal } from "@shared/ui";
+import { ModalContext, OrderContext } from "@shared/contexts";
 
 // 삭제 확인 모달 (DeleteCheck - 내역 없음)
 export const DeleteCheckModal = memo(() => {

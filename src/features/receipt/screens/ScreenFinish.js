@@ -1,6 +1,6 @@
 import React, { memo, useContext } from "react";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
-import { useAppTimeouts } from "../../../shared/hooks/useAppTimeouts";
+import { ScreenRouteContext } from "@shared/contexts";
+import { useAppTimeouts } from "@shared/hooks";
 
 const NO_RESET_EVENTS = [];
 
@@ -12,7 +12,7 @@ const ScreenFinish = memo(() => {
         idle: { enabled: false },
         autoFinish: {
             enabled: true,
-            initialSeconds: 3,
+            initialSeconds: 4,
             resetEvents: NO_RESET_EVENTS,
             onTimeout: () => navigateTo('ScreenStart')
         }
@@ -23,7 +23,7 @@ const ScreenFinish = memo(() => {
             <div className="title">이용해 주셔서 감사합니다</div>
             <div className="end-countdown">
                 <span>
-                    {countdown <= 0 ? '✓' : countdown}
+                    {countdown <= 1 ? '✓' : countdown - 1}
                 </span>
             </div>
         </>

@@ -1,5 +1,6 @@
 import { build, serve } from "bun";
-import { watch, existsSync, cpSync, mkdirSync, rmSync } from "fs";
+import { watch, existsSync, cpSync, mkdirSync, rmSync, statSync } from "fs";
+import { resolve } from "path";
 import { z } from "zod";
 
 // ============================================================================
@@ -17,6 +18,54 @@ const envSchema = z.object({
 
 const env = envSchema.parse(process.env);
 
+const resolveAliasPath = (basePath, aliasSuffix) => {
+  const resolvedBase = resolve(process.cwd(), basePath, aliasSuffix);
+  const fileCandidates = [
+    resolvedBase,
+    `${resolvedBase}.js`,
+    `${resolvedBase}.jsx`,
+    `${resolvedBase}.ts`,
+    `${resolvedBase}.tsx`,
+  ];
+
+  for (const candidate of fileCandidates) {
+    if (existsSync(candidate) && !statSync(candidate).isDirectory()) {
+      return candidate;
+    }
+  }
+
+  if (existsSync(resolvedBase) && statSync(resolvedBase).isDirectory()) {
+    const indexCandidates = ["index.js", "index.jsx", "index.ts", "index.tsx"];
+    for (const indexFile of indexCandidates) {
+      const indexPath = resolve(resolvedBase, indexFile);
+      if (existsSync(indexPath)) {
+        return indexPath;
+      }
+    }
+  }
+
+  return resolvedBase;
+};
+
+const aliasPlugin = {
+  name: "alias",
+  setup(builder) {
+    const aliases = [
+      { prefix: "@shared", path: "src/shared" },
+      { prefix: "@features", path: "src/features" },
+    ];
+
+    aliases.forEach((aliasConfig) => {
+      const filter = new RegExp(`^${aliasConfig.prefix}(\\/.*)?$`);
+      builder.onResolve({ filter }, (args) => {
+        const suffix = args.path.slice(aliasConfig.prefix.length);
+        const cleanSuffix = suffix.startsWith("/") ? suffix.slice(1) : suffix;
+        return { path: resolveAliasPath(aliasConfig.path, cleanSuffix) };
+      });
+    });
+  },
+};
+
 const config = {
   port: env.PORT,
   entry: env.ENTRY_FILE,
@@ -30,6 +79,7 @@ const config = {
     minify: env.BUILD_MINIFY,
     sourcemap: env.BUILD_SOURCEMAP,
     define: { "process.env.NODE_ENV": JSON.stringify(env.NODE_ENV) },
+    plugins: [aliasPlugin],
   },
 };
 

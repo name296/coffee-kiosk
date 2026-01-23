@@ -2,11 +2,9 @@ import React, { memo, useContext, useLayoutEffect } from "react";
 import Button from "../Button";
 import Icon from "../../../Icon";
 import Highlight, { H } from "../Highlight";
-import { TTS } from "../../constants/constants";
-import { RefContext } from "../../contexts/RefContext";
-import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
-import { useFocusTrap } from "../../hooks/useFocusTrap";
-import { useDOM } from "../../hooks/useDOM";
+import { TTS } from "../../constants";
+import { RefContext, ScreenRouteContext } from "../../contexts";
+import { useFocusTrap, useDOM } from "../../hooks";
 import MODAL_CONFIG from "./ModalConfig";
 
 // 공통 모달 베이스 (프레임)

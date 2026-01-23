@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { TTSDBContext, TTSStateContext } from "../contexts/TTSContext";
+import { TTSDBContext, TTSStateContext } from "../contexts";
 import {
     stopAllTTS,
     playAudio,
@@ -8,7 +8,7 @@ import {
     fetchTTSFromServer,
     playLocalTTS,
     VOLUME_MAP
-} from "../utils/tts";
+} from "../utils";
 
 // TTS 재생 함수 (단일책임: TTS 재생만)
 // 요구사항:
@@ -155,8 +155,7 @@ export const playTTS = async (text, speed, vol, ttsDB, ttsState, requestIdRef) =
 
 // TTS 텍스트 핸들러 훅 (단일책임: TTS 재생 관리만)
 // 요구사항: 새 TTS 재생 시 이전 TTS 즉시 중단, 단일 재생 보장
-// 의존성: TTSDBContext (initDB, getFromDB, saveToDB), TTSStateContext (setReplayText, replayText, isPlaying, setIsPlaying, requestIdRef)
-// 사용처: 모든 Screen 컴포넌트, 모달 컴포넌트
+
 export const useTextHandler = (volume) => {
     const ttsDB = useContext(TTSDBContext) || {};
     const ttsState = useContext(TTSStateContext) || {};

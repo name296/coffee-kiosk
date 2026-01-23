@@ -1,10 +1,8 @@
 import React, { memo, useContext, useRef } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 
-import { OrderContext } from "../../../shared/contexts/OrderContext";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
-import { useAppTimeouts } from "../../../shared/hooks/useAppTimeouts";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
+import { OrderContext, ScreenRouteContext } from "@shared/contexts";
+import { useFocusableSectionsManager, useAppTimeouts } from "@shared/hooks";
 
 const ScreenOrderComplete = memo(() => {
     const order = useContext(OrderContext);

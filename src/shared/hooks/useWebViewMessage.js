@@ -1,5 +1,5 @@
 import { useEffect, useContext } from "react";
-import { ScreenRouteContext } from "../contexts/ScreenRouteContext";
+import { ScreenRouteContext } from "../contexts";
 
 export const useWebViewMessage = () => {
     const { navigateTo } = useContext(ScreenRouteContext);

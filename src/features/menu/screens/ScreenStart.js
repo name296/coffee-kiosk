@@ -1,8 +1,8 @@
 import React, { memo, useRef } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 
 import { TakeinIcon, TakeoutIcon } from "../../../Icon";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
+import { useFocusableSectionsManager } from "@shared/hooks";
 
 const ScreenStart = memo(() => {
     const mainContentRef = useRef(null);

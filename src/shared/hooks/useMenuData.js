@@ -4,7 +4,7 @@ import {
     flattenMenuCategories,
     getCategoryInfo,
     getTabNames
-} from "../utils/menuUtils";
+} from "../utils";
 
 /**
  * 메뉴 데이터 훅 - menuUtils를 통해 메뉴판 정보를 제공

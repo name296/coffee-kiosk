@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { usePagination } from "./usePagination";
 
 // ============================================================================
-// 카테고리 페이지네이션 (가변 너비 버튼, 페이지별 시작 인덱스 저장)
+// 카테고리 조립 (가변 너비 버튼 + 페이지네이션 제어)
 // ============================================================================
-// 
+//
 // [중요] 이 훅은 가변 너비 버튼의 페이지네이션을 처리합니다.
-// 
+//
 const ACTUAL_GAP_THRESHOLD = 128; // 실제 렌더링 간격이 이 값 초과하면 compact 모드
 
-export const useCategoryPagination = (items, isLarge = false) => {
+export const useCategoryAssemble = (items, isLarge = false) => {
     const containerRef = useRef(null);  // 실제 표시 컨테이너
     const measureRef = useRef(null);    // 숨겨진 측정용 컨테이너
     const [pageBreakpoints, setPageBreakpoints] = useState([0]); // 페이지별 시작 인덱스
-    const [currentPage, setCurrentPage] = useState(0);
     const [calcTrigger, setCalcTrigger] = useState(0); // 재계산 트리거
     const [isCompact, setIsCompact] = useState(false); // compact 모드
     const [isReady, setIsReady] = useState(items.length === 0); // 최종 표시 준비 (빈 배열이면 바로 표시)
@@ -28,14 +28,6 @@ export const useCategoryPagination = (items, isLarge = false) => {
     const isCalculatingRef = useRef(false);
     const itemsRef = useRef(items);
 
-    // isLarge 변경 감지
-    useEffect(() => {
-        if (prevIsLargeRef.current !== isLarge) {
-            prevIsLargeRef.current = isLarge;
-            setCalcTrigger(t => t + 1);
-        }
-    }, [isLarge]);
-
     // items 변경 감지 (내용 비교)
     useEffect(() => {
         const currentItems = itemsRef.current;
@@ -44,6 +36,33 @@ export const useCategoryPagination = (items, isLarge = false) => {
             itemsRef.current = items;
         }
     }, [items]);
+
+    const {
+        pageNumber,
+        totalPages,
+        currentItems,
+        handlePrevPage,
+        handleNextPage,
+        resetPage,
+        setPageNumber
+    } = usePagination(items, 1, 1, false, pageBreakpoints);
+
+    // isLarge 변경 감지
+    useEffect(() => {
+        if (prevIsLargeRef.current !== isLarge) {
+            prevIsLargeRef.current = isLarge;
+            setCalcTrigger(t => t + 1);
+            resetPage();
+        }
+    }, [isLarge, resetPage]);
+
+    // 페이지 수가 줄어들면 마지막 페이지로 보정
+    useEffect(() => {
+        const maxPage = Math.max(1, totalPages);
+        if (pageNumber > maxPage) {
+            setPageNumber(maxPage);
+        }
+    }, [totalPages, pageNumber, setPageNumber]);
 
     const calculate = useCallback(() => {
         // 계산 중이면 무시 (무한루프 방지)
@@ -61,9 +80,6 @@ export const useCategoryPagination = (items, isLarge = false) => {
 
         // 계산 중 플래그 설정
         isCalculatingRef.current = true;
-
-        // isLarge 변경 감지 (prevIsLargeRef는 useEffect에서 업데이트됨)
-        const isLargeChanged = prevIsLargeRef.current !== isLarge;
 
         // 새 계산 시작 - 숨기기만 (compact는 실제 측정 후 결정)
         setIsReady(false);
@@ -107,18 +123,11 @@ export const useCategoryPagination = (items, isLarge = false) => {
         // 상태 일괄 업데이트 (동기적)
         // compact 계산은 렌더링 완료 후 실제 containerRef의 버튼 간격을 측정
         setPageBreakpoints(breakpoints);
-
-        if (isLargeChanged) {
-            setCurrentPage(0);
-        } else {
-            setCurrentPage(p => Math.min(p, breakpoints.length - 1));
-        }
-
         setIsReady(true);
 
         // 계산 완료 후 플래그 해제
         isCalculatingRef.current = false;
-    }, [isLarge]);
+    }, []);
 
     // ResizeObserver로 버튼 크기 변경 감지
     useEffect(() => {
@@ -174,7 +183,6 @@ export const useCategoryPagination = (items, isLarge = false) => {
     // pagedItems[n] = n번째 페이지에 표시될 아이템 배열
     // calculate 함수와 동일하게 itemsRef.current 사용 (일관성 유지)
     // ---------------------------------------------------------------
-    const totalPages = pageBreakpoints.length;
     const pagedItems = useMemo(() => {
         const currentItems = itemsRef.current;
         return pageBreakpoints.map((start, idx) => {
@@ -183,24 +191,17 @@ export const useCategoryPagination = (items, isLarge = false) => {
         });
     }, [pageBreakpoints]); // items는 itemsRef를 통해 접근하므로 의존성 불필요
 
-    // 현재 페이지 아이템
-    const currentItems = pagedItems[currentPage] ?? [];
-    const startIdx = pageBreakpoints[currentPage] ?? 0;
-    const endIdx = pageBreakpoints[currentPage + 1] ?? itemsRef.current.length;
-
     // 페이지 변경 시 isReady 복원 (이미 계산된 pageBreakpoints 사용)
     useEffect(() => {
         // pageBreakpoints가 설정되어 있고, currentPage가 유효한 범위 내에 있으면 즉시 표시
-        if (pageBreakpoints.length > 0 && currentPage >= 0 && currentPage < pageBreakpoints.length) {
+        const pageIndex = Math.max(0, Math.min(pageNumber - 1, pageBreakpoints.length - 1));
+        if (pageBreakpoints.length > 0 && pageIndex >= 0 && pageIndex < pageBreakpoints.length) {
             setIsReady(true);
         }
-    }, [currentPage, pageBreakpoints.length]);
+    }, [pageNumber, pageBreakpoints.length]);
 
     // compact 계산: 페이징 후 실제 렌더링된 containerRef의 각 페이지 내부 버튼들 사이 간격 측정
     // 간격이 ACTUAL_GAP_THRESHOLD를 초과하면 compact 모드 활성화 (좌측 정렬)
-    // 주의: 줄바꿈(breakpoints)과 compact는 완전히 별개 개념
-    //      - 줄바꿈: 버튼들이 한 줄에 들어가지 않아 여러 줄로 나뉘는 것 (페이지네이션 처리)
-    //      - compact: 실제 렌더링된 각 페이지 내부 버튼들 사이 간격이 넓어서 좌측 정렬 스타일을 적용해야 하는 것
     useEffect(() => {
         if (!isReady || !containerRef.current) return;
 
@@ -224,28 +225,18 @@ export const useCategoryPagination = (items, isLarge = false) => {
         return () => cancelAnimationFrame(frameId);
     }, [isReady, currentItems]);
 
-
-    // 페이지 변경
-    const prevPage = useCallback(() => {
-        setCurrentPage(p => p > 0 ? p - 1 : totalPages - 1);
-    }, [totalPages]);
-
-    const nextPage = useCallback(() => {
-        setCurrentPage(p => p < totalPages - 1 ? p + 1 : 0);
-    }, [totalPages]);
-
     return {
         containerRef,
         measureRef,
-        currentPage: currentPage + 1, // 1-based (UI 표시용)
+        currentPage: pageNumber, // 1-based (UI 표시용)
         totalPages,
         currentItems,        // 현재 페이지 아이템
         pagedItems,          // 모든 페이지별 아이템 배열
         pageBreakpoints,     // 페이지별 시작 인덱스
         hasPrev: totalPages > 1,
         hasNext: totalPages > 1,
-        prevPage,
-        nextPage,
+        prevPage: handlePrevPage,
+        nextPage: handleNextPage,
         recalculate,
         isCompact,           // compact 모드 여부
         isReady              // 계산 완료 후 표시 준비됨

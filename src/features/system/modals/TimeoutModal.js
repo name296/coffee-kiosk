@@ -1,8 +1,6 @@
 import React, { memo, useContext } from "react";
-import { BaseModal } from "../../../shared/ui/Modal";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { TimeoutContext } from "../../../shared/contexts/TimeoutContext";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
+import { BaseModal } from "@shared/ui";
+import { ModalContext, TimeoutContext, ScreenRouteContext } from "@shared/contexts";
 
 export const TimeoutModal = memo(({ onExtend }) => {
     const modal = useContext(ModalContext);

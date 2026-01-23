@@ -1,7 +1,6 @@
 import React, { memo, useContext } from "react";
-import { BaseModal } from "../../../shared/ui/Modal";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { OrderContext } from "../../../shared/contexts/OrderContext";
+import { BaseModal } from "@shared/ui";
+import { ModalContext, OrderContext } from "@shared/contexts";
 
 export const ResetModal = memo(() => {
     const modal = useContext(ModalContext);

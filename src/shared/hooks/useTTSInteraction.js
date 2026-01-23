@@ -1,10 +1,8 @@
 import { useEffect, useContext, useRef } from "react";
-import { TTSStateContext } from "../contexts/TTSContext";
+import { TTSStateContext } from "../contexts";
 
 // 이전 버튼의 부모 요소를 저장하는 전역 ref (같은 부모 안에서 버튼 변경 시 부모 TTS 재생 방지)
 const prevButtonParentRef = { current: null };
-// 이전 TTS 텍스트 저장 (중복 실행 방지)
-const prevTtsTextRef = { current: '' };
 
 // 포커스 인 및 마우스 엔터 시 TTS 재생 핸들러 (단일책임: 포커스 인 및 마우스 엔터 시 TTS 재생만)
 export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
@@ -63,8 +61,7 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
                     const btnTts = btn.dataset?.ttsText || '';
                     const ttsText = parentTts + btnTts;
 
-                    if (ttsText && ttsText !== prevTtsTextRef.current) {
-                        prevTtsTextRef.current = ttsText;
+                    if (ttsText) {
                         finalHandleText(ttsText);
                     }
 
@@ -74,8 +71,7 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
 
                 if (hoverTarget.type === 'main') {
                     const elementTts = hoverTarget.element.dataset?.ttsText || '';
-                    if (elementTts && elementTts !== prevTtsTextRef.current) {
-                        prevTtsTextRef.current = elementTts;
+                    if (elementTts) {
                         finalHandleText(elementTts);
                         prevButtonParentRef.current = null;
                     }
@@ -96,8 +92,7 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
                 const ttsText = parentTts + btnTts;
 
                 // 이전과 같은 텍스트면 재생하지 않음
-                if (ttsText && ttsText !== prevTtsTextRef.current) {
-                    prevTtsTextRef.current = ttsText;
+                if (ttsText) {
                     finalHandleText(ttsText);
                 }
 
@@ -108,8 +103,7 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
 
             // 버튼이 아닌 경우: data-tts-text가 있는 요소인지 확인 (예: .main)
             const elementTts = target.dataset?.ttsText || '';
-            if (elementTts && elementTts !== prevTtsTextRef.current) {
-                prevTtsTextRef.current = elementTts;
+            if (elementTts) {
                 finalHandleText(elementTts);
                 // .main 같은 경우는 부모가 없으므로 prevButtonParentRef를 null로 설정
                 prevButtonParentRef.current = null;

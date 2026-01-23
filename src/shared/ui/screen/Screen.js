@@ -2,12 +2,9 @@ import React, { memo, useContext } from "react";
 import Step from "../Step";
 import Main from "../Main";
 import Bottom from "../Bottom";
-import Summary from "../../../features/menu/components/Summary";
-import { AccessibilityContext } from "../../contexts/AccessibilityContext";
-import { ScreenRouteContext } from "../../contexts/ScreenRouteContext";
-import { useTextHandler } from "../../hooks/useTTS";
-import { useInteractiveTTSHandler } from "../../hooks/useTTSInteraction";
-import { useKeyboardNavigationHandler } from "../../hooks/useKeyboardNavigation";
+import { Summary } from "@features/menu";
+import { AccessibilityContext, ScreenRouteContext } from "../../contexts";
+import { useTextHandler, useInteractiveTTSHandler, useKeyboardNavigationHandler } from "../../hooks";
 import SCREEN_REGISTRY from "./ScreenRegistry";
 
 /**

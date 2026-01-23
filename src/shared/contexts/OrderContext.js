@@ -1,15 +1,15 @@
 import React, { createContext, useState, useCallback, useMemo, useRef } from "react";
-import { useMenuData } from "../hooks/useMenuData";
-import { categorizeMenu } from "../utils/menuUtils";
+import { useMenuData } from "../hooks";
 import {
+    categorizeMenu,
     calculateSum,
     calculateTotal,
     createOrderItems,
-    filterMenuItems
-} from "../utils/orderUtils";
-import { safeParseInt } from "../utils/format";
-import { safeLocalStorage } from "../utils/storage";
-import { convertToKoreanQuantity } from "../utils/format";
+    filterMenuItems,
+    safeParseInt,
+    safeLocalStorage,
+    convertToKoreanQuantity
+} from "../utils";
 
 // Order Context - 주문 상태 관리 (메뉴 선택, 수량, 주문 아이템)
 // 레벨: 전역 UI 상태/알림 레벨

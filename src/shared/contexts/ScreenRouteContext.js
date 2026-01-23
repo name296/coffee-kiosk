@@ -1,6 +1,5 @@
 import React, { createContext, useState, useCallback, useMemo, useRef, useEffect, useLayoutEffect } from "react";
-import { focusMainElement } from "../hooks/useDOM";
-import { useAppInitializer } from "../hooks/useAppInitializer";
+import { focusMainElement, useAppInitializer } from "../hooks";
 
 export const ScreenRouteContext = createContext();
 

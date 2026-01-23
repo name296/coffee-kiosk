@@ -1,15 +1,10 @@
 import React, { memo, useContext, useMemo, useEffect, useRef } from "react";
-import Highlight from "../../../shared/ui/Highlight";
-import OrderList from "../components/OrderList";
-import Pagination from "../components/Pagination";
+import { Highlight } from "@shared/ui";
+import { OrderList, Pagination } from "../components";
 
-import { OrderContext } from "../../../shared/contexts/OrderContext";
-import { AccessibilityContext } from "../../../shared/contexts/AccessibilityContext";
-import { ModalContext } from "../../../shared/contexts/ModalContext";
-import { ScreenRouteContext } from "../../../shared/contexts/ScreenRouteContext";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
-import { usePagination } from "../../../shared/hooks/usePagination";
-import { convertToKoreanQuantity } from "../../../shared/utils/format";
+import { OrderContext, AccessibilityContext, ModalContext, ScreenRouteContext } from "@shared/contexts";
+import { useFocusableSectionsManager, usePagination } from "@shared/hooks";
+import { convertToKoreanQuantity } from "@shared/utils";
 
 const ScreenDetails = memo(() => {
     const order = useContext(OrderContext);
@@ -88,8 +83,14 @@ const ScreenDetails = memo(() => {
     return (
         <>
             <div className="title">
-                <span><Highlight>내역</Highlight>을 확인하시고</span>
-                <span><Highlight>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
+                {accessibility.isLow ? (
+                    <span><Highlight>내역</Highlight>을 확인하시고 <Highlight>결제하기</Highlight> 버튼을 누르세요</span>
+                ) : (
+                    <>
+                        <span><Highlight>내역</Highlight>을 확인하시고</span>
+                        <span><Highlight>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
+                    </>
+                )}
             </div>
             <div className="banner field">
                 <p className="one-num">순서</p>

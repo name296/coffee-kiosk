@@ -1,6 +1,6 @@
 import React, { memo, useRef } from "react";
-import Button from "../../../shared/ui/Button";
-import { useFocusableSectionsManager } from "../../../shared/hooks/useFocusManagement";
+import { Button } from "@shared/ui";
+import { useFocusableSectionsManager } from "@shared/hooks";
 
 const ScreenCardRemoval = memo(() => {
     const actionBarRef = useRef(null);

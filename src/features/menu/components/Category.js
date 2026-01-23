@@ -1,5 +1,7 @@
 import React, { memo, useMemo } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
+import Icon from "../../../Icon";
+import { PaginationPrevButton, PaginationNextButton } from "./Pagination";
 
 // 카테고리 탭 버튼
 const CategoryTab = memo(({ tab, isSelected, onSelect }) => (
@@ -23,7 +25,9 @@ const Category = memo(({ categories, selectedTab, onSelectTab, pagination, conta
 
     return (
         <div className="category-full" ref={categoryNavRef} data-tts-text={`메뉴 카테고리, 현재상태, ${selectedTab}, 총 버튼 ${convertToKoreanQuantity(catItems.length)}개,`}>
-            {/* 숨겨진 측정용 컨테이너 (실제 구조와 동일하게 구분선 포함) */}
+            {/* 이전버튼 */}
+            <PaginationPrevButton label="이전" className="secondary1" onClick={catPrev} />
+            {/* 카테고리 버튼 모음, 숨겨진 측정용 컨테이너 (실제 구조와 동일하게 구분선 포함) */}
             <div ref={measureRef} className="category measure" aria-hidden="true" inert="true">
                 {categories.map((tab, idx) => (
                     <React.Fragment key={tab.id}>
@@ -32,7 +36,7 @@ const Category = memo(({ categories, selectedTab, onSelectTab, pagination, conta
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="이전" className="w113h076 secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
+            {/* 카테고리 메인 컨테이너 */}
             <div
                 className={categoryClassName}
                 ref={containerRef}
@@ -45,7 +49,8 @@ const Category = memo(({ categories, selectedTab, onSelectTab, pagination, conta
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="다음" className="w113h076 secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
+            {/* 다음버튼 */}
+            <PaginationNextButton label="다음" className="secondary1" onClick={catNext} />
         </div>
     );
 });

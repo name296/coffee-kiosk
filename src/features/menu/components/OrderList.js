@@ -1,7 +1,7 @@
 import React, { memo } from "react";
-import Button from "../../../shared/ui/Button";
+import { Button } from "@shared/ui";
 import { DeleteIcon, MinusIcon, PlusIcon } from "../../../Icon";
-import { formatNumber, convertToKoreanQuantity } from "../../../shared/utils/format";
+import { formatNumber, convertToKoreanQuantity } from "@shared/utils";
 
 // 주문 행
 const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, sectionRef, convertToKoreanQuantity }) => {
