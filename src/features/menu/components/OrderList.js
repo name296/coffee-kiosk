@@ -4,7 +4,7 @@ import { DeleteIcon, MinusIcon, PlusIcon } from "../../../Icon";
 import { formatNumber, convertToKoreanQuantity } from "@shared/utils";
 
 // 주문 행
-const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, sectionRef, convertToKoreanQuantity }) => {
+const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, sectionRef, convertToKoreanQuantity, accessibility }) => {
     const totalPrice = item.price * quantity;
 
     return (
@@ -16,9 +16,9 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
                 </div>
                 <p className="order-name">{item.name}</p>
                 <div className="order-quantity">
-                    <Button className="w080h076 secondary1" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
+                    <Button className="secondary1 counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
                     <Button className="qty" label={quantity} />
-                    <Button className="w080h076 secondary1" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
+                    <Button className="secondary1 counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
                 <Button className="order-price" label={`${formatNumber(totalPrice)}원`} />
                 <Button className="w076h076 delete-item" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
@@ -38,7 +38,8 @@ const OrderList = memo(({
     onDecrease,
     onIncrease,
     onDelete,
-    convertToKoreanQuantity
+    convertToKoreanQuantity,
+    accessibility
 }) => {
     return (
         <div className="order-list">
@@ -53,6 +54,7 @@ const OrderList = memo(({
                     onDelete={(e) => onDelete(item.id, currentItems.length)(e)}
                     sectionRef={itemsPerPage ? rowRefs[(i % itemsPerPage)] : rowRefs[i]}
                     convertToKoreanQuantity={convertToKoreanQuantity}
+                    accessibility={accessibility}
                 />
             ))}
         </div>

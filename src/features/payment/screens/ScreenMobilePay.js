@@ -4,7 +4,7 @@ import { Button } from "@shared/ui";
 import { useFocusableSectionsManager } from "@shared/hooks";
 import { ScreenRouteContext } from "@shared/contexts";
 
-const ScreenMobilePay = memo(() => {
+const ScreenMobilePay = memo(({ accessibility }) => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
     const actionBarRef = useRef(null);

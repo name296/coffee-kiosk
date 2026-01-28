@@ -4,7 +4,7 @@ import { Button } from "@shared/ui";
 import { OrderContext, ScreenRouteContext } from "@shared/contexts";
 import { useFocusableSectionsManager, useAppTimeouts } from "@shared/hooks";
 
-const ScreenOrderComplete = memo(() => {
+const ScreenOrderComplete = memo(({ accessibility }) => {
     const order = useContext(OrderContext);
     const { navigateTo } = useContext(ScreenRouteContext);
 

@@ -36,7 +36,7 @@ const Screen = memo(() => {
                 Component="div"
                 {...rest}
             >
-                <Component />
+                <Component accessibility={accessibility} />
             </Main>
             {showSummary && <Summary />}
             <Bottom />

@@ -6,9 +6,10 @@ import { OrderContext, AccessibilityContext, ModalContext, ScreenRouteContext } 
 import { useFocusableSectionsManager, usePagination } from "@shared/hooks";
 import { convertToKoreanQuantity } from "@shared/utils";
 
-const ScreenDetails = memo(() => {
+const ScreenDetails = memo(({ accessibility: accessibilityProp }) => {
     const order = useContext(OrderContext);
-    const accessibility = useContext(AccessibilityContext);
+    const contextAccessibility = useContext(AccessibilityContext);
+    const accessibility = accessibilityProp ?? contextAccessibility;
     const modal = useContext(ModalContext);
     const { navigateTo } = useContext(ScreenRouteContext);
 
@@ -92,33 +93,76 @@ const ScreenDetails = memo(() => {
                     </>
                 )}
             </div>
-            <div className="banner field">
-                <p className="one-num">순서</p>
-                <p className="one-normal">상품명</p>
-                <p className="one-qty-normal">수량</p>
-                <p className="one-price-normal">가격</p>
-                <p className="one-delete-normal">삭제</p>
-            </div>
-            <OrderList
-                currentItems={currentItems}
-                pageNumber={pageNumber}
-                itemsPerPage={itemsPerPage}
-                rowRefs={rowRefs}
-                quantities={order.quantities}
-                onDecrease={handleItemDecrease}
-                onIncrease={handleItemIncrease}
-                onDelete={handleItemDelete}
-                convertToKoreanQuantity={convertToKoreanQuantity}
-            />
-            <Pagination
-                pageNumber={pageNumber}
-                totalPages={totalPages}
-                onPrev={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
-                onNext={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
-                isDark={accessibility.isDark}
-                ttsPrefix="주문목록"
-                sectionRef={actionBarRef}
-            />
+
+
+            {accessibility.isLow ? (
+                <div className="banner field">
+                    <div className="one-num"><span>순서</span></div>
+                    <span className="one-normal">상품명</span>
+                    <span className="one-qty-normal">수량</span>
+                    <span className="one-price-normal">가격</span>
+                    <span className="one-delete-normal">삭제</span>
+                    <span className="one-pagination-normal">이동</span>
+                </div>
+            ) : (
+                <div className="banner field">
+                    <span className="one-num">순서</span>
+                    <span className="one-normal">상품명</span>
+                    <span className="one-qty-normal">수량</span>
+                    <span className="one-price-normal">가격</span>
+                    <span className="one-delete-normal">삭제</span>
+                </div>
+            )}
+
+            {accessibility.isLow ? (
+                <div className="details-content">
+                    <OrderList
+                        currentItems={currentItems}
+                        pageNumber={pageNumber}
+                        itemsPerPage={itemsPerPage}
+                        rowRefs={rowRefs}
+                        quantities={order.quantities}
+                        onDecrease={handleItemDecrease}
+                        onIncrease={handleItemIncrease}
+                        onDelete={handleItemDelete}
+                        convertToKoreanQuantity={convertToKoreanQuantity}
+                        accessibility={accessibility}
+                    />
+                    <Pagination
+                        pageNumber={pageNumber}
+                        totalPages={totalPages}
+                        onPrev={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
+                        onNext={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+                        direction="vertical"
+                        ttsPrefix="주문목록"
+                        sectionRef={actionBarRef}
+                    />
+                </div>
+            ) : (
+                <>
+                    <OrderList
+                        currentItems={currentItems}
+                        pageNumber={pageNumber}
+                        itemsPerPage={itemsPerPage}
+                        rowRefs={rowRefs}
+                        quantities={order.quantities}
+                        onDecrease={handleItemDecrease}
+                        onIncrease={handleItemIncrease}
+                        onDelete={handleItemDelete}
+                        convertToKoreanQuantity={convertToKoreanQuantity}
+                        accessibility={accessibility}
+                    />
+                    <Pagination
+                        pageNumber={pageNumber}
+                        totalPages={totalPages}
+                        onPrev={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
+                        onNext={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+                        direction="horizontal"
+                        ttsPrefix="주문목록"
+                        sectionRef={actionBarRef}
+                    />
+                </>
+            )}
         </>
     );
 });

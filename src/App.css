@@ -127,20 +127,6 @@
     --font-size-d3: 12.8rem;
     --font-size-d4: 18rem;
 
-    /* === 접근성 모달 버튼 크기 === */
-    /* 접근성 모달 버튼 크기 */
-    --acc-btn-height: 64px;
-    --acc-btn-height-action: 80px;
-    --acc-btn-font-size: 2rem;
-    --acc-btn-width: 100px;
-    /* 기본 (토글) */
-    --acc-btn-width-reset: 200px;
-    /* 초기설정 */
-    --acc-btn-width-volume: 64px;
-    /* 음량 */
-    --acc-btn-width-action: 220px;
-    /* 작업관리 */
-
     /* === font / weight === */
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
@@ -674,6 +660,8 @@
     &.modal {
       position: relative;
       width: 100%;
+      padding-left: 0px;
+      padding-right: 0px;
       height: fit-content;
       border-radius: 24px;
       border: 2px solid var(--body1-border-color);
@@ -882,7 +870,7 @@
     border-top: 2px solid var(--body1-border-color);
 
     & .task-manager {
-      width: 560px;
+      width: fit-content;
       justify-content: space-between;
     }
 
@@ -1118,12 +1106,17 @@
         flex-flow: row nowrap;
         justify-content: space-between;
 
+        & .counter {
+          width: 80px;
+          height: 76px;
+        }
+
         & .qty {
+          width: 82px;
+          height: 76px;
           position: relative;
           display: flex;
           justify-content: center;
-          width: 82px;
-          height: 76px;
         }
       }
 
@@ -1205,7 +1198,7 @@
 
     & .button {
       width: 184px;
-      height: 64px;
+      height: 76px;
       cursor: pointer;
     }
 
@@ -1293,8 +1286,6 @@
     display: flex;
     box-sizing: border-box;
     gap: var(--spacing-xs);
-    min-width: 70px;
-    min-height: 76px;
     padding-left: calc(var(--min-side) * 0.0625 * 2);
     padding-right: calc(var(--min-side) * 0.0625 * 2);
     outline-offset: calc(var(--min-side) * 0.0625 * -0.5);
@@ -1714,6 +1705,12 @@
 
   /* 카테고리 탭 버튼 */
   .category-full {
+
+    & .button {
+      height: 76px;
+      min-width: 70px;
+    }
+
     & .category {
       position: relative;
       flex: 1;
@@ -1723,8 +1720,7 @@
       height: fit-content;
       display: flex;
       flex-flow: row nowrap;
-      gap: 7px;
-      /* 최소 7px, 최대 11px */
+      gap: 8px;
       align-items: center;
       justify-content: space-between;
       /* 기본: 균등 분배 */
@@ -1732,7 +1728,7 @@
       /* gap이 최대값에 도달하면 왼쪽 정렬 */
       &.compact {
         justify-content: flex-start;
-        gap: 11px;
+        gap: 8px;
       }
 
       /* 숨겨진 측정용 컨테이너 */
@@ -1741,14 +1737,7 @@
         top: 0;
         visibility: hidden;
         pointer-events: none;
-      }
-
-      & .button {
-        position: relative;
-        flex: 0 0 auto;
-
-        white-space: nowrap;
-      }
+      } 
 
       & .category-separator {
         width: 2px;
@@ -1758,6 +1747,11 @@
         align-self: center;
       }
     }
+  }
+
+  /* 하단 버튼 높이 (components 레이어에서 적용) */
+  .bottom .button {
+    height: 76px;
   }
 }
 
@@ -1866,29 +1860,42 @@
 
       & .one-num {
         width: 113px;
+        overflow: visible;
+        white-space: nowrap;
         text-align: center;
+        
       }
 
       & .one-normal {
         width: 236px;
+        overflow: visible;
+        white-space: nowrap;
         text-align: center;
+        
       }
 
       & .one-qty-normal {
         width: 242px;
+        overflow: visible;
+        white-space: nowrap;
         text-align: center;
+        
       }
 
       & .one-price-normal {
         width: 236px;
+        overflow: visible;
+        white-space: nowrap;
         text-align: center;
+        
       }
 
       & .one-delete-normal {
         width: 76px;
-        overflow: auto;
-        white-space: nowrap;
         overflow: visible;
+        white-space: nowrap;
+        text-align: center;
+        
       }
     }
   }
@@ -1902,13 +1909,152 @@
       font-size: var(--font-size-h1);
       height: 100px;
     }
+    
+    & .main.third{
+      padding-bottom: 0px;
 
+      & .pagination {
+        flex-flow: column nowrap;
+      }
+
+      & .banner.field {
+        padding-left: 32px;
+        padding-right: 32px;
+        gap: 16px;
+
+        & .one-num {
+          width: 70px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }
+
+        & .one-normal {
+          width: 236px;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }
+
+        & .one-qty-normal {
+          width: 242px;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }
+
+        & .one-price-normal {
+          width: 236px;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }
+
+        & .one-delete-normal {
+          width: 76px;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }
+  
+        & .one-pagination-normal {
+          width: 184px;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+          
+        }      
+      }
+
+      & .details-content {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        gap: 16px;
+
+        & .order-list {
+          width: 100%;
+          height: 100%;
+          padding-left: 0px;
+          padding-right: 0px;
+  
+          & .row-line {
+            width: 100%;
+            height: 2px;
+          }
+
+          & .order-row {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            width: 100%;
+
+            & .order-image-div {
+              width: 70px;
+              height: 70px;
+              
+              & .order-image {
+                width: 100%;
+                height: 100%;
+              }
+
+              & .order-index {
+                width: fit-content;
+                height: fit-content;
+              }
+            }   
+
+            & .order-name {              
+              width: 236px;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+            }
+
+            & .order-quantity {
+
+
+              & .counter {
+                width: 63px;
+                height: 60px;
+              }
+
+              & .qty {
+                width: 73px;
+                height: 60px;
+              }
+            }
+
+            & .order-price {
+              width: 236px;
+            }
+
+            & .order-delete {
+              width: 70px;
+              height: 70px;
+            }
+          }
+        }
+      }
+    }
+    
     & .menu {
       width: fit-content;
       height: fit-content;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(1, 1fr);
-      /* .low 모드에서는 1행만 있으므로 페이지네이션을 마지막 칸(4번째 열, 1번째 행)에 배치 */
+
       & .menu-pagination {
         grid-row: 1;
         grid-column: 4;
@@ -1918,36 +2064,6 @@
     & .black {
       height: 1020px;
       flex-shrink: 0;
-    }
-
-    /* 주문 목록 레이아웃 */
-    & .order-item {
-      height: 97.5px;
-      justify-content: start;
-    }
-
-    & .row-line {
-      width: 820px;
-      max-width: 100%;
-      height: 1px;
-    }
-
-    & .order-image-div {
-      width: 80px;
-      height: 80px;
-    }
-
-    & .order-image {
-      width: 30px;
-      height: 70px;
-    }
-
-    & .order-name {
-      left: 145px;
-    }
-
-    & .order-quantity {
-      left: 360px;
     }
   }
 

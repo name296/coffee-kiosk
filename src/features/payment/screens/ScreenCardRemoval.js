@@ -2,7 +2,7 @@ import React, { memo, useRef } from "react";
 import { Button } from "@shared/ui";
 import { useFocusableSectionsManager } from "@shared/hooks";
 
-const ScreenCardRemoval = memo(() => {
+const ScreenCardRemoval = memo(({ accessibility }) => {
     const actionBarRef = useRef(null);
     const systemControlsRef = useRef(null);
     useFocusableSectionsManager(['actionBar', 'systemControls'], {

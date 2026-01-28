@@ -4,8 +4,9 @@ import { Button } from "@shared/ui";
 import { AccessibilityContext } from "@shared/contexts";
 import { useFocusableSectionsManager } from "@shared/hooks";
 
-const ScreenCardInsert = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+const ScreenCardInsert = memo(({ accessibility: accessibilityProp }) => {
+    const contextAccessibility = useContext(AccessibilityContext);
+    const accessibility = accessibilityProp ?? contextAccessibility;
 
     const actionBarRef = useRef(null);
     const systemControlsRef = useRef(null);

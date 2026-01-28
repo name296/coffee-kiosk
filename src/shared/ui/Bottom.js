@@ -15,19 +15,20 @@ const Bottom = memo(({ systemControlsRef }) => {
 
     return (
         <div className="bottom" data-tts-text="시스템 설정, 버튼 세 개," ref={systemControlsRef}>
-            <Button
-                className="down-footer-button btn-home"
+            <Button              
                 svg={<HomeIcon />}
                 label="시작화면"
                 modal="Restart"
             />
-            <Button
-                className="down-footer-button"
+            <Button           
                 svg={<TimeIcon />}
                 label={timeout?.globalRemainingTimeFormatted || "00:00"}
-                onClick={openModalManually}
+                modal="Timeout"
             />
-            <Button className="down-footer-button" svg={<WheelchairIcon />} label="접근성" modal="Accessibility" />
+            <Button
+                svg={<WheelchairIcon />}
+                label="접근성"
+                modal="Accessibility" />
         </div>
     );
 });

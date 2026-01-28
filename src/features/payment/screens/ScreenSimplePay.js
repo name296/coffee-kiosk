@@ -3,7 +3,7 @@ import { Button } from "@shared/ui";
 
 import { useFocusableSectionsManager } from "@shared/hooks";
 
-const ScreenSimplePay = memo(() => {
+const ScreenSimplePay = memo(({ accessibility }) => {
     const actionBarRef = useRef(null);
     const systemControlsRef = useRef(null);
 

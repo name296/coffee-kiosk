@@ -4,7 +4,7 @@ import { useAppTimeouts } from "@shared/hooks";
 
 const NO_RESET_EVENTS = [];
 
-const ScreenFinish = memo(() => {
+const ScreenFinish = memo(({ accessibility }) => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
     const { countdown } = useAppTimeouts({

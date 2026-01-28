@@ -9,8 +9,9 @@ import {
 } from "@shared/hooks";
 import { convertToKoreanQuantity } from "@shared/utils";
 
-const ScreenMenu = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
+const ScreenMenu = memo(({ accessibility: accessibilityProp }) => {
+    const contextAccessibility = useContext(AccessibilityContext);
+    const accessibility = accessibilityProp ?? contextAccessibility;
     const order = useContext(OrderContext);
 
     const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 16, ITEMS_PER_PAGE_LOW: 3 };

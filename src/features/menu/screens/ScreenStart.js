@@ -4,7 +4,7 @@ import { Button } from "@shared/ui";
 import { TakeinIcon, TakeoutIcon } from "../../../Icon";
 import { useFocusableSectionsManager } from "@shared/hooks";
 
-const ScreenStart = memo(() => {
+const ScreenStart = memo(({ accessibility }) => {
     const mainContentRef = useRef(null);
 
     useFocusableSectionsManager(['mainContent'], { mainContent: mainContentRef });

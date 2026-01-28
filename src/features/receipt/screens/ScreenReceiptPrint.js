@@ -4,7 +4,7 @@ import { Button } from "@shared/ui";
 import { useFocusableSectionsManager, useAppTimeouts } from "@shared/hooks";
 import { ScreenRouteContext } from "@shared/contexts";
 
-const ScreenReceiptPrint = memo(() => {
+const ScreenReceiptPrint = memo(({ accessibility }) => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
     const actionBarRef = useRef(null);

@@ -4,7 +4,7 @@ import { Button } from "@shared/ui";
 import { OrderContext, ScreenRouteContext } from "@shared/contexts";
 import { useFocusableSectionsManager } from "@shared/hooks";
 
-const ScreenPayments = memo(() => {
+const ScreenPayments = memo(({ accessibility }) => {
     const order = useContext(OrderContext);
     const { navigateTo } = useContext(ScreenRouteContext);
 
