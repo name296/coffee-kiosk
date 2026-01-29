@@ -3,7 +3,7 @@
   ============================== */
 @layer reset, design-system, layout, components, utilities;
 
-/* 큰글씨 모드는 JS에서 inline style로 직접 적용 (useHtmlClass) */
+/* 큰글씨 모드는 body.large + design-system 폰트 변수 오버라이드로 적용 */
 
 /* ==============================
   폰트 정의 (Font Faces)
@@ -94,7 +94,7 @@
   }
 
   html {
-    font-size: calc(62.5% * var(--font-size-scale));
+    font-size: 62.5%;
     font-family: var(--font-family);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
@@ -112,9 +112,8 @@
   :root {
     /* === 전체 타이포그래피 시스템=== */
     --font-family: 'Pretendard GOV', sans-serif;
-    --font-size-scale: 1;
 
-    /* === font / size (rem 단위 - html font-size에서 스케일 적용됨) === */
+    /* === font / size (rem 단위). 큰글씨는 body.large에서 변수 오버라이드로 통제 === */
     --font-size-xs: 1.2rem;
     --font-size-sm: 1.4rem;
     --font-size-md: 1.6rem;
@@ -330,6 +329,21 @@
     --highlight-color: #8C532CFF;
   }
 
+  /* 큰글씨 모드: body.large에서 폰트 사이즈 변수만 1.2배로 통제 (rem 기준은 html 고정) */
+  body.large {
+    --font-size-xs: 1.44rem;
+    --font-size-sm: 1.68rem;
+    --font-size-md: 1.92rem;
+    --font-size-lg: 2.4rem;
+    --font-size-b1: 4.8rem;
+    --font-size-h1: 5.76rem;
+    --font-size-h2: 6.96rem;
+    --font-size-d1: 8.04rem;
+    --font-size-d2: 9.96rem;
+    --font-size-d3: 15.36rem;
+    --font-size-d4: 21.6rem;
+  }
+
   /* ========================================
      전체 고대비 모드 (Dark Theme - 27 구조)
      ======================================== */
@@ -501,7 +515,8 @@
     --height-top: 70px;
     --height-step: 120px;
     --height-title: 200px;
-    --height-summary: 122px;
+    --height-summary: 182px;
+    --height-summary-low: 122px;
     --height-bottom: 112px;
     --height-banner: 70px;
     --height-banner-price: 200px;
@@ -521,29 +536,29 @@
   }
 
   /* ========================================
-     Body 레이아웃
+     Body 레이아웃 + 타이포 (process·modal 공통)
      ======================================== */
   body {
-    /* 레이아웃 */
     margin: 0;
     box-sizing: border-box;
+
+    /* 타이포: process·modal 공통 (body.large 시 변수로 확대) */
+    font-family: var(--font-family);
+    font-size: var(--font-size-b1);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+    font-stretch: 96%;
+
+    & .process {
+    /* 레이아웃 */
     display: flex;
     flex-direction: column;
     width: var(--layout-width);
     height: var(--layout-height);
     contain: size;
 
-    /* 상속 속성 (자식에게 전파) */
-    /* 기본 타이포: b1-bold = 4rem(40px) + 500 */
-    font-family: var(--font-family);
-    font-size: var(--font-size-b1);
-    font-weight: var(--font-weight-medium);
     color: var(--body1-content-primary-color);
-
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-stretch: 96%;
-    /* 비상속 속성 */
     background-color: var(--body1-background-color);
     border-color: var(--body1-border-color);
 
@@ -556,34 +571,38 @@
 
     /* 모든 자손 트랜지션 */
     & * {
-      transition: background-color 0.05s, color 0.05s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
+      transition: background-color 0.05s, color 0.00s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
     }
-  }
 
-  /* ========================================
-     헤더 영역 (.top, .step)
-     ======================================== */
+    /* ========================================
+       헤더 영역 (.top, .step)
+       ======================================== */
+    & .top {
+      width: 100%;
+      height: var(--height-top);
+      flex-shrink: 0;
+      border-bottom: 2px solid var(--body1-border-color);
+    }
 
-  .top {
-    width: 100%;
-    height: var(--height-top);
-    flex-shrink: 0;
-    border-bottom: 2px solid var(--body1-border-color);
-  }
+    /* 첫 페이지에서 Top, Step, Summary, black 숨기기 */
+    &.first .top,
+    &.first .step,
+    &.first .summary,
+    &.first .black {
+      display: none;
+    }
 
-  /* 첫 페이지에서 Top, Step 숨기기 */
-  body:has(.main.first) .top,
-  body:has(.main.first) .step {
-    display: none;
-  }
+    /* 결제/완료 레이아웃에서 Summary 숨기기 */
+    &.forth .summary {
+      display: none;
+    }
 
-  /* ========================================
-     Step Progress Bar
-     구조: .step > .step-num + .step-name + .separator
-     상태: .standby (대기) / .progress (진행) / .progress.current (현재)
-     ======================================== */
-
-  .step {
+    /* ========================================
+       Step Progress Bar
+       구조: .step > .step-num + .step-name + .separator (4단계 반복)
+       상태: .step.1 ~ .step.5 로 진행/현재 제어 (CSS 체이닝)
+       ======================================== */
+    & .step {
     width: 100%;
     height: var(--height-step);
     color: var(--layout-color);
@@ -595,7 +614,6 @@
     align-items: center;
     justify-content: space-evenly;
 
-    /* 단계 번호 */
     & .step-num {
       width: 74px;
       height: 74px;
@@ -609,27 +627,89 @@
       background-clip: padding-box;
       background-color: var(--body2-progress-background-standby-color);
       color: var(--body2-secondary2-color);
-
-      /* 진행 상태 */
-      &.progress {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-
-        /* 현재 위치 (보더 투명도 해제) */
-        &.current {
-          border-color: var(--body2-primary2-color);
-        }
-      }
     }
 
-    /* 공통: 대기 상태 색상 */
     & .step-name,
-    .separator {
+    & .separator {
       flex-shrink: 0;
       color: var(--body2-secondary2-color);
+    }
 
-      /* 진행 상태 색상 */
-      &.progress {
+    /* 진행(progress) = primary 배경/글자, 현재(current) = primary2 보더. span 순서: step-num 1,4,7,10 / step-name 2,5,8,11 / separator 3,6,9 */
+    &.step-1 {
+      & .step-num:nth-of-type(1) {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+        border-color: var(--body2-primary2-color);
+      }
+      & .step-name:nth-of-type(2),
+      & .separator:nth-of-type(3) {
+        color: var(--body2-primary1-color);
+      }
+    }
+    &.step-2 {
+      & .step-num:nth-of-type(1),
+      & .step-num:nth-of-type(4) {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+      }
+      & .step-num:nth-of-type(4) {
+        border-color: var(--body2-primary2-color);
+      }
+      & .step-name:nth-of-type(2),
+      & .step-name:nth-of-type(5),
+      & .separator:nth-of-type(3),
+      & .separator:nth-of-type(6) {
+        color: var(--body2-primary1-color);
+      }
+    }
+    &.step-3 {
+      & .step-num:nth-of-type(1),
+      & .step-num:nth-of-type(4),
+      & .step-num:nth-of-type(7) {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+      }
+      & .step-num:nth-of-type(7) {
+        border-color: var(--body2-primary2-color);
+      }
+      & .step-name:nth-of-type(2),
+      & .step-name:nth-of-type(5),
+      & .step-name:nth-of-type(8),
+      & .separator:nth-of-type(3),
+      & .separator:nth-of-type(6),
+      & .separator:nth-of-type(9) {
+        color: var(--body2-primary1-color);
+      }
+    }
+    &.step-4 {
+      & .step-num:nth-of-type(1),
+      & .step-num:nth-of-type(4),
+      & .step-num:nth-of-type(7),
+      & .step-num:nth-of-type(10) {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+      }
+      & .step-num:nth-of-type(10) {
+        border-color: var(--body2-primary2-color);
+      }
+      & .step-name:nth-of-type(2),
+      & .step-name:nth-of-type(5),
+      & .step-name:nth-of-type(8),
+      & .step-name:nth-of-type(11),
+      & .separator:nth-of-type(3),
+      & .separator:nth-of-type(6),
+      & .separator:nth-of-type(9) {
+        color: var(--body2-primary1-color);
+      }
+    }
+    &.step-5 {
+      & .step-num {
+        background-color: var(--body2-primary1-color);
+        color: var(--body2-progress-content-complete-color);
+      }
+      & .step-name,
+      & .separator {
         color: var(--body2-primary1-color);
       }
     }
@@ -639,7 +719,7 @@
      메인 영역 (.main)
      ======================================== */
   /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
-  .main {
+  & .main {
     width: 100%;
     height: 100%;
     display: flex;
@@ -656,12 +736,205 @@
       outline-offset: -12px;
     }
 
-    /* 모달 변형 (SCSS 네스티드) */
-    &.modal {
+    /* 타이틀 영역 */
+    & .title {
+      width: 100%;
+      height: var(--height-title);
+      flex-shrink: 0;
+      font-size: var(--font-size-h2);
+      font-weight: var(--font-weight-semibold);
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      color: var(--body1-content-secondary-color);
+      white-space: nowrap;
+
+      & .primary {
+        color: var(--body1-content-primary-color);
+      }
+    }
+
+    /* 페이지별 변형은 body 클래스에서 분기 */
+  }
+
+  /* ========================================
+     페이지별 변형 (body .process + 레이아웃 클래스)
+     ======================================== */
+  &.first {
+    & .main {
+      position: relative;
+      height: 100%;
+    }
+
+    & .main .poster {
+      width: var(--layout-width);
+      height: auto;
+      object-fit: contain;
+    }
+
+    & .main p {
+      letter-spacing: inherit;
+      line-height: inherit;
+      font-stretch: inherit;
+    }
+  }
+
+  &.second {
+    & .main {
+      justify-content: space-evenly;
+    }
+  }
+
+  /* 주문내역 .details-content: 논 low = 행2 열1(세로), pagination 셀 높이 = order-row 한 행 높이 */
+  &.third {
+    & .main {
+      & .details-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(6, 1fr) 1fr;
+        width: 100%;
+        height: 100%;
+        place-items: center;
+
+        & .order-list {
+          grid-row: 1 / 7;
+          justify-self: stretch;
+          align-self: stretch;
+        }
+
+        & .pagination {
+          grid-row: 7 / 8;
+          align-self: center;
+        }
+      }
+    }
+  }
+
+  &.forth {
+    & .main {
+      position: relative;
+      font-size: var(--font-size-b1);
+      padding-top: var(--height-title);
+      padding-bottom: 182px;
+
+      & .payment {
+        width: 100%;
+        height: 100%;
+        flex-grow: 1;
+      }
+
+      & .task-manager {
+        width: fit-content;
+        height: fit-content;
+      }
+    }
+  }
+
+  /* ========================================
+     푸터 영역 (.summary, .bottom)
+     ======================================== */
+  & .summary {
+    width: 100%;
+    height: var(--height-summary);
+    background-color: var(--body1-background-color);
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--spacing-sm);
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid var(--body1-border-color);
+
+    & .task-manager {
+      width: fit-content;
+      justify-content: space-between;
+    }
+
+    & .summary-label {
+      font-weight: var(--font-weight-semibold);
+      color: var(--body2-secondary1-color);
+    }
+
+    & .summary-text {
+      font-weight: var(--font-weight-semibold);
+      color: var(--body2-primary1-color);
+    }
+
+    & .short-colline {
+      width: 2px;
+      height: 41px;
+      background: var(--body1-border-color);
+    }
+  }
+
+  & .bottom {
+    width: 100%;
+    height: var(--height-bottom);
+    flex-shrink: 0;
+    border-top: 2px solid var(--body1-border-color);
+    background-color: var(--body1-background-color);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .countdown {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 낮은화면 상단 여백 */
+  & .black {
+    width: 100%;
+    height: 0px;
+    background-color: var(--color-gray-01);
+  }
+
+  & .short-colline {
+    width: 2px;
+    height: 41px;
+    background: var(--body1-content-secondary-color);
+  }
+  }
+
+  /* ========================================
+     & .modal – 모달 시스템 (body 하위)
+     구조: .modal > .main > .up-content, .down-content / 타이포는 body 상속
+     ======================================== */
+    & .modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 0 var(--layout-padding-x);
+    background: #00000099;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    & > .main {
+      grid-area: 1/1;
+      pointer-events: auto;
+    }
+
+    & .main {
       position: relative;
       width: 100%;
-      padding-left: 0px;
-      padding-right: 0px;
+      padding-left: 0;
+      padding-right: 0;
       height: fit-content;
       border-radius: 24px;
       border: 2px solid var(--body1-border-color);
@@ -673,9 +946,6 @@
       color: var(--body1-content-secondary-color);
       box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
 
-      /* ==============================
-         상단 (공통)
-         ============================== */
       & .up-content {
         width: 100%;
         background: var(--body1-background-color);
@@ -714,9 +984,6 @@
         }
       }
 
-      /* ==============================
-         하단 (공통)
-         ============================== */
       & .down-content {
         width: 100%;
         flex: 1;
@@ -725,22 +992,16 @@
         border-top: 2px solid var(--body1-border-color);
         justify-content: center;
         align-items: center;
-        /* 가로 중앙 */
         padding: var(--spacing-xl);
         gap: var(--spacing-xl);
 
-        /* 메시지/레이블 (공통) */
         & .modal-message {
           display: flex;
           flex-flow: column nowrap;
           align-items: center;
           gap: 8px;
 
-          & .highlight {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-
+          & .highlight,
           & .primary {
             color: var(--body1-content-primary-color);
             font-weight: var(--font-weight-semibold);
@@ -756,7 +1017,6 @@
           height: 10rem;
         }
 
-        /* 설정 항목명 (접근성 모달) */
         & .setting-name {
           display: flex;
           flex-flow: row nowrap;
@@ -771,7 +1031,6 @@
           }
         }
 
-        /* 작업관리 버튼 (공통) */
         & .task-manager {
           display: flex;
           justify-content: center;
@@ -779,7 +1038,6 @@
           gap: var(--spacing-sm);
         }
 
-        /* 구분선 (접근성용) */
         & .setting-line {
           width: 100%;
           height: 0;
@@ -789,140 +1047,7 @@
         }
       }
     }
-
-    /* 타이틀 영역 */
-    & .title {
-      width: 100%;
-      height: var(--height-title);
-      flex-shrink: 0;
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-semibold);
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      color: var(--body1-content-secondary-color);
-      white-space: nowrap;
-
-      & .primary {
-        color: var(--body1-content-primary-color);
-      }
-    }
-
-    /* 페이지별 변형 */
-    &.first {
-      position: relative;
-      height: 100%;
-
-      & .poster {
-        width: var(--layout-width);
-        height: auto;
-        object-fit: contain;
-      }
-
-      & p {
-        letter-spacing: inherit;
-        line-height: inherit;
-        font-stretch: inherit;
-      }
-    }
-
-    &.second {
-      justify-content: space-evenly;
-    }
-
-    &.third {
-      padding-bottom: 100px;
-    }
-
-    &.forth {
-      position: relative;
-      font-size: var(--font-size-b1);
-      padding-top: var(--height-title);
-      padding-bottom: 182px;
-
-      & .payment {
-        width: 100%;
-        height: 100%;
-        flex-grow: 1;
-      }
-
-      & .task-manager {
-        width: fit-content;
-        height: fit-content;
-      }
-    }
   }
-
-  /* ========================================
-     푸터 영역 (.summary, .bottom)
-     ======================================== */
-  .summary {
-    width: 100%;
-    height: var(--height-summary);
-    background-color: var(--body1-background-color);
-    display: flex;
-    flex-shrink: 0;
-    gap: var(--spacing-sm);
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 2px solid var(--body1-border-color);
-
-    & .task-manager {
-      width: fit-content;
-      justify-content: space-between;
-    }
-
-    & .summary-label {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-secondary1-color);
-    }
-
-    & .summary-text {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-primary1-color);
-    }
-
-    & .short-colline {
-      width: 2px;
-      height: 41px;
-      background: var(--body1-border-color);
-    }
-  }
-
-  .bottom {
-    width: 100%;
-    height: var(--height-bottom);
-    flex-shrink: 0;
-    border-top: 2px solid var(--body1-border-color);
-    background-color: var(--body1-background-color);
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .countdown {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* 낮은화면 상단 여백 */
-  .black {
-    width: 100%;
-    height: 0px;
-    background-color: var(--color-gray-01);
-  }
-
-  .short-colline {
-    width: 2px;
-    height: 41px;
-    background: var(--body1-content-secondary-color);
   }
 }
 
@@ -937,40 +1062,8 @@
      - 레이아웃 배색: --body* 변수 사용
      - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
      ============================== */
-
-  /* ==============================
-     모달 시스템
-     스크림 < 콘텐츠 < 업/다운 < ...
-     ============================== */
-  /* ==============================
-     모달 시스템
-     레이어: .modal-overlay (배경+정렬) > .main.modal (실제 박스)
-     ============================== */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    /* 가로세로 중앙 정렬 */
-    padding: 0 var(--layout-padding-x);
-    background: #00000099;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* 하위의 모든 모달은 같은 grid 영역에 겹쳐서 쌓임 */
-    &>.main.modal {
-      grid-area: 1/1;
-      pointer-events: auto;
-    }
-  }
+     
+  /* 모달 시스템: layout 레이어 body & .modal */
 
   .menu {
     position: relative;
@@ -1044,24 +1137,36 @@
   }
 
   .order-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, 1fr);
+    place-items: center;
+    row-gap: 0;
     width: 100%;
     height: 100%;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
     padding-left: 43px;
     padding-right: 43px;
     flex-grow: 1;
 
     & .order-row {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      height: fit-content;
-      padding-top: 25px;
-      padding-bottom: 25px;
+      height: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      &.with-line::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background-color: var(--body1-border-color);
+      }
 
       & .order-image-div {
         position: relative;
@@ -1130,11 +1235,6 @@
       }
     }
 
-    & .row-line {
-      width: 100%;
-      height: 2px;
-      background-color: var(--body1-border-color);
-    }
   }
 
   .credit-pay-image {
@@ -1206,18 +1306,18 @@
     &.pagination-vertical {
       flex-flow: column nowrap;
     }
-  }
 
-  .pagination-page-current {
-    color: var(--body1-content-primary-color);
-  }
+    & .pagination-page-current {
+      color: var(--body1-content-primary-color);
+    }
 
-  .pagination-separator {
-    color: var(--body1-border-color);
-  }
+    & .pagination-separator {
+      color: var(--body1-border-color);
+    }
 
-  .pagination-page-total {
-    color: var(--body1-content-secondary-color);
+    & .pagination-page-total {
+      color: var(--body1-content-secondary-color);
+    }
   }
 
   /* ========================================
@@ -1749,9 +1849,19 @@
     }
   }
 
-  /* 하단 버튼 높이 (components 레이어에서 적용) */
-  .bottom .button {
-    height: 76px;
+  /* 하단/요약 버튼 높이 (components 레이어에서 적용) */
+  body .process {
+    & .bottom {
+      & .button {
+        height: 76px;
+      }
+    }
+
+    & .summary {
+      & .button {
+        height: 134px;
+      }
+    }
   }
 }
 
@@ -1901,149 +2011,159 @@
   }
 
   /* ========================================
-     Low Screen Mode (.low) - 저시력 모드
+     Low Screen Mode (.low) - 저시력 모드 (body에 .low 클래스)
      버튼 크기 오버라이드
      ======================================== */
-  .low {
-    & .main.third .title {
-      font-size: var(--font-size-h1);
-      height: 100px;
+  body.low .process {
+    &.second {
+      & .main {
+        padding-top: 84px;
+      }
     }
-    
-    & .main.third{
-      padding-bottom: 0px;
 
-      & .pagination {
-        flex-flow: column nowrap;
+    &.third {
+      & .main .title {
+        font-size: var(--font-size-h1);
+        height: 100px;
       }
-
-      & .banner.field {
-        padding-left: 32px;
-        padding-right: 32px;
-        gap: 16px;
-
-        & .one-num {
-          width: 70px;
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: center;
-          align-items: center;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
+      
+      & .main {
+        & .pagination {
+          flex-flow: column nowrap;
         }
 
-        & .one-normal {
-          width: 236px;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
-        }
+        & .banner.field {
+          padding-left: 32px;
+          padding-right: 32px;
+          gap: 16px;
 
-        & .one-qty-normal {
-          width: 242px;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
-        }
-
-        & .one-price-normal {
-          width: 236px;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
-        }
-
-        & .one-delete-normal {
-          width: 76px;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
-        }
-  
-        & .one-pagination-normal {
-          width: 184px;
-          overflow: visible;
-          white-space: nowrap;
-          text-align: center;
-          
-        }      
-      }
-
-      & .details-content {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        gap: 16px;
-
-        & .order-list {
-          width: 100%;
-          height: 100%;
-          padding-left: 0px;
-          padding-right: 0px;
-  
-          & .row-line {
-            width: 100%;
-            height: 2px;
+          & .one-num {
+            width: 70px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
           }
 
-          & .order-row {
-            padding-top: 10px;
-            padding-bottom: 10px;
-            width: 100%;
+          & .one-normal {
+            width: 236px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
 
-            & .order-image-div {
-              width: 70px;
-              height: 70px;
-              
-              & .order-image {
-                width: 100%;
-                height: 100%;
+          & .one-qty-normal {
+            width: 242px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-price-normal {
+            width: 236px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-delete-normal {
+            width: 76px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+    
+          & .one-pagination-normal {
+            width: 184px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }      
+        }
+
+        /* .low: 가로 그리드(OrderList | Pagination) */
+        & .details-content {
+          grid-template-columns: 1fr auto;
+          grid-template-rows: 1fr;
+          gap: 16px;
+
+          & .order-list {
+            grid-column: 1;
+            grid-row: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(3, 1fr);
+            place-items: center;
+            row-gap: 0;
+            padding-left: 0px;
+            padding-right: 0px;
+
+            & .order-row {
+              width: 100%;
+              height: 100%;
+              padding-top: 0px;
+              padding-bottom: 0px;
+
+              & .order-image-div {
+                width: 70px;
+                height: 70px;
+                
+                & .order-image {
+                  width: 100%;
+                  height: 100%;
+                }
+
+                & .order-index {
+                  width: fit-content;
+                  height: fit-content;
+                }
+              }   
+
+              & .order-name {              
+                width: 236px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
               }
 
-              & .order-index {
-                width: fit-content;
-                height: fit-content;
-              }
-            }   
-
-            & .order-name {              
-              width: 236px;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow: hidden;
-            }
-
-            & .order-quantity {
+              & .order-quantity {
 
 
-              & .counter {
-                width: 63px;
-                height: 60px;
+                & .counter {
+                  width: 63px;
+                  height: 60px;
+                }
+
+                & .qty {
+                  width: 73px;
+                  height: 60px;
+                }
               }
 
-              & .qty {
-                width: 73px;
-                height: 60px;
+              & .order-price {
+                width: 236px;
+              }
+
+              & .order-delete {
+                width: 70px;
+                height: 70px;
               }
             }
+          }
 
-            & .order-price {
-              width: 236px;
-            }
-
-            & .order-delete {
-              width: 70px;
-              height: 70px;
-            }
+          & .pagination {
+            grid-column: 2;
+            grid-row: 1;
+            align-self: center;
           }
         }
       }
@@ -2061,6 +2181,14 @@
       }
     }
 
+    & .summary {
+      height: var(--height-summary-low);
+
+      & .button{
+        height: 90px;
+      }
+    }
+
     & .black {
       height: 1020px;
       flex-shrink: 0;
@@ -2068,13 +2196,15 @@
   }
 
   /* Hero 섹션 (첫 화면 메인 콘텐츠) */
-  .hero {
+  body .process {
+  & .hero {
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-evenly;
     align-items: center;
     flex: 1;
     /* 남은 공간 채우기 */
+  }
   }
 }
 

@@ -52,15 +52,29 @@ const aliasPlugin = {
   setup(builder) {
     const aliases = [
       { prefix: "@shared", path: "src/shared" },
-      { prefix: "@features", path: "src/features" },
+      { prefix: "@processes", path: "src/processes" },
+      { prefix: "@components", path: "src/components" },
+      { prefix: "@modals", path: "src/modals" },
     ];
 
+    const SHARED_SUBPATHS = ["constants", "contexts", "hooks", "initializers", "utils"];
     aliases.forEach((aliasConfig) => {
       const filter = new RegExp(`^${aliasConfig.prefix}(\\/.*)?$`);
       builder.onResolve({ filter }, (args) => {
         const suffix = args.path.slice(aliasConfig.prefix.length);
         const cleanSuffix = suffix.startsWith("/") ? suffix.slice(1) : suffix;
-        return { path: resolveAliasPath(aliasConfig.path, cleanSuffix) };
+        if (aliasConfig.prefix === "@shared" && !cleanSuffix) {
+          return { path: resolve(process.cwd(), "src/index.js") };
+        }
+        const basePath =
+          aliasConfig.prefix === "@shared" && SHARED_SUBPATHS.includes(cleanSuffix)
+            ? "src"
+            : aliasConfig.path;
+        const suffixPath =
+          aliasConfig.prefix === "@shared" && SHARED_SUBPATHS.includes(cleanSuffix)
+            ? cleanSuffix
+            : cleanSuffix;
+        return { path: resolveAliasPath(basePath, suffixPath) };
       });
     });
   },

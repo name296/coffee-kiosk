@@ -14,7 +14,7 @@ import {
   ButtonStateProvider,
   ButtonGroupProvider,
   ScreenRouteProvider
-} from "@shared/contexts";
+} from "./contexts";
 
 // Initializers
 import {
@@ -22,16 +22,16 @@ import {
   ViewportInitializer,
   AppFocusTrapInitializer,
   GlobalTimeoutInitializer
-} from "@shared/initializers";
+} from "./initializers";
 
 // Components
-import { Screen, ModalContainer } from "@shared/ui";
+import Screen from "./Screen";
 
 // ============================================================================
-// 메인 App 컴포넌트
+// ?? App ????
 // ============================================================================
 const App = () => {
-  // 전역 포커스 이동 추적 (디버깅용)
+  // ?? ??? ?? ?? (????)
   useEffect(() => {
     const handleFocusIn = (e) => {
       const target = e.target;
@@ -43,7 +43,7 @@ const App = () => {
         isModal: target.classList.contains('modal')
       } : null;
 
-      console.log('[포커스] focusin 이벤트 발생', {
+      console.log('[???] focusin ??? ??', {
         target: targetInfo,
         timestamp: new Date().toISOString()
       });
@@ -63,7 +63,7 @@ const App = () => {
         id: relatedTarget.id || null
       } : null;
 
-      console.log('[포커스] focusout 이벤트 발생', {
+      console.log('[???] focusout ??? ??', {
         from: targetInfo,
         to: relatedInfo,
         timestamp: new Date().toISOString()
@@ -82,7 +82,6 @@ const App = () => {
   return (
     <>
       <audio id="audioPlayer" src="" />
-
       <TTSDBProvider>
         <TTSStateProvider>
           <AccessibilityProvider>
@@ -98,7 +97,6 @@ const App = () => {
                           <AppFocusTrapInitializer />
                           <GlobalTimeoutInitializer />
                           <Screen />
-                          <ModalContainer />
                         </ScreenRouteProvider>
                       </ButtonGroupProvider>
                     </ButtonStateProvider>
@@ -116,8 +114,6 @@ const App = () => {
 // ============================================================================
 // Root Rendering
 // ============================================================================
-const rootElement = document.getElementById('root') || document.body;
-const root = ReactDOM.createRoot(rootElement);
-root.render(<App />);
+ReactDOM.createRoot(document.body).render(<App />);
 
 export default App;
