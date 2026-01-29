@@ -24,6 +24,9 @@ import {
   GlobalTimeoutInitializer
 } from "./initializers";
 
+// Hooks (TickProvider: 모든 카운트가 동시에 갱신되도록)
+import { TickProvider } from "./hooks/useCountdown";
+
 // Components
 import Screen from "./Screen";
 
@@ -92,11 +95,13 @@ const App = () => {
                     <ButtonStateProvider>
                       <ButtonGroupProvider>
                         <ScreenRouteProvider>
-                          <ButtonHandlerInitializer />
-                          <ViewportInitializer />
-                          <AppFocusTrapInitializer />
-                          <GlobalTimeoutInitializer />
-                          <Screen />
+                          <TickProvider>
+                            <ButtonHandlerInitializer />
+                            <ViewportInitializer />
+                            <AppFocusTrapInitializer />
+                            <GlobalTimeoutInitializer />
+                            <Screen />
+                          </TickProvider>
                         </ScreenRouteProvider>
                       </ButtonGroupProvider>
                     </ButtonStateProvider>

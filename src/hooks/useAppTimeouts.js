@@ -52,10 +52,8 @@ const useIdleTimeoutInternal = (onTimeout, timeout, enabled = true) => {
     } = useCountdown({
         durationMs: timeout,
         enabled,
-        tickMs: 100,
         onTimeout: handleTimeout,
-        restartOnTimeout: true,
-        precision: "ms"
+        restartOnTimeout: true
     });
 
     const resetTimer = useCallback(() => {
@@ -220,9 +218,7 @@ export const useAppTimeouts = ({
         durationMs: initialSeconds * 1000,
         enabled: autoFinishEnabled,
         onTimeout: onAutoFinishTimeout,
-        resetEvents,
-        tickMs: 100,
-        precision: "s"
+        resetEvents
     });
 
     return { resetApp, idleTimeout, countdown, resetCountdown };

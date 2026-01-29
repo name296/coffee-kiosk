@@ -25,12 +25,8 @@ export const GlobalTimeoutInitializer = () => {
 
     const { remainingTimeFormatted, remainingTime, resetTimer } = idleTimeout;
 
-    // 전역/지역 틱 맞추기: 전역도 '초'가 바뀔 때만 context 반영 (지역 카운트다운과 같은 틱)
-    const lastPushedSecondRef = useRef(-1);
+    // 전역 표시를 useCountdown 틱과 동기화: 매 틱마다 context 반영 (0.1초 차이 방지)
     useLayoutEffect(() => {
-        const displaySecond = Math.ceil(remainingTime / 1000);
-        if (displaySecond === lastPushedSecondRef.current) return;
-        lastPushedSecondRef.current = displaySecond;
         if (timeout?.setGlobalRemainingTime) {
             timeout.setGlobalRemainingTime(remainingTime);
         }
