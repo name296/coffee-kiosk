@@ -1612,6 +1612,7 @@
         border: 2px solid var(--body1-border-color);
         display: flex;
         flex-flow: column nowrap;
+        &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
         &:focus-visible {
           outline: 12px dashed var(--border-color-pointed);
           outline-offset: -12px;
