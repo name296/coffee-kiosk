@@ -12,8 +12,8 @@ import ProcessReceiptPrint from "./ProcessReceiptPrint";
 import ProcessFinish from "./ProcessFinish";
 
 /**
- * 프로세스 콘피그: ProcessName → [레이아웃 + 콘텐츠] 로 스크린 구성.
- * - layoutType: first | second | third | forth → div.process 클래스 (Step/Summary 표시 여부는 CSS .first 등으로 제어)
+ * 프로세스 콘피그: ProcessName → [스크린 레이아웃 + 콘텐츠] 로 스크린 구성.
+ * - layoutType: first | second | third | forth → body에 지정 (스크린 레이아웃, CSS body.first 등으로 제어)
  * - Component: 해당 프로세스 콘텐츠 컴포넌트
  * - className: Main 보조 클래스 (필요 시)
  */

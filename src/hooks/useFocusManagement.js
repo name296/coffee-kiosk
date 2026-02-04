@@ -9,30 +9,22 @@ export const getFocusableElements = () => {
         });
 
     // 모달 상태 확인
-    const modalContentElement = document.querySelector('.modal .main');
-    const isModalOpen = modalContentElement && window.getComputedStyle(modalContentElement).display !== 'none';
+    const modalElement = document.querySelector('.modal');
+    const isModalOpen = modalElement?.classList.contains('active');
 
-    if (isModalOpen) {
-        // 모달이 열려있을 때: .modal .main을 포커스 루프에 추가
-        if (modalContentElement) {
-            const modalStyle = window.getComputedStyle(modalContentElement);
-            if (modalStyle.display !== 'none' && modalStyle.visibility !== 'hidden') {
-                // .modal .main에 tabindex가 없으면 추가
-                if (!modalContentElement.hasAttribute('tabindex')) {
-                    modalContentElement.setAttribute('tabindex', '-1');
-                }
-                // .modal .main을 첫 번째 요소로 추가 (모달 열릴 때 포커스가 가도록)
-                elements.unshift(modalContentElement);
-            }
+    if (isModalOpen && modalElement) {
+        // 모달이 열려있을 때: .modal(흐려짐 영역)을 포커스 루프에 추가
+        const modalStyle = window.getComputedStyle(modalElement);
+        if (modalStyle.display !== 'none' && modalStyle.visibility !== 'hidden') {
+            elements.unshift(modalElement);
         }
     } else {
-        // 모달이 닫혀있을 때: body.process .main을 포커스 루프에 추가 (화면 전환 시 포커스 지정을 위해)
-        const mainElement = document.querySelector('.process .main');
-        if (mainElement) {
-            const mainStyle = window.getComputedStyle(mainElement);
-            if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
-                // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
-                elements.unshift(mainElement);
+        // 모달이 닫혀있을 때: .process를 포커스 루프에 추가 (화면 전환 시 포커스 지정을 위해)
+        const processElement = document.querySelector('.process');
+        if (processElement) {
+            const processStyle = window.getComputedStyle(processElement);
+            if (processStyle.display !== 'none' && processStyle.visibility !== 'hidden') {
+                elements.unshift(processElement);
             }
         }
     }

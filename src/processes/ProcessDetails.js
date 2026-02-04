@@ -1,5 +1,5 @@
 import React, { memo, useContext, useMemo, useEffect, useRef } from "react";
-import { Highlight, OrderList, Pagination } from "../components";
+import { OrderList, Pagination } from "../components";
 
 import { OrderContext, AccessibilityContext, ModalContext, ScreenRouteContext } from "../contexts";
 import { useFocusableSectionsManager, usePagination } from "../hooks";
@@ -56,8 +56,8 @@ const ProcessDetails = memo(() => {
         }
     }, [order.orderItems, navigateTo]);
 
-    const handleItemDecrease = (itemId, currentItemsLength) => (e) => {
-        e.preventDefault(); e.currentTarget.focus();
+    const handleItemDecrease = (itemId, currentItemsLength) => (e, target) => {
+        target?.focus?.();
         if (order.quantities[itemId] === 1) {
             modal.setModalDeleteItemId(itemId);
             (order.orderItems.length > 1) ? modal.ModalDelete.open() : modal.ModalDeleteCheck.open();
@@ -66,13 +66,13 @@ const ProcessDetails = memo(() => {
         }
     };
 
-    const handleItemIncrease = (itemId) => (e) => {
-        e.preventDefault(); e.currentTarget.focus();
+    const handleItemIncrease = (itemId) => (e, target) => {
+        target?.focus?.();
         order.handleIncrease(itemId);
     };
 
-    const handleItemDelete = (itemId, currentItemsLength) => (e) => {
-        e.preventDefault(); e.currentTarget.focus();
+    const handleItemDelete = (itemId, currentItemsLength) => (e, target) => {
+        target?.focus?.();
         modal.setModalDeleteItemId(itemId);
         (order.orderItems.length > 1) ? modal.ModalDelete.open() : modal.ModalDeleteCheck.open();
     };
@@ -81,11 +81,11 @@ const ProcessDetails = memo(() => {
         <>
             <div className="title">
                 {accessibility.isLow ? (
-                    <span><Highlight>내역</Highlight>을 확인하시고 <Highlight>결제하기</Highlight> 버튼을 누르세요</span>
+                    <span><span className="primary">내역</span>을 확인하시고 <span className="primary">결제하기</span> 버튼을 누르세요</span>
                 ) : (
                     <>
-                        <span><Highlight>내역</Highlight>을 확인하시고</span>
-                        <span><Highlight>결제하기</Highlight>&nbsp;버튼을 누르세요</span>
+                        <span><span className="primary">내역</span>을 확인하시고</span>
+                        <span><span className="primary">결제하기</span>&nbsp;버튼을 누르세요</span>
                     </>
                 )}
             </div>
@@ -118,8 +118,8 @@ const ProcessDetails = memo(() => {
                 <Pagination
                     pageNumber={pageNumber}
                     totalPages={totalPages}
-                    onPrev={(e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); }}
-                    onNext={(e) => { e.preventDefault(); e.target.focus(); handleNextPage(); }}
+                    onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
+                    onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
                     direction={accessibility.isLow ? "vertical" : "horizontal"}
                     ttsPrefix="주문목록"
                     sectionRef={actionBarRef}

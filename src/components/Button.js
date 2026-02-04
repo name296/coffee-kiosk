@@ -4,10 +4,12 @@ import { ScreenRouteContext, ModalContext } from "../contexts";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
-// 포커스 가능한 요소에 --min-side 계산
+const BUTTON_ACTION_DELAY_MS = 50;
+
+// 포커스 가능한 요소에 --button-min-side 계산
 const applyFocusableMinSide = (el) => {
     if (!el) return;
-    else el.style.setProperty('--min-side', `${Math.min(el.offsetWidth, el.offsetHeight)}px`);
+    else el.style.setProperty('--button-min-side', `${Math.min(el.offsetWidth, el.offsetHeight)}px`);
 };
 
 const Button = memo(({
@@ -134,22 +136,23 @@ const Button = memo(({
         onPressed?.(false);
 
         if (onChange && selectedValue !== undefined) {
-            onChange(selectedValue);
+            setTimeout(() => onChange(selectedValue), BUTTON_ACTION_DELAY_MS);
         } else {
-            // 프레임워크 액션 직접 실행
-            if (navigate) {
-                navigateTo(navigate);
-            }
-            if (modal) {
-                const modalInstance = modalContext?.[`Modal${modal}`];
-                if (modalInstance) {
-                    modalInstance.open(label, buttonIcon);
+            // 프레임워크 액션 100ms 딜레이 후 실행
+            setTimeout(() => {
+                if (navigate) {
+                    navigateTo(navigate);
                 }
-            }
-            // 사용자 정의 핸들러 병렬 실행
-            if (onClick) {
-                onClick(e);
-            }
+                if (modal) {
+                    const modalInstance = modalContext?.[`Modal${modal}`];
+                    if (modalInstance) {
+                        modalInstance.open(label, buttonIcon);
+                    }
+                }
+                if (onClick) {
+                    onClick(e, btnRef.current);
+                }
+            }, BUTTON_ACTION_DELAY_MS);
         }
     }, [disabled, navigate, modal, navigateTo, modalContext, label, buttonIcon, onClick, onChange, selectedValue, onPressed]);
 

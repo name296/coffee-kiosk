@@ -6,7 +6,7 @@ import { formatNumber, convertToKoreanQuantity } from "../utils";
 
 const Summary = memo(({ orderSummaryRef }) => {
     const order = useContext(OrderContext);
-    const { currentPage } = useContext(ScreenRouteContext);
+    const { currentProcess } = useContext(ScreenRouteContext);
     const totalCount = order?.totalCount || 0;
     const totalSum = order?.totalSum || 0;
 
@@ -17,7 +17,7 @@ const Summary = memo(({ orderSummaryRef }) => {
     }, [totalCount]);
 
     // 메뉴선택/내역확인 페이지에서만 표시
-    if (currentPage !== 'ProcessMenu' && currentPage !== 'ProcessDetails') {
+    if (currentProcess !== 'ProcessMenu' && currentProcess !== 'ProcessDetails') {
         return null;
     }
 
@@ -36,16 +36,15 @@ const Summary = memo(({ orderSummaryRef }) => {
 
             {/* 버튼 영역 */}
             <div className="task-manager" ref={orderSummaryRef} data-tts-text={summaryTtsText}>
-                {currentPage === 'ProcessMenu' && (
+                {currentProcess === 'ProcessMenu' && (
                     <>
                         <Button
-                            className="w199h090"
                             svg={<ResetIcon className="summary-btn-icon" />}
                             label="초기화"
                             modal="Reset"
                         />
                         <Button
-                            className="w199h090 primary1"
+                            className="primary1"
                             svg={<OrderIcon className="summary-btn-icon" />}
                             label="주문"
                             disabled={isDisabledBtn}
@@ -53,16 +52,15 @@ const Summary = memo(({ orderSummaryRef }) => {
                         />
                     </>
                 )}
-                {currentPage === 'ProcessDetails' && (
+                {currentProcess === 'ProcessDetails' && (
                     <>
                         <Button
-                            className="w199h090"
                             svg={<AddIcon className="summary-btn-icon" />}
                             label="메뉴"
                             navigate="ProcessMenu"
                         />
                         <Button
-                            className="w199h090 primary1"
+                            className="primary1"
                             svg={<PayIcon className="summary-btn-icon" />}
                             label="결제"
                             navigate="ProcessPayments"

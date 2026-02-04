@@ -13,11 +13,10 @@ export const safeQuerySelector = (s, c = null) => {
 
 export const focusMainElement = () => {
     if (typeof document === 'undefined') return;
-    const mainElement = document.querySelector('.main');
-    if (mainElement) {
+    const processElement = document.querySelector('.process');
+    if (processElement) {
         const prevActive = document.activeElement;
-        if (prevActive === mainElement && prevActive?.blur) {
-            // 이미 .main에 포커스가 있으면 blur -> focus로 focusin을 강제
+        if (prevActive === processElement && prevActive?.blur) {
             prevActive.blur();
         }
         const prevActiveInfo = prevActive ? {
@@ -28,11 +27,11 @@ export const focusMainElement = () => {
 
         console.log('[포커스] focusMainElement 호출', {
             from: prevActiveInfo,
-            to: { tagName: mainElement.tagName, className: mainElement.className },
+            to: { tagName: processElement.tagName, className: processElement.className },
             timestamp: new Date().toISOString()
         });
 
-        mainElement.focus();
+        processElement.focus();
     }
 };
 
@@ -69,9 +68,8 @@ export const useDOM = () => {
 
     const focusModalContent = useCallback(() => {
         if (typeof document !== 'undefined') {
-            // .modal .main (모달 콘텐츠 박스) 찾기
-            const modalContentElement = document.querySelector('.modal .main');
-            if (modalContentElement) {
+            const modalElement = document.querySelector('.modal');
+            if (modalElement) {
                 const prevActive = document.activeElement;
                 const prevActiveInfo = prevActive ? {
                     tagName: prevActive.tagName,
@@ -79,21 +77,15 @@ export const useDOM = () => {
                     id: prevActive.id || null
                 } : null;
 
-                // .modal .main에 tabindex가 없으면 추가
-                if (!modalContentElement.hasAttribute('tabindex')) {
-                    modalContentElement.setAttribute('tabindex', '-1');
-                }
-
                 console.log('[포커스] focusModalContent 호출', {
                     from: prevActiveInfo,
-                    to: { tagName: modalContentElement.tagName, className: modalContentElement.className },
+                    to: { tagName: modalElement.tagName, className: modalElement.className },
                     timestamp: new Date().toISOString()
                 });
 
-                // 항상 포커스 설정 (모달이 열릴 때)
-                modalContentElement.focus();
+                modalElement.focus();
             } else {
-                console.log('[포커스] focusModalContent 스킵 (.modal .main 요소 없음)');
+                console.log('[포커스] focusModalContent 스킵 (.modal 요소 없음)');
             }
         }
     }, []);

@@ -3,19 +3,19 @@ import { ScreenRouteContext } from "../contexts";
 import { StepIcon } from "../Icon";
 
 /** 단계 인덱스: ProcessMenu=1, ProcessDetails=2, 결제그룹=3, 완료그룹=4, ProcessFinish=5. CSS .step.1~.5로 상태 제어 */
-function getStepIndex(currentPage) {
-    if (currentPage === 'ProcessMenu') return 1;
-    if (currentPage === 'ProcessDetails') return 2;
-    if (['ProcessPayments', 'ProcessCardInsert', 'ProcessMobilePay', 'ProcessSimplePay', 'ProcessCardRemoval'].includes(currentPage)) return 3;
-    if (['ProcessOrderComplete', 'ProcessReceiptPrint'].includes(currentPage)) return 4;
-    if (currentPage === 'ProcessFinish') return 5;
+function getStepIndex(currentProcess) {
+    if (currentProcess === 'ProcessMenu') return 1;
+    if (currentProcess === 'ProcessDetails') return 2;
+    if (['ProcessPayments', 'ProcessCardInsert', 'ProcessMobilePay', 'ProcessSimplePay', 'ProcessCardRemoval'].includes(currentProcess)) return 3;
+    if (['ProcessOrderComplete', 'ProcessReceiptPrint'].includes(currentProcess)) return 4;
+    if (currentProcess === 'ProcessFinish') return 5;
     return null;
 }
 
 /** UI 컴포넌트: 단계 표시(메뉴선택 → 내역확인 → 결제 → 완료). 진행/현재 상태는 .step.1~.5 CSS로 제어 */
 const Step = memo(() => {
-    const { currentPage } = useContext(ScreenRouteContext);
-    const stepIndex = getStepIndex(currentPage);
+    const { currentProcess } = useContext(ScreenRouteContext);
+    const stepIndex = getStepIndex(currentProcess);
     if (stepIndex == null) return null;
 
     /* 지나간 스텝 = ✓, 현재/미래 스텝 = 숫자 */

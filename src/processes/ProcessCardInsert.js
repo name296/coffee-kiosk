@@ -20,9 +20,9 @@ const ProcessCardInsert = memo(() => {
             </div>
             <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
             <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리. 버튼 세 개,">
-                <Button className="w371h120" navigate="ProcessPayments" label="취소" />
-                <Button style={{ height: "120px" }} modal="PaymentError" label="가상오류" />
-                <Button style={{ height: "120px" }} navigate="ProcessCardRemoval" label="가상투입" />
+                <Button navigate="ProcessPayments" label="취소" />
+                <Button style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />
+                <Button style={{ width: "fit-content" }} navigate="ProcessCardRemoval" label="가상투입" />
             </div>
         </>
     );

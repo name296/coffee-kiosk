@@ -24,13 +24,13 @@ const ProcessPayments = memo(() => {
             <div className="banner price" onClick={(e) => { e.preventDefault(); e.target.focus(); order.updateOrderNumber(); navigateTo('ProcessOrderComplete'); }}>
                 <span>결제금액</span><span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
             </div>
-            <div className="task-manager" ref={mainContentRef} data-tts-text="결제 선택. 버튼 세 개, ">
-                <Button className="w328h460" navigate="ProcessCardInsert" img="./images/payment-card.png" label="신용카드" />
-                <Button className="w328h460" navigate="ProcessMobilePay" img="./images/payment-mobile.png" label="모바일 페이" />
-                <Button className="w328h460" navigate="ProcessSimplePay" img="./images/payment-simple.png" label="간편결제" />
+            <div className="payment" ref={mainContentRef} data-tts-text="결제 선택. 버튼 세 개, ">
+                <Button navigate="ProcessCardInsert" img="./images/payment-card.png" label="신용카드" />
+                <Button navigate="ProcessMobilePay" img="./images/payment-mobile.png" label="모바일 페이" />
+                <Button navigate="ProcessSimplePay" img="./images/payment-simple.png" label="간편결제" />
             </div>
             <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리. 버튼 한 개,">
-                <Button className="w500h120" navigate="ProcessDetails" label="취소" />
+                <Button navigate="ProcessDetails" label="취소" />
             </div>
         </>
     );

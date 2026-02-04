@@ -8,7 +8,7 @@ const ProcessFinish = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
     const { countdown } = useAppTimeouts({
-        setCurrentPage: (p) => navigateTo(p),
+        setCurrentProcess: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
             enabled: true,

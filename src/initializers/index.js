@@ -5,3 +5,4 @@ export { ButtonHandlerInitializer } from "./ButtonHandlerInitializer";
 export { ViewportInitializer } from "./ViewportInitializer";
 export { AppFocusTrapInitializer } from "./AppFocusTrapInitializer";
 export { GlobalTimeoutInitializer } from "./GlobalTimeoutInitializer";
+export { ResetOnProcessStartInitializer } from "./ResetOnProcessStartInitializer";

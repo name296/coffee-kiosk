@@ -178,11 +178,11 @@ const useIdleTimeoutInternal = (onTimeout, timeout, enabled = true) => {
 
 // 앱 전역 타임아웃/카운트다운을 한 곳에서 묶어 제공
 export const useAppTimeouts = ({
-    setCurrentPage,
+    setCurrentProcess,
     idle = {},
     autoFinish = {}
 } = {}) => {
-    const { resetApp } = useAppInitializer(setCurrentPage);
+    const { resetApp } = useAppInitializer(setCurrentProcess);
 
     const {
         timeoutMs = DEFAULT_IDLE_TIMEOUT_MS,

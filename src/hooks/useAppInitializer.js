@@ -31,7 +31,7 @@ const initializeApp = (callbacks) => {
         setGlobalRemainingTime,
         setGlobalRemainingTimeFormatted,
         resetIdleTimeout,
-        setCurrentPage
+        setCurrentProcess
     } = callbacks;
 
     ModalRestart?.close();
@@ -53,13 +53,13 @@ const initializeApp = (callbacks) => {
     setGlobalRemainingTimeFormatted?.(DEFAULT_GLOBAL_TIMEOUT_LABEL);
     resetIdleTimeout?.();
 
-    setCurrentPage?.('ProcessStart');
+    setCurrentProcess?.('ProcessStart');
 };
 
 /**
  * 애플리케이션 초기화(리셋) 기능을 제공하는 훅입니다.
  */
-export const useAppInitializer = (setCurrentPageState) => {
+export const useAppInitializer = (setCurrentProcessState) => {
     const order = useContext(OrderContext);
     const accessibility = useContext(AccessibilityContext);
     const modal = useContext(ModalContext);
@@ -89,10 +89,10 @@ export const useAppInitializer = (setCurrentPageState) => {
             setGlobalRemainingTimeFormatted: timeout?.setGlobalRemainingTimeFormatted,
             resetIdleTimeout: timeout?.resetIdleTimeout,
 
-            // 페이지 이동 함수
-            setCurrentPage: setCurrentPageState
+            // 프로세스 전환 함수
+            setCurrentProcess: setCurrentProcessState
         });
-    }, [accessibility, modal, order, timeout, setCurrentPageState]);
+    }, [accessibility, modal, order, timeout, setCurrentProcessState]);
 
     return { resetApp };
 };

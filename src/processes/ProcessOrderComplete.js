@@ -17,7 +17,7 @@ const ProcessOrderComplete = memo(() => {
     });
 
     const { countdown } = useAppTimeouts({
-        setCurrentPage: (p) => navigateTo(p),
+        setCurrentProcess: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
             enabled: true,
@@ -37,8 +37,8 @@ const ProcessOrderComplete = memo(() => {
                 <h1>{order.orderNumber || 100}</h1>
             </div>
             <div className="task-manager" ref={actionBarRef}>
-                <Button className="w371h120" onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp();}} navigate="ProcessReceiptPrint" label="영수증 출력" />
-                <Button ttsText="출력 안함," className="w371h120" navigate="ProcessFinish" label={`출력 안함${countdown}`} />
+                <Button onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp();}} navigate="ProcessReceiptPrint" label="영수증 출력" />
+                <Button ttsText="출력 안함," navigate="ProcessFinish" label={`출력 안함${countdown}`} />
             </div>
         </>
     );

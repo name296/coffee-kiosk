@@ -44,7 +44,7 @@ const MenuGrid = memo(({
                     key={item.id}
                     item={item}
                     disabled={item.id === 0}
-                    onPress={(e) => onItemPress(e, item.id)}
+                    onPress={(e, target) => onItemPress(e, item.id, target)}
                 />
             ))}
             {hasPagination && (

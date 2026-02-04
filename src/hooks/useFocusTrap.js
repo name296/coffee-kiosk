@@ -17,13 +17,12 @@ export const useFocusTrap = (isActive, options = {}) => {
                     return style.display !== 'none' && style.visibility !== 'hidden';
                 });
 
-            // main을 포커스 루프에 항상 추가 (화면 전환 시 포커스 지정을 위해)
-            const mainElement = document.querySelector('.main');
-            if (mainElement) {
-                const mainStyle = window.getComputedStyle(mainElement);
-                if (mainStyle.display !== 'none' && mainStyle.visibility !== 'hidden') {
-                    // main을 첫 번째 요소로 추가 (화면 전환 시 main에 포커스가 가도록)
-                    elements.unshift(mainElement);
+            // .process를 포커스 루프에 항상 추가 (화면 전환 시 포커스 지정을 위해)
+            const processElement = document.querySelector('.process');
+            if (processElement) {
+                const processStyle = window.getComputedStyle(processElement);
+                if (processStyle.display !== 'none' && processStyle.visibility !== 'hidden') {
+                    elements.unshift(processElement);
                 }
             }
 
@@ -37,17 +36,12 @@ export const useFocusTrap = (isActive, options = {}) => {
                     return st.display !== 'none' && st.visibility !== 'hidden';
                 });
 
-            // main.modal을 포커스 루프에 항상 추가 (모달 열릴 때 포커스 지정을 위해)
-            const modalContentElement = containerRef.current;
-            if (modalContentElement && modalContentElement.classList.contains('main') && modalContentElement.closest('.modal')) {
-                // .modal .main에 tabindex가 없으면 추가
-                if (!modalContentElement.hasAttribute('tabindex')) {
-                    modalContentElement.setAttribute('tabindex', '-1');
-                }
-                const modalContentStyle = window.getComputedStyle(modalContentElement);
-                if (modalContentStyle.display !== 'none' && modalContentStyle.visibility !== 'hidden') {
-                    // .modal .main을 첫 번째 요소로 추가 (모달 열릴 때 포커스 지정)
-                    elements.unshift(modalContentElement);
+            // .modal(흐려짐 영역)을 포커스 루프에 추가 (모달 열릴 때 포커스 지정을 위해)
+            const modalElement = containerRef.current?.closest('.modal');
+            if (modalElement) {
+                const modalStyle = window.getComputedStyle(modalElement);
+                if (modalStyle.display !== 'none' && modalStyle.visibility !== 'hidden') {
+                    elements.unshift(modalElement);
                 }
             }
 

@@ -22,7 +22,7 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
                     <Button className="secondary1 counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
                 <Button className="order-price" label={`${formatNumber(totalPrice)}원`} />
-                <Button className="w076h076 delete-item" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
+                <Button className="delete-item" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
             </div>
         </>
     );

@@ -20,8 +20,8 @@ const ProcessSimplePay = memo(() => {
             </div>
             <img src="./images/device-codeReader-simple.png" alt="" className="credit-pay-image" />
             <div ref={actionBarRef} className="task-manager">
-                <Button className="w371h120" navigate="ProcessPayments" label="취소" />
-                <Button className="w371h120" navigate="ProcessOrderComplete" label="가상인식" />
+                <Button navigate="ProcessPayments" label="취소" />
+                <Button navigate="ProcessOrderComplete" label="가상인식" />
             </div>
         </>
     );

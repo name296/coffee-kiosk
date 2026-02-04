@@ -20,18 +20,15 @@ export const useKeyboardNavigationHandler = (enableGlobalHandlers, enableKeyboar
             if (!activeEl) return;
 
             // 모달 상태 확인
-            const modalContentElement = document.querySelector('.modal .main');
-            const isModalOpen = modalContentElement && window.getComputedStyle(modalContentElement).display !== 'none';
+            const modalElement = document.querySelector('.modal');
+            const isModalOpen = modalElement?.classList.contains('active');
 
-            // 좌우 방향키: 모든 포커스 가능한 개체를 선형으로 탐색 (부모 관계 없이, .main 포함)
+            // 좌우 방향키: 모든 포커스 가능한 개체를 선형으로 탐색
             if (key === 'ArrowLeft' || key === 'ArrowRight') {
-                // 모달이 열려있으면 모달 안의 요소만, 아니면 전체 요소 (.main 포함)
                 const allFocusable = getFocusableElements();
-                const focusableElements = isModalOpen
-                    ? allFocusable.filter(el => {
-                        return modalContentElement.contains(el) || el === modalContentElement;
-                    })
-                    : allFocusable; // 스크린일 때는 전체 요소 (.main 포함)
+                const focusableElements = isModalOpen && modalElement
+                    ? allFocusable.filter(el => modalElement.contains(el) || el === modalElement)
+                    : allFocusable;
 
                 if (focusableElements.length === 0) {
                     return;
@@ -59,14 +56,11 @@ export const useKeyboardNavigationHandler = (enableGlobalHandlers, enableKeyboar
 
             // 상하 방향키: 부모가 바뀌는 지점(data-tts-text가 있는 조건)만 확인해서 이동
             if (key === 'ArrowUp' || key === 'ArrowDown') {
-                // 모달이 열려있으면 모달 안의 요소만, 아니면 전체 요소
                 const allFocusable = getFocusableElements();
-                // .main 제외 (버튼들만)
-                const focusableButtons = (isModalOpen
-                    ? allFocusable.filter(el => {
-                        return modalContentElement.contains(el) || el === modalContentElement;
-                    })
-                    : allFocusable).filter(el => !el.classList.contains('main'));
+                // .process, .modal 제외 (버튼들만)
+                const focusableButtons = (isModalOpen && modalElement
+                    ? allFocusable.filter(el => modalElement.contains(el) || el === modalElement)
+                    : allFocusable).filter(el => !el.classList.contains('process') && !el.classList.contains('modal'));
 
                 if (focusableButtons.length === 0) {
                     return;

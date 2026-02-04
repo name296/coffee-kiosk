@@ -1,5 +1,5 @@
 import React, { memo, useContext, useLayoutEffect } from "react";
-import { Button, Highlight, H } from "../components";
+import { Button } from "../components";
 import Icon from "../Icon";
 import { TTS } from "../constants";
 import { RefContext, ScreenRouteContext, ModalContext } from "../contexts";
@@ -32,19 +32,19 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
     const finalConfirmIcon = confirmIcon || finalIcon || config?.confirmIcon || "Ok";
     const finalConfirmLabel = confirmLabel || finalTitle || config?.confirmLabel || "확인";
 
-    const { currentPage } = useContext(ScreenRouteContext);
+    const { currentProcess } = useContext(ScreenRouteContext);
     useLayoutEffect(() => {
         if (isOpen) {
             focusModalContent();
         } else {
-            if (currentPage === 'ProcessStart') {
+            if (currentProcess === 'ProcessStart') {
                 requestAnimationFrame(() => focusMain());
             }
         }
-    }, [isOpen, currentPage, focusModalContent, focusMain]);
+    }, [isOpen, currentProcess, focusModalContent, focusMain]);
 
     return (
-        <div className="main" ref={containerRef} data-tts-text={finalTts ? (finalTts + TTS.replay) : ''} tabIndex={-1}>
+        <div className="main" ref={containerRef} data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}>
             <div className="up-content">
                 {finalIcon && <Icon name={finalIcon} className="modal-image" />}
                 {finalTitle && <div className="modal-title">{finalTitle}</div>}
@@ -52,13 +52,13 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
             <div className="down-content">
                 {customContent || (
                     <>
-                        <div className="modal-message">{config.message(H, countdown)}</div>
+                        <div className="modal-message">{typeof config.message === 'function' ? config.message(countdown) : config.message}</div>
                         <div data-tts-text={finalCancelLabel ? "작업관리, 버튼 두 개," : "작업관리, 버튼 한 개,"} ref={refsData.refs.BaseModal.modalConfirmButtonsRef} className="task-manager">
                             {finalCancelLabel && (
-                                <Button className="w285h090" svg={<Icon name={finalCancelIcon} />} label={finalCancelLabel} onClick={onCancel} />
+                                <Button svg={<Icon name={finalCancelIcon} />} label={finalCancelLabel} onClick={onCancel} />
                             )}
                             <Button
-                                className={`w285h090 ${config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}`}
+                                className={config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}
                                 svg={<Icon name={finalConfirmIcon} />}
                                 label={finalConfirmLabel}
                                 onClick={onConfirm}
@@ -92,7 +92,7 @@ export const Modal = () => {
     if (!modal) return null;
 
     return (
-        <div className={`modal ${isAnyModalOpen ? 'active' : ''}`} aria-hidden="true">
+        <div className={`modal ${isAnyModalOpen ? 'active' : ''}`} aria-hidden="true" tabIndex={-1}>
             {modal.ModalRestart.isOpen && <ModalRestart />}
             {modal.ModalReset.isOpen && <ModalReset />}
             {modal.ModalCall.isOpen && <ModalCall />}

@@ -29,7 +29,7 @@ const Category = memo(({ categories, selectedTab, onSelectTab, pagination, conta
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="이전" className="w113h076 secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
+            <Button toggle label="이전" className="secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
             <div
                 className={categoryClassName}
                 ref={containerRef}
@@ -42,7 +42,7 @@ const Category = memo(({ categories, selectedTab, onSelectTab, pagination, conta
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="다음" className="w113h076 secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
+            <Button toggle label="다음" className="secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
         </div>
     );
 });

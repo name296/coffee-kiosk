@@ -143,6 +143,20 @@
     --spacing-xl: calc(var(--spacing-base) * 2.25);
     /* 2.25rem = 36px */
 
+    /* === layout / 섹션 높이 / 버튼(min-side) === */
+    --height-banner: 70px;
+    --height-banner-price: 200px;
+    --height-bottom: 112px;
+    --height-step: 120px;
+    --height-summary: 182px;
+    --height-summary-low: 122px;
+    --height-title: 200px;
+    --height-top: 70px;
+    --layout-gap: var(--spacing-sm);
+    --layout-height: 1920px;
+    --layout-padding-x: 32px;
+    --layout-width: 1080px;
+
     /* 테마/팔레트 독립 속성 */
     --border-color-pointed: var(--color-system-01);
 
@@ -191,7 +205,7 @@
     --body1-content-primary-color: var(--color-brown-02);
     --body1-content-secondary-color: var(--color-gray-02);
 
-    --body2-background-color: #FAFAFAFF;
+    --body2-background-color: var(--color-gray-13);
     --body2-primary1-color: var(--color-brown-05);
     --body2-primary2-color: var(--color-brown-03);
     --body2-secondary1-color: var(--color-gray-14);
@@ -199,7 +213,6 @@
 
     --body2-progress-background-standby-color: var(--color-gray-01);
     --body2-progress-content-complete-color: var(--color-gray-01);
-    --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
 
     --body3-background-color: var(--color-gray-11);
     --body3-content-color: var(--color-gray-02);
@@ -326,11 +339,11 @@
     --delete-content-color-disabled: var(--color-gray-06);
 
     /* 텍스트 하이라이트 색상 */
-    --highlight-color: #8C532CFF;
+    --highlight-color: var(--color-brown-02);
   }
 
   /* 큰글씨 모드: body.large에서 폰트 사이즈 변수만 1.2배로 통제 (rem 기준은 html 고정) */
-  body.large {
+  .large {
     --font-size-xs: 1.44rem;
     --font-size-sm: 1.68rem;
     --font-size-md: 1.92rem;
@@ -362,8 +375,7 @@
 
     --body2-progress-background-standby-color: var(--color-gray-07);
     --body2-progress-content-complete-color: var(--color-gray-01);
-    --checked-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
-
+    
     --body3-background-color: var(--color-gray-03);
     --body3-content-color: var(--color-gray-14);
 
@@ -492,908 +504,44 @@
     --delete-content-color-disabled: var(--color-gray-07);
 
     /* 텍스트 하이라이트 색상 (Dark 테마) */
-    --highlight-color: #FFE100FF;
+    --highlight-color: var(--color-yellow-03);
   }
-}
-
-/* ========================================
-   전체 레이아웃 (Layout)
-   ======================================== */
-@layer layout {
 
   /* ========================================
-     레이아웃 변수 (Layout Variables)
+     버튼 시스템 (Button System)
+     - 의사변수: :root(--button-min-side-*), 포커스요소(--button-min-side, --clamped)
+     - 컴포넌트: .button (팔레트 소비, touch-action: none)
      ======================================== */
-  :root {
-    --layout-width: 1080px;
-    --layout-height: 1920px;
-    --layout-padding-x: 32px;
-    --layout-gap: var(--spacing-sm);
-    /* 1rem = 16px */
 
-    /* 섹션 높이 */
-    --height-top: 70px;
-    --height-step: 120px;
-    --height-title: 200px;
-    --height-summary: 182px;
-    --height-summary-low: 122px;
-    --height-bottom: 112px;
-    --height-banner: 70px;
-    --height-banner-price: 200px;
-  }
-
-  /* ========================================
-     공용 레이아웃 유틸리티
-     ======================================== */
-  /* Flex 컨테이너 */
-  .flex {
-    display: flex;
-  }
-
-  .center {
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* ========================================
-     Body 레이아웃 + 타이포 (process·modal 공통)
-     ======================================== */
-  body {
-    margin: 0;
-    box-sizing: border-box;
-
-    /* 타이포: process·modal 공통 (body.large 시 변수로 확대) */
-    font-family: var(--font-family);
-    font-size: var(--font-size-b1);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-stretch: 96%;
-
-    & .process {
-    /* 레이아웃 */
-    display: flex;
-    flex-direction: column;
-    width: var(--layout-width);
-    height: var(--layout-height);
-    contain: size;
-
-    color: var(--body1-content-primary-color);
-    background-color: var(--body1-background-color);
-    border-color: var(--body1-border-color);
-
-    /* 자식 공통 */
-    &>* {
-      padding-left: var(--layout-padding-x);
-      padding-right: var(--layout-padding-x);
-      box-sizing: border-box;
-    }
-
-    /* 모든 자손 트랜지션 */
-    & * {
-      transition: background-color 0.05s, color 0.00s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
-    }
-
-    /* ========================================
-       헤더 영역 (.top, .step)
-       ======================================== */
-    & .top {
-      width: 100%;
-      height: var(--height-top);
-      flex-shrink: 0;
-      border-bottom: 2px solid var(--body1-border-color);
-    }
-
-    /* 첫 페이지에서 Top, Step, Summary, black 숨기기 */
-    &.first .top,
-    &.first .step,
-    &.first .summary,
-    &.first .black {
-      display: none;
-    }
-
-    /* 결제/완료 레이아웃에서 Summary 숨기기 */
-    &.forth .summary {
-      display: none;
-    }
-
-    /* ========================================
-       Step Progress Bar
-       구조: .step > .step-num + .step-name + .separator (4단계 반복)
-       상태: .step.1 ~ .step.5 로 진행/현재 제어 (CSS 체이닝)
-       ======================================== */
-    & .step {
-    width: 100%;
-    height: var(--height-step);
-    color: var(--layout-color);
-    display: flex;
-    border-bottom: 2px solid var(--body1-border-color);
-    flex-shrink: 0;
-    height: 120px;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-evenly;
-
-    & .step-num {
-      width: 74px;
-      height: 74px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      box-sizing: border-box;
-      background-clip: padding-box;
-      background-color: var(--body2-progress-background-standby-color);
-      color: var(--body2-secondary2-color);
-    }
-
-    & .step-name,
-    & .separator {
-      flex-shrink: 0;
-      color: var(--body2-secondary2-color);
-    }
-
-    /* 진행(progress) = primary 배경/글자, 현재(current) = primary2 보더. span 순서: step-num 1,4,7,10 / step-name 2,5,8,11 / separator 3,6,9 */
-    &.step-1 {
-      & .step-num:nth-of-type(1) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .separator:nth-of-type(3) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-2 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(4) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-3 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(7) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-4 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7),
-      & .step-num:nth-of-type(10) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(10) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .step-name:nth-of-type(11),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-5 {
-      & .step-num {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-name,
-      & .separator {
-        color: var(--body2-primary1-color);
-      }
-    }
-  }
-
-  /* ========================================
-     메인 영역 (.main)
-     ======================================== */
-  /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
-  & .main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--body2-background-color);
-    border-color: var(--body2-border-color);
-    color: var(--body1-content-secondary-color);
-
-    &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
-    &:focus-visible {
-      outline: 12px dashed var(--border-color-pointed);
-      outline-offset: -12px;
-    }
-
-    /* 타이틀 영역 */
-    & .title {
-      width: 100%;
-      height: var(--height-title);
-      flex-shrink: 0;
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-semibold);
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      color: var(--body1-content-secondary-color);
-      white-space: nowrap;
-
-      & .primary {
-        color: var(--body1-content-primary-color);
-      }
-    }
-
-    /* 페이지별 변형은 body 클래스에서 분기 */
-  }
-
-  /* ========================================
-     페이지별 변형 (body .process + 레이아웃 클래스)
-     ======================================== */
-  &.first {
-    & .main {
-      position: relative;
-      height: 100%;
-    }
-
-    & .main .poster {
-      width: var(--layout-width);
-      height: auto;
-      object-fit: contain;
-    }
-
-    & .main p {
-      letter-spacing: inherit;
-      line-height: inherit;
-      font-stretch: inherit;
-    }
-  }
-
-  &.second {
-    & .main {
-      justify-content: space-evenly;
-    }
-  }
-
-  /* 주문내역 .details-content: 논 low = 행2 열1(세로), pagination 셀 높이 = order-row 한 행 높이 */
-  &.third {
-    & .main {
-      & .details-content {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr) 1fr;
-        width: 100%;
-        height: 100%;
-        place-items: center;
-
-        & .order-list {
-          grid-row: 1 / 7;
-          justify-self: stretch;
-          align-self: stretch;
-        }
-
-        & .pagination {
-          grid-row: 7 / 8;
-          align-self: center;
-        }
-      }
-    }
-  }
-
-  &.forth {
-    & .main {
-      position: relative;
-      font-size: var(--font-size-b1);
-      padding-top: var(--height-title);
-      padding-bottom: 182px;
-
-      & .payment {
-        width: 100%;
-        height: 100%;
-        flex-grow: 1;
-      }
-
-      & .task-manager {
-        width: fit-content;
-        height: fit-content;
-      }
-    }
-  }
-
-  /* ========================================
-     푸터 영역 (.summary, .bottom)
-     ======================================== */
-  & .summary {
-    width: 100%;
-    height: var(--height-summary);
-    background-color: var(--body1-background-color);
-    display: flex;
-    flex-shrink: 0;
-    gap: var(--spacing-sm);
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 2px solid var(--body1-border-color);
-
-    & .task-manager {
-      width: fit-content;
-      justify-content: space-between;
-    }
-
-    & .summary-label {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-secondary1-color);
-    }
-
-    & .summary-text {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-primary1-color);
-    }
-
-    & .short-colline {
-      width: 2px;
-      height: 41px;
-      background: var(--body1-border-color);
-    }
-  }
-
-  & .bottom {
-    width: 100%;
-    height: var(--height-bottom);
-    flex-shrink: 0;
-    border-top: 2px solid var(--body1-border-color);
-    background-color: var(--body1-background-color);
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  & .countdown {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* 낮은화면 상단 여백 */
-  & .black {
-    width: 100%;
-    height: 0px;
-    background-color: var(--color-gray-01);
-  }
-
-  & .short-colline {
-    width: 2px;
-    height: 41px;
-    background: var(--body1-content-secondary-color);
-  }
-  }
-
-  /* ========================================
-     & .modal – 모달 시스템 (body 하위)
-     구조: .modal > .main > .up-content, .down-content / 타이포는 body 상속
-     ======================================== */
-    & .modal {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 0 var(--layout-padding-x);
-    background: #00000099;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    & > .main {
-      grid-area: 1/1;
-      pointer-events: auto;
-    }
-
-    & .main {
-      position: relative;
-      width: 100%;
-      padding-left: 0;
-      padding-right: 0;
-      height: fit-content;
-      border-radius: 24px;
-      border: 2px solid var(--body1-border-color);
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: center;
-      overflow: hidden;
-      background: var(--body2-background-color);
-      color: var(--body1-content-secondary-color);
-      box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
-
-      & .up-content {
-        width: 100%;
-        background: var(--body1-background-color);
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-        gap: 1.6rem;
-        padding: var(--spacing-xl);
-        color: var(--body2-secondary1-color);
-
-        & .modal-image {
-          width: 10rem;
-          height: 10rem;
-          color: var(--body2-primary1-color);
-        }
-
-        & .modal-title {
-          font-weight: var(--font-weight-semibold);
-        }
-
-        & .modal-description {
-          display: flex;
-          flex-flow: column nowrap;
-          align-items: center;
-          gap: 0.4rem;
-        }
-
-        & .modal-subtitle {
-          text-align: center;
-        }
-
-        & .modal-subtitle-highlight {
-          color: var(--body2-primary1-color);
-          font-weight: var(--font-weight-semibold);
-        }
-      }
-
-      & .down-content {
-        width: 100%;
-        flex: 1;
-        display: flex;
-        flex-flow: column nowrap;
-        border-top: 2px solid var(--body1-border-color);
-        justify-content: center;
-        align-items: center;
-        padding: var(--spacing-xl);
-        gap: var(--spacing-xl);
-
-        & .modal-message {
-          display: flex;
-          flex-flow: column nowrap;
-          align-items: center;
-          gap: 8px;
-
-          & .highlight,
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .setting-row {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          height: 10rem;
-        }
-
-        & .setting-name {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          width: 100%;
-          height: 10rem;
-          gap: var(--spacing-sm);
-
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .task-manager {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: var(--spacing-sm);
-        }
-
-        & .setting-line {
-          width: 100%;
-          height: 0;
-          margin: 0;
-          border: none;
-          border-top: 2px solid var(--body1-border-color);
-        }
-      }
-    }
-  }
-  }
-}
-
-/* @layer layout */
-
-/* ==============================
-   컴포넌트 스타일 (Components)
-   ============================== */
-@layer components {
-  /* ==============================
-     모달 시스템 (SCSS 네스티드)
-     - 레이아웃 배색: --body* 변수 사용
-     - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
-     ============================== */
-     
-  /* 모달 시스템: layout 레이어 body & .modal */
-
-  .menu {
-    position: relative;
-    width: 100%;
-    height: fit-content;
-    grid-gap: var(--spacing-sm);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    /* 4x4 그리드*/
-    grid-template-rows: repeat(4, 1fr);
-    /* 4x4 배열 강제 설정 */
-    grid-auto-flow: row;
-    /* 가로방향으로 자동 배치 */
-    justify-items: center;
-    align-items: center;
-
-    /* 메뉴 아이템 버튼 (레이어 배치) - 직접 자식만 적용 */
-    & > .button {
-      width: 242px;
-      height: 280px;
-      position: relative;
-
-      & .icon {
-        width: 14rem;
-        height: 14rem;
-        position: absolute;
-        top: 0%;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      & .label {
-        position: absolute;
-        width: 100%;
-        min-height: 75%;
-        bottom: 0%;
-        left: 0%;
-        padding-top: 2.5rem;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        background: var(--primary3-background2-color-default);
-        border-radius: 0 0 calc(var(--min-side) * 0.0625 * 0.5) calc(var(--min-side) * 0.0625 * 0.5);
-
-        & p:nth-child(1) {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: var(--font-size-b1);
-          color: var(--primary3-content2-color-default1);
-        }
-
-        & p:nth-child(2) {
-          flex-shrink: 0;
-          font-size: var(--font-size-b1);
-          color: var(--primary3-content2-color-default2);
-          font-weight: var(--font-weight-medium);
-        }
-      }
-
-      /* pressed 상태 */
-      &.pressed .label {
-        background: var(--primary3-background2-color-pressed);
-
-        & p {
-          color: var(--primary3-content2-color-pressed);
-        }
-      }
-    }
-  }
-
-  .order-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 1fr);
-    place-items: center;
-    row-gap: 0;
-    width: 100%;
-    height: 100%;
-    padding-left: 43px;
-    padding-right: 43px;
-    flex-grow: 1;
-
-    & .order-row {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      height: 100%;
-      padding-top: 0;
-      padding-bottom: 0;
-
-      &.with-line::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 2px;
-        background-color: var(--body1-border-color);
-      }
-
-      & .order-image-div {
-        position: relative;
-        width: 113px;
-        height: 113px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 2px solid var(--body1-border-color);
-
-        & .order-index {
-          width: 56px;
-          height: 56px;
-          background-color: var(--color-gray-01);
-          border: 1px solid var(--color-gray-09);
-          color: var(--color-gray-13);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: absolute;
-          top: 0;
-          left: 0;
-        }
-
-        & .order-image {
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      & .order-name {
-        position: relative;
-        width: 236px;
-        /*word-break: keep-all;*/
-        color: var(--body1-content-secondary-color);
-      }
-
-      & .order-quantity {
-        position: relative;
-        display: flex;
-        align-items: center;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-
-        & .counter {
-          width: 80px;
-          height: 76px;
-        }
-
-        & .qty {
-          width: 82px;
-          height: 76px;
-          position: relative;
-          display: flex;
-          justify-content: center;
-        }
-      }
-
-      & .order-price {
-        position: relative;
-        width: 236px;
-        justify-content: right;
-        border: none;
-        background: none;
-
-      }
-    }
-
-  }
-
-  .credit-pay-image {
-    position: relative;
-    width: 762px;
-    height: 612px;
-  }
-
-  .order-num {
-    position: absolute;
-    top: 677px;
-    left: 707px;
-    /* 기존 중심점 (635 + 콘텐츠폭/2) */
-    transform: translateX(-50%);
-    width: fit-content;
-    height: fit-content;
-    font-size: var(--font-size-d2);
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    color: #000000FF;
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .end-countdown {
-    display: flex;
-    width: 278px;
-    height: 278px;
-    border-radius: 50%;
-    position: absolute;
-    justify-content: center;
-    line-height: 1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    align-items: center;
-    background-color: var(--body2-primary1-color);
-    border: 9px solid var(--body2-primary2-color);
-    color: var(--body2-progress-content-complete-color);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-d4);
-  }
-
-  /* ========================================
-   전체 컴포넌트 (Components) - 버튼
-   ======================================== */
-
-  /* ========================================
-       페이지네이션 스타일
-       ======================================== */
-  .pagination {
-    position: relative;
-    width: fit-content;
-    height: fit-content;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-
-    & .button {
-      width: 184px;
-      height: 76px;
-      cursor: pointer;
-    }
-
-    /* vertical 방향 스타일 */
-    &.pagination-vertical {
-      flex-flow: column nowrap;
-    }
-
-    & .pagination-page-current {
-      color: var(--body1-content-primary-color);
-    }
-
-    & .pagination-separator {
-      color: var(--body1-border-color);
-    }
-
-    & .pagination-page-total {
-      color: var(--body1-content-secondary-color);
-    }
-  }
-
-  /* ========================================
-       카테고리 탭 스타일
-       ======================================== */
-  .category-full {
-    position: relative;
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    flex-flow: row nowrap;
-    gap: var(--spacing-lg);
-    align-items: center;
-    flex-shrink: 1;
-  }
-
-
-  /* ========================================
-       아이콘 시스템 (Icon System)
-       ======================================== */
-  .icon {
-    display: flex;
-    width: 1em;
-    height: 1em;
-
-    & svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
-    }
-
-    & img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-
-  /* ========================================
-       포커스 가능한 요소 공통 스타일
-       ======================================== */
-
-  /* 포커스 가능한 모든 요소에 --min-side 적용 */
+  /* 포커스 가능한 요소: --button-min-side는 Button.js에서 동적 설정 */
   button:not([disabled]),
   a[href],
   input:not([disabled]),
   select:not([disabled]),
   textarea:not([disabled]),
   [tabindex]:not([tabindex="-1"]) {
-    --min-side: ;
-    /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+    --button-min-side: ;
+    --button-min-side-ratio: calc(0.0625 * 1.5);
+    --button-min-side-max: calc(var(--layout-width) * 0.16);
+    --button-min-side-min: calc(var(--layout-width) * 0.08);    
+    --button-min-side-clamped: clamp(var(--button-min-side-min), var(--button-min-side, var(--button-min-side-min)), var(--button-min-side-max));
   }
 
-  /* ========================================
-       전체 버튼 컴포넌트 스타일
-       ======================================== */
-
   .button {
-    --min-side: ;
-    /* 기본값, JS에서 실제 min(width, height)로 설정됨 */
+    transition: background-color 0.05s, color 0.00s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
     background-color: var(--primary2-background-color-default);
     background-clip: padding-box;
     position: relative;
     display: flex;
     box-sizing: border-box;
     gap: var(--spacing-xs);
-    padding-left: calc(var(--min-side) * 0.0625 * 2);
-    padding-right: calc(var(--min-side) * 0.0625 * 2);
-    outline-offset: calc(var(--min-side) * 0.0625 * -0.5);
-    border-radius: calc(var(--min-side) * 0.0625);
-    border: calc(var(--min-side) * 0.0625 * 0.5) solid var(--primary2-border-color-default);
-    box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.12);
+    padding: calc(var(--layout-width) * var(--button-min-side-ratio) * 0.1);
+    outline-offset: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * -0.5);
+    border-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 1);
+    border: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5) solid var(--primary2-border-color-default);
+    box-shadow: 0 0 calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.25) calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125) rgba(0, 0, 0, 0.12);
     -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    touch-action: none;
     width: fit-content;
     height: fit-content;
     justify-content: center;
@@ -1415,26 +563,26 @@
     &.toggle.pressed .icon.pressed {
       display: block;
       position: absolute;
+      border-top-right-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5 * 1);
+      overflow: hidden;
 
-      /* --min-side 기반 크기 속성 */
-      width: calc(var(--min-side) * 0.0625 * 2);
-      height: calc(var(--min-side) * 0.0625 * 2);
-      top: calc(var(--min-side) * 0.0625 * 0.5);
-      right: calc(var(--min-side) * 0.0625 * 0.5);
+      /* --button-min-side 기반 크기 속성 */
+      width: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
+      height: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
+      top: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0);
+      right: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0);
 
-      /* CSS mask-image로 SVG 지정하여 currentColor 적용 (JavaScript 인젝션 불필요) */
+      /* CSS mask-image로 SVG 지정하여 currentColor 적용 */
       &::before {
         content: '';
         display: block;
         width: 100%;
         height: 100%;
-        /* SVG를 mask로 사용하여 currentColor 적용 */
         background-color: currentColor;
         mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
         mask-size: contain;
         mask-repeat: no-repeat;
         mask-position: center;
-        /* Webkit 브라우저 호환성 */
         -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0H0L24 24V0Z' fill='black'/%3E%3C/svg%3E");
         -webkit-mask-size: contain;
         -webkit-mask-repeat: no-repeat;
@@ -1449,7 +597,8 @@
     text-align: center;
 
     &[aria-disabled="true"] {
-      border: calc(var(--min-side) * 0.03125) dashed var(--primary2-border-color-disabled);
+      border-style: dashed;
+      border-color: var(--primary2-border-color-disabled);
       cursor: not-allowed;
       background-color: var(--primary2-background-color-disabled);
       color: var(--primary2-content-color-disabled);
@@ -1466,7 +615,7 @@
     /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
     &:hover,
     &:focus-visible {
-      outline: calc(var(--min-side) * 0.09375) dashed var(--border-color-pointed);
+      outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--border-color-pointed);
     }
 
     /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
@@ -1712,157 +861,985 @@
     /* ========================================
        버튼 크기 (w가로h세로)
        - 색상: 팔레트 클래스 (primary1~3, secondary1~3)
-       - 외관: --min-side 비례 자동 계산
+       - 외관: --button-min-side 비례 자동 계산
        ======================================== */
 
-    /* 정사각형 */
-    &.w285h285 {
-      width: 285px;
-      height: 285px;
-      white-space: nowrap;
-      flex-direction: column;
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-semibold);
-
-      & .icon {
-        width: 9.6rem;
-        height: 9.6rem;
-      }
-    }
-
-    &.w080h080 {
-      width: 80px;
-      height: 80px;
-    }
-
-    &.w076h076 {
-      width: 76px;
-      height: 76px;
-    }
-
-    &.w070h076 {
-      width: 70px;
-      height: 76px;
-    }
-
-    /* 메뉴/카드 */
-    &.w328h460 {
-      width: 328px;
-      height: 460px;
-      flex-direction: column;
-
-      & .icon {
-        width: 25.6rem;
-        height: 25.6rem;
-      }
-    }
-
-    /* 액션 버튼 */
-    &.w500h120 {
-      width: 500px;
-      height: 120px;
-    }
-
-    &.w371h120 {
-      width: 371px;
-      height: 120px;
-    }
-
-    &.w285h090 {
-      width: 285px;
-      height: 90px;
-    }
-
-    /* 기능 버튼 */
-    &.w242h076 {
-      width: 242px;
-      height: 76px;
-    }
-
-    &.w199h090 {
-      min-width: 199px;
-      width: fit-content;
-      height: 90px;
-    }
-
-    &.w113h076 {
-      width: 113px;
-      height: 76px;
-    }
-
-    &.w080h076 {
-      width: 80px;
-      height: 76px;
-    }
-
-
-    /* 동적 크기 */
-    &.w-fit-h070 {
-      width: fit-content;
-      height: 76px;
-    }
   }
 
-  /* 카테고리 탭 버튼 */
-  .category-full {
+  /* ========================================
+     아이콘 시스템 (Icon System)
+     ======================================== */
+  .icon {
+    display: flex;
+    width: 1em;
+    height: 1em;
+
+    & svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    & img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+
+/* ========================================
+   전체 레이아웃 (Layout)
+   ======================================== */
+@layer layout {
+
+  /* ========================================
+     Body 레이아웃 + 타이포 (process·modal 공통)
+     ======================================== */
+  body {
+    margin: 0;
+    box-sizing: border-box;
+
+    /* 타이포: process·modal 공통 (body.large 시 변수로 확대) */
+    font-family: var(--font-family);
+    font-size: var(--font-size-b1);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+    font-stretch: 96%;
+
+    /* body .process */
+    & .process {
+      /* 레이아웃 */
+      display: flex;
+      flex-direction: column;
+      width: var(--layout-width);
+      height: var(--layout-height);
+      contain: size;
+      color: var(--body1-content-primary-color);
+      background-color: var(--body1-background-color);
+      border-color: var(--body1-border-color);
+
+      /* body .process > * */
+      &>* {
+        padding-left: var(--layout-padding-x);
+        padding-right: var(--layout-padding-x);
+        box-sizing: border-box;
+      }
+
+      /* ========================================
+         body .process .top
+         ======================================== */
+      & .top {
+        width: 100%;
+        height: var(--height-top);
+        flex-shrink: 0;
+        border-bottom: 2px solid var(--body1-border-color);
+      }
+
+      /* body .process.first – 첫 페이지에서 Top, Step, Summary, black 숨기기 */
+      &.first .top,
+      &.first .step,
+      &.first .summary,
+      &.first .black {
+        display: none;
+      }
+
+      /* body .process.forth – 결제/완료 레이아웃에서 Summary 숨기기 */
+      &.forth .summary {
+        display: none;
+      }
+
+      /* ========================================
+         body .process .step
+         구조: .step > .step-num + .step-name + .separator (4단계 반복)
+         상태: .step-1 ~ .step-5 로 진행/현재 제어 (CSS 체이닝)
+         ======================================== */
+      & .step {
+        width: 100%;
+        height: var(--height-step);
+        color: var(--layout-color);
+        display: flex;
+        border-bottom: 2px solid var(--body1-border-color);
+        flex-shrink: 0;
+        height: 120px;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-evenly;
+
+        /* body .process .step .step-num */
+        & .step-num {
+          width: 74px;
+          height: 74px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          border-radius: 50%;
+          border: 8px solid transparent;
+          box-sizing: border-box;
+          background-clip: padding-box;
+          background-color: var(--body2-progress-background-standby-color);
+          color: var(--body2-secondary2-color);
+        }
+
+        /* body .process .step .step-name, .separator */
+        & .step-name,
+        & .separator {
+          flex-shrink: 0;
+          color: var(--body2-secondary2-color);
+        }
+
+        /* body .process .step.step-1 ~ .step-5 – 진행/현재 상태 */
+        &.step-1 {
+          & .step-num:nth-of-type(1) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .separator:nth-of-type(3) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-2 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(4) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-3 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(7) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-4 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7),
+          & .step-num:nth-of-type(10) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(10) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .step-name:nth-of-type(11),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-5 {
+          & .step-num {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-name,
+          & .separator {
+            color: var(--body2-primary1-color);
+          }
+        }
+      }
+
+      /* ========================================
+         body .process .main
+         ======================================== */
+      /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
+      & .main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--body2-background-color);
+        border-color: var(--body2-border-color);
+        color: var(--body1-content-secondary-color);
+
+        &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+        &:focus-visible {
+          outline: 12px dashed var(--border-color-pointed);
+          outline-offset: -12px;
+        }
+
+        /* body .process .main .title */
+        & .title {
+          width: 100%;
+          height: var(--height-title);
+          flex-shrink: 0;
+          font-size: var(--font-size-h2);
+          font-weight: var(--font-weight-semibold);
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
+          color: var(--body1-content-secondary-color);
+          white-space: nowrap;
+
+          & .primary {
+            color: var(--body1-content-primary-color);
+          }
+        }
+      }
+
+      /* ========================================
+         body .process.first (시작 화면)
+         ======================================== */
+      &.first {
+        & .main {
+          position: relative;
+          height: 100%;
+        }
+
+        /* body .process.first .main .hero */
+        & .main .hero {
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: space-evenly;
+          align-items: center;
+          flex: 1;
+
+          /* body .process.first .main .hero .button */
+          & .button {
+            width: 285px;
+            height: 285px;
+            white-space: nowrap;
+            flex-direction: column;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+
+            & .icon {
+              width: 9.6rem;
+              height: 9.6rem;
+            }
+          }
+        }
+
+        & .main .poster {
+          width: var(--layout-width);
+          height: auto;
+          object-fit: contain;
+        }
+
+        & .main p {
+          letter-spacing: inherit;
+          line-height: inherit;
+          font-stretch: inherit;
+        }
+      }
+
+      /* ========================================
+         body .process.second (메뉴 선택)
+         body .process.second .main .category-full | .menu
+         ======================================== */
+      &.second {
+        & .main {
+          justify-content: space-evenly;
+
+          /* body .process.second .main .category-full */
+          & .category-full {
+            position: relative;
+            width: 100%;
+            height: fit-content;
+            display: flex;
+            flex-flow: row nowrap;
+            gap: var(--spacing-lg);
+            align-items: center;
+            flex-shrink: 1;
+
+            /* body .process.second .main .category-full .category .button (카테고리 탭) */
+            & .category .button {
+              height: 76px;
+              min-width: 70px;
+            }
+
+            /* body .process.second .main .category-full > .button (이전/다음) */
+            & > .button {
+              width: 113px;
+              height: 76px;
+            }
+
+            /* body .process.second .main .category-full .category */
+            & .category {
+              position: relative;
+              flex: 1;
+              min-width: 0;
+              height: fit-content;
+              display: flex;
+              flex-flow: row nowrap;
+              gap: 8px;
+              align-items: center;
+              justify-content: space-between;
+
+              /* body .process.second .main .category-full .category.compact */
+              &.compact {
+                justify-content: flex-start;
+                gap: 8px;
+              }
+
+              /* body .process.second .main .category-full .category.measure (측정용) */
+              &.measure {
+                position: absolute;
+                top: 0;
+                visibility: hidden;
+                pointer-events: none;
+              }
+
+              /* body .process.second .main .category-full .category .category-separator */
+              & .category-separator {
+                width: 2px;
+                height: 40px;
+                background-color: #DBDBDBFF;
+                flex-shrink: 0;
+                align-self: center;
+              }
+            }
+          }
+
+          /* body .process.second .main .menu */
+          & .menu {
+            position: relative;
+            width: 100%;
+            height: fit-content;
+            grid-gap: var(--spacing-sm);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            grid-auto-flow: row;
+            justify-items: center;
+            align-items: center;
+
+            /* body .process.second .main .menu > .button (메뉴 아이템만, 페이지네이션 제외) */
+            & > .button {
+              width: 242px;
+              height: 280px;
+              position: relative;
+
+              /* body .process.second .main .menu > .button .icon */
+              & .icon {
+                width: 14rem;
+                height: 14rem;
+                position: absolute;
+                top: 0%;
+                left: 50%;
+                transform: translateX(-50%);
+              }
+
+              /* body .process.second .main .menu > .button .label */
+              & .label {
+                position: absolute;
+                width: 100%;
+                min-height: 75%;
+                bottom: 0%;
+                left: 0%;
+                padding-top: 2.5rem;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                background: var(--primary3-background2-color-default);
+                border-radius: 0 0 calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5) calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5);
+
+                & p:nth-child(1) {
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: var(--font-size-b1);
+                  color: var(--primary3-content2-color-default1);
+                }
+
+                & p:nth-child(2) {
+                  flex-shrink: 0;
+                  font-size: var(--font-size-b1);
+                  color: var(--primary3-content2-color-default2);
+                  font-weight: var(--font-weight-medium);
+                }
+              }
+
+              &.pressed .label {
+                background: var(--primary3-background2-color-pressed);
+
+                & p {
+                  color: var(--primary3-content2-color-pressed);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      /* ========================================
+         body .process.third (주문내역)
+         body .process.third .main .details-content .order-list
+         ======================================== */
+      &.third {
+        & .main {
+          /* body .process.third .main .details-content */
+          & .details-content {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(6, 1fr) 1fr;
+          width: 100%;
+          height: 100%;
+          place-items: center;
+
+          /* .details-content .order-list */
+            & .order-list {
+              grid-row: 1 / 7;
+              justify-self: stretch;
+              align-self: stretch;
+              display: grid;
+              grid-template-columns: 1fr;
+              grid-template-rows: repeat(6, 1fr);
+              place-items: center;
+              row-gap: 0;
+              width: 100%;
+              height: 100%;
+              padding-left: 43px;
+              padding-right: 43px;
+              flex-grow: 1;
+
+              /* body .process.third .main .details-content .order-list .order-row */
+              & .order-row {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                height: 100%;
+                padding-top: 0;
+                padding-bottom: 0;
+
+                /* body .process.third .main .details-content .order-list .order-row.with-line::after */
+                &.with-line::after {
+                  content: '';
+                  position: absolute;
+                  left: 0;
+                  right: 0;
+                  bottom: 0;
+                  height: 2px;
+                  background-color: var(--body1-border-color);
+                }
+
+                /* body .process.third .main .details-content .order-list .order-row .order-image-div */
+                & .order-image-div {
+                  position: relative;
+                  width: 113px;
+                  height: 113px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border: 2px solid var(--body1-border-color);
+
+                  & .order-index {
+                    width: 56px;
+                    height: 56px;
+                    background-color: var(--color-gray-01);
+                    border: 1px solid var(--color-gray-09);
+                    color: var(--color-gray-13);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                  }
+
+                  & .order-image {
+                    width: 100%;
+                    height: 100%;
+                  }
+                }
+
+                /* body .process.third .main .details-content .order-list .order-row .order-name */
+                & .order-name {
+                  position: relative;
+                  width: 236px;
+                  color: var(--body1-content-secondary-color);
+                }
+
+                /* body .process.third .main .details-content .order-list .order-row .order-quantity */
+                & .order-quantity {
+                  position: relative;
+                  display: flex;
+                  align-items: center;
+                  flex-flow: row nowrap;
+                  justify-content: space-between;
+
+                  & .counter {
+                    width: 80px;
+                    height: 76px;
+                  }
+
+                  & .qty {
+                    width: 82px;
+                    height: 76px;
+                    position: relative;
+                    display: flex;
+                    justify-content: center;
+                  }
+                }
+
+                /* body .process.third .main .details-content .order-list .order-row .order-price */
+                & .order-price {
+                  position: relative;
+                  width: 236px;
+                  justify-content: right;
+                  border: none;
+                  background: none;
+                }
+
+                /* body .process.third .main .details-content .order-list .order-row .button.delete-item */
+                & .button.delete-item {
+                  width: 76px;
+                  height: 76px;
+                }
+              }
+            }
+
+            /* body .process.third .main .details-content .pagination */
+            & .pagination {
+              grid-row: 7 / 8;
+              align-self: center;
+            }
+          }
+        }
+      }
+
+      /* ========================================
+         body .process.forth (결제방법 선택)
+         body .process.forth .main .payment
+         ======================================== */
+      &.forth {
+        & .main {
+          position: relative;
+          font-size: var(--font-size-b1);
+          padding-top: var(--height-title);
+          padding-bottom: 182px;
+
+          & .task-manager,
+          & .payment {
+            width: fit-content;
+            height: fit-content;
+          }
+
+          /* body .process.forth .main .task-manager .button */
+          & .task-manager .button {
+            width: 371px;
+            height: 120px;
+          }
+          & .task-manager .button:only-child {
+            width: 500px;
+          }
+
+          /* body .process.forth .main .payment */
+          & .payment {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: 1fr;
+            grid-gap: var(--spacing-sm);
+            justify-items: center;
+            align-items: center;
+
+            /* body .process.forth .main .payment .button */
+            & .button {
+              width: 328px;
+              height: 460px;
+              flex-direction: column;
+
+              /* body .process.forth .main .payment .button .icon */
+              & .icon {
+                width: 25.6rem;
+                height: 25.6rem;
+              }
+            }
+          }
+        }
+      }
+
+      /* ========================================
+         body .process .summary
+         ======================================== */
+      & .summary {
+        width: 100%;
+        height: var(--height-summary);
+        background-color: var(--body1-background-color);
+        display: flex;
+        flex-shrink: 0;
+        gap: var(--spacing-sm);
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid var(--body1-border-color);
+
+        & .task-manager {
+          width: fit-content;
+          justify-content: space-between;
+        }
+
+        /* body .process .summary .task-manager .button */
+        & .task-manager .button {
+          width: 199px;
+          min-width: 199px;
+          height: 134px;
+        }
+
+        & .summary-label {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-secondary1-color);
+        }
+
+        & .summary-text {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-primary1-color);
+        }
+
+        & .short-colline {
+          width: 2px;
+          height: 41px;
+          background: var(--body1-border-color);
+        }
+
+      }
+
+      /* body .process .bottom */
+      & .bottom {
+        width: 100%;
+        height: var(--height-bottom);
+        flex-shrink: 0;
+        border-top: 2px solid var(--body1-border-color);
+        background-color: var(--body1-background-color);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        & .button {
+          height: 76px;
+        }
+      }
+
+      /* body .process .countdown */
+      & .countdown {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 낮은화면 상단 여백 */
+  & .black {
+    width: 100%;
+    height: 0px;
+    background-color: var(--color-gray-01);
+  }
+
+  & .short-colline {
+    width: 2px;
+    height: 41px;
+    background: var(--body1-content-secondary-color);
+  }
+  }
+
+  /* ========================================
+     & .modal – 모달 시스템 (body 하위)
+     구조: .modal > .main > .up-content, .down-content / 타이포는 body 상속
+     ======================================== */
+    & .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 0 var(--layout-padding-x);
+      background: #00000099;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+
+      &.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      & > .main {
+        grid-area: 1/1;
+        pointer-events: auto;
+      }
+
+      /* body .modal .main */
+      & .main {
+        position: relative;
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        height: fit-content;
+        border-radius: 24px;
+        border: 2px solid var(--body1-border-color);
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        overflow: hidden;
+        background: var(--body2-background-color);
+        color: var(--body1-content-secondary-color);
+        box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
+
+        /* body .modal .main .up-content */
+        & .up-content {
+          width: 100%;
+          background: var(--body1-background-color);
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
+          gap: 1.6rem;
+          padding: var(--spacing-xl);
+          color: var(--body2-secondary1-color);
+
+          & .modal-image {
+          width: 10rem;
+          height: 10rem;
+          color: var(--body2-primary1-color);
+        }
+
+        & .modal-title {
+          font-weight: var(--font-weight-semibold);
+        }
+
+        & .modal-description {
+          display: flex;
+          flex-flow: column nowrap;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        & .modal-subtitle {
+          text-align: center;
+        }
+
+        & .modal-subtitle-highlight {
+          color: var(--body2-primary1-color);
+          font-weight: var(--font-weight-semibold);
+        }
+      }
+
+        & .down-content {
+          width: 100%;
+          flex: 1;
+          display: flex;
+          flex-flow: column nowrap;
+          border-top: 2px solid var(--body1-border-color);
+          justify-content: center;
+          align-items: center;
+          padding: var(--spacing-xl);
+          gap: var(--spacing-xl);
+
+          & .modal-message {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: 8px;
+
+            & .highlight,
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .setting-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 10rem;
+          }
+
+          & .setting-name {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            width: 100%;
+            height: 10rem;
+            gap: var(--spacing-sm);
+
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .task-manager {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-sm);
+          }
+
+          /* body .modal .main .down-content .setting-row .task-manager .button */
+          & .setting-row .task-manager:has(.button:only-child) .button {
+            width: 242px;
+            height: 76px;
+          }
+          & .setting-row .task-manager:has(.button:nth-child(4)) .button {
+            width: 70px;
+            height: 76px;
+          }
+          & .setting-row .task-manager .button {
+            width: 113px;
+            height: 76px;
+          }
+
+          /* body .modal .main .down-content > .task-manager .button (취소/확인) */
+          & > .task-manager .button {
+            width: 285px;
+            height: 90px;
+          }
+
+          & .setting-line {
+            width: 100%;
+            height: 0;
+            margin: 0;
+            border: none;
+            border-top: 2px solid var(--body1-border-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* @layer layout */
+
+/* ==============================
+   컴포넌트 스타일 (Components)
+   ============================== */
+@layer components {
+  /* ==============================
+     모달 시스템 (SCSS 네스티드)
+     - 레이아웃 배색: --body* 변수 사용
+     - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
+     ============================== */
+     
+  /* 모달 시스템: layout 레이어 body & .modal */
+
+  .credit-pay-image {
+    position: relative;
+    width: 762px;
+    height: 612px;
+  }
+
+  .order-num {
+    position: absolute;
+    top: 677px;
+    left: 707px;
+    /* 기존 중심점 (635 + 콘텐츠폭/2) */
+    transform: translateX(-50%);
+    width: fit-content;
+    height: fit-content;
+    font-size: var(--font-size-d2);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    color: #000000FF;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .end-countdown {
+    display: flex;
+    width: 278px;
+    height: 278px;
+    border-radius: 50%;
+    position: absolute;
+    justify-content: center;
+    line-height: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+    background-color: var(--body2-primary1-color);
+    border: 9px solid var(--body2-primary2-color);
+    color: var(--body2-progress-content-complete-color);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-d4);
+  }
+
+  /* ========================================
+   전체 컴포넌트 (Components) - 버튼
+   ======================================== */
+
+  /* ========================================
+       페이지네이션 스타일
+       ======================================== */
+  .pagination {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
 
     & .button {
+      width: 184px;
       height: 76px;
-      min-width: 70px;
     }
 
-    & .category {
-      position: relative;
-      flex: 1;
-      /* width: 100% 대신 flex: 1로 남은 공간 차지 */
-      min-width: 0;
-      /* flex item 축소 허용 */
-      height: fit-content;
-      display: flex;
-      flex-flow: row nowrap;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
-      /* 기본: 균등 분배 */
+    /* vertical 방향 스타일 */
+    &.pagination-vertical {
+      flex-flow: column nowrap;
+    }
 
-      /* gap이 최대값에 도달하면 왼쪽 정렬 */
-      &.compact {
-        justify-content: flex-start;
-        gap: 8px;
-      }
+    & .pagination-page-current {
+      color: var(--body1-content-primary-color);
+    }
 
-      /* 숨겨진 측정용 컨테이너 */
-      &.measure {
-        position: absolute;
-        top: 0;
-        visibility: hidden;
-        pointer-events: none;
-      } 
+    & .pagination-separator {
+      color: var(--body1-border-color);
+    }
 
-      & .category-separator {
-        width: 2px;
-        height: 40px;
-        background-color: #DBDBDBFF;
-        flex-shrink: 0;
-        align-self: center;
-      }
+    & .pagination-page-total {
+      color: var(--body1-content-secondary-color);
     }
   }
 
-  /* 하단/요약 버튼 높이 (components 레이어에서 적용) */
-  body .process {
-    & .bottom {
-      & .button {
-        height: 76px;
-      }
-    }
-
-    & .summary {
-      & .button {
-        height: 134px;
-      }
-    }
-  }
 }
 
 /* @layer components */
@@ -2169,7 +2146,7 @@
       }
     }
     
-    & .menu {
+    & .main .menu {
       width: fit-content;
       height: fit-content;
       grid-template-columns: repeat(4, 1fr);
@@ -2193,18 +2170,6 @@
       height: 1020px;
       flex-shrink: 0;
     }
-  }
-
-  /* Hero 섹션 (첫 화면 메인 콘텐츠) */
-  body .process {
-  & .hero {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-evenly;
-    align-items: center;
-    flex: 1;
-    /* 남은 공간 채우기 */
-  }
   }
 }
 

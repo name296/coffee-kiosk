@@ -21,7 +21,8 @@ import {
   ButtonHandlerInitializer,
   ViewportInitializer,
   AppFocusTrapInitializer,
-  GlobalTimeoutInitializer
+  GlobalTimeoutInitializer,
+  ResetOnProcessStartInitializer
 } from "./initializers";
 
 // Hooks (TickProvider: 모든 카운트가 동시에 갱신되도록)
@@ -100,6 +101,7 @@ const App = () => {
                             <ViewportInitializer />
                             <AppFocusTrapInitializer />
                             <GlobalTimeoutInitializer />
+                            <ResetOnProcessStartInitializer />
                             <Screen />
                           </TickProvider>
                         </ScreenRouteProvider>

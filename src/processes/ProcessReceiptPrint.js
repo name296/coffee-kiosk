@@ -16,7 +16,7 @@ const ProcessReceiptPrint = memo(() => {
     });
 
     const { countdown } = useAppTimeouts({
-        setCurrentPage: (p) => navigateTo(p),
+        setCurrentProcess: (p) => navigateTo(p),
         idle: { enabled: false },
         autoFinish: {
             enabled: true,
@@ -31,7 +31,9 @@ const ProcessReceiptPrint = memo(() => {
                 <div>받으시고 <span className="primary">마무리</span>&nbsp;버튼을 누르세요</div>
             </div>
             <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
-            <Button className="w500h120" navigate="ProcessFinish" label={`마무리${countdown}`} ttsText="마무리하기" />
+            <div className="task-manager" ref={actionBarRef} data-tts-text="마무리 버튼 한 개,">
+                <Button navigate="ProcessFinish" label={`마무리${countdown}`} ttsText="마무리하기" />
+            </div>
         </>
     );
 });

@@ -86,9 +86,8 @@ const ProcessMenu = memo(() => {
             />
             <MenuGrid
                 items={currentItems}
-                onItemPress={(e, id) => {
-                    e.preventDefault();
-                    e.target.focus();
+                onItemPress={(e, id, target) => {
+                    target?.focus?.();
                     if (id !== 0) {
                         order.handleIncrease(id);
                     }
@@ -100,8 +99,8 @@ const ProcessMenu = memo(() => {
                 paginationProps={{
                     pageNumber,
                     totalPages,
-                    onPrev: (e) => { e.preventDefault(); e.target.focus(); handlePrevPage(); },
-                    onNext: (e) => { e.preventDefault(); e.target.focus(); handleNextPage(); },
+                    onPrev: (e, target) => { target?.focus?.(); handlePrevPage(); },
+                    onNext: (e, target) => { target?.focus?.(); handleNextPage(); },
                     isDark: accessibility.isDark,
                     ttsPrefix: "??"
                 }}
