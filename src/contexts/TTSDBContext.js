@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useMemo, useContext } from "react";
+import React, { createContext, useState, useCallback, useMemo } from "react";
 
 // TTS Database Context - IndexedDB 관리 (TTS 오디오 파일 캐싱)
 export const TTSDBContext = createContext(null);
@@ -60,14 +60,4 @@ export const TTSDBProvider = ({ children }) => {
             {children}
         </TTSDBContext.Provider>
     );
-};
-
-export const useTTSDB = () => {
-    const context = useContext(TTSDBContext);
-    return {
-        db: context?.db ?? null,
-        initDB: context?.initDB ?? (async () => null),
-        getFromDB: context?.getFromDB ?? (async () => null),
-        saveToDB: context?.saveToDB ?? (async () => { })
-    };
 };

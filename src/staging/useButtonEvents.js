@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useSound } from "./useSound";
+import { useSound } from "../hooks/useSound";
 
 // 버튼 pressed 상태 추가 (단일책임: pressed 클래스 추가 및 사운드 재생만)
 export const addButtonPressedState = (btn, playSoundFn) => {

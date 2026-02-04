@@ -1,7 +1,7 @@
 import React, { memo, useContext, useRef } from "react";
 import { Button } from "../components";
 
-import { useFocusableSectionsManager, useAppTimeouts } from "../hooks";
+import { useFocusableSectionsManager, useTimeoutCountdown } from "../hooks";
 import { ScreenRouteContext } from "../contexts";
 
 const ProcessReceiptPrint = memo(() => {
@@ -15,13 +15,11 @@ const ProcessReceiptPrint = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const { countdown } = useAppTimeouts({
-        setCurrentProcess: (p) => navigateTo(p),
-        idle: { enabled: false },
-        autoFinish: {
-            enabled: true,
-            onTimeout: () => navigateTo('ProcessFinish')
-        }
+    const { remainingSeconds: countdown } = useTimeoutCountdown({
+        durationMs: 60000,
+        enabled: true,
+        onTimeout: () => navigateTo('ProcessFinish'),
+        resetOnUserActivity: true
     });
 
     return (

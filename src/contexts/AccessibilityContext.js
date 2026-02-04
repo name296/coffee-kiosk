@@ -1,10 +1,17 @@
 import React, { createContext, useState, useMemo, useEffect } from "react";
-import { useBodyClass } from "../hooks";
 
 // Accessibility Context - 접근성 설정 및 모달 상태 관리
 
-export const AccessibilityContext = createContext();
+const useBodyClass = (className, condition) => {
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        if (condition) document.body.classList.add(className);
+        else document.body.classList.remove(className);
+        return () => document.body.classList.remove(className);
+    }, [className, condition]);
+};
 
+export const AccessibilityContext = createContext();
 
 export const AccessibilityProvider = ({ children }) => {
     // 접근성 설정 상태

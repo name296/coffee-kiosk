@@ -3,7 +3,7 @@ import { Category, MenuGrid, Pagination } from "../components";
 
 import { AccessibilityContext, OrderContext } from "../contexts";
 import {
-    usePagination,
+    usePageSlicer,
     useCategoryAssemble,
     useFocusableSectionsManager
 } from "../hooks";
@@ -38,7 +38,7 @@ const ProcessMenu = memo(() => {
     const {
         pageNumber, totalPages, currentItems,
         handlePrevPage, handleNextPage, resetPage
-    } = usePagination(
+    } = usePageSlicer(
         order.menuItems,
         PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL,
         PAGINATION_CONFIG.ITEMS_PER_PAGE_LOW,

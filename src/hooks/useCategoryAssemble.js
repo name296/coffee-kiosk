@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { usePagination } from "./usePagination";
+import { usePageSlicer } from "./usePageSlicer";
 
 // 카테고리 조립 (가변 너비 버튼 + 페이지네이션 제어)
 const ACTUAL_GAP_THRESHOLD = 64;
@@ -37,7 +37,7 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         handleNextPage,
         resetPage,
         setPageNumber
-    } = usePagination(items, 1, 1, false, pageBreakpoints);
+    } = usePageSlicer(items, 1, 1, false, pageBreakpoints);
 
     useEffect(() => {
         if (prevIsLargeRef.current !== isLarge) {

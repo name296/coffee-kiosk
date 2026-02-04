@@ -1,6 +1,6 @@
-import React, { memo, useContext, useLayoutEffect, useRef } from "react";
+import React, { memo, useContext } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "../contexts";
-import { useTextHandler, useInteractiveTTSHandler, useKeyboardNavigationHandler } from "../hooks";
+import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler } from "../hooks";
 import { Main, Step, Bottom, Summary } from "../components";
 import PROCESS_CONFIG from "./ProcessConfig";
 
@@ -14,23 +14,20 @@ const Process = memo(() => {
     const { currentProcess } = useContext(ScreenRouteContext);
     const accessibility = useContext(AccessibilityContext);
     const { handleText } = useTextHandler(accessibility.volume);
-    const processRef = useRef(null);
 
     const config = PROCESS_CONFIG[currentProcess];
     if (!config) return null;
     const { layoutType, Component, className = "", ttsText = "", ...rest } = config;
 
     useInteractiveTTSHandler(true, handleText);
-    useKeyboardNavigationHandler(false, true);
+    useFocusNavigationHandler(true);
 
-    useLayoutEffect(() => {
-        processRef.current?.focus();
-    }, [currentProcess]);
+    // 포커스 초기화는 FocusExecutor에서 처리
 
     const processClassName = ["process", layoutType].filter(Boolean).join(" ");
 
     return (
-        <div ref={processRef} className={processClassName} tabIndex={-1}>
+        <div className={processClassName} tabIndex={-1}>
             <div className="black" />
             <div className="top" />
             <Step />

@@ -13,10 +13,10 @@ export const safeQuerySelector = (s, c = null) => {
 
 export const focusMainElement = () => {
     if (typeof document === 'undefined') return;
-    const processElement = document.querySelector('.process');
-    if (processElement) {
+    const mainElement = document.querySelector('.process .main');
+    if (mainElement) {
         const prevActive = document.activeElement;
-        if (prevActive === processElement && prevActive?.blur) {
+        if (prevActive === mainElement && prevActive?.blur) {
             prevActive.blur();
         }
         const prevActiveInfo = prevActive ? {
@@ -27,11 +27,11 @@ export const focusMainElement = () => {
 
         console.log('[포커스] focusMainElement 호출', {
             from: prevActiveInfo,
-            to: { tagName: processElement.tagName, className: processElement.className },
+            to: { tagName: mainElement.tagName, className: mainElement.className },
             timestamp: new Date().toISOString()
         });
 
-        processElement.focus();
+        mainElement.focus();
     }
 };
 
@@ -68,8 +68,8 @@ export const useDOM = () => {
 
     const focusModalContent = useCallback(() => {
         if (typeof document !== 'undefined') {
-            const modalElement = document.querySelector('.modal');
-            if (modalElement) {
+            const modalMainElement = document.querySelector('.modal .main');
+            if (modalMainElement) {
                 const prevActive = document.activeElement;
                 const prevActiveInfo = prevActive ? {
                     tagName: prevActive.tagName,
@@ -79,13 +79,13 @@ export const useDOM = () => {
 
                 console.log('[포커스] focusModalContent 호출', {
                     from: prevActiveInfo,
-                    to: { tagName: modalElement.tagName, className: modalElement.className },
+                    to: { tagName: modalMainElement.tagName, className: modalMainElement.className },
                     timestamp: new Date().toISOString()
                 });
 
-                modalElement.focus();
+                modalMainElement.focus();
             } else {
-                console.log('[포커스] focusModalContent 스킵 (.modal 요소 없음)');
+                console.log('[포커스] focusModalContent 스킵 (.modal .main 요소 없음)');
             }
         }
     }, []);

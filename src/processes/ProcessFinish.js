@@ -1,21 +1,15 @@
 import React, { memo, useContext } from "react";
 import { ScreenRouteContext } from "../contexts";
-import { useAppTimeouts } from "../hooks";
-
-const NO_RESET_EVENTS = [];
+import { useTimeoutCountdown } from "../hooks";
 
 const ProcessFinish = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
 
-    const { countdown } = useAppTimeouts({
-        setCurrentProcess: (p) => navigateTo(p),
-        idle: { enabled: false },
-        autoFinish: {
-            enabled: true,
-            initialSeconds: 4,
-            resetEvents: NO_RESET_EVENTS,
-            onTimeout: () => navigateTo('ProcessStart')
-        }
+    const { remainingSeconds: countdown } = useTimeoutCountdown({
+        durationMs: 4000,
+        enabled: true,
+        onTimeout: () => navigateTo('ProcessStart'),
+        resetOnUserActivity: false
     });
 
     return (

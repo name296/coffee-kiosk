@@ -1,9 +1,9 @@
-import React, { memo, useContext, useLayoutEffect } from "react";
+import React, { memo, useContext } from "react";
 import { Button } from "../components";
 import Icon from "../Icon";
 import { TTS } from "../constants";
-import { RefContext, ScreenRouteContext, ModalContext } from "../contexts";
-import { useFocusTrap, useDOM } from "../hooks";
+import { RefContext, ModalContext } from "../contexts";
+import { useFocusTrap } from "../hooks";
 import MODAL_CONFIG from "./ModalConfig";
 import ModalRestart from "./ModalRestart";
 import ModalReset from "./ModalReset";
@@ -19,7 +19,6 @@ import ModalAccessibility from "./ModalAccessibility";
 export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel, cancelIcon, confirmIcon, confirmLabel, customContent, customTts, icon: customIcon, title: customTitle, countdown }) => {
     const refsData = useContext(RefContext);
     const { containerRef } = useFocusTrap(isOpen);
-    const { focusModalContent, focusMain } = useDOM();
 
     const config = MODAL_CONFIG[type];
     if (!isOpen || (!config && !customContent)) return null;
@@ -32,19 +31,13 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
     const finalConfirmIcon = confirmIcon || finalIcon || config?.confirmIcon || "Ok";
     const finalConfirmLabel = confirmLabel || finalTitle || config?.confirmLabel || "확인";
 
-    const { currentProcess } = useContext(ScreenRouteContext);
-    useLayoutEffect(() => {
-        if (isOpen) {
-            focusModalContent();
-        } else {
-            if (currentProcess === 'ProcessStart') {
-                requestAnimationFrame(() => focusMain());
-            }
-        }
-    }, [isOpen, currentProcess, focusModalContent, focusMain]);
-
     return (
-        <div className="main" ref={containerRef} data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}>
+        <div
+            className="main"
+            ref={containerRef}
+            data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}
+            tabIndex={-1}
+        >
             <div className="up-content">
                 {finalIcon && <Icon name={finalIcon} className="modal-image" />}
                 {finalTitle && <div className="modal-title">{finalTitle}</div>}

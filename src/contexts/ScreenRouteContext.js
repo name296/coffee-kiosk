@@ -14,8 +14,8 @@ export const ScreenRouteProvider = ({ children }) => {
     }, []);
 
     const value = useMemo(
-        () => ({ currentProcess, navigateTo, currentProcessRef }),
-        [currentProcess, navigateTo]
+        () => ({ currentProcess, navigateTo, currentProcessRef, transitionCount }),
+        [currentProcess, navigateTo, transitionCount]
     );
 
     return (

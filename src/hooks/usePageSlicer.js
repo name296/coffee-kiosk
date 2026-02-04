@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 
-export const usePagination = (items, itemsPerPageNormal, itemsPerPageLow, isLow, breakpoints) => {
+export const usePageSlicer = (items, itemsPerPageNormal, itemsPerPageLow, isLow, breakpoints) => {
     const useBreakpoints = Array.isArray(breakpoints) && breakpoints.length > 0;
     const normalizedBreakpoints = useMemo(() => {
         if (!useBreakpoints) return null;

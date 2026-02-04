@@ -2,7 +2,7 @@ import React, { memo, useContext, useRef } from "react";
 import { Button } from "../components";
 
 import { OrderContext, ScreenRouteContext } from "../contexts";
-import { useFocusableSectionsManager, useAppTimeouts } from "../hooks";
+import { useFocusableSectionsManager, useTimeoutCountdown } from "../hooks";
 
 const ProcessOrderComplete = memo(() => {
     const order = useContext(OrderContext);
@@ -16,13 +16,11 @@ const ProcessOrderComplete = memo(() => {
         systemControls: systemControlsRef
     });
 
-    const { countdown } = useAppTimeouts({
-        setCurrentProcess: (p) => navigateTo(p),
-        idle: { enabled: false },
-        autoFinish: {
-            enabled: true,
-            onTimeout: () => navigateTo('ProcessFinish')
-        }
+    const { remainingSeconds: countdown } = useTimeoutCountdown({
+        durationMs: 60000,
+        enabled: true,
+        onTimeout: () => navigateTo('ProcessFinish'),
+        resetOnUserActivity: true
     });
 
     return (

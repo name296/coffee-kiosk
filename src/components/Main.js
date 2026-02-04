@@ -10,7 +10,7 @@ const Main = memo(({
     children,
     className = "",
     ttsText = "",
-    mainRef,
+    tabIndex = -1,
     Component = "div",
     ...rest
 }) => {
@@ -18,7 +18,7 @@ const Main = memo(({
         <Component
             className={`main ${className}`}
             data-tts-text={ttsText}
-            ref={mainRef}
+            tabIndex={tabIndex}
             {...rest}
         >
             {children}

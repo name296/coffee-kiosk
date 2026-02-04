@@ -1612,6 +1612,10 @@
         border: 2px solid var(--body1-border-color);
         display: flex;
         flex-flow: column nowrap;
+        &:focus-visible {
+          outline: 12px dashed var(--border-color-pointed);
+          outline-offset: -12px;
+        }
         align-items: center;
         overflow: hidden;
         background: var(--body2-background-color);

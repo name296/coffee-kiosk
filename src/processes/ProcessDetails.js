@@ -2,7 +2,7 @@ import React, { memo, useContext, useMemo, useEffect, useRef } from "react";
 import { OrderList, Pagination } from "../components";
 
 import { OrderContext, AccessibilityContext, ModalContext, ScreenRouteContext } from "../contexts";
-import { useFocusableSectionsManager, usePagination } from "../hooks";
+import { useFocusableSectionsManager, usePageSlicer } from "../hooks";
 import { convertToKoreanQuantity } from "../utils";
 
 const ProcessDetails = memo(() => {
@@ -29,7 +29,7 @@ const ProcessDetails = memo(() => {
     const {
         pageNumber, totalPages, currentItems,
         handlePrevPage, handleNextPage, itemsPerPage
-    } = usePagination(
+    } = usePageSlicer(
         order.orderItems,
         accessibility.isLow ? 3 : 6,
         3,

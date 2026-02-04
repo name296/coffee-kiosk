@@ -11,31 +11,27 @@ import {
   TimeoutProvider,
   OrderProvider,
   RefProvider,
-  ButtonStateProvider,
-  ButtonGroupProvider,
   ScreenRouteProvider
 } from "./contexts";
 
-// Initializers
+// Screens
 import {
-  ButtonHandlerInitializer,
   ViewportInitializer,
-  AppFocusTrapInitializer,
-  GlobalTimeoutInitializer,
-  ResetOnProcessStartInitializer
-} from "./initializers";
+  InitialExecutor,
+  FocusExecutor
+} from "./screens";
 
 // Hooks (TickProvider: 모든 카운트가 동시에 갱신되도록)
-import { TickProvider } from "./hooks/useCountdown";
+import { TickProvider } from "./hooks/useInitialCountdown";
 
 // Components
 import Screen from "./Screen";
 
 // ============================================================================
-// ?? App ????
+// 앱 루트
 // ============================================================================
 const App = () => {
-  // ?? ??? ?? ?? (????)
+  // 포커스 디버그 로그 (개발용)
   useEffect(() => {
     const handleFocusIn = (e) => {
       const target = e.target;
@@ -47,7 +43,7 @@ const App = () => {
         isModal: target.classList.contains('modal')
       } : null;
 
-      console.log('[???] focusin ??? ??', {
+      console.log('[포커스] focusin 이벤트', {
         target: targetInfo,
         timestamp: new Date().toISOString()
       });
@@ -67,7 +63,7 @@ const App = () => {
         id: relatedTarget.id || null
       } : null;
 
-      console.log('[???] focusout ??? ??', {
+      console.log('[포커스] focusout 이벤트', {
         from: targetInfo,
         to: relatedInfo,
         timestamp: new Date().toISOString()
@@ -93,20 +89,14 @@ const App = () => {
               <TimeoutProvider>
                 <OrderProvider>
                   <RefProvider>
-                    <ButtonStateProvider>
-                      <ButtonGroupProvider>
-                        <ScreenRouteProvider>
-                          <TickProvider>
-                            <ButtonHandlerInitializer />
-                            <ViewportInitializer />
-                            <AppFocusTrapInitializer />
-                            <GlobalTimeoutInitializer />
-                            <ResetOnProcessStartInitializer />
-                            <Screen />
-                          </TickProvider>
-                        </ScreenRouteProvider>
-                      </ButtonGroupProvider>
-                    </ButtonStateProvider>
+                    <ScreenRouteProvider>
+                      <TickProvider>
+                        <ViewportInitializer />
+                        <InitialExecutor />
+                        <FocusExecutor />
+                        <Screen />
+                      </TickProvider>
+                    </ScreenRouteProvider>
                   </RefProvider>
                 </OrderProvider>
               </TimeoutProvider>
