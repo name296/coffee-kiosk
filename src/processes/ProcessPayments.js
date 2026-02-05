@@ -29,7 +29,7 @@ const ProcessPayments = memo(() => {
                 <Button navigate="ProcessMobilePay" img="./images/payment-mobile.png" label="모바일 페이" />
                 <Button navigate="ProcessSimplePay" img="./images/payment-simple.png" label="간편결제" />
             </div>
-            <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리. 버튼 한 개,">
+            <div ref={actionBarRef} className="task-manager" data-tts-text="작업관리, 버튼 한 개,">
                 <Button navigate="ProcessDetails" label="취소" />
             </div>
         </>

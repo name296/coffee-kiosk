@@ -12,11 +12,10 @@ function getStepIndex(currentProcess) {
     return null;
 }
 
-/** UI 컴포넌트: 단계 표시(메뉴선택 → 내역확인 → 결제 → 완료). 진행/현재 상태는 .step.1~.5 CSS로 제어 */
+/** UI 컴포넌트: 단계 표시(메뉴선택 → 내역확인 → 결제 → 완료). 진행/현재 상태는 .step.1~.5 CSS로 제어. .first 시 CSS display:none */
 const Step = memo(() => {
     const { currentProcess } = useContext(ScreenRouteContext);
-    const stepIndex = getStepIndex(currentProcess);
-    if (stepIndex == null) return null;
+    const stepIndex = getStepIndex(currentProcess) ?? 0;
 
     /* 지나간 스텝 = ✓, 현재/미래 스텝 = 숫자 */
     return (

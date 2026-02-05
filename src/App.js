@@ -25,7 +25,7 @@ import {
 import { TickProvider } from "./hooks/useInitialCountdown";
 
 // Components
-import Screen from "./Screen";
+import Screen from "./screens/Screen";
 
 // ============================================================================
 // 앱 루트

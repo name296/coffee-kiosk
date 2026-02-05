@@ -1,6 +1,6 @@
 import React, { memo } from "react";
-import Process from "./processes/Process";
-import { Modal } from "./modals/Modal";
+import Process from "../processes/Process";
+import { Modal } from "../modals/Modal";
 
 /**
  * Screen – Process + Modal 자식으로 구성

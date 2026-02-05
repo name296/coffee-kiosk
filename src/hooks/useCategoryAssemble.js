@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePageSlicer } from "./usePageSlicer";
 
 // 카테고리 조립 (가변 너비 버튼 + 페이지네이션 제어)
-const ACTUAL_GAP_THRESHOLD = 64;
+const ACTUAL_GAP_THRESHOLD = 96;
 
 export const useCategoryAssemble = (items, isLarge = false) => {
     const containerRef = useRef(null);
@@ -17,15 +17,18 @@ export const useCategoryAssemble = (items, isLarge = false) => {
     }, []);
 
     const prevIsLargeRef = useRef(isLarge);
-    const lastWidthRef = useRef(0);
+    const lastWidthRef = useRef(null);
+    const lastContainerWidthRef = useRef(0);
     const isCalculatingRef = useRef(false);
     const itemsRef = useRef(items);
 
     useEffect(() => {
         const currentItems = itemsRef.current;
-        if (items.length !== currentItems.length ||
-            items.some((item, idx) => !currentItems[idx] || item.id !== currentItems[idx].id || item.name !== currentItems[idx].name)) {
+        const changed = items.length !== currentItems.length ||
+            items.some((item, idx) => !currentItems[idx] || item.id !== currentItems[idx].id || item.name !== currentItems[idx].name);
+        if (changed) {
             itemsRef.current = items;
+            setCalcTrigger(t => t + 1);
         }
     }, [items]);
 
@@ -70,6 +73,11 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         setIsReady(false);
 
         const containerWidth = containerRef.current.clientWidth;
+        if (containerWidth <= 0) {
+            isCalculatingRef.current = false;
+            return;
+        }
+
         const gap = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
 
         const buttons = measureRef.current.querySelectorAll('.button');
@@ -119,8 +127,8 @@ export const useCategoryAssemble = (items, isLarge = false) => {
             return;
         }
 
-        const firstButton = measureRef.current.querySelector('.button');
-        if (!firstButton) {
+        const buttons = measureRef.current.querySelectorAll('.button');
+        if (!buttons.length) {
             setIsReady(true);
             setPageBreakpoints([0]);
             return;
@@ -129,24 +137,52 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         const observer = new ResizeObserver((entries) => {
             if (isCalculatingRef.current) return;
 
-            const newWidth = entries[0]?.contentRect.width || 0;
-            if (Math.abs(newWidth - lastWidthRef.current) > 1) {
-                lastWidthRef.current = newWidth;
-                calculate();
+            const observedWidths = lastWidthRef.current;
+            let shouldRecalc = false;
+
+            for (const entry of entries) {
+                const newWidth = entry?.contentRect?.width ?? 0;
+                const target = entry?.target;
+
+                if (target === containerRef.current) {
+                    if (Math.abs(newWidth - lastContainerWidthRef.current) > 1) {
+                        lastContainerWidthRef.current = newWidth;
+                        shouldRecalc = true;
+                    }
+                    continue;
+                }
+
+                if (!observedWidths) continue;
+                const key = target?.dataset?.observeKey ?? Array.from(buttons).indexOf(target);
+                if (key === -1) continue;
+                const prev = observedWidths[key];
+                if (prev === undefined || Math.abs(newWidth - prev) > 1) {
+                    observedWidths[key] = newWidth;
+                    shouldRecalc = true;
+                }
             }
+            if (shouldRecalc) calculate();
         });
 
-        observer.observe(firstButton);
+        const observedWidths = {};
+        buttons.forEach((btn, i) => {
+            btn.dataset.observeKey = String(i);
+            observedWidths[i] = btn.offsetWidth;
+            observer.observe(btn);
+        });
+        lastWidthRef.current = observedWidths;
 
-        if (measureRef.current && containerRef.current) {
-            calculate();
+        if (containerRef.current) {
+            lastContainerWidthRef.current = containerRef.current.clientWidth;
+            observer.observe(containerRef.current);
         }
 
-        window.addEventListener('resize', calculate);
+        const handleResize = () => requestAnimationFrame(calculate);
+        window.addEventListener('resize', handleResize);
 
         return () => {
             observer.disconnect();
-            window.removeEventListener('resize', calculate);
+            window.removeEventListener('resize', handleResize);
         };
     }, [items.length, calcTrigger, calculate]);
 

@@ -34,7 +34,7 @@ const ProcessOrderComplete = memo(() => {
                 <p>주문번호</p>
                 <h1>{order.orderNumber || 100}</h1>
             </div>
-            <div className="task-manager" ref={actionBarRef}>
+            <div className="task-manager" ref={actionBarRef} data-tts-text="작업관리, 버튼 두 개,">
                 <Button onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp();}} navigate="ProcessReceiptPrint" label="영수증 출력" />
                 <Button ttsText="출력 안함," navigate="ProcessFinish" label={`출력 안함${countdown}`} />
             </div>

@@ -117,6 +117,10 @@ if (existsSync('./src/SoundNote.wav')) {
   cpSync('./src/SoundNote.wav', './dist/SoundNote.wav');
   console.log('  ✅ Copied SoundNote.wav');
 }
+if (existsSync('./src/Favicon.png')) {
+  cpSync('./src/Favicon.png', './dist/Favicon.png');
+  console.log('  ✅ Copied Favicon.png');
+}
 
 // 3. JavaScript/CSS 빌드
 console.log('📦 Building JavaScript and CSS...');

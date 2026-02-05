@@ -170,32 +170,6 @@ const ExtentionIcon = (props) => (
   </svg>
 );
 
-// FaviconIcon 아이콘
-const FaviconIcon = (props) => (
-  <svg
-    width="32"
-    height="24"
-    viewBox="0 0 32 32"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-    {...props}
-  >
-    <circle cx="16" cy="16" r="16" fill="currentColor">
-      </circle>
-      <circle cx="16" cy="16" r="8" fill="currentColor">
-      </circle>
-      <circle cx="16" cy="16" r="6" fill="currentColor">
-      </circle>
-      <circle cx="13" cy="13" r="1" fill="currentColor" opacity="0.6">
-      </circle>
-      <circle cx="19" cy="14" r="0.8" fill="currentColor" opacity="0.4">
-      </circle>
-      <circle cx="15" cy="19" r="0.6" fill="currentColor" opacity="0.3">
-      </circle>
-  </svg>
-);
-
 // GraphicBellIcon 아이콘
 const GraphicBellIcon = (props) => (
   <svg
@@ -775,7 +749,6 @@ const iconMap = {
   'Done': DoneIcon,
   'Exit': ExitIcon,
   'Extention': ExtentionIcon,
-  'Favicon': FaviconIcon,
   'GraphicBell': GraphicBellIcon,
   'GraphicClock': GraphicClockIcon,
   'GraphicHome': GraphicHomeIcon,
@@ -832,7 +805,6 @@ export {
   DoneIcon,
   ExitIcon,
   ExtentionIcon,
-  FaviconIcon,
   GraphicBellIcon,
   GraphicClockIcon,
   GraphicHomeIcon,

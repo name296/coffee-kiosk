@@ -4,7 +4,8 @@ import { ScreenRouteContext, ModalContext } from "../contexts";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
 
-const BUTTON_ACTION_DELAY_MS = 50;
+const BUTTON_RELEASE_DELAY_MS = 90;
+const BUTTON_ACTION_DELAY_MS = 180;
 
 // 포커스 가능한 요소에 --button-min-side 계산
 const applyFocusableMinSide = (el) => {
@@ -41,6 +42,8 @@ const Button = memo(({
     const btnRef = useRef(null);
     const [isPressing, setIsPressing] = useState(false);
     const isPressingRef = useRef(false);
+    const releaseTimerRef = useRef(null);
+    const actionTimerRef = useRef(null);
     const { play: playSound } = useSound();
 
     // Context 직접 주입 (Zero-Abstraction)
@@ -58,6 +61,13 @@ const Button = memo(({
     useEffect(() => {
         isPressingRef.current = isPressing;
     }, [isPressing]);
+
+    useEffect(() => {
+        return () => {
+            if (releaseTimerRef.current) clearTimeout(releaseTimerRef.current);
+            if (actionTimerRef.current) clearTimeout(actionTimerRef.current);
+        };
+    }, []);
 
     // SVG에서 아이콘 이름 추출
     const getIconNameFromSvg = useMemo(() => {
@@ -114,47 +124,61 @@ const Button = memo(({
         return c.join(' ');
     }, [className, toggle, pressed, isPressing]);
 
-    // 버튼 시작 이벤트 핸들러
+    // 다운 시점에 액션 실행 (mousedown, touchstart, keydown)
+    const runAction = useCallback((e) => {
+        if (onChange && selectedValue !== undefined) {
+            onChange(selectedValue);
+        } else {
+            if (navigate) navigateTo(navigate);
+            if (modal) {
+                const modalInstance = modalContext?.[`Modal${modal}`];
+                if (modalInstance) modalInstance.open(label, buttonIcon);
+            }
+            if (onClick) onClick(e, btnRef.current);
+        }
+    }, [navigate, modal, navigateTo, modalContext, label, buttonIcon, onClick, onChange, selectedValue]);
+
+    const clearReleaseTimer = useCallback(() => {
+        if (releaseTimerRef.current) {
+            clearTimeout(releaseTimerRef.current);
+            releaseTimerRef.current = null;
+        }
+    }, []);
+
+    // 버튼 시작 이벤트 핸들러 (다운 시점: 액티브 + 사운드)
     const onStart = useCallback((e) => {
         if (disabled || (e.type === 'keydown' && !isActionKey(e))) return;
-        if (e.type === 'keydown') e.preventDefault();
+        if (e.type === 'keydown') {
+            if (e.repeat) return;
+            e.preventDefault();
+        }
 
+        clearReleaseTimer();
         setIsPressing(true);
         onPressed?.(true);
 
         if (!disabled) {
             playSound('onPressed');
+            releaseTimerRef.current = setTimeout(() => {
+                releaseTimerRef.current = null;
+                setIsPressing(false);
+                onPressed?.(false);
+            }, BUTTON_RELEASE_DELAY_MS);
+            actionTimerRef.current = setTimeout(() => {
+                actionTimerRef.current = null;
+                runAction(e);
+            }, BUTTON_ACTION_DELAY_MS);
         }
-    }, [disabled, onPressed, playSound]);
+    }, [disabled, onPressed, playSound, runAction, clearReleaseTimer]);
 
-    // 버튼 종료 이벤트 핸들러
+    // 버튼 종료 이벤트 핸들러 (업 시점: release 타이머는 유지하여 100ms 풀림 보장)
     const onEnd = useCallback((e) => {
         if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
         if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
 
-        setIsPressing(false);
-        onPressed?.(false);
-
-        if (onChange && selectedValue !== undefined) {
-            setTimeout(() => onChange(selectedValue), BUTTON_ACTION_DELAY_MS);
-        } else {
-            // 프레임워크 액션 100ms 딜레이 후 실행
-            setTimeout(() => {
-                if (navigate) {
-                    navigateTo(navigate);
-                }
-                if (modal) {
-                    const modalInstance = modalContext?.[`Modal${modal}`];
-                    if (modalInstance) {
-                        modalInstance.open(label, buttonIcon);
-                    }
-                }
-                if (onClick) {
-                    onClick(e, btnRef.current);
-                }
-            }, BUTTON_ACTION_DELAY_MS);
-        }
-    }, [disabled, navigate, modal, navigateTo, modalContext, label, buttonIcon, onClick, onChange, selectedValue, onPressed]);
+        // release 타이머는 그대로 두어 다운 후 100ms 동안 isPressing 유지
+        // (빨리 손 떼어도 100ms 풀림 보장)
+    }, [disabled]);
 
     return (
         <button
@@ -168,8 +192,10 @@ const Button = memo(({
             tabIndex={disabled ? 0 : undefined}
             onMouseDown={onStart}
             onMouseUp={onEnd}
+            onMouseLeave={onEnd}
             onTouchStart={onStart}
             onTouchEnd={onEnd}
+            onTouchCancel={onEnd}
             onKeyDown={onStart}
             onKeyUp={onEnd}
             {...rest}

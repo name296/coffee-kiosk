@@ -16,11 +16,6 @@ const Summary = memo(({ orderSummaryRef }) => {
         setIsDisabledBtn(totalCount <= 0);
     }, [totalCount]);
 
-    // 메뉴선택/내역확인 페이지에서만 표시
-    if (currentProcess !== 'ProcessMenu' && currentProcess !== 'ProcessDetails') {
-        return null;
-    }
-
     const summaryTtsText = `주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
 
     return (
@@ -42,6 +37,7 @@ const Summary = memo(({ orderSummaryRef }) => {
                             svg={<ResetIcon className="summary-btn-icon" />}
                             label="초기화"
                             modal="Reset"
+                            disabled={isDisabledBtn}
                         />
                         <Button
                             className="primary1"

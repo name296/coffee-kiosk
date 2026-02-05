@@ -242,11 +242,11 @@
 
     --primary2-border-color-default: var(--color-gray-09);
     --primary2-border-color-pressed: var(--color-brown-03);
-    --primary2-border-color-disabled: var(--color-gray-06);
+    --primary2-border-color-disabled: var(--color-gray-08);
 
     --primary2-content-color-default: var(--color-gray-03);
     --primary2-content-color-pressed: var(--color-gray-14);
-    --primary2-content-color-disabled: var(--color-gray-06);
+    --primary2-content-color-disabled: var(--color-gray-08);
 
     /* Primary3 팔레트(중첩 배경 시스템) */
     /* Background1 (중첩 배경) */
@@ -466,7 +466,6 @@
     --secondary2-content-color-default: var(--color-gray-12);
     --secondary2-content-color-pressed: var(--color-gray-14);
     --secondary2-content-color-disabled: var(--color-gray-07);
-    --secondary2-border-color-pointed: var(--color-system-01);
 
     /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
     /* Background1  */
@@ -528,7 +527,7 @@
   }
 
   .button {
-    transition: background-color 0.05s, color 0.00s, border-color 0.05s, transform 0.05s, box-shadow 0.05s, outline 0.05s;
+    transition: background-color 0.090s, color 0.0s, border-color 0.0s, transform 0.090s, box-shadow 0.0s, outline 0.0s;
     background-color: var(--primary2-background-color-default);
     background-clip: padding-box;
     position: relative;
@@ -563,14 +562,14 @@
     &.toggle.pressed .icon.pressed {
       display: block;
       position: absolute;
-      border-top-right-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5 * 1);
+      border-top-right-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5 * 0.875);
       overflow: hidden;
 
       /* --button-min-side 기반 크기 속성 */
       width: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
       height: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
-      top: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0);
-      right: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0);
+      top: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
+      right: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
 
       /* CSS mask-image로 SVG 지정하여 currentColor 적용 */
       &::before {
@@ -620,8 +619,7 @@
 
     /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
     &.pressing:not([aria-disabled="true"]) {
-      box-shadow: inset 0 0 6px 1px rgba(0, 0, 0, 0.15);
-      transform: translateY(1px) scale(0.95);
+      transform: scale(0.92);
     }
 
     /* ========================================
@@ -755,10 +753,6 @@
         background-color: var(--secondary1-background-color-pressed);
         border-color: var(--secondary1-border-color-pressed);
         color: var(--secondary1-content-color-pressed);
-
-        & .icon.pressed {
-          display: var(--content-icon-display-pressed-toggle);
-        }
       }
 
       &[aria-disabled="true"] {
@@ -789,10 +783,6 @@
         background-color: var(--secondary2-background-color-pressed);
         border-color: var(--secondary2-border-color-pressed);
         color: var(--secondary2-content-color-pressed);
-
-        & .icon.pressed {
-          display: var(--content-icon-display-pressed-toggle);
-        }
       }
 
       &[aria-disabled="true"] {
@@ -823,10 +813,6 @@
         background-color: var(--secondary3-background1-color-pressed);
         border-color: var(--secondary3-border-color-pressed);
         color: var(--secondary3-content-color-pressed);
-
-        & .icon.pressed {
-          display: var(--content-icon-display-pressed-toggle);
-        }
       }
 
       &[aria-disabled="true"] {
@@ -857,13 +843,6 @@
         color: var(--delete-content-color-disabled);
       }
     }
-
-    /* ========================================
-       버튼 크기 (w가로h세로)
-       - 색상: 팔레트 클래스 (primary1~3, secondary1~3)
-       - 외관: --button-min-side 비례 자동 계산
-       ======================================== */
-
   }
 
   /* ========================================
