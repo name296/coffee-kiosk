@@ -1,6 +1,10 @@
-import React, { memo } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import Button from "./Button";
 import Pagination from "./Pagination";
+import { OrderContext, AccessibilityContext } from "../contexts";
+import { usePageSlicer } from "../hooks";
+
+const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 15, ITEMS_PER_PAGE_LOW: 3 };
 
 // 메뉴 아이템
 const MenuItem = memo(({ item, disabled, onPress }) => (
@@ -22,50 +26,66 @@ const MenuItem = memo(({ item, disabled, onPress }) => (
 MenuItem.displayName = 'MenuItem';
 
 // 메뉴 그리드
-const MenuGrid = memo(({ 
-    items, 
-    onItemPress, 
-    selectedTab, 
-    convertToKoreanQuantity, 
-    mainContentRef,
-    isLow = false,
-    paginationProps
-}) => {
-    // 4*4 그리드이므로 최대 15개 아이템만 표시하고 마지막 칸에 페이지네이션
-    // .low 모드에서는 3개 아이템만 표시하고 4번째 칸에 페이지네이션
-    const maxItems = isLow ? 3 : 15;
-    const displayItems = items.slice(0, maxItems);
-    const hasPagination = paginationProps !== undefined && paginationProps !== null;
+const MenuGrid = memo(() => {
+    const order = useContext(OrderContext);
+    const accessibility = useContext(AccessibilityContext);
+
+    const {
+        pageNumber, totalPages, currentItems,
+        handlePrevPage, handleNextPage, resetPage
+    } = usePageSlicer(
+        order.menuItems,
+        PAGINATION_CONFIG.ITEMS_PER_PAGE_NORMAL,
+        PAGINATION_CONFIG.ITEMS_PER_PAGE_LOW,
+        accessibility.isLow
+    );
+
+    useEffect(() => {
+        const t = setTimeout(() => resetPage(), 0);
+        return () => clearTimeout(t);
+    }, [order.selectedTab, resetPage]);
+
+    const handleItemPress = (e, id, target) => {
+        target?.focus?.();
+        if (id !== 0) {
+            order.handleIncrease(id);
+        }
+    };
 
     return (
-        <div className="menu" ref={mainContentRef} data-tts-text={`메뉴, ${selectedTab}, 버튼 ${convertToKoreanQuantity(items.length)}개,`}>
-            {displayItems.map(item => (
+        <div
+            className="menu"
+            data-tts-text={`메뉴, ${order.selectedTab},`}
+        >
+            {currentItems.map(item => (
                 <MenuItem
                     key={item.id}
                     item={item}
                     disabled={item.id === 0}
-                    onPress={(e, target) => onItemPress(e, item.id, target)}
+                    onPress={(e, target) => handleItemPress(e, item.id, target)}
                 />
             ))}
-            {hasPagination && (
-                <div 
-                    className="menu-pagination"
-                    style={{ 
-                        display: "flex", 
-                        justifyContent: "center", 
-                        alignItems: "center", 
-                        width: "100%", 
-                        height: "100%",
-                        gridColumn: "4",
-                        gridRow: isLow ? "1" : "4"
-                    }}
-                >
-                    <Pagination
-                        direction="vertical"
-                        {...paginationProps}
-                    />
-                </div>
-            )}
+            <div
+                className="menu-pagination"
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    height: "100%",
+                    gridColumn: "4",
+                    gridRow: accessibility.isLow ? "1" : "4"
+                }}
+            >
+                <Pagination
+                    direction="vertical"
+                    pageNumber={pageNumber}
+                    totalPages={totalPages}
+                    onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
+                    onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
+                    ttsPrefix="메뉴"
+                />
+            </div>
         </div>
     );
 });

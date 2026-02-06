@@ -49,11 +49,10 @@ export const TTSDBProvider = ({ children }) => {
     }, [db, initDB]);
 
     const value = useMemo(() => ({
-        db,
         initDB,
         getFromDB,
         saveToDB
-    }), [db, initDB, getFromDB, saveToDB]);
+    }), [initDB, getFromDB, saveToDB]);
 
     return (
         <TTSDBContext.Provider value={value}>

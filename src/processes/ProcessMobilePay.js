@@ -1,20 +1,7 @@
-import React, { memo, useContext, useRef } from "react";
+import React, { memo } from "react";
 import { Button } from "../components";
 
-import { useFocusableSectionsManager } from "../hooks";
-import { ScreenRouteContext } from "../contexts";
-
 const ProcessMobilePay = memo(() => {
-    const { navigateTo } = useContext(ScreenRouteContext);
-
-    const actionBarRef = useRef(null);
-    const systemControlsRef = useRef(null);
-
-    useFocusableSectionsManager(['actionBar', 'systemControls'], {
-        actionBar: actionBarRef,
-        systemControls: systemControlsRef
-    });
-
     return (
         <>
             <div className="title">
@@ -22,7 +9,7 @@ const ProcessMobilePay = memo(() => {
                 <div><span className="primary">모바일페이</span>를 켜고 접근시키세요</div>
             </div>
             <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" />
-            <div ref={actionBarRef} className="task-manager">
+            <div className="task-manager">
                 <Button navigate="ProcessPayments" label="취소" />
                 <Button navigate="ProcessOrderComplete" label="가상인식" />
             </div>

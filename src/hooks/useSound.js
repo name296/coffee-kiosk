@@ -1,27 +1,8 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useCallback } from "react";
 
 export const useSound = () => {
     const audioRefs = useRef({});
     const volumeRef = useRef(0.5);
-    const globalAudioRefs = useRef(new Set());
-
-    // 컴포넌트 마운트 시 audioRefs 등록, 언마운트 시 제거
-    useEffect(() => {
-        const refs = audioRefs.current;
-        Object.values(refs).forEach(audio => {
-            if (audio instanceof Audio) {
-                globalAudioRefs.current.add(audio);
-            }
-        });
-
-        return () => {
-            Object.values(refs).forEach(audio => {
-                if (audio instanceof Audio) {
-                    globalAudioRefs.current.delete(audio);
-                }
-            });
-        };
-    }, [globalAudioRefs]);
 
     const play = useCallback((name) => {
         const src = name === 'onPressed' ? './SoundOnPressed.mp3' : name === 'note' ? './SoundNote.wav' : null;
@@ -41,7 +22,6 @@ export const useSound = () => {
         if (!audioRefs.current[name]) {
             const audio = new Audio(src);
             audioRefs.current[name] = audio;
-            globalAudioRefs.current.add(audio);
 
             // 에러 핸들러 추가 (개발 환경 디버깅용)
             audio.addEventListener('error', (e) => {

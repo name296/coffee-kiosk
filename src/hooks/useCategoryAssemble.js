@@ -229,13 +229,10 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         currentPage: pageNumber,
         totalPages,
         currentItems,
-        pagedItems,
-        pageBreakpoints,
         hasPrev: totalPages > 1,
         hasNext: totalPages > 1,
         prevPage: handlePrevPage,
         nextPage: handleNextPage,
-        recalculate,
         isCompact,
         isReady
     };

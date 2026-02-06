@@ -1,20 +1,15 @@
-import React, { memo, useContext, useState, useEffect } from "react";
+import React, { memo, useContext } from "react";
 import Button from "./Button";
 import { OrderIcon, ResetIcon, AddIcon, PayIcon } from "../Icon";
 import { OrderContext, ScreenRouteContext } from "../contexts";
 import { formatNumber, convertToKoreanQuantity } from "../utils";
 
-const Summary = memo(({ orderSummaryRef }) => {
+const Summary = memo(() => {
     const order = useContext(OrderContext);
     const { currentProcess } = useContext(ScreenRouteContext);
     const totalCount = order?.totalCount || 0;
     const totalSum = order?.totalSum || 0;
-
-    const [isDisabledBtn, setIsDisabledBtn] = useState(true);
-
-    useEffect(() => {
-        setIsDisabledBtn(totalCount <= 0);
-    }, [totalCount]);
+    const isDisabledBtn = totalCount <= 0;
 
     const summaryTtsText = `주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
 
@@ -30,7 +25,7 @@ const Summary = memo(({ orderSummaryRef }) => {
             </div>
 
             {/* 버튼 영역 */}
-            <div className="task-manager" ref={orderSummaryRef} data-tts-text={summaryTtsText}>
+            <div className="task-manager" data-tts-text={summaryTtsText}>
                 {currentProcess === 'ProcessMenu' && (
                     <>
                         <Button

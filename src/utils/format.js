@@ -15,12 +15,6 @@ export const safeParseInt = (v, d = 0) => {
     return isNaN(p) ? d : p;
 };
 
-export const safeParseFloat = (v, d = 0) => {
-    if (v == null || v === '') return d;
-    const p = parseFloat(v);
-    return isNaN(p) ? d : p;
-};
-
 export const formatNumber = (n, l = 'ko-KR', o = {}) => {
     if (n == null || isNaN(n)) return '0';
     const num = typeof n === 'string' ? parseFloat(n) : n;

@@ -24,28 +24,12 @@ export const AccessibilityProvider = ({ children }) => {
     useBodyClass('large', isLarge);
     useBodyClass('low', isLow);
 
-    const accessibility = useMemo(() => ({
-        isDark,
-        isLow,
-        isLarge,
-        volume
-    }), [isDark, isLow, isLarge, volume]);
-
-    const [accessibilityState, setAccessibilityState] = useState(accessibility);
-
-    useEffect(() => {
-        setAccessibilityState(accessibility);
-    }, [accessibility]);
-
     const value = useMemo(() => ({
-        // 접근성 설정
         isDark, setIsDark,
         isLow, setIsLow,
         isLarge, setIsLarge,
         volume, setVolume,
-        accessibility,
-        setAccessibility: setAccessibilityState,
-    }), [isDark, isLow, isLarge, volume, accessibility]);
+    }), [isDark, isLow, isLarge, volume]);
 
     return (
         <AccessibilityContext.Provider value={value}>

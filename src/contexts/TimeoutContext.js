@@ -1,35 +1,38 @@
-import React, { createContext, useMemo, useState, useRef, useCallback } from "react";
+import React, { createContext, useMemo, useRef, useCallback, useContext } from "react";
+import { useTimeoutCountdown } from "../hooks/useTimeoutCountdown";
+import { ModalContext } from "./ModalContext";
+import { ScreenRouteContext } from "./ScreenRouteContext";
+import { IDLE_TIMEOUT_MS } from "../utils/format";
 
 export const TimeoutContext = createContext();
 
 export const TimeoutProvider = ({ children }) => {
-    const [globalRemainingTime, setGlobalRemainingTime] = useState(null);
-    const [globalRemainingTimeFormatted, setGlobalRemainingTimeFormatted] = useState("00:00");
-    const resetIdleTimeoutRef = useRef(null);
+    const { currentProcess } = useContext(ScreenRouteContext);
+    const modal = useContext(ModalContext);
 
-    const setResetIdleTimeout = useCallback((fn) => {
-        resetIdleTimeoutRef.current = fn || null;
-    }, []);
+    // onTimeout은 외부(InitialExecutor)에서 등록
+    const onTimeoutRef = useRef(null);
+    const registerOnTimeout = useCallback((fn) => { onTimeoutRef.current = fn; }, []);
 
-    const resetIdleTimeout = useCallback(() => {
-        if (resetIdleTimeoutRef.current) {
-            resetIdleTimeoutRef.current();
-        }
-    }, []);
+    const { remainingMs, remainingTimeFormatted, resetTimer } = useTimeoutCountdown({
+        durationMs: IDLE_TIMEOUT_MS,
+        enabled: true,
+        onTimeout: () => onTimeoutRef.current?.(),
+        restartOnTimeout: true,
+        resetOnUserActivity: true,
+        onWarning: () => {
+            if (currentProcess === 'ProcessStart') return;
+            modal?.ModalTimeout?.open();
+        },
+        warningThresholdMs: 20000
+    });
 
     const value = useMemo(() => ({
-        globalRemainingTime,
-        globalRemainingTimeFormatted,
-        setGlobalRemainingTime,
-        setGlobalRemainingTimeFormatted,
-        resetIdleTimeout,
-        setResetIdleTimeout
-    }), [
-        globalRemainingTime,
-        globalRemainingTimeFormatted,
-        resetIdleTimeout,
-        setResetIdleTimeout
-    ]);
+        globalRemainingTime: remainingMs,
+        globalRemainingTimeFormatted: remainingTimeFormatted,
+        resetIdleTimeout: resetTimer,
+        registerOnTimeout
+    }), [remainingMs, remainingTimeFormatted, resetTimer, registerOnTimeout]);
 
     return (
         <TimeoutContext.Provider value={value}>

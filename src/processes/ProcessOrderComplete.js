@@ -1,20 +1,11 @@
-import React, { memo, useContext, useRef } from "react";
+import React, { memo, useContext } from "react";
 import { Button } from "../components";
-
 import { OrderContext, ScreenRouteContext } from "../contexts";
-import { useFocusableSectionsManager, useTimeoutCountdown } from "../hooks";
+import { useTimeoutCountdown } from "../hooks";
 
 const ProcessOrderComplete = memo(() => {
     const order = useContext(OrderContext);
     const { navigateTo } = useContext(ScreenRouteContext);
-
-    const actionBarRef = useRef(null);
-    const systemControlsRef = useRef(null);
-
-    useFocusableSectionsManager(['actionBar', 'systemControls'], {
-        actionBar: actionBarRef,
-        systemControls: systemControlsRef
-    });
 
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 60000,
@@ -34,8 +25,8 @@ const ProcessOrderComplete = memo(() => {
                 <p>주문번호</p>
                 <h1>{order.orderNumber || 100}</h1>
             </div>
-            <div className="task-manager" ref={actionBarRef} data-tts-text="작업관리, 버튼 두 개,">
-                <Button onClick={() => { if (order.sendPrintReceiptToApp) order.sendPrintReceiptToApp();}} navigate="ProcessReceiptPrint" label="영수증 출력" />
+            <div className="task-manager">
+                <Button onClick={() => order.sendPrintReceiptToApp()} navigate="ProcessReceiptPrint" label="영수증 출력" />
                 <Button ttsText="출력 안함," navigate="ProcessFinish" label={`출력 안함${countdown}`} />
             </div>
         </>

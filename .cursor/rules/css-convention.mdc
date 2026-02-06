@@ -1,0 +1,35 @@
+---
+description: App.css 작성 규칙 (플랫·쉼표 셀렉터 금지)
+alwaysApply: true
+globs: ["**/App.css", "**/*.css"]
+---
+
+# App.css 작성 규칙
+
+다음 규칙을 **절대** 위반하지 않는다.
+
+| 금지 | 설명 | 대안 |
+|------|------|------|
+| **플랫 셀렉터** | 부모 없이 긴 경로 나열 | 네스팅(`&`)만 사용 |
+| **쉼표 셀렉터** | `& .process.second ..., &.low .process.third ...` 형태 | 각 경로를 해당 블록 안에 네스팅으로 분리 |
+
+## 금지 예시
+
+```css
+/* ❌ 쉼표로 여러 경로 묶기 */
+& .process.second .order-list.low > .order-list,
+&.low .process.third .main .details-content .order-list { ... }
+
+```
+
+## 허용 예시
+
+```css
+/* ✅ 각 블록 안에 네스팅 */
+& .process {
+  &.second .order-list.low { & > .order-list { ... } }
+}
+&.low .process.third .main .details-content { & .order-list { ... } }
+```
+
+CSS 수정 시 위 규칙을 먼저 확인하고 적용한다.

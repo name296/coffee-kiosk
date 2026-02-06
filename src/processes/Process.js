@@ -22,8 +22,6 @@ const Process = memo(() => {
     useInteractiveTTSHandler(true, handleText);
     useFocusNavigationHandler(true);
 
-    // 포커스 초기화는 FocusExecutor에서 처리
-
     const processClassName = ["process", layoutType].filter(Boolean).join(" ");
 
     return (

@@ -21,12 +21,6 @@ export const calculateTotal = (quantities, items) => {
 };
 
 /**
- * 선택된 메뉴만 필터링 (장바구니 노출용)
- */
-export const filterMenuItems = (items, quantities) =>
-    items.filter(item => quantities[item.id] > 0);
-
-/**
  * 주문 아이템 생성 (결제/출력용 데이터 변환)
  */
 export const createOrderItems = (items, quantities) =>

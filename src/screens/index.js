@@ -4,3 +4,4 @@
 export { ViewportInitializer } from "./ViewportInitializer";
 export { InitialExecutor } from "./InitialExecutor";
 export { FocusExecutor } from "./FocusExecutor";
+export { ButtonCountInjector } from "./ButtonCountInjector";

@@ -1,12 +1,12 @@
-/* ==============================
-  전체 CSS 시스템/모듈 구조
+﻿/* ==============================
+  ?꾩껜 CSS ?쒖뒪??紐⑤뱢 援ъ“
   ============================== */
 @layer reset, design-system, layout, components, utilities;
 
-/* 큰글씨 모드는 body.large + design-system 폰트 변수 오버라이드로 적용 */
+/* ?곌???紐⑤뱶??body.large + design-system ?고듃 蹂???ㅻ쾭?쇱씠?쒕줈 ?곸슜 */
 
 /* ==============================
-  폰트 정의 (Font Faces)
+  ?고듃 ?뺤쓽 (Font Faces)
   ============================== */
 @font-face {
   font-family: "Pretendard GOV";
@@ -81,7 +81,7 @@
 }
 
 /* ==============================
-  전체 CSS Reset & Base
+  ?꾩껜 CSS Reset & Base
   ============================== */
 @layer reset {
 
@@ -100,25 +100,20 @@
     scroll-behavior: smooth;
   }
 
-  body {
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
   button {
     all: unset;
   }
 }
 
 /* ========================================
-   전체 디자인 시스템(Design System)
+   ?꾩껜 ?붿옄???쒖뒪??Design System)
    ======================================== */
 @layer design-system {
   :root {
-    /* === 전체 타이포그래피 시스템=== */
+    /* === ?꾩껜 ??댄룷洹몃옒???쒖뒪??== */
     --font-family: 'Pretendard GOV', sans-serif;
 
-    /* === font / size (rem 단위). 큰글씨는 body.large에서 변수 오버라이드로 통제 === */
+    /* === font / size (rem ?⑥쐞). ?곌??⑤뒗 body.large?먯꽌 蹂???ㅻ쾭?쇱씠?쒕줈 ?듭젣 === */
     --font-size-xs: 1.2rem;
     --font-size-sm: 1.4rem;
     --font-size-md: 1.6rem;
@@ -148,7 +143,7 @@
     --spacing-xl: calc(var(--spacing-base) * 2.25);
     /* 2.25rem = 36px */
 
-    /* === layout / 섹션 높이 / 버튼(min-side) === */
+    /* === layout / ?뱀뀡 ?믪씠 / 踰꾪듉(min-side) === */
     --height-banner: 70px;
     --height-banner-price: 200px;
     --height-bottom: 112px;
@@ -162,10 +157,10 @@
     --layout-padding-x: 32px;
     --layout-width: 1080px;
 
-    /* 테마/팔레트 독립 속성 */
+    /* ?뚮쭏/?붾젅???낅┰ ?띿꽦 */
     --border-color-pointed: var(--color-system-01);
 
-    /* 원시 팔레트(Primitive Palette) */
+    /* ?먯떆 ?붾젅??Primitive Palette) */
     /* Brown */
     --color-brown-01: #4C3F37FF;
     --color-brown-02: #8C532CFF;
@@ -203,8 +198,8 @@
     --color-system-04: #FF4800FF;
     --color-system-05: #00000099;
 
-    /* 참조 팔레트(Reference Palette) */
-    /* Body 참조 팔레트*/
+    /* 李몄“ ?붾젅??Reference Palette) */
+    /* Body 李몄“ ?붾젅??/
     --body1-background-color: var(--color-gray-03);
     --body1-border-color: var(--color-gray-09);
     --body1-content-primary-color: var(--color-brown-02);
@@ -226,8 +221,8 @@
     --body4-border-color: var(--color-gray-09);
     --body4-content-color: var(--color-gray-01);
 
-    /* 버튼 팔레트(Light 테마) */
-    /* Primary1 팔레트*/
+    /* 踰꾪듉 ?붾젅??Light ?뚮쭏) */
+    /* Primary1 ?붾젅??/
     --primary1-background-color-default: var(--color-brown-03);
     --primary1-background-color-pressed: var(--color-brown-06);
     --primary1-background-color-disabled: transparent;
@@ -240,7 +235,7 @@
     --primary1-content-color-pressed: var(--color-brown-02);
     --primary1-content-color-disabled: var(--body2-primary1-color);
 
-    /* Primary2 팔레트*/
+    /* Primary2 ?붾젅??/
     --primary2-background-color-default: var(--color-gray-11);
     --primary2-background-color-pressed: var(--color-brown-03);
     --primary2-background-color-disabled: transparent;
@@ -253,38 +248,38 @@
     --primary2-content-color-pressed: var(--color-gray-14);
     --primary2-content-color-disabled: var(--color-gray-08);
 
-    /* Primary3 팔레트(중첩 배경 시스템) */
-    /* Background1 (중첩 배경) */
+    /* Primary3 ?붾젅??以묒꺽 諛곌꼍 ?쒖뒪?? */
+    /* Background1 (以묒꺽 諛곌꼍) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-14);
     --primary3-background1-color-disabled: var(--color-gray-14);
 
-    /* Border (테두리) */
+    /* Border (?뚮몢由? */
     --primary3-border-color-default: var(--color-gray-09);
     --primary3-border-color-pressed: var(--color-brown-03);
     --primary3-border-color-disabled: var(--color-gray-09);
 
-    /* Background2 그라디언트 레이어 */
+    /* Background2 洹몃씪?붿뼵???덉씠??*/
     --primary3-background2-color-default: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
     --primary3-background2-color-pressed: linear-gradient(180deg, #A4693F00 0%, #A4693FE6 15%, #A4693FFF 43%, #A4693FFF 100%);
     --primary3-background2-color-disabled: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
 
-    /* Content2 (background2 위의 HTML 요소) */
+    /* Content2 (background2 ?꾩쓽 HTML ?붿냼) */
     --primary3-content2-color-default1: var(--color-gray-03);
     --primary3-content2-color-default2: var(--color-brown-02);
     --primary3-content2-color-pressed: var(--color-gray-14);
     --primary3-content2-color-disabled1: var(--color-gray-03);
     --primary3-content2-color-disabled2: var(--color-brown-02);
 
-    /* Content3 (별도 구분 HTML 요소) */
+    /* Content3 (蹂꾨룄 援щ텇 HTML ?붿냼) */
     --primary3-content3-color-disabled: var(--color-system-02);
 
-    /* Content (버튼 기본 콘텐츠) */
+    /* Content (踰꾪듉 湲곕낯 肄섑뀗痢? */
     --primary3-content-color-default: var(--color-gray-03);
     --primary3-content-color-pressed: var(--color-gray-14);
     --primary3-content-color-disabled: var(--color-gray-07);
 
-    /* Secondary1 팔레트*/
+    /* Secondary1 ?붾젅??/
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-11);
     --secondary1-background-color-disabled: transparent;
@@ -297,7 +292,7 @@
     --secondary1-content-color-pressed: var(--color-gray-03);
     --secondary1-content-color-disabled: var(--color-gray-06);
 
-    /* Secondary2 팔레트*/
+    /* Secondary2 ?붾젅??/
     --secondary2-background-color-default: var(--color-gray-11);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
@@ -310,7 +305,7 @@
     --secondary2-content-color-pressed: var(--color-gray-14);
     --secondary2-content-color-disabled: var(--color-gray-06);
 
-    /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
+    /* Secondary3 ?붾젅??以묒꺽 諛곌꼍 ?쒖뒪?? ?덉씠???곸슜) */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
@@ -319,18 +314,18 @@
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-06);
 
-    /* Content1 (background1 위의 HTML 요소) */
+    /* Content1 (background1 ?꾩쓽 HTML ?붿냼) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-06);
 
-    /* Background2 (레이어 적용 배경) */
+    /* Background2 (?덉씠???곸슜 諛곌꼍) */
     --secondary3-background2-color-default: var(--color-gray-01);
 
-    /* Content2 (background2 위의 HTML 요소 - 레이어) */
+    /* Content2 (background2 ?꾩쓽 HTML ?붿냼 - ?덉씠?? */
     --secondary3-content2-color-default: var(--color-gray-14);
 
-    /* Delete 버튼 팔레트 */
+    /* Delete 踰꾪듉 ?붾젅??*/
     --delete-background-color-default: var(--color-system-02);
     --delete-background-color-pressed: var(--color-system-03);
     --delete-background-color-disabled: transparent;
@@ -343,17 +338,181 @@
     --delete-content-color-pressed: var(--color-gray-14);
     --delete-content-color-disabled: var(--color-gray-06);
 
-    /* 텍스트 하이라이트 색상 */
+    /* ?띿뒪???섏씠?쇱씠???됱긽 */
     --highlight-color: var(--color-brown-02);
   }
 
+  /* ?곌???紐⑤뱶: body.large?먯꽌 ?고듃 ?ъ씠利?蹂?섎쭔 1.2諛곕줈 ?듭젣 (rem 湲곗?? html 怨좎젙) */
+  .large {
+    --font-size-xs: 1.44rem;
+    --font-size-sm: 1.68rem;
+    --font-size-md: 1.92rem;
+    --font-size-lg: 2.4rem;
+    --font-size-b1: 4.8rem;
+    --font-size-h1: 5.76rem;
+    --font-size-h2: 6.96rem;
+    --font-size-d1: 8.04rem;
+    --font-size-d2: 9.96rem;
+    --font-size-d3: 15.36rem;
+    --font-size-d4: 21.6rem;
+  }
+
   /* ========================================
-     버튼 시스템 (Button System)
-     - 의사변수: :root(--button-min-side-*), 포커스요소(--button-min-side, --clamped)
-     - 컴포넌트: .button (팔레트 소비, touch-action: none)
+     ?꾩껜 怨좊?鍮?紐⑤뱶 (Dark Theme - 27 援ъ“)
+     ======================================== */
+  .dark {
+    /* Body 李몄“ ?붾젅??Dark ?뚮쭏) */
+    --body1-background-color: var(--color-gray-03);
+    --body1-border-color: var(--color-gray-07);
+    --body1-content-primary-color: var(--color-yellow-03);
+    --body1-content-secondary-color: var(--color-gray-14);
+
+    --body2-background-color: var(--color-gray-01);
+    --body2-primary1-color: var(--color-yellow-03);
+    --body2-primary2-color: var(--color-yellow-02);
+    --body2-secondary1-color: var(--color-gray-14);
+    --body2-secondary2-color: var(--color-gray-14);
+
+    --body2-progress-background-standby-color: var(--color-gray-07);
+    --body2-progress-content-complete-color: var(--color-gray-01);
+    
+    --body3-background-color: var(--color-gray-03);
+    --body3-content-color: var(--color-gray-14);
+
+    --body4-background-color: var(--color-gray-02);
+    --body4-border-color: var(--color-gray-07);
+    --body4-content-color: var(--color-gray-14);
+
+    /* 踰꾪듉 ?붾젅??Dark ?뚮쭏) */
+    /* Primary1 ?붾젅??/
+    --primary1-background-color-default: var(--color-yellow-03);
+    --primary1-background-color-pressed: var(--color-yellow-01);
+    --primary1-background-color-disabled: transparent;
+
+    --primary1-border-color-default: var(--color-yellow-03);
+    --primary1-border-color-pressed: var(--color-yellow-04);
+    --primary1-border-color-disabled: var(--body2-primary1-color);
+
+    --primary1-content-color-default: var(--color-gray-01);
+    --primary1-content-color-pressed: var(--color-yellow-04);
+    --primary1-content-color-disabled: var(--body2-primary1-color);
+
+    /* Primary2 ?붾젅??/
+    --primary2-background-color-default: var(--color-gray-03);
+    --primary2-background-color-pressed: var(--color-yellow-03);
+    --primary2-background-color-disabled: transparent;
+
+    --primary2-border-color-default: var(--color-gray-07);
+    --primary2-border-color-pressed: var(--color-yellow-03);
+    --primary2-border-color-disabled: var(--color-gray-07);
+
+    --primary2-content-color-default: var(--color-gray-12);
+    --primary2-content-color-pressed: var(--color-gray-01);
+    --primary2-content-color-disabled: var(--color-gray-07);
+
+    /* Primary3 ?붾젅??以묒꺽 諛곌꼍 ?쒖뒪?? */
+    /* Background1 (以묒꺽 諛곌꼍) */
+    --primary3-background1-color-default: var(--color-gray-14);
+    --primary3-background1-color-pressed: var(--color-gray-01);
+    --primary3-background1-color-disabled: var(--color-gray-14);
+
+    /* Border (?뚮몢由? */
+    --primary3-border-color-default: var(--color-gray-07);
+    --primary3-border-color-pressed: var(--color-yellow-03);
+    --primary3-border-color-disabled: var(--color-gray-07);
+
+    /* Background2 洹몃씪?붿뼵???덉씠??*/
+    --primary3-background2-color-default: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
+    --primary3-background2-color-pressed: linear-gradient(180deg, #FFE10000 0%, #FFE100E6 15%, #FFE100FF 43%, #FFE100FF 100%);
+    --primary3-background2-color-disabled: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
+
+    /* Content2 (background2 ?꾩쓽 HTML ?붿냼) */
+    --primary3-content2-color-default1: var(--color-gray-12);
+    --primary3-content2-color-default2: var(--color-yellow-03);
+    --primary3-content2-color-pressed: var(--color-gray-01);
+    --primary3-content2-color-disabled1: var(--color-gray-12);
+    --primary3-content2-color-disabled2: var(--color-yellow-03);
+
+    /* Content3 (蹂꾨룄 援щ텇 HTML ?붿냼) */
+    --primary3-content3-color-disabled: var(--color-system-04);
+
+    /* Content (踰꾪듉 湲곕낯 肄섑뀗痢? */
+    --primary3-content-color-default: var(--color-gray-13);
+    --primary3-content-color-pressed: var(--color-gray-01);
+    --primary3-content-color-disabled: var(--color-gray-07);
+
+    /* Secondary1 ?붾젅??/
+    --secondary1-background-color-default: var(--color-gray-07);
+    --secondary1-background-color-pressed: var(--color-gray-03);
+    --secondary1-background-color-disabled: transparent;
+
+    --secondary1-border-color-default: var(--color-gray-07);
+    --secondary1-border-color-pressed: var(--color-gray-07);
+    --secondary1-border-color-disabled: var(--color-gray-07);
+
+    --secondary1-content-color-default: var(--color-gray-14);
+    --secondary1-content-color-pressed: var(--color-gray-12);
+    --secondary1-content-color-disabled: var(--color-gray-07);
+
+    /* Secondary2 ?붾젅??/
+    --secondary2-background-color-default: var(--color-gray-03);
+    --secondary2-background-color-pressed: var(--color-gray-07);
+    --secondary2-background-color-disabled: transparent;
+
+    --secondary2-border-color-default: var(--color-gray-07);
+    --secondary2-border-color-pressed: var(--color-gray-07);
+    --secondary2-border-color-disabled: var(--color-gray-07);
+
+    --secondary2-content-color-default: var(--color-gray-12);
+    --secondary2-content-color-pressed: var(--color-gray-14);
+    --secondary2-content-color-disabled: var(--color-gray-07);
+
+    /* Secondary3 ?붾젅??以묒꺽 諛곌꼍 ?쒖뒪?? ?덉씠???곸슜) */
+    /* Background1  */
+    --secondary3-background1-color-default: var(--color-gray-14);
+    --secondary3-background1-color-pressed: var(--color-gray-07);
+    --secondary3-background1-color-disabled: transparent;
+
+    /* Border1 */
+    --secondary3-border-color-default: var(--color-gray-09);
+    --secondary3-border-color-pressed: var(--color-gray-07);
+    --secondary3-border-color-disabled: var(--color-gray-07);
+
+    /* Content1 (background1 ?꾩쓽 HTML ?붿냼) */
+    --secondary3-content1-color-default: var(--color-gray-01);
+    --secondary3-content1-color-pressed: var(--color-gray-14);
+    --secondary3-content1-color-disabled: var(--color-gray-07);
+
+    /* Background2 (?덉씠???곸슜 諛곌꼍) */
+    --secondary3-background2-color-default: var(--color-gray-01);
+
+    /* Content2 (background2 ?꾩쓽 HTML ?붿냼 - ?덉씠?? */
+    --secondary3-content2-color-default: var(--color-gray-14);
+
+    /* Delete 踰꾪듉 ?붾젅??(Dark ?뚮쭏) */
+    --delete-background-color-default: var(--color-system-02);
+    --delete-background-color-pressed: var(--color-system-03);
+    --delete-background-color-disabled: transparent;
+
+    --delete-border-color-default: var(--color-system-02);
+    --delete-border-color-pressed: var(--color-system-02);
+    --delete-border-color-disabled: var(--color-gray-07);
+
+    --delete-content-color-default: var(--color-gray-14);
+    --delete-content-color-pressed: var(--color-gray-14);
+    --delete-content-color-disabled: var(--color-gray-07);
+
+    /* ?띿뒪???섏씠?쇱씠???됱긽 (Dark ?뚮쭏) */
+    --highlight-color: var(--color-yellow-03);
+  }
+
+  /* ========================================
+     踰꾪듉 ?쒖뒪??(Button System)
+     - ?섏궗蹂?? :root(--button-min-side-*), ?ъ빱?ㅼ슂??--button-min-side, --clamped)
+     - 而댄룷?뚰듃: .button (?붾젅???뚮퉬, touch-action: none)
      ======================================== */
 
-  /* 포커스 가능한 요소: --button-min-side는 Button.js에서 동적 설정 */
+  /* ?ъ빱??媛?ν븳 ?붿냼: --button-min-side??Button.js?먯꽌 ?숈쟻 ?ㅼ젙 */
   button:not([disabled]),
   a[href],
   input:not([disabled]),
@@ -368,7 +527,7 @@
   }
 
   .button {
-    transition: background-color 0.18s, color 0.0s, border-color 0.0s, transform 0.090s, box-shadow 0.0s, outline 0.0s;
+    transition: background-color 0.090s, color 0.0s, border-color 0.0s, transform 0.090s, box-shadow 0.0s, outline 0.0s;
     background-color: var(--primary2-background-color-default);
     background-clip: padding-box;
     position: relative;
@@ -392,9 +551,9 @@
     flex-flow: row nowrap;
     flex-shrink: 0;
 
-    /* 상속 속성 (자식에게 전파) */
+    /* ?곸냽 ?띿꽦 (?먯떇?먭쾶 ?꾪뙆) */
     color: var(--primary2-content-color-default);
-    /* 토글 체크 아이콘 - CSS ::before로 처리 */
+    /* ?좉? 泥댄겕 ?꾩씠肄?- CSS ::before濡?泥섎━ */
 
     &.toggle .icon.pressed {
       display: none;
@@ -406,13 +565,13 @@
       border-top-right-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5 * 0.875);
       overflow: hidden;
 
-      /* --button-min-side 기반 크기 속성 */
+      /* --button-min-side 湲곕컲 ?ш린 ?띿꽦 */
       width: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
       height: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
       top: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
       right: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
 
-      /* CSS mask-image로 SVG 지정하여 currentColor 적용 */
+      /* CSS mask-image濡?SVG 吏?뺥븯??currentColor ?곸슜 */
       &::before {
         content: '';
         display: block;
@@ -430,7 +589,7 @@
       }
     }
 
-    /* 라벨 레이아웃 - 버튼에 직접 상속 */
+    /* ?쇰꺼 ?덉씠?꾩썐 - 踰꾪듉??吏곸젒 ?곸냽 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -443,28 +602,28 @@
       background-color: var(--primary2-background-color-disabled);
       color: var(--primary2-content-color-disabled);
       pointer-events: auto;
-      /* 탭 포커스를 받기 위해 auto */
+      /* ???ъ빱?ㅻ? 諛쏄린 ?꾪빐 auto */
 
-      /* 비활성 버튼은 pressed 스타일 무시 */
+      /* 鍮꾪솢??踰꾪듉? pressed ?ㅽ???臾댁떆 */
       &.pressed {
         background-color: var(--primary2-background-color-disabled);
         color: var(--primary2-content-color-disabled);
       }
     }
 
-    /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
+    /* ?몃쾭 諛??ъ빱????outline ?쒖떆 (鍮꾪솢??踰꾪듉?먯꽌???곸슜 媛?? */
     &:hover,
     &:focus-visible {
       outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--border-color-pointed);
     }
 
-    /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
+    /* pressing ?곹깭 - ?꾨Ⅴ???쒓컙?먮쭔 ?곸슜 (?ㅼ???+ ?대꼫 洹몃┝?? */
     &.pressing:not([aria-disabled="true"]) {
       transform: scale(0.92);
     }
 
     /* ========================================
-       팔레트 클래스 - Primary
+       ?붾젅???대옒??- Primary
        ======================================== */
 
     &.primary1 {
@@ -566,12 +725,12 @@
         background-color: var(--primary3-background1-color-disabled);
         border-color: var(--primary3-border-color-disabled);
         color: var(--primary3-content-color-disabled);
-  }
-}
+      }
+    }
 
-/* ========================================
-       팔레트 클래스 - Secondary
-   ======================================== */
+    /* ========================================
+       ?붾젅???대옒??- Secondary
+       ======================================== */
 
     &.secondary1 {
       background-color: var(--secondary1-background-color-default);
@@ -663,7 +822,7 @@
       }
     }
 
-    /* Delete 아이템 버튼 (빨간색) */
+    /* Delete ?꾩씠??踰꾪듉 (鍮④컙?? */
     &.delete-item {
       width: 70px;
       height: 70px;
@@ -687,7 +846,7 @@
   }
 
   /* ========================================
-     아이콘 시스템 (Icon System)
+     ?꾩씠肄??쒖뒪??(Icon System)
      ======================================== */
   .icon {
     display: flex;
@@ -711,18 +870,18 @@
 }
 
 /* ========================================
-   전체 레이아웃 (Layout)
+   ?꾩껜 ?덉씠?꾩썐 (Layout)
    ======================================== */
 @layer layout {
 
   /* ========================================
-     Body 레이아웃 + 타이포 (process·modal 공통)
+     Body ?덉씠?꾩썐 + ??댄룷 (process쨌modal 怨듯넻)
      ======================================== */
   body {
     margin: 0;
     box-sizing: border-box;
 
-    /* 타이포: process·modal 공통 (body.large 시 변수로 확대) */
+    /* ??댄룷: process쨌modal 怨듯넻 (body.large ??蹂?섎줈 ?뺣?) */
     font-family: var(--font-family);
     font-size: var(--font-size-b1);
     font-weight: var(--font-weight-medium);
@@ -732,215 +891,215 @@
 
     /* body .process */
     & .process {
-    /* 레이아웃 */
-    display: flex;
-    flex-direction: column;
-    width: var(--layout-width);
-    height: var(--layout-height);
-    contain: size;
-    color: var(--body1-content-primary-color);
-    background-color: var(--body1-background-color);
-    border-color: var(--body1-border-color);
+      /* ?덉씠?꾩썐 */
+      display: flex;
+      flex-direction: column;
+      width: var(--layout-width);
+      height: var(--layout-height);
+      contain: size;
+      color: var(--body1-content-primary-color);
+      background-color: var(--body1-background-color);
+      border-color: var(--body1-border-color);
 
       /* body .process > * */
-    &>* {
-      padding-left: var(--layout-padding-x);
-      padding-right: var(--layout-padding-x);
-      box-sizing: border-box;
-    }
+      &>* {
+        padding-left: var(--layout-padding-x);
+        padding-right: var(--layout-padding-x);
+        box-sizing: border-box;
+      }
 
-    /* ========================================
+      /* ========================================
          body .process .top
-       ======================================== */
-    & .top {
-      width: 100%;
-      height: var(--height-top);
-      flex-shrink: 0;
-      border-bottom: 2px solid var(--body1-border-color);
-    }
+         ======================================== */
+      & .top {
+        width: 100%;
+        height: var(--height-top);
+        flex-shrink: 0;
+        border-bottom: 2px solid var(--body1-border-color);
+      }
 
-      /* body .process.first – 첫 페이지에서 Top, Step, Summary, black 숨기기 */
-    &.first .top,
-    &.first .step,
-    &.first .summary,
-    &.first .black {
-      display: none;
-    }
+      /* body .process.first ??泥??섏씠吏?먯꽌 Top, Step, Summary, black ?④린湲?*/
+      &.first .top,
+      &.first .step,
+      &.first .summary,
+      &.first .black {
+        display: none;
+      }
 
-      /* body .process.forth – 결제/완료 레이아웃에서 Summary 숨기기 */
-    &.forth .summary {
-      display: none;
-    }
+      /* body .process.forth ??寃곗젣/?꾨즺 ?덉씠?꾩썐?먯꽌 Summary ?④린湲?*/
+      &.forth .summary {
+        display: none;
+      }
 
-    /* ========================================
+      /* ========================================
          body .process .step
-       구조: .step > .step-num + .step-name + .separator (4단계 반복)
-         상태: .step-1 ~ .step-5 로 진행/현재 제어 (CSS 체이닝)
-       ======================================== */
-    & .step {
-    width: 100%;
-    height: var(--height-step);
-    color: var(--layout-color);
-    display: flex;
-    border-bottom: 2px solid var(--body1-border-color);
-    flex-shrink: 0;
-    height: 120px;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-evenly;
+         援ъ“: .step > .step-num + .step-name + .separator (4?④퀎 諛섎났)
+         ?곹깭: .step-1 ~ .step-5 濡?吏꾪뻾/?꾩옱 ?쒖뼱 (CSS 泥댁씠??
+         ======================================== */
+      & .step {
+        width: 100%;
+        height: var(--height-step);
+        color: var(--layout-color);
+        display: flex;
+        border-bottom: 2px solid var(--body1-border-color);
+        flex-shrink: 0;
+        height: 120px;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-evenly;
 
         /* body .process .step .step-num */
-    & .step-num {
-      width: 74px;
-      height: 74px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      box-sizing: border-box;
-      background-clip: padding-box;
-      background-color: var(--body2-progress-background-standby-color);
-      color: var(--body2-secondary2-color);
-    }
+        & .step-num {
+          width: 74px;
+          height: 74px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          border-radius: 50%;
+          border: 8px solid transparent;
+          box-sizing: border-box;
+          background-clip: padding-box;
+          background-color: var(--body2-progress-background-standby-color);
+          color: var(--body2-secondary2-color);
+        }
 
         /* body .process .step .step-name, .separator */
-    & .step-name,
-    & .separator {
-      flex-shrink: 0;
-      color: var(--body2-secondary2-color);
-    }
+        & .step-name,
+        & .separator {
+          flex-shrink: 0;
+          color: var(--body2-secondary2-color);
+        }
 
-        /* body .process .step.step-1 ~ .step-5 – 진행/현재 상태 */
-    &.step-1 {
-      & .step-num:nth-of-type(1) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-        border-color: var(--body2-primary2-color);
+        /* body .process .step.step-1 ~ .step-5 ??吏꾪뻾/?꾩옱 ?곹깭 */
+        &.step-1 {
+          & .step-num:nth-of-type(1) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .separator:nth-of-type(3) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-2 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(4) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-3 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(7) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-4 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7),
+          & .step-num:nth-of-type(10) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-num:nth-of-type(10) {
+            border-color: var(--body2-primary2-color);
+          }
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .step-name:nth-of-type(11),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+        &.step-5 {
+          & .step-num {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+          & .step-name,
+          & .separator {
+            color: var(--body2-primary1-color);
+          }
+        }
       }
-      & .step-name:nth-of-type(2),
-      & .separator:nth-of-type(3) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-2 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(4) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-3 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(7) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-4 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7),
-      & .step-num:nth-of-type(10) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(10) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .step-name:nth-of-type(11),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-5 {
-      & .step-num {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-name,
-      & .separator {
-        color: var(--body2-primary1-color);
-      }
-    }
-  }
 
-  /* ========================================
+      /* ========================================
          body .process .main
-     ======================================== */
-  /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
-  & .main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--body2-background-color);
-    border-color: var(--body2-border-color);
-    color: var(--body1-content-secondary-color);
+         ======================================== */
+      /* .main ?붿냼??JSX?먯꽌 tabIndex={-1}濡??ㅼ젙??(CSS濡쒕뒗 HTML ?띿꽦 異붽? 遺덇?) */
+      & .main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--body2-background-color);
+        border-color: var(--body2-border-color);
+        color: var(--body1-content-secondary-color);
 
-    &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
-    &:focus-visible {
-      outline: 12px dashed var(--border-color-pointed);
-      outline-offset: -12px;
-    }
+        &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+        &:focus-visible {
+          outline: 12px dashed var(--border-color-pointed);
+          outline-offset: -12px;
+        }
 
         /* body .process .main .title */
-    & .title {
-      width: 100%;
-      height: var(--height-title);
-      flex-shrink: 0;
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-semibold);
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      color: var(--body1-content-secondary-color);
-      white-space: nowrap;
+        & .title {
+          width: 100%;
+          height: var(--height-title);
+          flex-shrink: 0;
+          font-size: var(--font-size-h2);
+          font-weight: var(--font-weight-semibold);
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
+          color: var(--body1-content-secondary-color);
+          white-space: nowrap;
 
-      & .primary {
-        color: var(--body1-content-primary-color);
+          & .primary {
+            color: var(--body1-content-primary-color);
+          }
+        }
       }
-    }
-  }
 
-  /* ========================================
-         body .process.first (시작 화면)
-     ======================================== */
-  &.first {
-    & .main {
-      position: relative;
-      height: 100%;
-    }
+      /* ========================================
+         body .process.first (?쒖옉 ?붾㈃)
+         ======================================== */
+      &.first {
+        & .main {
+          position: relative;
+          height: 100%;
+        }
 
         /* body .process.first .main .hero */
         & .main .hero {
@@ -966,26 +1125,26 @@
           }
         }
 
-    & .main .poster {
-      width: var(--layout-width);
-      height: auto;
-      object-fit: contain;
-    }
+        & .main .poster {
+          width: var(--layout-width);
+          height: auto;
+          object-fit: contain;
+        }
 
-    & .main p {
-      letter-spacing: inherit;
-      line-height: inherit;
-      font-stretch: inherit;
-    }
-  }
+        & .main p {
+          letter-spacing: inherit;
+          line-height: inherit;
+          font-stretch: inherit;
+        }
+      }
 
       /* ========================================
-         body .process.second (메뉴 선택)
+         body .process.second (硫붾돱 ?좏깮)
          body .process.second .main .category-full | .menu
          ======================================== */
-  &.second {
-    & .main {
-      justify-content: space-evenly;
+      &.second {
+        & .main {
+          justify-content: space-evenly;
 
           /* body .process.second .main .category-full */
           & .category-full {
@@ -998,13 +1157,13 @@
             align-items: center;
             flex-shrink: 1;
 
-            /* body .process.second .main .category-full .category .button (카테고리 탭) */
+            /* body .process.second .main .category-full .category .button (移댄뀒怨좊━ ?? */
             & .category .button {
               height: 76px;
               min-width: 70px;
             }
 
-            /* body .process.second .main .category-full > .button (이전/다음) */
+            /* body .process.second .main .category-full > .button (?댁쟾/?ㅼ쓬) */
             & > .button {
               width: 113px;
               height: 76px;
@@ -1028,7 +1187,7 @@
                 gap: 8px;
               }
 
-              /* body .process.second .main .category-full .category.measure (측정용) */
+              /* body .process.second .main .category-full .category.measure (痢≪젙?? */
               &.measure {
                 position: absolute;
                 top: 0;
@@ -1060,7 +1219,7 @@
             justify-items: center;
             align-items: center;
 
-            /* body .process.second .main .menu > .button (메뉴 아이템만, 페이지네이션 제외) */
+            /* body .process.second .main .menu > .button (硫붾돱 ?꾩씠?쒕쭔, ?섏씠吏?ㅼ씠???쒖쇅) */
             & > .button {
               width: 242px;
               height: 280px;
@@ -1120,25 +1279,25 @@
       }
 
       /* ========================================
-         body .process.third (주문내역)
+         body .process.third (二쇰Ц?댁뿭)
          body .process.third .main .details-content .order-list
          ======================================== */
-  &.third {
-    & .main {
+      &.third {
+        & .main {
           /* body .process.third .main .details-content */
-      & .details-content {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr) 1fr;
-        width: 100%;
-        height: 100%;
-        place-items: center;
+          & .details-content {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(6, 1fr) 1fr;
+          width: 100%;
+          height: 100%;
+          place-items: center;
 
           /* .details-content .order-list */
-        & .order-list {
-          grid-row: 1 / 7;
-          justify-self: stretch;
-          align-self: stretch;
+            & .order-list {
+              grid-row: 1 / 7;
+              justify-self: stretch;
+              align-self: stretch;
               display: grid;
               grid-template-columns: 1fr;
               grid-template-rows: repeat(6, 1fr);
@@ -1249,30 +1408,30 @@
             }
 
             /* body .process.third .main .details-content .pagination */
-        & .pagination {
-          grid-row: 7 / 8;
-          align-self: center;
+            & .pagination {
+              grid-row: 7 / 8;
+              align-self: center;
+            }
+          }
         }
       }
-    }
-  }
 
       /* ========================================
-         body .process.forth (결제방법 선택)
+         body .process.forth (寃곗젣諛⑸쾿 ?좏깮)
          body .process.forth .main .payment
          ======================================== */
-  &.forth {
-    & .main {
-      position: relative;
-      font-size: var(--font-size-b1);
-      padding-top: var(--height-title);
-      padding-bottom: 182px;
+      &.forth {
+        & .main {
+          position: relative;
+          font-size: var(--font-size-b1);
+          padding-top: var(--height-title);
+          padding-bottom: 182px;
 
           & .task-manager,
-      & .payment {
-        width: fit-content;
-        height: fit-content;
-      }
+          & .payment {
+            width: fit-content;
+            height: fit-content;
+          }
 
           /* body .process.forth .main .task-manager .button */
           & .task-manager .button {
@@ -1305,28 +1464,28 @@
               }
             }
           }
-    }
-  }
+        }
+      }
 
-  /* ========================================
+      /* ========================================
          body .process .summary
-     ======================================== */
-  & .summary {
-    width: 100%;
-    height: var(--height-summary);
-    background-color: var(--body1-background-color);
-    display: flex;
-    flex-shrink: 0;
-    gap: var(--spacing-sm);
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 2px solid var(--body1-border-color);
+         ======================================== */
+      & .summary {
+        width: 100%;
+        height: var(--height-summary);
+        background-color: var(--body1-background-color);
+        display: flex;
+        flex-shrink: 0;
+        gap: var(--spacing-sm);
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid var(--body1-border-color);
 
-    & .task-manager {
-      width: fit-content;
-      justify-content: space-between;
-    }
+        & .task-manager {
+          width: fit-content;
+          justify-content: space-between;
+        }
 
         /* body .process .summary .task-manager .button */
         & .task-manager .button {
@@ -1335,43 +1494,43 @@
           height: 134px;
         }
 
-    & .summary-label {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-secondary1-color);
-    }
+        & .summary-label {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-secondary1-color);
+        }
 
-    & .summary-text {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-primary1-color);
-    }
+        & .summary-text {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-primary1-color);
+        }
 
-    & .short-colline {
-      width: 2px;
-      height: 41px;
-      background: var(--body1-border-color);
-    }
+        & .short-colline {
+          width: 2px;
+          height: 41px;
+          background: var(--body1-border-color);
+        }
 
-  }
+      }
 
       /* body .process .bottom */
-  & .bottom {
-    width: 100%;
-    height: var(--height-bottom);
-    flex-shrink: 0;
-    border-top: 2px solid var(--body1-border-color);
-    background-color: var(--body1-background-color);
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+      & .bottom {
+        width: 100%;
+        height: var(--height-bottom);
+        flex-shrink: 0;
+        border-top: 2px solid var(--body1-border-color);
+        background-color: var(--body1-background-color);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         & .button {
           height: 76px;
         }
-  }
+      }
 
       /* body .process .countdown */
-  & .countdown {
+      & .countdown {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -1380,7 +1539,7 @@
     justify-content: center;
   }
 
-  /* 낮은화면 상단 여백 */
+  /* ????붾㈃ ?곷떒 ?щ갚 */
   & .black {
     width: 100%;
     height: 0px;
@@ -1395,67 +1554,67 @@
   }
 
   /* ========================================
-     & .modal – 모달 시스템 (body 하위)
-     구조: .modal > .main > .up-content, .down-content / 타이포는 body 상속
+     & .modal ??紐⑤떖 ?쒖뒪??(body ?섏쐞)
+     援ъ“: .modal > .main > .up-content, .down-content / ??댄룷??body ?곸냽
      ======================================== */
     & .modal {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 0 var(--layout-padding-x);
-    background: #00000099;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 0 var(--layout-padding-x);
+      background: #00000099;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
 
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+      &.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-    & > .main {
-      grid-area: 1/1;
-      pointer-events: auto;
-    }
+      & > .main {
+        grid-area: 1/1;
+        pointer-events: auto;
+      }
 
       /* body .modal .main */
-    & .main {
-      position: relative;
-      width: 100%;
-      padding-left: 0;
-      padding-right: 0;
-      height: fit-content;
-      border-radius: 24px;
-      border: 2px solid var(--body1-border-color);
-      display: flex;
-      flex-flow: column nowrap;
+      & .main {
+        position: relative;
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        height: fit-content;
+        border-radius: 24px;
+        border: 2px solid var(--body1-border-color);
+        display: flex;
+        flex-flow: column nowrap;
         &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
         &:focus-visible {
           outline: 12px dashed var(--border-color-pointed);
           outline-offset: -12px;
         }
-      align-items: center;
-      overflow: hidden;
-      background: var(--body2-background-color);
-      color: var(--body1-content-secondary-color);
-      box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
+        align-items: center;
+        overflow: hidden;
+        background: var(--body2-background-color);
+        color: var(--body1-content-secondary-color);
+        box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
 
         /* body .modal .main .up-content */
-      & .up-content {
-        width: 100%;
-        background: var(--body1-background-color);
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-        gap: 1.6rem;
-        padding: var(--spacing-xl);
-        color: var(--body2-secondary1-color);
+        & .up-content {
+          width: 100%;
+          background: var(--body1-background-color);
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
+          gap: 1.6rem;
+          padding: var(--spacing-xl);
+          color: var(--body2-secondary1-color);
 
-        & .modal-image {
+          & .modal-image {
           width: 10rem;
           height: 10rem;
           color: var(--body2-primary1-color);
@@ -1482,59 +1641,59 @@
         }
       }
 
-      & .down-content {
-        width: 100%;
-        flex: 1;
-        display: flex;
-        flex-flow: column nowrap;
-        border-top: 2px solid var(--body1-border-color);
-        justify-content: center;
-        align-items: center;
-        padding: var(--spacing-xl);
-        gap: var(--spacing-xl);
-
-        & .modal-message {
+        & .down-content {
+          width: 100%;
+          flex: 1;
           display: flex;
           flex-flow: column nowrap;
-          align-items: center;
-          gap: 8px;
-
-          & .highlight,
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .setting-row {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          height: 10rem;
-        }
-
-        & .setting-name {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          width: 100%;
-          height: 10rem;
-          gap: var(--spacing-sm);
-
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .task-manager {
-          display: flex;
+          border-top: 2px solid var(--body1-border-color);
           justify-content: center;
           align-items: center;
-          gap: var(--spacing-sm);
-        }
+          padding: var(--spacing-xl);
+          gap: var(--spacing-xl);
+
+          & .modal-message {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: 8px;
+
+            & .highlight,
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .setting-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 10rem;
+          }
+
+          & .setting-name {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            width: 100%;
+            height: 10rem;
+            gap: var(--spacing-sm);
+
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .task-manager {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-sm);
+          }
 
           /* body .modal .main .down-content .setting-row .task-manager .button */
           & .setting-row .task-manager:has(.button:only-child) .button {
@@ -1550,38 +1709,38 @@
             height: 76px;
           }
 
-          /* body .modal .main .down-content > .task-manager .button (취소/확인) */
+          /* body .modal .main .down-content > .task-manager .button (痍⑥냼/?뺤씤) */
           & > .task-manager .button {
             width: 285px;
             height: 90px;
           }
 
-        & .setting-line {
-          width: 100%;
-          height: 0;
-          margin: 0;
-          border: none;
-          border-top: 2px solid var(--body1-border-color);
+          & .setting-line {
+            width: 100%;
+            height: 0;
+            margin: 0;
+            border: none;
+            border-top: 2px solid var(--body1-border-color);
+          }
         }
       }
     }
-  }
   }
 }
 
 /* @layer layout */
 
 /* ==============================
-   컴포넌트 스타일 (Components)
+   而댄룷?뚰듃 ?ㅽ???(Components)
    ============================== */
 @layer components {
   /* ==============================
-     모달 시스템 (SCSS 네스티드)
-     - 레이아웃 배색: --body* 변수 사용
-     - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
+     紐⑤떖 ?쒖뒪??(SCSS ?ㅼ뒪?곕뱶)
+     - ?덉씠?꾩썐 諛곗깋: --body* 蹂???ъ슜
+     - 踰꾪듉 諛곗깋: ?붾젅???쒖뒪??(蹂꾨룄 ?뺤쓽 ?놁쓬)
      ============================== */
      
-  /* 모달 시스템: layout 레이어 body & .modal */
+  /* 紐⑤떖 ?쒖뒪?? layout ?덉씠??body & .modal */
 
   .credit-pay-image {
     position: relative;
@@ -1593,7 +1752,7 @@
     position: absolute;
     top: 677px;
     left: 707px;
-    /* 기존 중심점 (635 + 콘텐츠폭/2) */
+    /* 湲곗〈 以묒떖??(635 + 肄섑뀗痢좏룺/2) */
     transform: translateX(-50%);
     width: fit-content;
     height: fit-content;
@@ -1626,12 +1785,11 @@
   }
 
   /* ========================================
-   전체 컴포넌트 (Components) - 버튼
+   ?꾩껜 而댄룷?뚰듃 (Components) - 踰꾪듉
    ======================================== */
 
   /* ========================================
-       페이지네이션 스타일
-       ======================================== */
+       ?섏씠吏?ㅼ씠???ㅽ???       ======================================== */
   .pagination {
     position: relative;
     width: fit-content;
@@ -1647,7 +1805,7 @@
       height: 76px;
     }
 
-    /* vertical 방향 스타일 */
+    /* vertical 諛⑺뼢 ?ㅽ???*/
     &.pagination-vertical {
       flex-flow: column nowrap;
     }
@@ -1669,302 +1827,16 @@
 
 /* @layer components */
 
-  /* ========================================
-   전체 유틸리티 (Utilities)
-       ======================================== */
+/* ========================================
+   ?꾩껜 ?좏떥由ы떚 (Utilities)
+   ======================================== */
 @layer utilities {
 
   /* ========================================
-     접근성: body.low, body.dark, body.large
-       ======================================== */
-
-  /* 큰글씨 모드: 폰트 사이즈 변수 1.2배 */
-  .large {
-    --font-size-xs: 1.44rem;
-    --font-size-sm: 1.68rem;
-    --font-size-md: 1.92rem;
-    --font-size-lg: 2.4rem;
-    --font-size-b1: 4.8rem;
-    --font-size-h1: 5.76rem;
-    --font-size-h2: 6.96rem;
-    --font-size-d1: 8.04rem;
-    --font-size-d2: 9.96rem;
-    --font-size-d3: 15.36rem;
-    --font-size-d4: 21.6rem;
-  }
-
-  /* 고대비 모드 (Dark Theme) */
-  .dark {
-    --body1-background-color: var(--color-gray-03);
-    --body1-border-color: var(--color-gray-07);
-    --body1-content-primary-color: var(--color-yellow-03);
-    --body1-content-secondary-color: var(--color-gray-14);
-    --body2-background-color: var(--color-gray-01);
-    --body2-primary1-color: var(--color-yellow-03);
-    --body2-primary2-color: var(--color-yellow-02);
-    --body2-secondary1-color: var(--color-gray-14);
-    --body2-secondary2-color: var(--color-gray-14);
-    --body2-progress-background-standby-color: var(--color-gray-07);
-    --body2-progress-content-complete-color: var(--color-gray-01);
-    --body3-background-color: var(--color-gray-03);
-    --body3-content-color: var(--color-gray-14);
-    --body4-background-color: var(--color-gray-02);
-    --body4-border-color: var(--color-gray-07);
-    --body4-content-color: var(--color-gray-14);
-    --primary1-background-color-default: var(--color-yellow-03);
-    --primary1-background-color-pressed: var(--color-yellow-01);
-    --primary1-background-color-disabled: transparent;
-    --primary1-border-color-default: var(--color-yellow-03);
-    --primary1-border-color-pressed: var(--color-yellow-04);
-    --primary1-border-color-disabled: var(--body2-primary1-color);
-    --primary1-content-color-default: var(--color-gray-01);
-    --primary1-content-color-pressed: var(--color-yellow-04);
-    --primary1-content-color-disabled: var(--body2-primary1-color);
-    --primary2-background-color-default: var(--color-gray-03);
-    --primary2-background-color-pressed: var(--color-yellow-03);
-    --primary2-background-color-disabled: transparent;
-    --primary2-border-color-default: var(--color-gray-07);
-    --primary2-border-color-pressed: var(--color-yellow-03);
-    --primary2-border-color-disabled: var(--color-gray-07);
-    --primary2-content-color-default: var(--color-gray-12);
-    --primary2-content-color-pressed: var(--color-gray-01);
-    --primary2-content-color-disabled: var(--color-gray-07);
-    --primary3-background1-color-default: var(--color-gray-14);
-    --primary3-background1-color-pressed: var(--color-gray-01);
-    --primary3-background1-color-disabled: var(--color-gray-14);
-    --primary3-border-color-default: var(--color-gray-07);
-    --primary3-border-color-pressed: var(--color-yellow-03);
-    --primary3-border-color-disabled: var(--color-gray-07);
-    --primary3-background2-color-default: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
-    --primary3-background2-color-pressed: linear-gradient(180deg, #FFE10000 0%, #FFE100E6 15%, #FFE100FF 43%, #FFE100FF 100%);
-    --primary3-background2-color-disabled: linear-gradient(180deg, #00000000 0%, #000000E6 15%, #000000FF 43%, #000000FF 100%);
-    --primary3-content2-color-default1: var(--color-gray-12);
-    --primary3-content2-color-default2: var(--color-yellow-03);
-    --primary3-content2-color-pressed: var(--color-gray-01);
-    --primary3-content2-color-disabled1: var(--color-gray-12);
-    --primary3-content2-color-disabled2: var(--color-yellow-03);
-    --primary3-content3-color-disabled: var(--color-system-04);
-    --primary3-content-color-default: var(--color-gray-13);
-    --primary3-content-color-pressed: var(--color-gray-01);
-    --primary3-content-color-disabled: var(--color-gray-07);
-    --secondary1-background-color-default: var(--color-gray-07);
-    --secondary1-background-color-pressed: var(--color-gray-03);
-    --secondary1-background-color-disabled: transparent;
-    --secondary1-border-color-default: var(--color-gray-07);
-    --secondary1-border-color-pressed: var(--color-gray-07);
-    --secondary1-border-color-disabled: var(--color-gray-07);
-    --secondary1-content-color-default: var(--color-gray-14);
-    --secondary1-content-color-pressed: var(--color-gray-12);
-    --secondary1-content-color-disabled: var(--color-gray-07);
-    --secondary2-background-color-default: var(--color-gray-03);
-    --secondary2-background-color-pressed: var(--color-gray-07);
-    --secondary2-background-color-disabled: transparent;
-    --secondary2-border-color-default: var(--color-gray-07);
-    --secondary2-border-color-pressed: var(--color-gray-07);
-    --secondary2-border-color-disabled: var(--color-gray-07);
-    --secondary2-content-color-default: var(--color-gray-12);
-    --secondary2-content-color-pressed: var(--color-gray-14);
-    --secondary2-content-color-disabled: var(--color-gray-07);
-    --secondary3-background1-color-default: var(--color-gray-14);
-    --secondary3-background1-color-pressed: var(--color-gray-07);
-    --secondary3-background1-color-disabled: transparent;
-    --secondary3-border-color-default: var(--color-gray-09);
-    --secondary3-border-color-pressed: var(--color-gray-07);
-    --secondary3-border-color-disabled: var(--color-gray-07);
-    --secondary3-content1-color-default: var(--color-gray-01);
-    --secondary3-content1-color-pressed: var(--color-gray-14);
-    --secondary3-content1-color-disabled: var(--color-gray-07);
-    --secondary3-background2-color-default: var(--color-gray-01);
-    --secondary3-content2-color-default: var(--color-gray-14);
-    --delete-background-color-default: var(--color-system-02);
-    --delete-background-color-pressed: var(--color-system-03);
-    --delete-background-color-disabled: transparent;
-    --delete-border-color-default: var(--color-system-02);
-    --delete-border-color-pressed: var(--color-system-02);
-    --delete-border-color-disabled: var(--color-gray-07);
-    --delete-content-color-default: var(--color-gray-14);
-    --delete-content-color-pressed: var(--color-gray-14);
-    --delete-content-color-disabled: var(--color-gray-07);
-    --highlight-color: var(--color-yellow-03);
-  }
-
-  /* 저시력 모드 (.low) */
-  .low {
-    & .process {
-      &.second {
-        & .main {
-          padding-top: 84px;
-        }
-      }
-
-      &.third {
-        & .main .title {
-          font-size: var(--font-size-h1);
-          height: 100px;
-        }
-
-        & .main .pagination {
-          flex-flow: column nowrap;
-        }
-
-        & .main .banner.field {
-          padding-left: 32px;
-          padding-right: 32px;
-          gap: 16px;
-
-          & .one-num {
-            width: 70px;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-            align-items: center;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-normal {
-            width: 236px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-qty-normal {
-            width: 242px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-price-normal {
-            width: 236px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-delete-normal {
-            width: 76px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-pagination-normal {
-            width: 184px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-        }
-
-        & .main .details-content {
-          grid-template-columns: 1fr auto;
-          grid-template-rows: 1fr;
-          gap: 16px;
-
-          & .order-list {
-            grid-column: 1;
-            grid-row: 1;
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: repeat(3, 1fr);
-            place-items: center;
-            row-gap: 0;
-            padding-left: 0;
-            padding-right: 0;
-
-            & .order-row {
-              width: 100%;
-              height: 100%;
-              padding-top: 0;
-              padding-bottom: 0;
-
-              & .order-image-div {
-      width: 70px;
-      height: 70px;
-
-                & .order-image {
-                  width: 100%;
-                  height: 100%;
-                }
-
-                & .order-index {
-                  width: fit-content;
-                  height: fit-content;
-                }
-              }
-
-              & .order-name {
-                width: 236px;
-                text-overflow: ellipsis;
-      white-space: nowrap;
-                overflow: hidden;
-              }
-
-              & .order-quantity .counter {
-                width: 63px;
-                height: 60px;
-              }
-
-              & .order-quantity .qty {
-                width: 73px;
-                height: 60px;
-              }
-
-              & .order-price {
-                width: 236px;
-              }
-
-              & .button.delete-item {
-      width: 70px;
-                height: 70px;
-              }
-            }
-          }
-
-          & .pagination {
-            grid-column: 2;
-            grid-row: 1;
-            align-self: center;
-          }
-        }
-      }
-
-      & .main .menu {
-      width: fit-content;
-        height: fit-content;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(1, 1fr);
-
-        & .menu-pagination {
-          grid-row: 1;
-          grid-column: 4;
-        }
-      }
-
-      & .summary {
-        height: var(--height-summary-low);
-
-    & .button {
-          height: 90px;
-        }
-      }
-
-      & .black {
-        height: 1020px;
-        flex-shrink: 0;
-      }
-    }
-  }
-
-  /* ========================================
-     Body 팔레트 유틸리티 클래스
-     - 테마(Light/Dark) 자동 전환
+     Body ?붾젅???좏떥由ы떚 ?대옒??     - ?뚮쭏(Light/Dark) ?먮룞 ?꾪솚
      ======================================== */
 
-  /* Body1: 메인 배경 팔레트 */
+  /* Body1: 硫붿씤 諛곌꼍 ?붾젅??*/
   .body1 {
     background-color: var(--body1-background-color);
     border-color: var(--body1-border-color);
@@ -1979,7 +1851,7 @@
     }
   }
 
-  /* Body2: 콘텐츠 영역 팔레트 */
+  /* Body2: 肄섑뀗痢??곸뿭 ?붾젅??*/
   .body2 {
     background-color: var(--body2-background-color);
     color: var(--body2-secondary2-color);
@@ -2001,14 +1873,14 @@
     }
   }
 
-  /* Body3: 배너/강조 영역 팔레트 */
+  /* Body3: 諛곕꼫/媛뺤“ ?곸뿭 ?붾젅??*/
   .body3 {
     background-color: var(--body3-background-color);
     border-color: var(--body1-border-color);
     color: var(--body3-content-color);
   }
 
-  /* Body4: 추가 팔레트 (필요시 확장) */
+  /* Body4: 異붽? ?붾젅??(?꾩슂???뺤옣) */
   .body4 {
     background-color: var(--body4-background-color, var(--body1-background-color));
     border-color: var(--body4-border-color, var(--body1-border-color));
@@ -2094,7 +1966,191 @@
         text-align: center;
         
       }
+    }
   }
+
+  /* ========================================
+     Low Screen Mode (.low) - ??쒕젰 紐⑤뱶 (body??.low ?대옒??
+     踰꾪듉 ?ш린 ?ㅻ쾭?쇱씠??     ======================================== */
+  body.low .process {
+    &.second {
+      & .main {
+        padding-top: 84px;
+      }
+    }
+
+    &.third {
+      & .main .title {
+        font-size: var(--font-size-h1);
+        height: 100px;
+      }
+      
+      & .main {
+        & .pagination {
+          flex-flow: column nowrap;
+        }
+
+        & .banner.field {
+          padding-left: 32px;
+          padding-right: 32px;
+          gap: 16px;
+
+          & .one-num {
+            width: 70px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-normal {
+            width: 236px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-qty-normal {
+            width: 242px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-price-normal {
+            width: 236px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+
+          & .one-delete-normal {
+            width: 76px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }
+    
+          & .one-pagination-normal {
+            width: 184px;
+            overflow: visible;
+            white-space: nowrap;
+            text-align: center;
+            
+          }      
+        }
+
+        /* .low: 媛濡?洹몃━??OrderList | Pagination) */
+        & .details-content {
+          grid-template-columns: 1fr auto;
+          grid-template-rows: 1fr;
+          gap: 16px;
+
+          & .order-list {
+            grid-column: 1;
+            grid-row: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(3, 1fr);
+            place-items: center;
+            row-gap: 0;
+            padding-left: 0px;
+            padding-right: 0px;
+
+            & .order-row {
+              width: 100%;
+              height: 100%;
+              padding-top: 0px;
+              padding-bottom: 0px;
+
+              & .order-image-div {
+                width: 70px;
+                height: 70px;
+                
+                & .order-image {
+                  width: 100%;
+                  height: 100%;
+                }
+
+                & .order-index {
+                  width: fit-content;
+                  height: fit-content;
+                }
+              }   
+
+              & .order-name {              
+                width: 236px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              }
+
+              & .order-quantity {
+
+
+                & .counter {
+                  width: 63px;
+                  height: 60px;
+                }
+
+                & .qty {
+                  width: 73px;
+                  height: 60px;
+                }
+              }
+
+              & .order-price {
+                width: 236px;
+              }
+
+              & .order-delete {
+                width: 70px;
+                height: 70px;
+              }
+            }
+          }
+
+          & .pagination {
+            grid-column: 2;
+            grid-row: 1;
+            align-self: center;
+          }
+        }
+      }
+    }
+    
+    & .main .menu {
+      width: fit-content;
+      height: fit-content;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(1, 1fr);
+
+      & .menu-pagination {
+        grid-row: 1;
+        grid-column: 4;
+      }
+    }
+
+    & .summary {
+      height: var(--height-summary-low);
+
+      & .button{
+        height: 90px;
+      }
+    }
+
+    & .black {
+      height: 1020px;
+      flex-shrink: 0;
+    }
   }
 }
 

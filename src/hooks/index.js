@@ -1,7 +1,7 @@
 export * from "./useAccessibilitySettings";
 export * from "./useInitialCountdown";
 export * from "./useInitialTrigger";
-export { useTimeoutCountdown } from "../screens/InitialExecutor";
+export { useTimeoutCountdown } from "./useTimeoutCountdown";
 export * from "./useCategoryAssemble";
 export * from "./useDOM";
 export * from "./useFocusElementFinder";

@@ -6,9 +6,9 @@ import {
     saveAudioToDB,
     createTTSAudioErrorHandler,
     fetchTTSFromServer,
-    playLocalTTS,
-    VOLUME_MAP
+    playLocalTTS
 } from "../utils";
+import { VOLUME_MAP } from "../constants";
 
 // 티티에스 프로시저: TTS 재생 및 텍스트 핸들러
 // 요구사항:

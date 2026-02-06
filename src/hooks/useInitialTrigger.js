@@ -1,8 +1,5 @@
 import { useContext, useCallback } from "react";
 import { OrderContext, AccessibilityContext, ModalContext, TimeoutContext } from "../contexts";
-import { formatRemainingTime, IDLE_TIMEOUT_MS } from "../utils/format";
-
-const DEFAULT_GLOBAL_TIMEOUT_LABEL = formatRemainingTime(IDLE_TIMEOUT_MS);
 
 const closeAllModals = (modal) => {
     modal?.ModalRestart?.close();
@@ -27,8 +24,6 @@ const resetAccessibility = (accessibility) => {
 };
 
 const resetTimeoutDisplay = (timeout) => {
-    timeout?.setGlobalRemainingTime?.(IDLE_TIMEOUT_MS);
-    timeout?.setGlobalRemainingTimeFormatted?.(DEFAULT_GLOBAL_TIMEOUT_LABEL);
     timeout?.resetIdleTimeout?.();
 };
 

@@ -56,7 +56,6 @@ const PROCESS_CONFIG = {
     ProcessCardRemoval: {
         layoutType: "forth",
         Component: ProcessCardRemoval,
-        showStep: true,
         className: "card-remove",
         ttsText: `카드를 뽑으세요.`
     },

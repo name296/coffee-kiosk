@@ -2,7 +2,7 @@ import React, { memo, useContext } from "react";
 import { BaseModal } from "./Modal";
 import { ModalContext, TimeoutContext, ScreenRouteContext } from "../contexts";
 
-export const ModalTimeout = memo(({ onExtend }) => {
+export const ModalTimeout = memo(() => {
     const modal = useContext(ModalContext);
     const timeout = useContext(TimeoutContext);
     const { navigateTo } = useContext(ScreenRouteContext);
@@ -13,7 +13,7 @@ export const ModalTimeout = memo(({ onExtend }) => {
             type="timeout"
             countdown={timeout?.globalRemainingTime}
             onCancel={() => { modal.ModalTimeout.close(); navigateTo('ProcessStart'); }}
-            onConfirm={() => { modal.ModalTimeout.close(); onExtend?.(); }}
+            onConfirm={() => { modal.ModalTimeout.close(); timeout?.resetIdleTimeout?.(); }}
         />
     );
 });

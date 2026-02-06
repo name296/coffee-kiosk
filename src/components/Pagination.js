@@ -41,7 +41,6 @@ const Pagination = memo(({
     totalPages,
     onPrev,
     onNext,
-    isDark,
     ttsPrefix = "메뉴",
     sectionRef,
     style,
@@ -74,7 +73,7 @@ const Pagination = memo(({
             className={containerClassName}
             style={containerStyle}
             ref={sectionRef}
-            data-tts-text={`페이지네이션, ${ttsPrefix}, ${totalPages} 페이지 중 ${pageNumber} 페이지, 버튼 두 개,`}
+            data-tts-text={`페이지네이션, ${ttsPrefix}, ${totalPages} 페이지 중 ${pageNumber} 페이지,`}
         >
             <PaginationPrevButton 
                 label={prevLabel}

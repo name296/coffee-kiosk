@@ -1,21 +1,14 @@
-import React, { memo, useContext, useCallback } from "react";
+import React, { memo, useContext } from "react";
 import Button from "./Button";
 import { HomeIcon, TimeIcon, WheelchairIcon } from "../Icon";
-import { ModalContext, TimeoutContext } from "../contexts";
+import { TimeoutContext } from "../contexts";
 
 /** UI 컴포넌트: 하단 시스템 버튼(시작화면, 타임아웃, 접근성) */
-const Bottom = memo(({ systemControlsRef }) => {
-    const modal = useContext(ModalContext);
+const Bottom = memo(() => {
     const timeout = useContext(TimeoutContext);
 
-    const openModalManually = useCallback(() => {
-        if (modal?.ModalTimeout) {
-            modal.ModalTimeout.open();
-        }
-    }, [modal]);
-
     return (
-        <div className="bottom" data-tts-text="시스템 설정, 버튼 세 개," ref={systemControlsRef}>
+        <div className="bottom" data-tts-text="시스템 설정,">
             <Button
                 svg={<HomeIcon />}
                 label="시작화면"

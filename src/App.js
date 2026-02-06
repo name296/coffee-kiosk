@@ -18,7 +18,8 @@ import {
 import {
   ViewportInitializer,
   InitialExecutor,
-  FocusExecutor
+  FocusExecutor,
+  ButtonCountInjector
 } from "./screens";
 
 // Hooks (TickProvider: 모든 카운트가 동시에 갱신되도록)
@@ -86,20 +87,21 @@ const App = () => {
         <TTSStateProvider>
           <AccessibilityProvider>
             <ModalProvider>
-              <TimeoutProvider>
-                <OrderProvider>
-                  <RefProvider>
-                    <ScreenRouteProvider>
-                      <TickProvider>
+              <OrderProvider>
+                <RefProvider>
+                  <ScreenRouteProvider>
+                    <TickProvider>
+                      <TimeoutProvider>
                         <ViewportInitializer />
                         <InitialExecutor />
                         <FocusExecutor />
+                        <ButtonCountInjector />
                         <Screen />
-                      </TickProvider>
-                    </ScreenRouteProvider>
-                  </RefProvider>
-                </OrderProvider>
-              </TimeoutProvider>
+                      </TimeoutProvider>
+                    </TickProvider>
+                  </ScreenRouteProvider>
+                </RefProvider>
+              </OrderProvider>
             </ModalProvider>
           </AccessibilityProvider>
         </TTSStateProvider>

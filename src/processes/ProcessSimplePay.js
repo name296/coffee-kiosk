@@ -1,17 +1,7 @@
-import React, { memo, useRef } from "react";
+import React, { memo } from "react";
 import { Button } from "../components";
 
-import { useFocusableSectionsManager } from "../hooks";
-
 const ProcessSimplePay = memo(() => {
-    const actionBarRef = useRef(null);
-    const systemControlsRef = useRef(null);
-
-    useFocusableSectionsManager(['actionBar', 'systemControls'], {
-        actionBar: actionBarRef,
-        systemControls: systemControlsRef
-    });
-
     return (
         <>
             <div className="title">
@@ -19,7 +9,7 @@ const ProcessSimplePay = memo(() => {
                 <div><span className="primary">QR코드</span>를 인식시킵니다</div>
             </div>
             <img src="./images/device-codeReader-simple.png" alt="" className="credit-pay-image" />
-            <div ref={actionBarRef} className="task-manager">
+            <div className="task-manager">
                 <Button navigate="ProcessPayments" label="취소" />
                 <Button navigate="ProcessOrderComplete" label="가상인식" />
             </div>

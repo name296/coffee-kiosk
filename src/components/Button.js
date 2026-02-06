@@ -24,7 +24,6 @@ const Button = memo(({
     children,
     disabled = false,
     pressed: pressedProp = false,
-    pointed = false,
     toggle = false,
     value,
     selectedValue,
@@ -32,8 +31,6 @@ const Button = memo(({
     navigate,
     modal,
     onClick,
-    onPressed,
-    onPointed,
     ttsText,
     iconFirst = true,
     ...rest
@@ -68,18 +65,6 @@ const Button = memo(({
             if (actionTimerRef.current) clearTimeout(actionTimerRef.current);
         };
     }, []);
-
-    // SVG에서 아이콘 이름 추출
-    const getIconNameFromSvg = useMemo(() => {
-        if (!svg || typeof svg !== 'object') return null;
-        const componentName = svg.type?.name || '';
-        if (componentName.endsWith('Icon')) {
-            return componentName.replace('Icon', '');
-        }
-        return null;
-    }, [svg]);
-
-    const buttonIcon = getIconNameFromSvg;
 
     // 버튼 최소축-> 최소축 비례 스타일 적용
     useLayoutEffect(() => {
@@ -132,11 +117,11 @@ const Button = memo(({
             if (navigate) navigateTo(navigate);
             if (modal) {
                 const modalInstance = modalContext?.[`Modal${modal}`];
-                if (modalInstance) modalInstance.open(label, buttonIcon);
+                if (modalInstance) modalInstance.open();
             }
             if (onClick) onClick(e, btnRef.current);
         }
-    }, [navigate, modal, navigateTo, modalContext, label, buttonIcon, onClick, onChange, selectedValue]);
+    }, [navigate, modal, navigateTo, modalContext, onClick, onChange, selectedValue]);
 
     const clearReleaseTimer = useCallback(() => {
         if (releaseTimerRef.current) {
@@ -155,21 +140,19 @@ const Button = memo(({
 
         clearReleaseTimer();
         setIsPressing(true);
-        onPressed?.(true);
 
         if (!disabled) {
             playSound('onPressed');
             releaseTimerRef.current = setTimeout(() => {
                 releaseTimerRef.current = null;
                 setIsPressing(false);
-                onPressed?.(false);
             }, BUTTON_RELEASE_DELAY_MS);
             actionTimerRef.current = setTimeout(() => {
                 actionTimerRef.current = null;
                 runAction(e);
             }, BUTTON_ACTION_DELAY_MS);
         }
-    }, [disabled, onPressed, playSound, runAction, clearReleaseTimer]);
+    }, [disabled, playSound, runAction, clearReleaseTimer]);
 
     // 버튼 종료 이벤트 핸들러 (업 시점: release 타이머는 유지하여 100ms 풀림 보장)
     const onEnd = useCallback((e) => {

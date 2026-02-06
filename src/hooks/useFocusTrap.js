@@ -77,5 +77,5 @@ export const useFocusTrap = (isActive, options = {}) => {
         return () => document.removeEventListener('keydown', hkd);
     }, [isActive, getFocusableElements]);
 
-    return { containerRef, focusFirst };
+    return { containerRef };
 };

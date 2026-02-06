@@ -9,12 +9,13 @@ export const ScreenRouteProvider = ({ children }) => {
 
     const navigateTo = useCallback((p) => {
         console.log('[화면 전환] nav 호출', { from: currentProcessRef.current, to: p });
+        currentProcessRef.current = p;
         setTransitionCount((c) => c + 1);
         setCurrentProcessState(p);
     }, []);
 
     const value = useMemo(
-        () => ({ currentProcess, navigateTo, currentProcessRef, transitionCount }),
+        () => ({ currentProcess, navigateTo, transitionCount }),
         [currentProcess, navigateTo, transitionCount]
     );
 

@@ -1,14 +1,9 @@
-import React, { memo, useRef } from "react";
+import React, { memo } from "react";
 import { Button } from "../components";
 
 import { TakeinIcon, TakeoutIcon } from "../Icon";
-import { useFocusableSectionsManager } from "../hooks";
 
 const ProcessStart = memo(() => {
-    const mainContentRef = useRef(null);
-
-    useFocusableSectionsManager(['mainContent'], { mainContent: mainContentRef });
-
     return (
         <>
             <img src="./images/poster.png" className="poster" alt="커피포스터" />
@@ -17,7 +12,6 @@ const ProcessStart = memo(() => {
                 <div
                     className="task-manager"
                     data-tts-text="취식방식 선택 영역입니다. 포장하기, 먹고가기 버튼이 있습니다. 좌우 방향키로 버튼을 선택합니다,"
-                    ref={mainContentRef}
                 >
                     <Button className="secondary1" svg={<TakeoutIcon />} label="포장하기" navigate="ProcessMenu" />
                     <Button className="secondary1" svg={<TakeinIcon />} label="먹고가기" navigate="ProcessMenu" />

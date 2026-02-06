@@ -18,8 +18,6 @@ export const useMenuData = () => {
     const categoryInfo = useMemo(() => getCategoryInfo(categories), [categories]);
 
     return {
-        menuData,
-        categories,
         tabs,
         totalMenuItems,
         categoryInfo

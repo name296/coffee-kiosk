@@ -1,5 +1,3 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-
 // 포커스 엘레멘트 파인더: 포커스 가능 요소 조회 및 섹션 이동 계산
 
 // 포커스 가능한 요소 찾기 (단일책임: 포커스 가능 요소 필터링만)
@@ -119,35 +117,4 @@ export const findPrevSectionElement = (allFocusable, currentIndex, currentParent
 
     if (!targetParent) return -1;
     return firstIndexByParent.get(targetParent) ?? -1;
-};
-
-// 섹션 업데이트 관리 (단일책임: 포커스 가능 섹션 관리만)
-export const useFocusableSectionsManager = (initFocusableSections, sectionsRefs) => {
-    const [, setFocusableSections] = useState(initFocusableSections);
-    const keyboardNavState = useRef(null);
-
-    if (!keyboardNavState.current) {
-        keyboardNavState.current = {
-            currentSectionIndex: 0,
-            currentButtonIndex: 0,
-            sections: initFocusableSections,
-            sectionsRefs: sectionsRefs
-        };
-    }
-
-    useEffect(() => {
-        if (sectionsRefs && Object.keys(sectionsRefs).length > 0) {
-            keyboardNavState.current.sectionsRefs = sectionsRefs;
-        }
-    }, [sectionsRefs]);
-
-    const updateFocusableSections = useCallback((newSections, newSectionsRefs = null) => {
-        setFocusableSections(newSections);
-        keyboardNavState.current.sections = newSections;
-        if (newSectionsRefs) {
-            keyboardNavState.current.sectionsRefs = newSectionsRefs;
-        }
-    }, []);
-
-    return { updateFocusableSections };
 };

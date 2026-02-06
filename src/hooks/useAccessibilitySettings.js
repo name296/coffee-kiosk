@@ -19,6 +19,6 @@ export const useAccessibilitySettings = (initialSettings = { isDark: false, isLo
 
     return {
         settings, setDark, setLow, setLarge,
-        setVolume: setVolumeVal, resetToDefault, updateAll, getStatusText
+        setVolume: setVolumeVal, updateAll, getStatusText
     };
 };
