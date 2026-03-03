@@ -1,15 +1,19 @@
 import { useContext, useCallback } from "react";
-import { OrderContext, AccessibilityContext, ModalContext, TimeoutContext } from "../contexts";
+import { PROCESS_NAME } from "../constants";
+import { MODAL_REGISTRY, OrderContext, AccessibilityContext, ModalContext, TimeoutContext } from "../contexts";
 
 const closeAllModals = (modal) => {
-    modal?.ModalRestart?.close();
-    modal?.ModalAccessibility?.close();
-    modal?.ModalReset?.close();
-    modal?.ModalDelete?.close();
-    modal?.ModalDeleteCheck?.close();
-    modal?.ModalCall?.close();
-    modal?.ModalTimeout?.close();
-    modal?.ModalPaymentError?.close();
+    if (modal?.closeAllModals) {
+        modal.closeAllModals();
+        return;
+    }
+    MODAL_REGISTRY.forEach(({ key, contextName }) => {
+        if (modal?.closeModal) {
+            modal.closeModal(key);
+            return;
+        }
+        modal?.[contextName]?.close?.();
+    });
 };
 
 const resetOrder = (order) => {
@@ -38,7 +42,7 @@ export const useInitialTrigger = (setCurrentProcess) => {
         resetOrder(order);
         resetAccessibility(accessibility);
         resetTimeoutDisplay(timeout);
-        setCurrentProcess?.('ProcessStart');
+        setCurrentProcess?.(PROCESS_NAME.START);
     }, [accessibility, modal, order, timeout, setCurrentProcess]);
 
     return { resetApp };

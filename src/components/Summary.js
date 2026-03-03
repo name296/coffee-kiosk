@@ -1,6 +1,7 @@
 import React, { memo, useContext } from "react";
 import Button from "./Button";
 import { OrderIcon, ResetIcon, AddIcon, PayIcon } from "../Icon";
+import { PROCESS_NAME } from "../constants";
 import { OrderContext, ScreenRouteContext } from "../contexts";
 import { formatNumber, convertToKoreanQuantity } from "../utils";
 
@@ -26,7 +27,7 @@ const Summary = memo(() => {
 
             {/* 버튼 영역 */}
             <div className="task-manager" data-tts-text={summaryTtsText}>
-                {currentProcess === 'ProcessMenu' && (
+                {currentProcess === PROCESS_NAME.MENU && (
                     <>
                         <Button
                             svg={<ResetIcon className="summary-btn-icon" />}
@@ -39,22 +40,22 @@ const Summary = memo(() => {
                             svg={<OrderIcon className="summary-btn-icon" />}
                             label="주문"
                             disabled={isDisabledBtn}
-                            navigate="ProcessDetails"
+                            navigate={PROCESS_NAME.DETAILS}
                         />
                     </>
                 )}
-                {currentProcess === 'ProcessDetails' && (
+                {currentProcess === PROCESS_NAME.DETAILS && (
                     <>
                         <Button
                             svg={<AddIcon className="summary-btn-icon" />}
                             label="메뉴"
-                            navigate="ProcessMenu"
+                            navigate={PROCESS_NAME.MENU}
                         />
                         <Button
                             className="primary1"
                             svg={<PayIcon className="summary-btn-icon" />}
                             label="결제"
-                            navigate="ProcessPayments"
+                            navigate={PROCESS_NAME.PAYMENTS}
                         />
                     </>
                 )}

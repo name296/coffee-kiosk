@@ -1,7 +1,8 @@
-import React, { memo, useContext } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "../contexts";
 import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler } from "../hooks";
 import { Main, Step, Bottom, Summary, DetailsContent } from "../components";
+import { PROCESS_NAME } from "../constants";
 import PROCESS_CONFIG from "./ProcessConfig";
 
 /**
@@ -11,13 +12,20 @@ import PROCESS_CONFIG from "./ProcessConfig";
  * - black/top/step/main/summary/bottom은 CSS로 제어.
  */
 const Process = memo(() => {
-    const { currentProcess } = useContext(ScreenRouteContext);
+    const { currentProcess, navigateTo } = useContext(ScreenRouteContext);
     const accessibility = useContext(AccessibilityContext);
     const { handleText } = useTextHandler(accessibility.volume);
 
-    const config = PROCESS_CONFIG[currentProcess];
-    if (!config) return null;
+    const hasConfig = Boolean(PROCESS_CONFIG[currentProcess]);
+    const effectiveProcess = hasConfig ? currentProcess : PROCESS_NAME.START;
+    const config = PROCESS_CONFIG[effectiveProcess];
     const { layoutType, Component, className = "", ttsText = "", ...rest } = config;
+
+    useEffect(() => {
+        if (!hasConfig) {
+            navigateTo(PROCESS_NAME.START);
+        }
+    }, [hasConfig, navigateTo]);
 
     useInteractiveTTSHandler(true, handleText);
     useFocusNavigationHandler(true);

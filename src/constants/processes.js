@@ -1,0 +1,26 @@
+export const PROCESS_NAME = Object.freeze({
+    START: "ProcessStart",
+    MENU: "ProcessMenu",
+    DETAILS: "ProcessDetails",
+    PAYMENTS: "ProcessPayments",
+    CARD_INSERT: "ProcessCardInsert",
+    MOBILE_PAY: "ProcessMobilePay",
+    SIMPLE_PAY: "ProcessSimplePay",
+    CARD_REMOVAL: "ProcessCardRemoval",
+    ORDER_COMPLETE: "ProcessOrderComplete",
+    RECEIPT_PRINT: "ProcessReceiptPrint",
+    FINISH: "ProcessFinish"
+});
+
+export const STEP_INDEX_BY_PROCESS = Object.freeze({
+    [PROCESS_NAME.MENU]: 1,
+    [PROCESS_NAME.DETAILS]: 2,
+    [PROCESS_NAME.PAYMENTS]: 3,
+    [PROCESS_NAME.CARD_INSERT]: 3,
+    [PROCESS_NAME.MOBILE_PAY]: 3,
+    [PROCESS_NAME.SIMPLE_PAY]: 3,
+    [PROCESS_NAME.CARD_REMOVAL]: 3,
+    [PROCESS_NAME.ORDER_COMPLETE]: 4,
+    [PROCESS_NAME.RECEIPT_PRINT]: 4,
+    [PROCESS_NAME.FINISH]: 5
+});

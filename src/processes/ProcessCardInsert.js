@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 
 const ProcessCardInsert = memo(() => {
     return (
@@ -10,9 +11,9 @@ const ProcessCardInsert = memo(() => {
             </div>
             <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
             <div className="task-manager">
-                <Button navigate="ProcessPayments" label="취소" />
+                <Button navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                 <Button style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />
-                <Button style={{ width: "fit-content" }} navigate="ProcessCardRemoval" label="가상투입" />
+                <Button style={{ width: "fit-content" }} navigate={PROCESS_NAME.CARD_REMOVAL} label="가상투입" />
             </div>
         </>
     );

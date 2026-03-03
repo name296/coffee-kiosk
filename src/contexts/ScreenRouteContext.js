@@ -1,14 +1,17 @@
 import React, { createContext, useState, useCallback, useMemo, useRef } from "react";
+import { PROCESS_NAME } from "../constants";
 
 export const ScreenRouteContext = createContext();
 
 export const ScreenRouteProvider = ({ children }) => {
-    const [currentProcess, setCurrentProcessState] = useState("ProcessStart");
+    const [currentProcess, setCurrentProcessState] = useState(PROCESS_NAME.START);
     const [transitionCount, setTransitionCount] = useState(0);
-    const currentProcessRef = useRef("ProcessStart");
+    const currentProcessRef = useRef(PROCESS_NAME.START);
 
     const navigateTo = useCallback((p) => {
-        console.log('[화면 전환] nav 호출', { from: currentProcessRef.current, to: p });
+        if (process.env.NODE_ENV === "development") {
+            console.log("[화면 전환] nav 호출", { from: currentProcessRef.current, to: p });
+        }
         currentProcessRef.current = p;
         setTransitionCount((c) => c + 1);
         setCurrentProcessState(p);

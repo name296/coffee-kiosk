@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 
 const ProcessSimplePay = memo(() => {
     return (
@@ -10,8 +11,8 @@ const ProcessSimplePay = memo(() => {
             </div>
             <img src="./images/device-codeReader-simple.png" alt="" className="credit-pay-image" />
             <div className="task-manager">
-                <Button navigate="ProcessPayments" label="취소" />
-                <Button navigate="ProcessOrderComplete" label="가상인식" />
+                <Button navigate={PROCESS_NAME.PAYMENTS} label="취소" />
+                <Button navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
             </div>
         </>
     );

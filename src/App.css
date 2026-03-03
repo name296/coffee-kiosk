@@ -321,7 +321,7 @@
   }
 
   .button {
-    transition: background-color 0.18s, color 0.0s, border-color 0.0s, transform 0.090s, box-shadow 0.0s, outline 0.0s;
+    transition: background-color 0.18s, color 0.0s, border-color 0.0s, transform 0.060s, box-shadow 0.0s, outline 0.0s;
     background-color: var(--primary2-background-color-default);
     background-clip: padding-box;
     position: relative;

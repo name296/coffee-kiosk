@@ -1,5 +1,6 @@
 import React, { memo, useContext } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 import { OrderContext } from "../contexts";
 
 const ProcessPayments = memo(() => {
@@ -12,12 +13,12 @@ const ProcessPayments = memo(() => {
                 <span>결제금액</span><span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
             </div>
             <div className="payment" data-tts-text="결제 선택,">
-                <Button navigate="ProcessCardInsert" img="./images/payment-card.png" label="신용카드" />
-                <Button navigate="ProcessMobilePay" img="./images/payment-mobile.png" label="모바일 페이" />
-                <Button navigate="ProcessSimplePay" img="./images/payment-simple.png" label="간편결제" />
+                <Button navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
+                <Button navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일 페이" />
+                <Button navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
             </div>
             <div className="task-manager">
-                <Button navigate="ProcessDetails" label="취소" />
+                <Button navigate={PROCESS_NAME.DETAILS} label="취소" />
             </div>
         </>
     );

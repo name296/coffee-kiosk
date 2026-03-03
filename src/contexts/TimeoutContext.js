@@ -1,18 +1,16 @@
-import React, { createContext, useMemo, useRef, useCallback, useContext } from "react";
+import React, { createContext, useMemo, useRef, useCallback } from "react";
 import { useTimeoutCountdown } from "../hooks/useTimeoutCountdown";
-import { ModalContext } from "./ModalContext";
-import { ScreenRouteContext } from "./ScreenRouteContext";
 import { IDLE_TIMEOUT_MS } from "../utils/format";
 
 export const TimeoutContext = createContext();
 
 export const TimeoutProvider = ({ children }) => {
-    const { currentProcess } = useContext(ScreenRouteContext);
-    const modal = useContext(ModalContext);
-
     // onTimeout은 외부(InitialExecutor)에서 등록
     const onTimeoutRef = useRef(null);
+    // onWarning은 외부(UI Layer)에서 등록
+    const onWarningRef = useRef(null);
     const registerOnTimeout = useCallback((fn) => { onTimeoutRef.current = fn; }, []);
+    const registerOnWarning = useCallback((fn) => { onWarningRef.current = fn; }, []);
 
     const { remainingMs, remainingTimeFormatted, resetTimer } = useTimeoutCountdown({
         durationMs: IDLE_TIMEOUT_MS,
@@ -20,10 +18,7 @@ export const TimeoutProvider = ({ children }) => {
         onTimeout: () => onTimeoutRef.current?.(),
         restartOnTimeout: true,
         resetOnUserActivity: true,
-        onWarning: () => {
-            if (currentProcess === 'ProcessStart') return;
-            modal?.ModalTimeout?.open();
-        },
+        onWarning: (warningRemainingMs) => onWarningRef.current?.(warningRemainingMs),
         warningThresholdMs: 20000
     });
 
@@ -31,8 +26,9 @@ export const TimeoutProvider = ({ children }) => {
         globalRemainingTime: remainingMs,
         globalRemainingTimeFormatted: remainingTimeFormatted,
         resetIdleTimeout: resetTimer,
-        registerOnTimeout
-    }), [remainingMs, remainingTimeFormatted, resetTimer, registerOnTimeout]);
+        registerOnTimeout,
+        registerOnWarning
+    }), [remainingMs, remainingTimeFormatted, resetTimer, registerOnTimeout, registerOnWarning]);
 
     return (
         <TimeoutContext.Provider value={value}>

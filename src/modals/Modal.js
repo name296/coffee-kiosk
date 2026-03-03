@@ -2,7 +2,7 @@ import React, { memo, useContext } from "react";
 import { Button } from "../components";
 import Icon from "../Icon";
 import { TTS } from "../constants";
-import { RefContext, ModalContext } from "../contexts";
+import { RefContext, ModalContext, MODAL_REGISTRY } from "../contexts";
 import { useFocusTrap } from "../hooks";
 import MODAL_CONFIG from "./ModalConfig";
 import ModalRestart from "./ModalRestart";
@@ -12,6 +12,17 @@ import ModalCall from "./ModalCall";
 import ModalTimeout from "./ModalTimeout";
 import ModalPaymentError from "./ModalPaymentError";
 import ModalAccessibility from "./ModalAccessibility";
+
+const MODAL_COMPONENT_BY_KEY = {
+    restart: ModalRestart,
+    accessibility: ModalAccessibility,
+    reset: ModalReset,
+    delete: ModalDelete,
+    deleteCheck: ModalDeleteCheck,
+    call: ModalCall,
+    timeout: ModalTimeout,
+    paymentError: ModalPaymentError
+};
 
 // ============================================================================
 // BaseModal – 공통 모달 프레임 (타입/커스텀에 따라 업·다운 콘텐츠 렌더)
@@ -74,14 +85,10 @@ export const Modal = () => {
 
     return (
         <div className={`modal ${modal.isAnyOpen ? 'active' : ''}`} aria-hidden="true" tabIndex={-1}>
-            {modal.ModalRestart.isOpen && <ModalRestart />}
-            {modal.ModalReset.isOpen && <ModalReset />}
-            {modal.ModalCall.isOpen && <ModalCall />}
-            {modal.ModalAccessibility.isOpen && <ModalAccessibility />}
-            {modal.ModalDelete.isOpen && <ModalDelete />}
-            {modal.ModalDeleteCheck.isOpen && <ModalDeleteCheck />}
-            {modal.ModalTimeout.isOpen && <ModalTimeout />}
-            {modal.ModalPaymentError.isOpen && <ModalPaymentError />}
+            {MODAL_REGISTRY.map(({ key }) => {
+                const Component = MODAL_COMPONENT_BY_KEY[key];
+                return modal.modalStates?.[key] && Component ? <Component key={key} /> : null;
+            })}
         </div>
     );
 };

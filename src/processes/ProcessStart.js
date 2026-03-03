@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 
 import { TakeinIcon, TakeoutIcon } from "../Icon";
 
@@ -13,8 +14,8 @@ const ProcessStart = memo(() => {
                     className="task-manager"
                     data-tts-text="취식방식 선택 영역입니다. 포장하기, 먹고가기 버튼이 있습니다. 좌우 방향키로 버튼을 선택합니다,"
                 >
-                    <Button className="secondary1" svg={<TakeoutIcon />} label="포장하기" navigate="ProcessMenu" />
-                    <Button className="secondary1" svg={<TakeinIcon />} label="먹고가기" navigate="ProcessMenu" />
+                    <Button className="secondary1" svg={<TakeoutIcon />} label="포장하기" navigate={PROCESS_NAME.MENU} />
+                    <Button className="secondary1" svg={<TakeinIcon />} label="먹고가기" navigate={PROCESS_NAME.MENU} />
                 </div>
                 <span>키패드 사용은 이어폰 잭에 이어폰을 꽂거나, 상하좌우 버튼 또는 동그라미 버튼을 눌러 시작할 수 있습니다</span>
             </div>

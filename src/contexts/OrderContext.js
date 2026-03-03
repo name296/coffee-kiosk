@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useMemo, useRef, useEffect } from "react";
+import React, { createContext, useState, useCallback, useMemo, useEffect } from "react";
 import { useMenuData } from "../hooks";
 import {
     categorizeMenu,
@@ -66,30 +66,24 @@ export const OrderProvider = ({ children }) => {
     // WebView 통신
     const setCallWebToApp = useCallback((cmd, val) => {
         const o = { Command: cmd, arg: val };
-        console.log("obj_cmd: " + JSON.stringify(o));
+        if (process.env.NODE_ENV === "development") {
+            console.log("obj_cmd: " + JSON.stringify(o));
+        }
         if (window.chrome?.webview) window.chrome.webview.postMessage(JSON.stringify(o));
     }, []);
 
     const sendPrintReceiptToApp = useCallback(() => setCallWebToApp('PRINT', ''), [setCallWebToApp]);
-
-    // 카테고리 페이지 네비게이션 - 로컬 ref 사용
-    const categoryPageNavRef = useRef(null);
-    const setHandleCategoryPageNav = useCallback((fn) => {
-        categoryPageNavRef.current = fn;
-    }, []);
 
     // Context value
     const value = useMemo(() => ({
         categoryInfo, menuItems, selectedTab, setSelectedTab,
         quantities, setQuantities, handleIncrease, handleDecrease, handleDelete,
         totalCount, totalSum, orderItems,
-        orderNumber, sendPrintReceiptToApp, updateOrderNumber,
-        setHandleCategoryPageNav
+        orderNumber, sendPrintReceiptToApp, updateOrderNumber
     }), [
         categoryInfo, menuItems, selectedTab, setSelectedTab,
         quantities, handleIncrease, handleDecrease, handleDelete, totalCount, totalSum, orderItems,
-        orderNumber, sendPrintReceiptToApp, updateOrderNumber,
-        setHandleCategoryPageNav
+        orderNumber, sendPrintReceiptToApp, updateOrderNumber
     ]);
 
     return (

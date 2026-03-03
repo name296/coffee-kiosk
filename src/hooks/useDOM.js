@@ -31,11 +31,13 @@ export const focusMainElement = () => {
             id: prevActive.id || null
         } : null;
 
-        console.log('[포커스] focusMainElement 호출', {
-            from: prevActiveInfo,
-            to: { tagName: mainElement.tagName, className: mainElement.className },
-            timestamp: new Date().toISOString()
-        });
+        if (process.env.NODE_ENV === "development") {
+            console.log("[포커스] focusMainElement 호출", {
+                from: prevActiveInfo,
+                to: { tagName: mainElement.tagName, className: mainElement.className },
+                timestamp: new Date().toISOString()
+            });
+        }
 
         mainElement.focus();
     }

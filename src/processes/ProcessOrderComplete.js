@@ -1,5 +1,6 @@
 import React, { memo, useContext } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 import { OrderContext, ScreenRouteContext } from "../contexts";
 import { useTimeoutCountdown } from "../hooks";
 
@@ -10,7 +11,7 @@ const ProcessOrderComplete = memo(() => {
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 60000,
         enabled: true,
-        onTimeout: () => navigateTo('ProcessFinish'),
+        onTimeout: () => navigateTo(PROCESS_NAME.FINISH),
         resetOnUserActivity: true
     });
 
@@ -26,8 +27,8 @@ const ProcessOrderComplete = memo(() => {
                 <h1>{order.orderNumber || 100}</h1>
             </div>
             <div className="task-manager">
-                <Button onClick={() => order.sendPrintReceiptToApp()} navigate="ProcessReceiptPrint" label="영수증 출력" />
-                <Button ttsText="출력 안함," navigate="ProcessFinish" label={`출력 안함${countdown}`} />
+                <Button onClick={() => order.sendPrintReceiptToApp()} navigate={PROCESS_NAME.RECEIPT_PRINT} label="영수증 출력" />
+                <Button ttsText="출력 안함," navigate={PROCESS_NAME.FINISH} label={`출력 안함${countdown}`} />
             </div>
         </>
     );

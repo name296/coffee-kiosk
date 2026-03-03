@@ -1,4 +1,4 @@
-import React, { memo, useContext, useMemo, useLayoutEffect } from "react";
+import React, { memo, useContext, useMemo } from "react";
 import Button from "./Button";
 import { OrderContext, AccessibilityContext } from "../contexts";
 import { useCategoryAssemble } from "../hooks";
@@ -28,8 +28,6 @@ const Category = memo(() => {
     const {
         containerRef: catContainerRef,
         measureRef: catMeasureRef,
-        currentPage: catPage,
-        totalPages: catTotal,
         currentItems: catItems,
         hasPrev: catHasPrev,
         hasNext: catHasNext,
@@ -38,11 +36,6 @@ const Category = memo(() => {
         isCompact: catIsCompact,
         isReady: catIsReady
     } = useCategoryAssemble(categories, accessibility.isLarge);
-
-    useLayoutEffect(() => {
-        order.setHandleCategoryPageNav?.((dir) => { dir === 'prev' ? catPrev() : catNext(); });
-        return () => order.setHandleCategoryPageNav?.(null);
-    }, [catPrev, catNext, order.setHandleCategoryPageNav]);
 
     const categoryClassName = useMemo(() => `category${catIsCompact ? ' compact' : ''}`, [catIsCompact]);
 

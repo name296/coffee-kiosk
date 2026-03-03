@@ -1,4 +1,5 @@
 import React, { memo, useContext } from "react";
+import { PROCESS_NAME } from "../constants";
 import { ScreenRouteContext } from "../contexts";
 import { useTimeoutCountdown } from "../hooks";
 
@@ -8,7 +9,7 @@ const ProcessFinish = memo(() => {
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 4000,
         enabled: true,
-        onTimeout: () => navigateTo('ProcessStart'),
+        onTimeout: () => navigateTo(PROCESS_NAME.START),
         resetOnUserActivity: false
     });
 

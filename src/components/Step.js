@@ -1,15 +1,11 @@
 import React, { memo, useContext } from "react";
 import { ScreenRouteContext } from "../contexts";
+import { STEP_INDEX_BY_PROCESS } from "../constants";
 import { StepIcon } from "../Icon";
 
 /** 단계 인덱스: ProcessMenu=1, ProcessDetails=2, 결제그룹=3, 완료그룹=4, ProcessFinish=5. CSS .step.1~.5로 상태 제어 */
 function getStepIndex(currentProcess) {
-    if (currentProcess === 'ProcessMenu') return 1;
-    if (currentProcess === 'ProcessDetails') return 2;
-    if (['ProcessPayments', 'ProcessCardInsert', 'ProcessMobilePay', 'ProcessSimplePay', 'ProcessCardRemoval'].includes(currentProcess)) return 3;
-    if (['ProcessOrderComplete', 'ProcessReceiptPrint'].includes(currentProcess)) return 4;
-    if (currentProcess === 'ProcessFinish') return 5;
-    return null;
+    return STEP_INDEX_BY_PROCESS[currentProcess] ?? null;
 }
 
 /** UI 컴포넌트: 단계 표시(메뉴선택 → 내역확인 → 결제 → 완료). 진행/현재 상태는 .step.1~.5 CSS로 제어. .first 시 CSS display:none */

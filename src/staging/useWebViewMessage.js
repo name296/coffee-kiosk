@@ -1,4 +1,5 @@
 import { useEffect, useContext } from "react";
+import { PROCESS_NAME } from "../constants";
 import { ScreenRouteContext } from "../contexts";
 
 export const useWebViewMessage = () => {
@@ -10,10 +11,12 @@ export const useWebViewMessage = () => {
         const hm = (e) => {
             let d = e.data;
             if (d.arg.result === 'SUCCESS') {
-                if (d.Command === 'PAY') navigateTo('ProcessCardRemoval');
-                if (d.Command === 'PRINT') navigateTo('ProcessOrderComplete');
+                if (d.Command === 'PAY') navigateTo(PROCESS_NAME.CARD_REMOVAL);
+                if (d.Command === 'PRINT') navigateTo(PROCESS_NAME.ORDER_COMPLETE);
             } else {
-                console.log(d.arg.errorMessage);
+                if (process.env.NODE_ENV === "development") {
+                    console.log(d.arg.errorMessage);
+                }
             }
         };
 

@@ -1,5 +1,6 @@
 import React, { memo, useContext, useEffect } from "react";
 import { DetailsContent } from "../components";
+import { PROCESS_NAME } from "../constants";
 import { AccessibilityContext, OrderContext, ScreenRouteContext } from "../contexts";
 
 const ProcessDetails = memo(() => {
@@ -9,7 +10,7 @@ const ProcessDetails = memo(() => {
 
     useEffect(() => {
         if (!order.orderItems || order.orderItems.length === 0) {
-            navigateTo('ProcessMenu');
+            navigateTo(PROCESS_NAME.MENU);
         }
     }, [order.orderItems, navigateTo]);
 

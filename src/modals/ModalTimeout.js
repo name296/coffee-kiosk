@@ -1,5 +1,6 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "./Modal";
+import { PROCESS_NAME } from "../constants";
 import { ModalContext, TimeoutContext, ScreenRouteContext } from "../contexts";
 
 export const ModalTimeout = memo(() => {
@@ -12,7 +13,7 @@ export const ModalTimeout = memo(() => {
             isOpen={modal.ModalTimeout.isOpen}
             type="timeout"
             countdown={timeout?.globalRemainingTime}
-            onCancel={() => { modal.ModalTimeout.close(); navigateTo('ProcessStart'); }}
+            onCancel={() => { modal.ModalTimeout.close(); navigateTo(PROCESS_NAME.START); }}
             onConfirm={() => { modal.ModalTimeout.close(); timeout?.resetIdleTimeout?.(); }}
         />
     );

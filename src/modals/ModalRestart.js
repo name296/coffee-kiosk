@@ -1,5 +1,6 @@
 import React, { memo, useContext } from "react";
 import { BaseModal } from "./Modal";
+import { PROCESS_NAME } from "../constants";
 import { ModalContext, ScreenRouteContext } from "../contexts";
 
 export const ModalRestart = memo(() => {
@@ -11,7 +12,7 @@ export const ModalRestart = memo(() => {
             isOpen={modal.ModalRestart.isOpen}
             type="restart"
             onCancel={() => modal.ModalRestart.close()}
-            onConfirm={() => { modal.ModalRestart.close(); navigateTo('ProcessStart'); }}
+            onConfirm={() => { modal.ModalRestart.close(); navigateTo(PROCESS_NAME.START); }}
         />
     );
 });

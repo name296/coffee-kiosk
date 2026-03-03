@@ -1,5 +1,6 @@
 import React, { memo, useContext } from "react";
 import { Button } from "../components";
+import { PROCESS_NAME } from "../constants";
 import { useTimeoutCountdown } from "../hooks";
 import { ScreenRouteContext } from "../contexts";
 
@@ -9,7 +10,7 @@ const ProcessReceiptPrint = memo(() => {
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 60000,
         enabled: true,
-        onTimeout: () => navigateTo('ProcessFinish'),
+        onTimeout: () => navigateTo(PROCESS_NAME.FINISH),
         resetOnUserActivity: true
     });
 
@@ -21,7 +22,7 @@ const ProcessReceiptPrint = memo(() => {
             </div>
             <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
             <div className="task-manager">
-                <Button navigate="ProcessFinish" label={`마무리${countdown}`} ttsText="마무리하기" />
+                <Button navigate={PROCESS_NAME.FINISH} label={`마무리${countdown}`} ttsText="마무리하기" />
             </div>
         </>
     );

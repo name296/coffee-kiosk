@@ -34,6 +34,10 @@ import Screen from "./screens/Screen";
 const App = () => {
   // 포커스 디버그 로그 (개발용)
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") {
+      return undefined;
+    }
+
     const handleFocusIn = (e) => {
       const target = e.target;
       const targetInfo = target ? {
