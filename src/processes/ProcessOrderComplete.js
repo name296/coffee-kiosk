@@ -22,7 +22,7 @@ const ProcessOrderComplete = memo(() => {
             </div>
             <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
             <div className="order-num">
-                <p>주문번호</p>
+                <span>주문번호</span>
                 <h1>{order.orderNumber || 100}</h1>
             </div>
             <div className="task-manager">

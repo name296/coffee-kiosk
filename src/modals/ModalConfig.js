@@ -9,7 +9,7 @@ const MODAL_CONFIG = {
         cancelLabel: "취소",
         confirmIcon: "Ok",
         confirmLabel: "확인",
-        message: <><p>내역이 없으면 <span className="highlight">메뉴선택</span>으로 돌아갑니다</p><p>계속 진행하시려면 <span className="highlight">확인</span> 버튼을 누르세요</p></>,
+        message: <><span>내역이 없으면 <span className="highlight">메뉴선택</span>으로 돌아갑니다</span><span>계속 진행하시려면 <span className="highlight">확인</span> 버튼을 누르세요</span></>,
     },
     delete: {
         tts: "알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
@@ -19,7 +19,7 @@ const MODAL_CONFIG = {
         cancelLabel: "취소",
         confirmIcon: "Delete",
         confirmLabel: "삭제",
-        message: <><p>주문 상품을 <span className="highlight">삭제</span>합니다</p><p>계속 진행하시려면 <span className="highlight">삭제</span> 버튼을 누릅니다</p></>,
+        message: <><span>주문 상품을 <span className="highlight">삭제</span>합니다</span><span>계속 진행하시려면 <span className="highlight">삭제</span> 버튼을 누릅니다</span></>,
     },
     reset: {
         tts: "알림, 초기화, 주문 내역을 초기화합니다, 계속 진행하시려면 초기화 버튼을 누릅니다, ",
@@ -29,7 +29,7 @@ const MODAL_CONFIG = {
         cancelLabel: "취소",
         confirmIcon: "Reset",
         confirmLabel: "초기화",
-        message: <><p>주문 내역을 <span className="highlight">초기화</span>합니다</p><p>계속 진행하시려면 <span className="highlight">초기화</span> 버튼을 누릅니다</p></>,
+        message: <><span>주문 내역을 <span className="highlight">초기화</span>합니다</span><span>계속 진행하시려면 <span className="highlight">초기화</span> 버튼을 누릅니다</span></>,
     },
     restart: {
         tts: "알림, 시작화면, 시작화면으로 이동합니다, 계속 진행하시려면 시작화면 버튼을 누릅니다,",
@@ -39,7 +39,7 @@ const MODAL_CONFIG = {
         cancelLabel: "취소",
         confirmIcon: "Ok",
         confirmLabel: "시작화면",
-        message: <><p><span className="highlight">시작화면</span>으로 이동합니다</p><p>계속 진행하시려면 <span className="highlight">시작화면</span> 버튼을 누릅니다</p></>,
+        message: <><span><span className="highlight">시작화면</span>으로 이동합니다</span><span>계속 진행하시려면 <span className="highlight">시작화면</span> 버튼을 누릅니다</span></>,
     },
     call: {
         tts: "알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
@@ -49,7 +49,7 @@ const MODAL_CONFIG = {
         cancelLabel: "취소",
         confirmIcon: "Call",
         confirmLabel: "호출",
-        message: <><p>직원을 <span className="highlight">호출</span>합니다</p><p>계속 진행하시려면 <span className="highlight">호출</span> 버튼을 누릅니다</p></>,
+        message: <><span>직원을 <span className="highlight">호출</span>합니다</span><span>계속 진행하시려면 <span className="highlight">호출</span> 버튼을 누릅니다</span></>,
     },
     timeout: {
         tts: "알림, 시간연장, 사용시간이 20초 남았습니다, 계속 사용하시려면 연장 버튼을 누릅니다, ",
@@ -59,7 +59,7 @@ const MODAL_CONFIG = {
         cancelLabel: "시작화면",
         confirmIcon: "Extention",
         confirmLabel: "연장",
-        message: (countdown) => <><p>사용시간이 <span className="highlight">{countdown !== undefined ? `${Math.ceil(countdown / 1000)}초` : '20초'}</span> 남았습니다</p><p>계속 사용하시려면 <span className="highlight">연장</span> 버튼을 누릅니다</p></>,
+        message: (countdown) => <><span>사용시간이 <span className="highlight">{countdown !== undefined ? `${Math.ceil(countdown / 1000)}초` : '20초'}</span> 남았습니다</span><span>계속 사용하시려면 <span className="highlight">연장</span> 버튼을 누릅니다</span></>,
     },
     paymentError: {
         tts: "알림, 결제 경고, 카드가 잘못 삽입되었습니다, 카드를 제거하시고 다시결제 버튼을 누릅니다, ",
@@ -70,7 +70,7 @@ const MODAL_CONFIG = {
         confirmIcon: "Warning",
         confirmLabel: "다시결제",
         confirmButtonStyle: "delete",
-        message: <><p>카드가 <span className="highlight">잘못 삽입</span>되었습니다</p><p>카드를 제거하시고</p><p><span className="highlight">다시결제</span> 버튼을 누릅니다</p></>,
+        message: <><span>카드가 <span className="highlight">잘못 삽입</span>되었습니다</span><span>카드를 제거하시고</span><span><span className="highlight">다시결제</span> 버튼을 누릅니다</span></>,
     },
     accessibility: {
         tts: "알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, ",
@@ -80,7 +80,7 @@ const MODAL_CONFIG = {
         cancelLabel: "적용안함",
         confirmIcon: "Ok",
         confirmLabel: "적용하기",
-        message: <><p>원하시는 <span className="highlight">접근성 옵션</span>을 선택하시고</p><p><span className="highlight">적용하기</span> 버튼을 누르세요</p></>,
+        message: <><span>원하시는 <span className="highlight">접근성 옵션</span>을 선택하시고</span><span><span className="highlight">적용하기</span> 버튼을 누르세요</span></>,
     },
 };
 

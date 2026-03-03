@@ -18,8 +18,8 @@ const MenuItem = memo(({ item, disabled, onPress }) => (
             <img src={`./images/${item.img}`} alt={item.name} />
         </span>
         <div className="label">
-            <p>{item.name}</p>
-            <p>{Number(item.price).toLocaleString()}원</p>
+            <span>{item.name}</span>
+            <span>{Number(item.price).toLocaleString()}원</span>
         </div>
     </Button>
 ));

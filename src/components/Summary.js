@@ -17,11 +17,11 @@ const Summary = memo(() => {
         <div className="summary">
             {/* 수량/금액 표시 영역 */}
             <div className="task-manager">
-                <p className="summary-label">수량</p>
-                <p className="summary-text">{totalCount}개</p>
+                <span className="summary-label">수량</span>
+                <span className="summary-text">{totalCount}개</span>
                 <div className="short-colline" />
-                <p className="summary-label">금액</p>
-                <p className="summary-text">{formatNumber(totalSum)}원</p>
+                <span className="summary-label">금액</span>
+                <span className="summary-text">{formatNumber(totalSum)}원</span>
             </div>
 
             {/* 버튼 영역 */}

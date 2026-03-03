@@ -18,7 +18,7 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
                     <div className="order-index">{index}</div>
                     <img src={`./images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
-                <p className="order-name">{item.name}</p>
+                <span className="order-name">{item.name}</span>
                 <div className="order-quantity">
                     <Button className="secondary1 counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
                     <Button className="qty" label={quantity} />

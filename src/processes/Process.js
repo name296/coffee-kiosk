@@ -38,9 +38,9 @@ const Process = memo(() => {
                 <Component />
             </Main>
             <Summary />
-            {currentProcess === "ProcessMenu" && (
+            {/*currentProcess === "ProcessMenu" && (
                 <DetailsContent paginationDirection="vertical" itemsPerPageOverride={3} style={{ height: "300px" }} />
-            )}
+            )}*/}
             <Bottom />
         </div>
     );
