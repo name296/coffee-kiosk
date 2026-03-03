@@ -1759,9 +1759,6 @@
       }
 
       & .main .menu {
-        width: 100%;
-        height: fit-content;
-        grid-template-columns: repeat(4, 1fr);
         grid-template-rows: repeat(1, 1fr);
 
         & .menu-pagination {
