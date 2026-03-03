@@ -4,7 +4,7 @@ import Pagination from "./Pagination";
 import { OrderContext, AccessibilityContext } from "../contexts";
 import { usePageSlicer } from "../hooks";
 
-const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 15, ITEMS_PER_PAGE_LOW: 3 };
+const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 11, ITEMS_PER_PAGE_LOW: 3 };
 
 // 메뉴 아이템
 const MenuItem = memo(({ item, disabled, onPress }) => (
@@ -74,7 +74,7 @@ const MenuGrid = memo(() => {
                     width: "100%",
                     height: "100%",
                     gridColumn: "4",
-                    gridRow: accessibility.isLow ? "1" : "4"
+                    gridRow: accessibility.isLow ? "1" : "3"
                 }}
             >
                 <Pagination

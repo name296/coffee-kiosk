@@ -1,7 +1,7 @@
 import React, { memo, useContext } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "../contexts";
 import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler } from "../hooks";
-import { Main, Step, Bottom, Summary } from "../components";
+import { Main, Step, Bottom, Summary, DetailsContent } from "../components";
 import PROCESS_CONFIG from "./ProcessConfig";
 
 /**
@@ -38,6 +38,9 @@ const Process = memo(() => {
                 <Component />
             </Main>
             <Summary />
+            {currentProcess === "ProcessMenu" && (
+                <DetailsContent paginationDirection="vertical" itemsPerPageOverride={3} style={{ height: "300px" }} />
+            )}
             <Bottom />
         </div>
     );

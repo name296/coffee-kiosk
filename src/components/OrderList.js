@@ -32,17 +32,18 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
 });
 OrderRow.displayName = 'OrderRow';
 
-const OrderList = memo(() => {
+const OrderList = memo(({ paginationDirection, itemsPerPageOverride } = {}) => {
     const order = useContext(OrderContext);
     const accessibility = useContext(AccessibilityContext);
     const modal = useContext(ModalContext);
 
+    const normalItems = itemsPerPageOverride || (accessibility.isLow ? 3 : 6);
     const {
         pageNumber, totalPages, currentItems,
         handlePrevPage, handleNextPage, itemsPerPage
     } = usePageSlicer(
         order.orderItems,
-        accessibility.isLow ? 3 : 6,
+        normalItems,
         3,
         accessibility.isLow
     );
@@ -89,7 +90,7 @@ const OrderList = memo(() => {
                 totalPages={totalPages}
                 onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
                 onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
-                direction={accessibility.isLow ? "vertical" : "horizontal"}
+                direction={paginationDirection || (accessibility.isLow ? "vertical" : "horizontal")}
                 ttsPrefix="주문목록"
             />
         </>

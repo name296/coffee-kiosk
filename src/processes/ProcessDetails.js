@@ -1,5 +1,5 @@
 import React, { memo, useContext, useEffect } from "react";
-import { OrderList } from "../components";
+import { DetailsContent } from "../components";
 import { AccessibilityContext, OrderContext, ScreenRouteContext } from "../contexts";
 
 const ProcessDetails = memo(() => {
@@ -37,9 +37,7 @@ const ProcessDetails = memo(() => {
                 ) : null}
             </div>
 
-            <div className="details-content">
-                <OrderList />
-            </div>
+            <DetailsContent />
         </>
     );
 });

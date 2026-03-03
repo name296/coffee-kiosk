@@ -84,7 +84,6 @@
   전체 CSS Reset & Base
   ============================== */
 @layer reset {
-
   *,
   *::before,
   *::after {
@@ -115,15 +114,11 @@
    ======================================== */
 @layer design-system {
   :root {
-    /* === 전체 타이포그래피 시스템=== */
+    /* === 전체 타이포그래피 시스템 === */
     --font-family: 'Pretendard GOV', sans-serif;
 
-    /* === font / size (rem 단위). 큰글씨는 body.large에서 변수 오버라이드로 통제 === */
-    --font-size-xs: 1.2rem;
-    --font-size-sm: 1.4rem;
-    --font-size-md: 1.6rem;
-    --font-size-lg: 2rem;
-    --font-size-b1: 4rem;
+    /* === font / size === */
+    --font-size-b1: 4.65rem;
     --font-size-h1: 4.8rem;
     --font-size-h2: 5.8rem;
     --font-size-d1: 6.7rem;
@@ -138,15 +133,10 @@
     /* === spacing === */
     --spacing-base: 1rem;
     --spacing-xs: calc(var(--spacing-base) * 0.5);
-    /* 0.5rem = 8px */
     --spacing-sm: calc(var(--spacing-base) * 1);
-    /* 1rem = 16px */
     --spacing-md: calc(var(--spacing-base) * 1.5);
-    /* 1.5rem = 24px */
     --spacing-lg: calc(var(--spacing-base) * 2);
-    /* 2rem = 32px */
     --spacing-xl: calc(var(--spacing-base) * 2.25);
-    /* 2.25rem = 36px */
 
     /* === layout / 섹션 높이 / 버튼(min-side) === */
     --height-banner: 70px;
@@ -155,6 +145,7 @@
     --height-step: 120px;
     --height-summary: 182px;
     --height-summary-low: 122px;
+    --height-details-content-summary: 320px;
     --height-title: 200px;
     --height-top: 70px;
     --layout-gap: var(--spacing-sm);
@@ -166,7 +157,6 @@
     --border-color-pointed: var(--color-system-01);
 
     /* 원시 팔레트(Primitive Palette) */
-    /* Brown */
     --color-brown-01: #4C3F37FF;
     --color-brown-02: #8C532CFF;
     --color-brown-03: #A4693FFF;
@@ -174,13 +164,11 @@
     --color-brown-05: #EB9B63FF;
     --color-brown-06: #EEDCD2FF;
 
-    /* Yellow */
     --color-yellow-01: #241F00FF;
     --color-yellow-02: #807000FF;
     --color-yellow-03: #FFE100FF;
     --color-yellow-04: #FFEF80FF;
 
-    /* Gray */
     --color-gray-01: #000000FF;
     --color-gray-02: #1F1F1FFF;
     --color-gray-03: #252525FF;
@@ -196,7 +184,6 @@
     --color-gray-13: #FAFAFAFF;
     --color-gray-14: #FFFFFFFF;
 
-    /* System */
     --color-system-01: #FF00E1FF;
     --color-system-02: #B81A00FF;
     --color-system-03: #751200FF;
@@ -204,7 +191,6 @@
     --color-system-05: #00000099;
 
     /* 참조 팔레트(Reference Palette) */
-    /* Body 참조 팔레트*/
     --body1-background-color: var(--color-gray-03);
     --body1-border-color: var(--color-gray-09);
     --body1-content-primary-color: var(--color-brown-02);
@@ -226,119 +212,90 @@
     --body4-border-color: var(--color-gray-09);
     --body4-content-color: var(--color-gray-01);
 
-    /* 버튼 팔레트(Light 테마) */
-    /* Primary1 팔레트*/
+    /* 버튼 팔레트 – Primary1 */
     --primary1-background-color-default: var(--color-brown-03);
     --primary1-background-color-pressed: var(--color-brown-06);
     --primary1-background-color-disabled: transparent;
-
     --primary1-border-color-default: var(--color-brown-03);
     --primary1-border-color-pressed: var(--color-brown-02);
     --primary1-border-color-disabled: var(--body2-primary1-color);
-
     --primary1-content-color-default: var(--color-gray-14);
     --primary1-content-color-pressed: var(--color-brown-02);
     --primary1-content-color-disabled: var(--body2-primary1-color);
 
-    /* Primary2 팔레트*/
+    /* 버튼 팔레트 – Primary2 */
     --primary2-background-color-default: var(--color-gray-11);
     --primary2-background-color-pressed: var(--color-brown-03);
     --primary2-background-color-disabled: transparent;
-
     --primary2-border-color-default: var(--color-gray-09);
     --primary2-border-color-pressed: var(--color-brown-03);
     --primary2-border-color-disabled: var(--color-gray-08);
-
     --primary2-content-color-default: var(--color-gray-03);
     --primary2-content-color-pressed: var(--color-gray-14);
     --primary2-content-color-disabled: var(--color-gray-08);
 
-    /* Primary3 팔레트(중첩 배경 시스템) */
-    /* Background1 (중첩 배경) */
+    /* 버튼 팔레트 – Primary3 (중첩 배경 시스템) */
     --primary3-background1-color-default: var(--color-gray-14);
     --primary3-background1-color-pressed: var(--color-gray-14);
     --primary3-background1-color-disabled: var(--color-gray-14);
-
-    /* Border (테두리) */
     --primary3-border-color-default: var(--color-gray-09);
     --primary3-border-color-pressed: var(--color-brown-03);
     --primary3-border-color-disabled: var(--color-gray-09);
-
-    /* Background2 그라디언트 레이어 */
     --primary3-background2-color-default: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
     --primary3-background2-color-pressed: linear-gradient(180deg, #A4693F00 0%, #A4693FE6 15%, #A4693FFF 43%, #A4693FFF 100%);
     --primary3-background2-color-disabled: linear-gradient(180deg, #E8E8E800 0%, #E8E8E8E6 15%, #E8E8E8FF 43%, #E8E8E8FF 100%);
-
-    /* Content2 (background2 위의 HTML 요소) */
     --primary3-content2-color-default1: var(--color-gray-03);
     --primary3-content2-color-default2: var(--color-brown-02);
     --primary3-content2-color-pressed: var(--color-gray-14);
     --primary3-content2-color-disabled1: var(--color-gray-03);
     --primary3-content2-color-disabled2: var(--color-brown-02);
-
-    /* Content3 (별도 구분 HTML 요소) */
     --primary3-content3-color-disabled: var(--color-system-02);
-
-    /* Content (버튼 기본 콘텐츠) */
     --primary3-content-color-default: var(--color-gray-03);
     --primary3-content-color-pressed: var(--color-gray-14);
     --primary3-content-color-disabled: var(--color-gray-07);
 
-    /* Secondary1 팔레트*/
+    /* 버튼 팔레트 – Secondary1 */
     --secondary1-background-color-default: var(--color-gray-07);
     --secondary1-background-color-pressed: var(--color-gray-11);
     --secondary1-background-color-disabled: transparent;
-
     --secondary1-border-color-default: var(--color-gray-07);
     --secondary1-border-color-pressed: var(--color-gray-09);
     --secondary1-border-color-disabled: var(--color-gray-06);
-
     --secondary1-content-color-default: var(--color-gray-14);
     --secondary1-content-color-pressed: var(--color-gray-03);
     --secondary1-content-color-disabled: var(--color-gray-06);
 
-    /* Secondary2 팔레트*/
+    /* 버튼 팔레트 – Secondary2 */
     --secondary2-background-color-default: var(--color-gray-11);
     --secondary2-background-color-pressed: var(--color-gray-07);
     --secondary2-background-color-disabled: transparent;
-
     --secondary2-border-color-default: var(--color-gray-09);
     --secondary2-border-color-pressed: var(--color-gray-07);
     --secondary2-border-color-disabled: var(--color-gray-06);
-
     --secondary2-content-color-default: var(--color-gray-03);
     --secondary2-content-color-pressed: var(--color-gray-14);
     --secondary2-content-color-disabled: var(--color-gray-06);
 
-    /* Secondary3 팔레트(중첩 배경 시스템- 레이어 적용) */
+    /* 버튼 팔레트 – Secondary3 (중첩 배경 시스템) */
     --secondary3-background1-color-default: var(--color-gray-14);
     --secondary3-background1-color-pressed: var(--color-gray-07);
     --secondary3-background1-color-disabled: transparent;
-
     --secondary3-border-color-default: var(--color-gray-09);
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-06);
-
-    /* Content1 (background1 위의 HTML 요소) */
     --secondary3-content1-color-default: var(--color-gray-01);
     --secondary3-content1-color-pressed: var(--color-gray-14);
     --secondary3-content1-color-disabled: var(--color-gray-06);
-
-    /* Background2 (레이어 적용 배경) */
     --secondary3-background2-color-default: var(--color-gray-01);
-
-    /* Content2 (background2 위의 HTML 요소 - 레이어) */
     --secondary3-content2-color-default: var(--color-gray-14);
 
     /* Delete 버튼 팔레트 */
     --delete-background-color-default: var(--color-system-02);
     --delete-background-color-pressed: var(--color-system-03);
     --delete-background-color-disabled: transparent;
-
     --delete-border-color-default: var(--color-system-02);
     --delete-border-color-pressed: var(--color-system-02);
     --delete-border-color-disabled: var(--color-gray-06);
-
     --delete-content-color-default: var(--color-gray-14);
     --delete-content-color-pressed: var(--color-gray-14);
     --delete-content-color-disabled: var(--color-gray-06);
@@ -349,11 +306,7 @@
 
   /* ========================================
      버튼 시스템 (Button System)
-     - 의사변수: :root(--button-min-side-*), 포커스요소(--button-min-side, --clamped)
-     - 컴포넌트: .button (팔레트 소비, touch-action: none)
      ======================================== */
-
-  /* 포커스 가능한 요소: --button-min-side는 Button.js에서 동적 설정 */
   button:not([disabled]),
   a[href],
   input:not([disabled]),
@@ -363,7 +316,7 @@
     --button-min-side: ;
     --button-min-side-ratio: calc(0.0625 * 1.5);
     --button-min-side-max: calc(var(--layout-width) * 0.16);
-    --button-min-side-min: calc(var(--layout-width) * 0.08);    
+    --button-min-side-min: calc(var(--layout-width) * 0.08);
     --button-min-side-clamped: clamp(var(--button-min-side-min), var(--button-min-side, var(--button-min-side-min)), var(--button-min-side-max));
   }
 
@@ -391,11 +344,10 @@
     contain: layout style;
     flex-flow: row nowrap;
     flex-shrink: 0;
-
-    /* 상속 속성 (자식에게 전파) */
     color: var(--primary2-content-color-default);
-    /* 토글 체크 아이콘 - CSS ::before로 처리 */
+    text-align: center;
 
+    /* 토글 체크 아이콘 */
     &.toggle .icon.pressed {
       display: none;
     }
@@ -405,14 +357,11 @@
       position: absolute;
       border-top-right-radius: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.5 * 0.875);
       overflow: hidden;
-
-      /* --button-min-side 기반 크기 속성 */
       width: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
       height: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 2);
       top: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
       right: calc(var(--button-min-side-clamped) * var(--button-min-side-ratio) * 0.125);
 
-      /* CSS mask-image로 SVG 지정하여 currentColor 적용 */
       &::before {
         content: '';
         display: block;
@@ -430,12 +379,6 @@
       }
     }
 
-    /* 라벨 레이아웃 - 버튼에 직접 상속 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-
     &[aria-disabled="true"] {
       border-style: dashed;
       border-color: var(--primary2-border-color-disabled);
@@ -443,30 +386,23 @@
       background-color: var(--primary2-background-color-disabled);
       color: var(--primary2-content-color-disabled);
       pointer-events: auto;
-      /* 탭 포커스를 받기 위해 auto */
 
-      /* 비활성 버튼은 pressed 스타일 무시 */
       &.pressed {
         background-color: var(--primary2-background-color-disabled);
         color: var(--primary2-content-color-disabled);
       }
     }
 
-    /* 호버 및 포커스 시 outline 표시 (비활성 버튼에서도 적용 가능) */
     &:hover,
     &:focus-visible {
       outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--border-color-pointed);
     }
 
-    /* pressing 상태 - 누르는 순간에만 적용 (스케일 + 이너 그림자) */
     &.pressing:not([aria-disabled="true"]) {
       transform: scale(0.92);
     }
 
-    /* ========================================
-       팔레트 클래스 - Primary
-       ======================================== */
-
+    /* 팔레트 – Primary1 */
     &.primary1 {
       background-color: var(--primary1-background-color-default);
       border-color: var(--primary1-border-color-default);
@@ -501,6 +437,7 @@
       }
     }
 
+    /* 팔레트 – Primary2 */
     &.primary2 {
       background-color: var(--primary2-background-color-default);
       border-color: var(--primary2-border-color-default);
@@ -535,6 +472,7 @@
       }
     }
 
+    /* 팔레트 – Primary3 */
     &.primary3 {
       background-color: var(--primary3-background1-color-default);
       border-color: var(--primary3-border-color-default);
@@ -566,13 +504,10 @@
         background-color: var(--primary3-background1-color-disabled);
         border-color: var(--primary3-border-color-disabled);
         color: var(--primary3-content-color-disabled);
-  }
-}
+      }
+    }
 
-/* ========================================
-       팔레트 클래스 - Secondary
-   ======================================== */
-
+    /* 팔레트 – Secondary1 */
     &.secondary1 {
       background-color: var(--secondary1-background-color-default);
       border-color: var(--secondary1-border-color-default);
@@ -603,6 +538,7 @@
       }
     }
 
+    /* 팔레트 – Secondary2 */
     &.secondary2 {
       background-color: var(--secondary2-background-color-default);
       border-color: var(--secondary2-border-color-default);
@@ -633,6 +569,7 @@
       }
     }
 
+    /* 팔레트 – Secondary3 */
     &.secondary3 {
       background-color: var(--secondary3-background1-color-default);
       border-color: var(--secondary3-border-color-default);
@@ -663,7 +600,7 @@
       }
     }
 
-    /* Delete 아이템 버튼 (빨간색) */
+    /* Delete 버튼 */
     &.delete-item {
       width: 70px;
       height: 70px;
@@ -714,15 +651,9 @@
    전체 레이아웃 (Layout)
    ======================================== */
 @layer layout {
-
-  /* ========================================
-     Body 레이아웃 + 타이포 (process·modal 공통)
-     ======================================== */
   body {
     margin: 0;
     box-sizing: border-box;
-
-    /* 타이포: process·modal 공통 (body.large 시 변수로 확대) */
     font-family: var(--font-family);
     font-size: var(--font-size-b1);
     font-weight: var(--font-weight-medium);
@@ -730,219 +661,212 @@
     letter-spacing: -0.04em;
     font-stretch: 96%;
 
-    /* body .process */
+    /* .process */
     & .process {
-    /* 레이아웃 */
-    display: flex;
-    flex-direction: column;
-    width: var(--layout-width);
-    height: var(--layout-height);
-    contain: size;
-    color: var(--body1-content-primary-color);
-    background-color: var(--body1-background-color);
-    border-color: var(--body1-border-color);
-
-      /* body .process > * */
-    &>* {
-      padding-left: var(--layout-padding-x);
-      padding-right: var(--layout-padding-x);
-      box-sizing: border-box;
-    }
-
-    /* ========================================
-         body .process .top
-       ======================================== */
-    & .top {
-      width: 100%;
-      height: var(--height-top);
-      flex-shrink: 0;
-      border-bottom: 2px solid var(--body1-border-color);
-    }
-
-      /* body .process.first – 첫 페이지에서 Top, Step, Summary, black 숨기기 */
-    &.first .top,
-    &.first .step,
-    &.first .summary,
-    &.first .black {
-      display: none;
-    }
-
-      /* body .process.forth – 결제/완료 레이아웃에서 Summary 숨기기 */
-    &.forth .summary {
-      display: none;
-    }
-
-    /* ========================================
-         body .process .step
-       구조: .step > .step-num + .step-name + .separator (4단계 반복)
-         상태: .step-1 ~ .step-5 로 진행/현재 제어 (CSS 체이닝)
-       ======================================== */
-    & .step {
-    width: 100%;
-    height: var(--height-step);
-    color: var(--layout-color);
-    display: flex;
-    border-bottom: 2px solid var(--body1-border-color);
-    flex-shrink: 0;
-    height: 120px;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: space-evenly;
-
-        /* body .process .step .step-num */
-    & .step-num {
-      width: 74px;
-      height: 74px;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      box-sizing: border-box;
-      background-clip: padding-box;
-      background-color: var(--body2-progress-background-standby-color);
-      color: var(--body2-secondary2-color);
-    }
+      flex-direction: column;
+      width: var(--layout-width);
+      height: var(--layout-height);
+      contain: size;
+      color: var(--body1-content-primary-color);
+      background-color: var(--body1-background-color);
+      border-color: var(--body1-border-color);
 
-        /* body .process .step .step-name, .separator */
-    & .step-name,
-    & .separator {
-      flex-shrink: 0;
-      color: var(--body2-secondary2-color);
-    }
+      & > * {
+        padding-left: var(--layout-padding-x);
+        padding-right: var(--layout-padding-x);
+        box-sizing: border-box;
+      }
 
-        /* body .process .step.step-1 ~ .step-5 – 진행/현재 상태 */
-    &.step-1 {
-      & .step-num:nth-of-type(1) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-        border-color: var(--body2-primary2-color);
+      /* .top */
+      & .top {
+        width: 100%;
+        height: var(--height-top);
+        flex-shrink: 0;
+        border-bottom: 2px solid var(--body1-border-color);
       }
-      & .step-name:nth-of-type(2),
-      & .separator:nth-of-type(3) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-2 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(4) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-3 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(7) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-4 {
-      & .step-num:nth-of-type(1),
-      & .step-num:nth-of-type(4),
-      & .step-num:nth-of-type(7),
-      & .step-num:nth-of-type(10) {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-num:nth-of-type(10) {
-        border-color: var(--body2-primary2-color);
-      }
-      & .step-name:nth-of-type(2),
-      & .step-name:nth-of-type(5),
-      & .step-name:nth-of-type(8),
-      & .step-name:nth-of-type(11),
-      & .separator:nth-of-type(3),
-      & .separator:nth-of-type(6),
-      & .separator:nth-of-type(9) {
-        color: var(--body2-primary1-color);
-      }
-    }
-    &.step-5 {
-      & .step-num {
-        background-color: var(--body2-primary1-color);
-        color: var(--body2-progress-content-complete-color);
-      }
-      & .step-name,
-      & .separator {
-        color: var(--body2-primary1-color);
-      }
-    }
-  }
 
-  /* ========================================
-         body .process .main
-     ======================================== */
-  /* .main 요소는 JSX에서 tabIndex={-1}로 설정됨 (CSS로는 HTML 속성 추가 불가) */
-  & .main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--body2-background-color);
-    border-color: var(--body2-border-color);
-    color: var(--body1-content-secondary-color);
-
-    &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
-    &:focus-visible {
-      outline: 12px dashed var(--border-color-pointed);
-      outline-offset: -12px;
-    }
-
-        /* body .process .main .title */
-    & .title {
-      width: 100%;
-      height: var(--height-title);
-      flex-shrink: 0;
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-semibold);
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      color: var(--body1-content-secondary-color);
-      white-space: nowrap;
-
-      & .primary {
-        color: var(--body1-content-primary-color);
+      /* .first – Top, Step, Summary, black 숨기기 */
+      &.first .top,
+      &.first .step,
+      &.first .summary,
+      &.first .black {
+        display: none;
       }
-    }
-  }
 
-  /* ========================================
-         body .process.first (시작 화면)
-     ======================================== */
-  &.first {
-    & .main {
-      position: relative;
-      height: 100%;
-    }
+      /* .forth – Summary 숨기기 */
+      &.forth .summary {
+        display: none;
+      }
 
-        /* body .process.first .main .hero */
+      /* .step */
+      & .step {
+        width: 100%;
+        height: var(--height-step);
+        color: var(--layout-color);
+        display: flex;
+        border-bottom: 2px solid var(--body1-border-color);
+        flex-shrink: 0;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-evenly;
+
+        & .step-num {
+          width: 74px;
+          height: 74px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          border-radius: 50%;
+          border: 8px solid transparent;
+          box-sizing: border-box;
+          background-clip: padding-box;
+          background-color: var(--body2-progress-background-standby-color);
+          color: var(--body2-secondary2-color);
+        }
+
+        & .step-name,
+        & .separator {
+          flex-shrink: 0;
+          color: var(--body2-secondary2-color);
+        }
+
+        &.step-1 {
+          & .step-num:nth-of-type(1) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+            border-color: var(--body2-primary2-color);
+          }
+
+          & .step-name:nth-of-type(2),
+          & .separator:nth-of-type(3) {
+            color: var(--body2-primary1-color);
+          }
+        }
+
+        &.step-2 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+
+          & .step-num:nth-of-type(4) {
+            border-color: var(--body2-primary2-color);
+          }
+
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6) {
+            color: var(--body2-primary1-color);
+          }
+        }
+
+        &.step-3 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+
+          & .step-num:nth-of-type(7) {
+            border-color: var(--body2-primary2-color);
+          }
+
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+
+        &.step-4 {
+          & .step-num:nth-of-type(1),
+          & .step-num:nth-of-type(4),
+          & .step-num:nth-of-type(7),
+          & .step-num:nth-of-type(10) {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+
+          & .step-num:nth-of-type(10) {
+            border-color: var(--body2-primary2-color);
+          }
+
+          & .step-name:nth-of-type(2),
+          & .step-name:nth-of-type(5),
+          & .step-name:nth-of-type(8),
+          & .step-name:nth-of-type(11),
+          & .separator:nth-of-type(3),
+          & .separator:nth-of-type(6),
+          & .separator:nth-of-type(9) {
+            color: var(--body2-primary1-color);
+          }
+        }
+
+        &.step-5 {
+          & .step-num {
+            background-color: var(--body2-primary1-color);
+            color: var(--body2-progress-content-complete-color);
+          }
+
+          & .step-name,
+          & .separator {
+            color: var(--body2-primary1-color);
+          }
+        }
+      }
+
+      /* .main */
+      & .main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--body2-background-color);
+        border-color: var(--body2-border-color);
+        color: var(--body1-content-secondary-color);
+
+        &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+        &:focus-visible {
+          outline: 12px dashed var(--border-color-pointed);
+          outline-offset: -12px;
+        }
+
+        & .title {
+          width: 100%;
+          height: var(--height-title);
+          flex-shrink: 0;
+          font-size: var(--font-size-h2);
+          font-weight: var(--font-weight-semibold);
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
+          color: var(--body1-content-secondary-color);
+          white-space: nowrap;
+
+          & .primary {
+            color: var(--body1-content-primary-color);
+          }
+        }
+      }
+
+      /* .first (시작 화면) */
+      &.first {
+        & .main {
+          position: relative;
+          height: 100%;
+        }
+
         & .main .hero {
           display: flex;
           flex-flow: column nowrap;
@@ -950,7 +874,6 @@
           align-items: center;
           flex: 1;
 
-          /* body .process.first .main .hero .button */
           & .button {
             width: 285px;
             height: 285px;
@@ -966,28 +889,34 @@
           }
         }
 
-    & .main .poster {
-      width: var(--layout-width);
-      height: auto;
-      object-fit: contain;
-    }
+        & .main .poster {
+          width: var(--layout-width);
+          height: auto;
+          object-fit: contain;
+        }
 
-    & .main p {
-      letter-spacing: inherit;
-      line-height: inherit;
-      font-stretch: inherit;
-    }
-  }
+        & .main p {
+          letter-spacing: inherit;
+          line-height: inherit;
+          font-stretch: inherit;
+        }
+      }
 
-      /* ========================================
-         body .process.second (메뉴 선택)
-         body .process.second .main .category-full | .menu
-         ======================================== */
-  &.second {
-    & .main {
-      justify-content: space-evenly;
+      /* .second (메뉴 선택) – .low 스타일 기본 사용, Summary 아래 컨테이너만 추가 */
+      &.second {
+        & > .details-content {
+          flex-shrink: 0;
+          height: var(--height-details-content-summary);
+          background-color: var(--body2-background-color);
+          border-top: 2px solid var(--body1-border-color);
+          padding: 8px var(--layout-padding-x);
+          box-sizing: border-box;
+        }
 
-          /* body .process.second .main .category-full */
+        & .main {
+          justify-content: space-evenly;
+
+          /* .category-full */
           & .category-full {
             position: relative;
             width: 100%;
@@ -998,19 +927,16 @@
             align-items: center;
             flex-shrink: 1;
 
-            /* body .process.second .main .category-full .category .button (카테고리 탭) */
             & .category .button {
               height: 76px;
               min-width: 70px;
             }
 
-            /* body .process.second .main .category-full > .button (이전/다음) */
             & > .button {
               width: 113px;
               height: 76px;
             }
 
-            /* body .process.second .main .category-full .category */
             & .category {
               position: relative;
               flex: 1;
@@ -1022,13 +948,11 @@
               align-items: center;
               justify-content: space-between;
 
-              /* body .process.second .main .category-full .category.compact */
               &.compact {
                 justify-content: flex-start;
                 gap: 8px;
               }
 
-              /* body .process.second .main .category-full .category.measure (측정용) */
               &.measure {
                 position: absolute;
                 top: 0;
@@ -1036,7 +960,6 @@
                 pointer-events: none;
               }
 
-              /* body .process.second .main .category-full .category .category-separator */
               & .category-separator {
                 width: 2px;
                 height: 40px;
@@ -1047,7 +970,7 @@
             }
           }
 
-          /* body .process.second .main .menu */
+          /* .menu */
           & .menu {
             position: relative;
             width: 100%;
@@ -1055,18 +978,16 @@
             grid-gap: var(--spacing-sm);
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             grid-auto-flow: row;
             justify-items: center;
             align-items: center;
 
-            /* body .process.second .main .menu > .button (메뉴 아이템만, 페이지네이션 제외) */
             & > .button {
               width: 242px;
               height: 280px;
               position: relative;
 
-              /* body .process.second .main .menu > .button .icon */
               & .icon {
                 width: 14rem;
                 height: 14rem;
@@ -1076,7 +997,6 @@
                 transform: translateX(-50%);
               }
 
-              /* body .process.second .main .menu > .button .label */
               & .label {
                 position: absolute;
                 width: 100%;
@@ -1119,171 +1039,39 @@
         }
       }
 
-      /* ========================================
-         body .process.third (주문내역)
-         body .process.third .main .details-content .order-list
-         ======================================== */
-  &.third {
-    & .main {
-          /* body .process.third .main .details-content */
-      & .details-content {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr) 1fr;
-        width: 100%;
-        height: 100%;
-        place-items: center;
-
-          /* .details-content .order-list */
-        & .order-list {
-          grid-row: 1 / 7;
-          justify-self: stretch;
-          align-self: stretch;
-              display: grid;
-              grid-template-columns: 1fr;
-              grid-template-rows: repeat(6, 1fr);
-              place-items: center;
-              row-gap: 0;
-              width: 100%;
-              height: 100%;
-              padding-left: 43px;
-              padding-right: 43px;
-              flex-grow: 1;
-
-              /* body .process.third .main .details-content .order-list .order-row */
-              & .order-row {
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                height: 100%;
-                padding-top: 0;
-                padding-bottom: 0;
-
-                /* body .process.third .main .details-content .order-list .order-row.with-line::after */
-                &.with-line::after {
-                  content: '';
-                  position: absolute;
-                  left: 0;
-                  right: 0;
-                  bottom: 0;
-                  height: 2px;
-                  background-color: var(--body1-border-color);
-                }
-
-                /* body .process.third .main .details-content .order-list .order-row .order-image-div */
-                & .order-image-div {
-                  position: relative;
-                  width: 113px;
-                  height: 113px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  border: 2px solid var(--body1-border-color);
-
-                  & .order-index {
-                    width: 56px;
-                    height: 56px;
-                    background-color: var(--color-gray-01);
-                    border: 1px solid var(--color-gray-09);
-                    color: var(--color-gray-13);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                  }
-
-                  & .order-image {
-                    width: 100%;
-                    height: 100%;
-                  }
-                }
-
-                /* body .process.third .main .details-content .order-list .order-row .order-name */
-                & .order-name {
-                  position: relative;
-                  width: 236px;
-                  color: var(--body1-content-secondary-color);
-                }
-
-                /* body .process.third .main .details-content .order-list .order-row .order-quantity */
-                & .order-quantity {
-                  position: relative;
-                  display: flex;
-                  align-items: center;
-                  flex-flow: row nowrap;
-                  justify-content: space-between;
-
-                  & .counter {
-                    width: 80px;
-                    height: 76px;
-                  }
-
-                  & .qty {
-                    width: 82px;
-                    height: 76px;
-                    position: relative;
-                    display: flex;
-                    justify-content: center;
-                  }
-                }
-
-                /* body .process.third .main .details-content .order-list .order-row .order-price */
-                & .order-price {
-                  position: relative;
-                  width: 236px;
-                  justify-content: right;
-                  border: none;
-                  background: none;
-                }
-
-                /* body .process.third .main .details-content .order-list .order-row .button.delete-item */
-                & .button.delete-item {
-                  width: 76px;
-                  height: 76px;
-                }
-              }
-            }
-
-            /* body .process.third .main .details-content .pagination */
-        & .pagination {
-          grid-row: 7 / 8;
-          align-self: center;
+      /* .third (주문내역) */
+      &.third {
+        & .main {
+          & .pagination {
+            grid-row: 7 / 8;
+            align-self: center;
+          }
         }
       }
-    }
-  }
 
-      /* ========================================
-         body .process.forth (결제방법 선택)
-         body .process.forth .main .payment
-         ======================================== */
-  &.forth {
-    & .main {
-      position: relative;
-      font-size: var(--font-size-b1);
-      padding-top: var(--height-title);
-      padding-bottom: 182px;
+      /* .forth (결제방법 선택) */
+      &.forth {
+        & .main {
+          position: relative;
+          font-size: var(--font-size-b1);
+          padding-top: var(--height-title);
+          padding-bottom: 182px;
 
           & .task-manager,
-      & .payment {
-        width: fit-content;
-        height: fit-content;
-      }
+          & .payment {
+            width: fit-content;
+            height: fit-content;
+          }
 
-          /* body .process.forth .main .task-manager .button */
           & .task-manager .button {
             width: 371px;
             height: 120px;
           }
+
           & .task-manager .button:only-child {
             width: 500px;
           }
 
-          /* body .process.forth .main .payment */
           & .payment {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1292,296 +1080,417 @@
             justify-items: center;
             align-items: center;
 
-            /* body .process.forth .main .payment .button */
             & .button {
               width: 328px;
               height: 460px;
               flex-direction: column;
 
-              /* body .process.forth .main .payment .button .icon */
               & .icon {
                 width: 25.6rem;
                 height: 25.6rem;
               }
             }
           }
-    }
-  }
+        }
+      }
 
-  /* ========================================
-         body .process .summary
-     ======================================== */
-  & .summary {
-    width: 100%;
-    height: var(--height-summary);
-    background-color: var(--body1-background-color);
-    display: flex;
-    flex-shrink: 0;
-    gap: var(--spacing-sm);
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 2px solid var(--body1-border-color);
+      /* .summary */
+      & .summary {
+        width: 100%;
+        height: var(--height-summary);
+        background-color: var(--body1-background-color);
+        display: flex;
+        flex-shrink: 0;
+        gap: var(--spacing-sm);
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid var(--body1-border-color);
 
-    & .task-manager {
-      width: fit-content;
-      justify-content: space-between;
-    }
+        & .task-manager {
+          width: fit-content;
+          justify-content: space-between;
+        }
 
-        /* body .process .summary .task-manager .button */
         & .task-manager .button {
           width: 199px;
           min-width: 199px;
           height: 134px;
         }
 
-    & .summary-label {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-secondary1-color);
-    }
+        & .summary-label {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-secondary1-color);
+        }
 
-    & .summary-text {
-      font-weight: var(--font-weight-semibold);
-      color: var(--body2-primary1-color);
-    }
+        & .summary-text {
+          font-weight: var(--font-weight-semibold);
+          color: var(--body2-primary1-color);
+        }
 
-    & .short-colline {
-      width: 2px;
-      height: 41px;
-      background: var(--body1-border-color);
-    }
+        & .short-colline {
+          width: 2px;
+          height: 41px;
+          background: var(--body1-border-color);
+        }
+      }
 
-  }
-
-      /* body .process .bottom */
-  & .bottom {
-    width: 100%;
-    height: var(--height-bottom);
-    flex-shrink: 0;
-    border-top: 2px solid var(--body1-border-color);
-    background-color: var(--body1-background-color);
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+      /* .bottom */
+      & .bottom {
+        width: 100%;
+        height: var(--height-bottom);
+        flex-shrink: 0;
+        border-top: 2px solid var(--body1-border-color);
+        background-color: var(--body1-background-color);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         & .button {
           height: 76px;
         }
-  }
+      }
 
-      /* body .process .countdown */
-  & .countdown {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+      /* .countdown */
+      & .countdown {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  /* 낮은화면 상단 여백 */
-  & .black {
-    width: 100%;
-    height: 0px;
-    background-color: var(--color-gray-01);
-  }
+      /* .black (낮은화면 상단 여백) */
+      & .black {
+        width: 100%;
+        height: 0px;
+        background-color: var(--color-gray-01);
+      }
 
-  & .short-colline {
-    width: 2px;
-    height: 41px;
-    background: var(--body1-content-secondary-color);
-  }
-  }
+      & .short-colline {
+        width: 2px;
+        height: 41px;
+        background: var(--body1-content-secondary-color);
+      }
+    }
 
-  /* ========================================
-     & .modal – 모달 시스템 (body 하위)
-     구조: .modal > .main > .up-content, .down-content / 타이포는 body 상속
-     ======================================== */
+    /* .modal */
     & .modal {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 0 var(--layout-padding-x);
-    background: #00000099;
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 0 var(--layout-padding-x);
+      background: #00000099;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
 
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+      &.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-    & > .main {
-      grid-area: 1/1;
-      pointer-events: auto;
-    }
+      & > .main {
+        grid-area: 1/1;
+        pointer-events: auto;
+      }
 
-      /* body .modal .main */
-    & .main {
-      position: relative;
-      width: 100%;
-      padding-left: 0;
-      padding-right: 0;
-      height: fit-content;
-      border-radius: 24px;
-      border: 2px solid var(--body1-border-color);
-      display: flex;
-      flex-flow: column nowrap;
+      & .main {
+        position: relative;
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        height: fit-content;
+        border-radius: 24px;
+        border: 2px solid var(--body1-border-color);
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        overflow: hidden;
+        background: var(--body2-background-color);
+        color: var(--body1-content-secondary-color);
+        box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
+
         &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
         &:focus-visible {
           outline: 12px dashed var(--border-color-pointed);
           outline-offset: -12px;
         }
-      align-items: center;
-      overflow: hidden;
-      background: var(--body2-background-color);
-      color: var(--body1-content-secondary-color);
-      box-shadow: 0 0 50px #00000040, 0 0 0 1px #0000000D;
 
-        /* body .modal .main .up-content */
-      & .up-content {
-        width: 100%;
-        background: var(--body1-background-color);
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-        gap: 1.6rem;
-        padding: var(--spacing-xl);
-        color: var(--body2-secondary1-color);
-
-        & .modal-image {
-          width: 10rem;
-          height: 10rem;
-          color: var(--body2-primary1-color);
-        }
-
-        & .modal-title {
-          font-weight: var(--font-weight-semibold);
-        }
-
-        & .modal-description {
+        & .up-content {
+          width: 100%;
+          background: var(--body1-background-color);
           display: flex;
           flex-flow: column nowrap;
-          align-items: center;
-          gap: 0.4rem;
-        }
-
-        & .modal-subtitle {
-          text-align: center;
-        }
-
-        & .modal-subtitle-highlight {
-          color: var(--body2-primary1-color);
-          font-weight: var(--font-weight-semibold);
-        }
-      }
-
-      & .down-content {
-        width: 100%;
-        flex: 1;
-        display: flex;
-        flex-flow: column nowrap;
-        border-top: 2px solid var(--body1-border-color);
-        justify-content: center;
-        align-items: center;
-        padding: var(--spacing-xl);
-        gap: var(--spacing-xl);
-
-        & .modal-message {
-          display: flex;
-          flex-flow: column nowrap;
-          align-items: center;
-          gap: 8px;
-
-          & .highlight,
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .setting-row {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          height: 10rem;
-        }
-
-        & .setting-name {
-          display: flex;
-          flex-flow: row nowrap;
-          align-items: center;
-          width: 100%;
-          height: 10rem;
-          gap: var(--spacing-sm);
-
-          & .primary {
-            color: var(--body1-content-primary-color);
-            font-weight: var(--font-weight-semibold);
-          }
-        }
-
-        & .task-manager {
-          display: flex;
           justify-content: center;
           align-items: center;
-          gap: var(--spacing-sm);
+          gap: 1.6rem;
+          padding: var(--spacing-xl);
+          color: var(--body2-secondary1-color);
+
+          & .modal-image {
+            width: 10rem;
+            height: 10rem;
+            color: var(--body2-primary1-color);
+          }
+
+          & .modal-title {
+            font-weight: var(--font-weight-semibold);
+          }
+
+          & .modal-description {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: 0.4rem;
+          }
+
+          & .modal-subtitle {
+            text-align: center;
+          }
+
+          & .modal-subtitle-highlight {
+            color: var(--body2-primary1-color);
+            font-weight: var(--font-weight-semibold);
+          }
         }
 
-          /* body .modal .main .down-content .setting-row .task-manager .button */
+        & .down-content {
+          width: 100%;
+          flex: 1;
+          display: flex;
+          flex-flow: column nowrap;
+          border-top: 2px solid var(--body1-border-color);
+          justify-content: center;
+          align-items: center;
+          padding: var(--spacing-xl);
+          gap: var(--spacing-xl);
+
+          & .modal-message {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: 8px;
+
+            & .highlight,
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .setting-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 10rem;
+          }
+
+          & .setting-name {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            width: 100%;
+            height: 10rem;
+            gap: var(--spacing-sm);
+
+            & .primary {
+              color: var(--body1-content-primary-color);
+              font-weight: var(--font-weight-semibold);
+            }
+          }
+
+          & .task-manager {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-sm);
+          }
+
           & .setting-row .task-manager:has(.button:only-child) .button {
             width: 242px;
             height: 76px;
           }
+
           & .setting-row .task-manager:has(.button:nth-child(4)) .button {
             width: 70px;
             height: 76px;
           }
+
           & .setting-row .task-manager .button {
             width: 113px;
             height: 76px;
           }
 
-          /* body .modal .main .down-content > .task-manager .button (취소/확인) */
           & > .task-manager .button {
             width: 285px;
             height: 90px;
           }
 
-        & .setting-line {
-          width: 100%;
-          height: 0;
-          margin: 0;
-          border: none;
-          border-top: 2px solid var(--body1-border-color);
+          & .setting-line {
+            width: 100%;
+            height: 0;
+            margin: 0;
+            border: none;
+            border-top: 2px solid var(--body1-border-color);
+          }
         }
       }
     }
   }
-  }
 }
-
-/* @layer layout */
 
 /* ==============================
    컴포넌트 스타일 (Components)
    ============================== */
 @layer components {
-  /* ==============================
-     모달 시스템 (SCSS 네스티드)
-     - 레이아웃 배색: --body* 변수 사용
-     - 버튼 배색: 팔레트 시스템 (별도 정의 없음)
-     ============================== */
-     
-  /* 모달 시스템: layout 레이어 body & .modal */
+  /* .details-content – OrderList 기본 스타일 (ProcessDetails) */
+  .details-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, 1fr) 1fr;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+
+    & .order-list {
+      grid-row: 1 / 7;
+      justify-self: stretch;
+      align-self: stretch;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(6, 1fr);
+      place-items: center;
+      row-gap: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0 43px;
+      flex-grow: 1;
+
+      & .order-image-div {
+        width: 113px;
+        height: 113px;
+
+        & .order-index {
+          width: 56px;
+          height: 56px;
+          background-color: var(--color-gray-01);
+          border: 1px solid var(--color-gray-09);
+          color: var(--color-gray-13);
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+      }
+
+      & .order-name { color: var(--body1-content-secondary-color); }
+
+      & .order-quantity {
+        justify-content: space-between;
+
+        & .counter { width: 80px; height: 76px; }
+        & .qty { width: 82px; height: 76px; }
+      }
+
+      & .button.delete-item { width: 76px; height: 76px; }
+    }
+
+    & .pagination {
+      grid-row: 7 / 8;
+      align-self: center;
+    }
+
+    & .order-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      &.with-line::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background-color: var(--body1-border-color);
+      }
+
+      & .order-image-div {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid var(--body1-border-color);
+
+        & .order-image { width: 100%; height: 100%; }
+        & .order-index { width: fit-content; height: fit-content; }
+      }
+
+      & .order-name {
+        width: 236px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      & .order-quantity {
+        display: flex;
+        align-items: center;
+        flex-flow: row nowrap;
+
+        & .counter, & .qty { display: flex; justify-content: center; }
+      }
+
+      & .order-price {
+        width: 236px;
+        justify-content: right;
+        border: none;
+        background: none;
+      }
+    }
+  }
+
+  /* .details-content .low 스타일 – ProcessMenu 기본, .low ProcessDetails */
+  .process.second > .details-content,
+  .low .process.third .main .details-content {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr;
+    gap: 16px;
+
+    & .order-list {
+      grid-column: 1;
+      grid-row: 1;
+      grid-template-rows: repeat(3, 1fr);
+      padding: 0;
+
+      & .order-image-div { width: 70px; height: 70px; }
+      & .order-image-div .order-index {
+        width: fit-content;
+        height: fit-content;
+        background: none;
+        border: none;
+        color: inherit;
+        position: static;
+      }
+      & .order-quantity .counter { width: 63px; height: 60px; }
+      & .order-quantity .qty { width: 73px; height: 60px; }
+      & .button.delete-item { width: 70px; height: 70px; }
+    }
+
+    & .pagination { grid-row: auto; align-self: center; }
+  }
 
   .credit-pay-image {
     position: relative;
@@ -1593,7 +1502,6 @@
     position: absolute;
     top: 677px;
     left: 707px;
-    /* 기존 중심점 (635 + 콘텐츠폭/2) */
     transform: translateX(-50%);
     width: fit-content;
     height: fit-content;
@@ -1625,13 +1533,7 @@
     font-size: var(--font-size-d4);
   }
 
-  /* ========================================
-   전체 컴포넌트 (Components) - 버튼
-   ======================================== */
-
-  /* ========================================
-       페이지네이션 스타일
-       ======================================== */
+  /* 페이지네이션 */
   .pagination {
     position: relative;
     width: fit-content;
@@ -1647,7 +1549,6 @@
       height: 76px;
     }
 
-    /* vertical 방향 스타일 */
     &.pagination-vertical {
       flex-flow: column nowrap;
     }
@@ -1664,26 +1565,14 @@
       color: var(--body1-content-secondary-color);
     }
   }
-
 }
 
-/* @layer components */
-
-  /* ========================================
-   전체 유틸리티 (Utilities)
-       ======================================== */
+/* ==============================
+   유틸리티 (Utilities)
+   ============================== */
 @layer utilities {
-
-  /* ========================================
-     접근성: body.low, body.dark, body.large
-       ======================================== */
-
-  /* 큰글씨 모드: 폰트 사이즈 변수 1.2배 */
+  /* 큰글씨 모드 */
   .large {
-    --font-size-xs: 1.44rem;
-    --font-size-sm: 1.68rem;
-    --font-size-md: 1.92rem;
-    --font-size-lg: 2.4rem;
     --font-size-b1: 4.8rem;
     --font-size-h1: 5.76rem;
     --font-size-h2: 6.96rem;
@@ -1693,7 +1582,7 @@
     --font-size-d4: 21.6rem;
   }
 
-  /* 고대비 모드 (Dark Theme) */
+  /* 고대비 모드 (.dark) */
   .dark {
     --body1-background-color: var(--color-gray-03);
     --body1-border-color: var(--color-gray-07);
@@ -1795,6 +1684,14 @@
         & .main {
           padding-top: 84px;
         }
+
+        & > .details-content {
+          display: none;
+        }
+
+        & .summary {
+          height: var(--height-summary-low);
+        }
       }
 
       &.third {
@@ -1859,81 +1756,10 @@
           }
         }
 
-        & .main .details-content {
-          grid-template-columns: 1fr auto;
-          grid-template-rows: 1fr;
-          gap: 16px;
-
-          & .order-list {
-            grid-column: 1;
-            grid-row: 1;
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: repeat(3, 1fr);
-            place-items: center;
-            row-gap: 0;
-            padding-left: 0;
-            padding-right: 0;
-
-            & .order-row {
-              width: 100%;
-              height: 100%;
-              padding-top: 0;
-              padding-bottom: 0;
-
-              & .order-image-div {
-      width: 70px;
-      height: 70px;
-
-                & .order-image {
-                  width: 100%;
-                  height: 100%;
-                }
-
-                & .order-index {
-                  width: fit-content;
-                  height: fit-content;
-                }
-              }
-
-              & .order-name {
-                width: 236px;
-                text-overflow: ellipsis;
-      white-space: nowrap;
-                overflow: hidden;
-              }
-
-              & .order-quantity .counter {
-                width: 63px;
-                height: 60px;
-              }
-
-              & .order-quantity .qty {
-                width: 73px;
-                height: 60px;
-              }
-
-              & .order-price {
-                width: 236px;
-              }
-
-              & .button.delete-item {
-      width: 70px;
-                height: 70px;
-              }
-            }
-          }
-
-          & .pagination {
-            grid-column: 2;
-            grid-row: 1;
-            align-self: center;
-          }
-        }
       }
 
       & .main .menu {
-      width: fit-content;
+        width: 100%;
         height: fit-content;
         grid-template-columns: repeat(4, 1fr);
         grid-template-rows: repeat(1, 1fr);
@@ -1947,7 +1773,7 @@
       & .summary {
         height: var(--height-summary-low);
 
-    & .button {
+        & .button {
           height: 90px;
         }
       }
@@ -1959,56 +1785,32 @@
     }
   }
 
-  /* ========================================
-     Body 팔레트 유틸리티 클래스
-     - 테마(Light/Dark) 자동 전환
-     ======================================== */
-
-  /* Body1: 메인 배경 팔레트 */
+  /* Body 팔레트 유틸리티 클래스 */
   .body1 {
     background-color: var(--body1-background-color);
     border-color: var(--body1-border-color);
     color: var(--body1-content-secondary-color);
 
-    & .primary {
-      color: var(--body1-content-primary-color);
-    }
-
-    & .secondary {
-      color: var(--body1-content-secondary-color);
-    }
+    & .primary { color: var(--body1-content-primary-color); }
+    & .secondary { color: var(--body1-content-secondary-color); }
   }
 
-  /* Body2: 콘텐츠 영역 팔레트 */
   .body2 {
     background-color: var(--body2-background-color);
     color: var(--body2-secondary2-color);
 
-    & .primary1 {
-      color: var(--body2-primary1-color);
-    }
-
-    & .primary2 {
-      color: var(--body2-primary2-color);
-    }
-
-    & .secondary1 {
-      color: var(--body2-secondary1-color);
-    }
-
-    & .secondary2 {
-      color: var(--body2-secondary2-color);
-    }
+    & .primary1 { color: var(--body2-primary1-color); }
+    & .primary2 { color: var(--body2-primary2-color); }
+    & .secondary1 { color: var(--body2-secondary1-color); }
+    & .secondary2 { color: var(--body2-secondary2-color); }
   }
 
-  /* Body3: 배너/강조 영역 팔레트 */
   .body3 {
     background-color: var(--body3-background-color);
     border-color: var(--body1-border-color);
     color: var(--body3-content-color);
   }
 
-  /* Body4: 추가 팔레트 (필요시 확장) */
   .body4 {
     background-color: var(--body4-background-color, var(--body1-background-color));
     border-color: var(--body4-border-color, var(--body1-border-color));
@@ -2060,7 +1862,6 @@
         overflow: visible;
         white-space: nowrap;
         text-align: center;
-        
       }
 
       & .one-normal {
@@ -2068,7 +1869,6 @@
         overflow: visible;
         white-space: nowrap;
         text-align: center;
-        
       }
 
       & .one-qty-normal {
@@ -2076,7 +1876,6 @@
         overflow: visible;
         white-space: nowrap;
         text-align: center;
-        
       }
 
       & .one-price-normal {
@@ -2084,7 +1883,6 @@
         overflow: visible;
         white-space: nowrap;
         text-align: center;
-        
       }
 
       & .one-delete-normal {
@@ -2092,10 +1890,7 @@
         overflow: visible;
         white-space: nowrap;
         text-align: center;
-        
       }
-  }
+    }
   }
 }
-
-/* @layer utilities */

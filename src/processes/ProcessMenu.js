@@ -8,5 +8,5 @@ const ProcessMenu = memo(() => (
     </>
 ));
 
-ProcessMenu.displayName = 'ProcessMenu';
+ProcessMenu.displayName = "ProcessMenu";
 export default ProcessMenu;
