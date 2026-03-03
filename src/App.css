@@ -865,37 +865,35 @@
         & .main {
           position: relative;
           height: 100%;
-        }
 
-        & .main .hero {
-          display: flex;
-          flex-flow: column nowrap;
-          justify-content: space-evenly;
-          align-items: center;
-          flex: 1;
+          & .hero {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: space-evenly;
+            align-items: center;
+            flex: 1;
 
-          & .button {
-            width: 285px;
-            height: 285px;
-            white-space: nowrap;
-            flex-direction: column;
-            font-size: var(--font-size-h2);
-            font-weight: var(--font-weight-semibold);
+            & .button {
+              width: 285px;
+              height: 285px;
+              white-space: nowrap;
+              flex-direction: column;
+              font-size: var(--font-size-h2);
+              font-weight: var(--font-weight-semibold);
 
-            & .icon {
-              width: 9.6rem;
-              height: 9.6rem;
+              & .icon {
+                width: 9.6rem;
+                height: 9.6rem;
+              }
             }
           }
+
+          & .poster {
+            width: var(--layout-width);
+            height: auto;
+            object-fit: contain;
+          }
         }
-
-        & .main .poster {
-          width: var(--layout-width);
-          height: auto;
-          object-fit: contain;
-        }
-
-
       }
 
       /* .second (메뉴 선택) – .low 스타일 기본 사용, Summary 아래 컨테이너만 추가 */
@@ -923,11 +921,6 @@
             align-items: center;
             flex-shrink: 1;
 
-            & .category .button {
-              height: 76px;
-              min-width: 70px;
-            }
-
             & > .button {
               width: 113px;
               height: 76px;
@@ -943,6 +936,11 @@
               gap: 8px;
               align-items: center;
               justify-content: space-between;
+
+              & .button {
+                height: 76px;
+                min-width: 70px;
+              }
 
               &.compact {
                 justify-content: flex-start;
@@ -1059,13 +1057,15 @@
             height: fit-content;
           }
 
-          & .task-manager .button {
-            width: 371px;
-            height: 120px;
-          }
+          & .task-manager {
+            & .button {
+              width: 371px;
+              height: 120px;
 
-          & .task-manager .button:only-child {
-            width: 500px;
+              &:only-child {
+                width: 500px;
+              }
+            }
           }
 
           & .payment {
@@ -1106,12 +1106,12 @@
         & .task-manager {
           width: fit-content;
           justify-content: space-between;
-        }
 
-        & .task-manager .button {
-          width: 199px;
-          min-width: 199px;
-          height: 134px;
+          & .button {
+            width: 199px;
+            min-width: 199px;
+            height: 134px;
+          }
         }
 
         & .summary-label {
@@ -1310,24 +1310,30 @@
             gap: var(--spacing-sm);
           }
 
-          & .setting-row .task-manager:has(.button:only-child) .button {
-            width: 242px;
-            height: 76px;
+          & .setting-row {
+            & .task-manager {
+              & .button {
+                width: 113px;
+                height: 76px;
+              }
+
+              &:has(.button:only-child) .button {
+                width: 242px;
+                height: 76px;
+              }
+
+              &:has(.button:nth-child(4)) .button {
+                width: 70px;
+                height: 76px;
+              }
+            }
           }
 
-          & .setting-row .task-manager:has(.button:nth-child(4)) .button {
-            width: 70px;
-            height: 76px;
-          }
-
-          & .setting-row .task-manager .button {
-            width: 113px;
-            height: 76px;
-          }
-
-          & > .task-manager .button {
-            width: 285px;
-            height: 90px;
+          & > .task-manager {
+            & .button {
+              width: 285px;
+              height: 90px;
+            }
           }
 
           & .setting-line {
@@ -1347,8 +1353,9 @@
    컴포넌트 스타일 (Components)
    ============================== */
 @layer components {
+  body {
   /* .details-content – OrderList 기본 스타일 (ProcessDetails) */
-  .details-content {
+  & .details-content {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: repeat(6, 1fr) 1fr;
@@ -1456,8 +1463,8 @@
   }
 
   /* .details-content .low 스타일 – ProcessMenu 기본, .low ProcessDetails */
-  .process.second > .details-content,
-  .low .process.third .main .details-content {
+  & .process.second > .details-content,
+  &.low .process.third .main .details-content {
     grid-template-columns: 1fr auto;
     grid-template-rows: 1fr;
     gap: 16px;
@@ -1468,36 +1475,44 @@
       grid-template-rows: repeat(3, 1fr);
       padding: 0;
 
-      & .order-image-div { width: 70px; height: 70px; }
-      & .order-image-div .order-index {
-        width: fit-content;
-        height: fit-content;
-        background: none;
-        border: none;
-        color: inherit;
-        position: static;
+      & .order-image-div {
+        width: 70px;
+        height: 70px;
+
+        & .order-index {
+          width: fit-content;
+          height: fit-content;
+          background: none;
+          border: none;
+          color: inherit;
+          position: static;
+        }
       }
-      & .order-quantity .counter { width: 63px; height: 60px; }
-      & .order-quantity .qty { width: 73px; height: 60px; }
+      & .order-quantity {
+        & .counter { width: 63px; height: 60px; }
+        & .qty { width: 73px; height: 60px; }
+      }
       & .button.delete-item { width: 70px; height: 70px; }
     }
 
-    & .order-row .order-name {
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
+    & .order-row {
+      & .order-name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
     }
 
     & .pagination { grid-row: auto; align-self: center; }
   }
 
-  .credit-pay-image {
+  & .credit-pay-image {
     position: relative;
     width: 762px;
     height: 612px;
   }
 
-  .order-num {
+  & .order-num {
     position: absolute;
     top: 677px;
     left: 707px;
@@ -1513,7 +1528,7 @@
     font-weight: var(--font-weight-semibold);
   }
 
-  .end-countdown {
+  & .end-countdown {
     display: flex;
     width: 278px;
     height: 278px;
@@ -1533,7 +1548,7 @@
   }
 
   /* 페이지네이션 */
-  .pagination {
+  & .pagination {
     position: relative;
     width: fit-content;
     height: fit-content;
@@ -1564,14 +1579,16 @@
       color: var(--body1-content-secondary-color);
     }
   }
+  } /* end body */
 }
 
 /* ==============================
    유틸리티 (Utilities)
    ============================== */
 @layer utilities {
+  body {
   /* 큰글씨 모드 */
-  .large {
+  &.large {
     --font-size-b1: 4.8rem;
     --font-size-h1: 5.76rem;
     --font-size-h2: 6.96rem;
@@ -1582,7 +1599,7 @@
   }
 
   /* 고대비 모드 (.dark) */
-  .dark {
+  &.dark {
     --body1-background-color: var(--color-gray-03);
     --body1-border-color: var(--color-gray-07);
     --body1-content-primary-color: var(--color-yellow-03);
@@ -1677,7 +1694,7 @@
   }
 
   /* 저시력 모드 (.low) */
-  .low {
+  &.low {
     & .process {
       &.second {
         & .main {
@@ -1694,75 +1711,78 @@
       }
 
       &.third {
-        & .main .title {
-          font-size: var(--font-size-h1);
-          height: 100px;
+        & .main {
+          & .title {
+            font-size: var(--font-size-h1);
+            height: 100px;
+          }
+
+          & .pagination {
+            flex-flow: column nowrap;
+          }
+
+          & .banner.field {
+            padding-left: 32px;
+            padding-right: 32px;
+            gap: 16px;
+
+            & .one-num {
+              width: 70px;
+              display: flex;
+              flex-flow: row nowrap;
+              justify-content: center;
+              align-items: center;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+
+            & .one-normal {
+              width: 236px;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+
+            & .one-qty-normal {
+              width: 242px;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+
+            & .one-price-normal {
+              width: 236px;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+
+            & .one-delete-normal {
+              width: 76px;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+
+            & .one-pagination-normal {
+              width: 184px;
+              overflow: visible;
+              white-space: nowrap;
+              text-align: center;
+            }
+          }
         }
-
-        & .main .pagination {
-          flex-flow: column nowrap;
-        }
-
-        & .main .banner.field {
-          padding-left: 32px;
-          padding-right: 32px;
-          gap: 16px;
-
-          & .one-num {
-            width: 70px;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-            align-items: center;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-normal {
-            width: 236px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-qty-normal {
-            width: 242px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-price-normal {
-            width: 236px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-delete-normal {
-            width: 76px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-
-          & .one-pagination-normal {
-            width: 184px;
-            overflow: visible;
-            white-space: nowrap;
-            text-align: center;
-          }
-        }
-
       }
 
-      & .main .menu {
-        grid-template-rows: repeat(1, 1fr);
+      & .main {
+        & .menu {
+          grid-template-rows: repeat(1, 1fr);
 
-        & .menu-pagination {
-          grid-row: 1;
-          grid-column: 4;
+          & .menu-pagination {
+            grid-row: 1;
+            grid-column: 4;
+          }
         }
       }
 
@@ -1782,7 +1802,7 @@
   }
 
   /* Body 팔레트 유틸리티 클래스 */
-  .body1 {
+  & .body1 {
     background-color: var(--body1-background-color);
     border-color: var(--body1-border-color);
     color: var(--body1-content-secondary-color);
@@ -1791,7 +1811,7 @@
     & .secondary { color: var(--body1-content-secondary-color); }
   }
 
-  .body2 {
+  & .body2 {
     background-color: var(--body2-background-color);
     color: var(--body2-secondary2-color);
 
@@ -1801,19 +1821,19 @@
     & .secondary2 { color: var(--body2-secondary2-color); }
   }
 
-  .body3 {
+  & .body3 {
     background-color: var(--body3-background-color);
     border-color: var(--body1-border-color);
     color: var(--body3-content-color);
   }
 
-  .body4 {
+  & .body4 {
     background-color: var(--body4-background-color, var(--body1-background-color));
     border-color: var(--body4-border-color, var(--body1-border-color));
     color: var(--body4-content-color, var(--body1-content-secondary-color));
   }
 
-  .task-manager {
+  & .task-manager {
     width: fit-content;
     height: fit-content;
     display: flex;
@@ -1823,7 +1843,7 @@
     gap: var(--spacing-md);
   }
 
-  .banner {
+  & .banner {
     width: 1080px;
     background-color: var(--body3-background-color);
     border-top: 2px solid var(--body1-border-color);
@@ -1889,4 +1909,5 @@
       }
     }
   }
+  } /* end body */
 }
