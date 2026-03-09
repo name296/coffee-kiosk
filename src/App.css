@@ -1434,10 +1434,11 @@
           }
         }
 
-
+        & .order-price {
+          display: flex;
+          align-items: center;
+          justify-content: right;
           text-align: right;
-          border: none;
-          background: none;
         }
 
         & .delete-item {
