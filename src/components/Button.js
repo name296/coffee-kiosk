@@ -99,14 +99,14 @@ const Button = memo(({
     }, [ttsText, label, toggle, pressed, disabled]);
 
     // 버튼 클래스명 생성
-    const cls = useMemo(() => {
-        const c = ['button'];
-        if (!/primary[123]|secondary[123]/.test(className)) c.push('primary2');
-        if (toggle) c.push('toggle');
-        if (pressed || (isPressing && !toggle)) c.push('pressed');
-        if (isPressing) c.push('pressing');
-        if (className) c.push(className);
-        return c.join(' ');
+    const buttonClassName = useMemo(() => {
+        const classNames = ['button'];
+        if (!/primary[123]|secondary[123]/.test(className)) classNames.push('primary2');
+        if (toggle) classNames.push('toggle');
+        if (pressed || (isPressing && !toggle)) classNames.push('pressed');
+        if (isPressing) classNames.push('pressing');
+        if (className) classNames.push(className);
+        return classNames.join(' ');
     }, [className, toggle, pressed, isPressing]);
 
     // 다운 시점에 액션 실행 (mousedown, touchstart, keydown)
@@ -166,7 +166,7 @@ const Button = memo(({
     return (
         <button
             ref={btnRef}
-            className={cls}
+            className={buttonClassName}
             style={style}
             data-tts-text={finalTtsText}
             data-react-handler="true"
@@ -204,7 +204,7 @@ const Button = memo(({
             )}
             {children}
             {toggle && (
-                <span className="icon pressed" aria-hidden="true"></span>
+                <span className="icon checked" aria-hidden="true"></span>
             )}
         </button>
     );

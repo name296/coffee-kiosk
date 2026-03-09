@@ -11,7 +11,7 @@ const Bottom = memo(() => {
         <div className="bottom" data-tts-text="시스템 설정,">
             <Button
                 svg={<HomeIcon />}
-                label="시작화면"
+                label="처음으로"
                 modal="Restart"
             />
             <Button
@@ -22,7 +22,8 @@ const Bottom = memo(() => {
             <Button
                 svg={<WheelchairIcon />}
                 label="접근성"
-                modal="Accessibility" />
+                modal="Accessibility"
+            />
         </div>
     );
 });
