@@ -1,12 +1,18 @@
 // 포커스 엘레멘트 파인더: 포커스 가능 요소 조회 및 섹션 이동 계산
 
+// 조상 중 display:none 또는 visibility:hidden 있으면 포커스 불가
+const isVisible = (el) => {
+    for (let n = el; n; n = n.parentElement) {
+        const s = window.getComputedStyle(n);
+        if (s.display === 'none' || s.visibility === 'hidden') return false;
+    }
+    return true;
+};
+
 // 포커스 가능한 요소 찾기 (단일책임: 포커스 가능 요소 필터링만)
 export const getFocusableElements = () => {
     const elements = Array.from(document.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
-        .filter(el => {
-            const style = window.getComputedStyle(el);
-            return style.display !== 'none' && style.visibility !== 'hidden';
-        });
+        .filter(el => isVisible(el));
 
     // 모달 상태 확인
     const modalElement = document.querySelector('.modal');
@@ -17,18 +23,8 @@ export const getFocusableElements = () => {
     const modalMain = isModalOpen ? document.querySelector('.modal .main') : null;
     const prepend = [];
 
-    if (modalMain) {
-        const modalMainStyle = window.getComputedStyle(modalMain);
-        if (modalMainStyle.display !== 'none' && modalMainStyle.visibility !== 'hidden') {
-            prepend.push(modalMain);
-        }
-    }
-    if (processMain) {
-        const processMainStyle = window.getComputedStyle(processMain);
-        if (processMainStyle.display !== 'none' && processMainStyle.visibility !== 'hidden') {
-            prepend.push(processMain);
-        }
-    }
+    if (modalMain && isVisible(modalMain)) prepend.push(modalMain);
+    if (processMain && isVisible(processMain)) prepend.push(processMain);
     if (prepend.length) {
         elements.unshift(...prepend);
     }

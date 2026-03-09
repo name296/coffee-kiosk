@@ -13,7 +13,7 @@ import ProcessFinish from "./ProcessFinish";
 
 /**
  * 프로세스 콘피그: ProcessName → [스크린 레이아웃 + 콘텐츠] 로 스크린 구성.
- * - layoutType: first | second | third | forth → body에 지정 (스크린 레이아웃, CSS body.first 등으로 제어)
+ * - layoutType: first | second | third | forth | fifth → body에 지정 (스크린 레이아웃, CSS body.first 등으로 제어)
  * - Component: 해당 프로세스 콘텐츠 컴포넌트
  * - className: Main 보조 클래스 (필요 시)
  */
@@ -39,38 +39,38 @@ const PROCESS_CONFIG = {
         ttsText: `결제 수단 선택 단계입니다.`
     },
     [PROCESS_NAME.CARD_INSERT]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessCardInsert,
         ttsText: `카드를 투입구에 끝까지 넣으세요.`
     },
     [PROCESS_NAME.MOBILE_PAY]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessMobilePay,
         ttsText: `휴대폰을 카드결제기에 접촉시키세요.`
     },
     [PROCESS_NAME.SIMPLE_PAY]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessSimplePay,
         ttsText: `QR코드나 바코드를 인식시키세요`
     },
     [PROCESS_NAME.CARD_REMOVAL]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessCardRemoval,
         className: "card-remove",
         ttsText: `카드를 뽑으세요.`
     },
     [PROCESS_NAME.ORDER_COMPLETE]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessOrderComplete,
         ttsText: `주문이 성공적으로 접수되었습니다.`
     },
     [PROCESS_NAME.RECEIPT_PRINT]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessReceiptPrint,
         ttsText: `영수증을 출력하고 있습니다.`
     },
     [PROCESS_NAME.FINISH]: {
-        layoutType: "forth",
+        layoutType: "fifth",
         Component: ProcessFinish,
         ttsText: `이용해 주셔서 감사합니다, 안녕히 가십시오.`
     }

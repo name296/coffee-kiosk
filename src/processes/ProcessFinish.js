@@ -1,10 +1,11 @@
 import React, { memo, useContext } from "react";
 import { PROCESS_NAME } from "../constants";
-import { ScreenRouteContext } from "../contexts";
+import { AccessibilityContext, ScreenRouteContext } from "../contexts";
 import { useTimeoutCountdown } from "../hooks";
 
 const ProcessFinish = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
+    const { isLow } = useContext(AccessibilityContext);
 
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 4000,
@@ -13,13 +14,28 @@ const ProcessFinish = memo(() => {
         resetOnUserActivity: false
     });
 
-    return (
+    const countdownContent = (
+        <span>
+            {countdown <= 1 ? '✓' : countdown - 1}
+        </span>
+    );
+
+    return isLow ? (
         <>
-            <div className="title">이용해 주셔서 감사합니다</div>
+            <div className="content-container">
+                <div className="end-countdown">
+                    {countdownContent}
+                </div>
+            </div>
+            <div className="content-control">
+                <div className="title"><span>이용해 주셔서 감사합니다</span></div>
+            </div>
+        </>
+    ) : (
+        <>
+            <div className="title"><span>이용해 주셔서 감사합니다</span></div>
             <div className="end-countdown">
-                <span>
-                    {countdown <= 1 ? '✓' : countdown - 1}
-                </span>
+                {countdownContent}
             </div>
         </>
     );

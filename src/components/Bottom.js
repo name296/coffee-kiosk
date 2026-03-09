@@ -10,16 +10,19 @@ const Bottom = memo(() => {
     return (
         <div className="bottom" data-tts-text="시스템 설정,">
             <Button
+                className="secondary3"
                 svg={<HomeIcon />}
                 label="처음으로"
                 modal="Restart"
             />
             <Button
+                className="secondary3"
                 svg={<TimeIcon />}
                 label={timeout?.globalRemainingTimeFormatted || "00:00"}
                 modal="Timeout"
             />
             <Button
+                className="secondary3"
                 svg={<WheelchairIcon />}
                 label="접근성"
                 modal="Accessibility"

@@ -8,7 +8,7 @@ import PROCESS_CONFIG from "./ProcessConfig";
 /**
  * Process 컴포넌트
  * - ProcessConfig로 레이아웃 + 콘텐츠 결정.
- * - 스크린 레이아웃(first|second|third|forth)은 div.process에 지정 → CSS body .process.first 등으로 제어.
+ * - 스크린 레이아웃(first|second|third|forth|fifth)은 div.process에 지정 → CSS body .process.first 등으로 제어.
  * - black/top/step/main/summary/bottom은 CSS로 제어.
  */
 const Process = memo(() => {
@@ -32,8 +32,7 @@ const Process = memo(() => {
 
     const processClassName = [
         "process",
-        layoutType,
-        accessibility.isLow && currentProcess === PROCESS_NAME.PAYMENTS && "payment"
+        layoutType
     ].filter(Boolean).join(" ");
 
     return (
