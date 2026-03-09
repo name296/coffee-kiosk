@@ -23,8 +23,8 @@ const ProcessOrderComplete = memo(() => {
             </div>
             <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
             <div className="order-num">
-                <span>주문번호</span>
-                <h1>{order.orderNumber || 100}</h1>
+                <span>주문</span>
+                <span>{order.orderNumber || 100}</span>
             </div>
             <div className="task-manager">
                 <Button onClick={() => order.sendPrintReceiptToApp()} navigate={PROCESS_NAME.RECEIPT_PRINT} label="영수증 출력" />

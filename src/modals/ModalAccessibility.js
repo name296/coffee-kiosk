@@ -99,7 +99,7 @@ export const ModalAccessibility = memo(() => {
             <div className="setting-row" data-tts-text="초기설정으로 일괄선택,">
                 <span className="setting-name"><span className="primary">초기설정</span>으로 일괄선택</span>
                 <div className="task-manager">
-                    <Button svg={<Icon name="Restart" />} label="초기설정" onClick={handleInitialSettingsPress} />
+                    <Button svg={<Icon name="Restart" />} label="초기화" onClick={handleInitialSettingsPress} />
                 </div>
             </div>
             <hr className="setting-line" />

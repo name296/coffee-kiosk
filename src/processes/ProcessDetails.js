@@ -27,22 +27,7 @@ const ProcessDetails = memo(() => {
                 )}
             </div>
 
-            <div className="banner field">
-                <div className="field-list">
-                    <div className="one-num"><span>순서</span></div>
-                    <div className="one-normal"><span>상품명</span></div>
-                    <div className="one-qty-normal"><span>수량</span></div>
-                    <div className="one-price-normal"><span>가격</span></div>
-                    <div className="one-delete-normal"><span>삭제</span></div>
-                </div>
-                {accessibility.isLow ? (
-                    <div className="field-pagination">
-                        <div className="one-pagination-normal"><span>이동</span></div>
-                    </div>
-                ) : null}
-            </div>
-
-            <DetailsContent className={accessibility.isLow ? "compact" : ""} />
+            <DetailsContent className={accessibility.isLow ? "compact" : ""} showFieldHeader />
         </>
     );
 });

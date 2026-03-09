@@ -30,7 +30,11 @@ const Process = memo(() => {
     useInteractiveTTSHandler(true, handleText);
     useFocusNavigationHandler(true);
 
-    const processClassName = ["process", layoutType].filter(Boolean).join(" ");
+    const processClassName = [
+        "process",
+        layoutType,
+        accessibility.isLow && currentProcess === PROCESS_NAME.PAYMENTS && "payment"
+    ].filter(Boolean).join(" ");
 
     return (
         <div className={processClassName} tabIndex={-1}>
@@ -46,9 +50,7 @@ const Process = memo(() => {
                 <Component />
             </Main>
             <Summary />
-            {currentProcess === "ProcessMenu" && (
-                <DetailsContent className="compact" paginationDirection="vertical" itemsPerPageOverride={3} style={{ height: "300px" }} />
-            )}
+            <DetailsContent className="compact" />
             <Bottom />
         </div>
     );

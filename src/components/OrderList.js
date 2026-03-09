@@ -1,27 +1,24 @@
 import React, { memo, useContext } from "react";
 import Button from "./Button";
 import { DeleteIcon, MinusIcon, PlusIcon } from "../Icon";
-import Pagination from "./Pagination";
 import { formatNumber, convertToKoreanQuantity } from "../utils";
-import { OrderContext, AccessibilityContext, ModalContext } from "../contexts";
-import { usePageSlicer } from "../hooks";
+import { OrderContext, ModalContext } from "../contexts";
 
 // 주문 행
-const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity, showRowLine = true }) => {
+const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity }) => {
     const totalPrice = item.price * quantity;
-    const rowClassName = showRowLine ? "order-row with-line" : "order-row";
 
     return (
         <>
-            <div className={rowClassName} data-tts-text={`주문목록,${index}번, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`}>
-                <div className="order-image-div">
+            <div className="order-row" data-tts-text={`주문목록,${index}번, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`}>
+                <div className="order-item">
                     <div className="order-index">{index}</div>
                     <img src={`./images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
                 <span className="order-name">{item.name}</span>
                 <div className="order-quantity">
                     <Button className="secondary1 counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
-                    <Button className="qty"><span>{quantity}</span></Button>
+                    <Button className="qty" label={quantity} ttsText={`${formatNumber(quantity)}개`}></Button>
                     <Button className="secondary1 counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
                 <span className="order-price">{`${formatNumber(totalPrice)}원`}</span>
@@ -32,21 +29,9 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
 });
 OrderRow.displayName = 'OrderRow';
 
-const OrderList = memo(({ paginationDirection, itemsPerPageOverride } = {}) => {
+const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     const order = useContext(OrderContext);
-    const accessibility = useContext(AccessibilityContext);
     const modal = useContext(ModalContext);
-
-    const normalItems = itemsPerPageOverride || (accessibility.isLow ? 3 : 6);
-    const {
-        pageNumber, totalPages, currentItems,
-        handlePrevPage, handleNextPage, itemsPerPage
-    } = usePageSlicer(
-        order.orderItems,
-        normalItems,
-        3,
-        accessibility.isLow
-    );
 
     const openDeleteModal = (itemId) => {
         modal.setModalDeleteItemId(itemId);
@@ -69,31 +54,20 @@ const OrderList = memo(({ paginationDirection, itemsPerPageOverride } = {}) => {
     };
 
     return (
-        <>
-            <div className="order-list">
-                {currentItems && currentItems.length > 0 && currentItems.map((item, i) => (
-                    <OrderRow
-                        key={item.id}
-                        item={item}
-                        index={(pageNumber - 1) * itemsPerPage + i + 1}
-                        quantity={order.quantities[item.id]}
-                        onDecrease={(e, target) => handleItemDecrease(item.id)(e, target)}
-                        onIncrease={(e, target) => handleItemIncrease(item.id)(e, target)}
-                        onDelete={(e, target) => handleItemDelete(item.id)(e, target)}
-                        convertToKoreanQuantity={convertToKoreanQuantity}
-                        showRowLine={i < currentItems.length - 1}
-                    />
-                ))}
-            </div>
-            <Pagination
-                pageNumber={pageNumber}
-                totalPages={totalPages}
-                onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
-                onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
-                direction={paginationDirection || (accessibility.isLow ? "vertical" : "horizontal")}
-                ttsPrefix="주문목록"
-            />
-        </>
+        <div className="order-list">
+            {currentItems && currentItems.length > 0 && currentItems.map((item, i) => (
+                <OrderRow
+                    key={item.id}
+                    item={item}
+                    index={startIndex + i + 1}
+                    quantity={order.quantities[item.id]}
+                    onDecrease={(e, target) => handleItemDecrease(item.id)(e, target)}
+                    onIncrease={(e, target) => handleItemIncrease(item.id)(e, target)}
+                    onDelete={(e, target) => handleItemDelete(item.id)(e, target)}
+                    convertToKoreanQuantity={convertToKoreanQuantity}
+                />
+            ))}
+        </div>
     );
 });
 OrderList.displayName = 'OrderList';

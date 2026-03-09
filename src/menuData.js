@@ -11,7 +11,7 @@ const categories = [
   {
     name: "커피",
     items: [
-      { name: "아메리카노 (아이스)", price: "2500", img: "item-americano.png" },
+      { name: "아메리카노 (아이스)", price: "100000", img: "item-americano.png" },
       { name: "콜드브루 디카페인", price: "2900", img: "item-cold-brew.png" },
       { name: "콜드브루 (아이스)", price: "2500", img: "item-cold-brew.png" },
       { name: "카라멜 마끼아또", price: "3000", img: "item-vanilla-latte.png" },
