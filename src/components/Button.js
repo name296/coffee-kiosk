@@ -7,7 +7,7 @@ export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code =
 const BUTTON_RELEASE_DELAY_MS = 60;
 const BUTTON_ACTION_DELAY_MS = 180;
 
-// 포커스 가능한 요소에 --button-min-side 계산
+// 포커스 가능한 요소에 --button-min-side 계산하기기
 const applyFocusableMinSide = (el) => {
     if (!el) return;
     else el.style.setProperty('--button-min-side', `${Math.min(el.offsetWidth, el.offsetHeight)}px`);
