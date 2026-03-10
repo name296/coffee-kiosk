@@ -9,11 +9,12 @@ export const FocusExecutor = () => {
     useLayoutEffect(() => {
         if (typeof document === 'undefined') return;
         if (modal?.isAnyOpen) {
-            focusWithRefire(document.querySelector('.modal .main'));
+            const mains = document.querySelectorAll('.modal .main');
+            focusWithRefire(mains.length ? mains[mains.length - 1] : null);
             return;
         }
         focusWithRefire(document.querySelector('.process .main'));
-    }, [modal?.isAnyOpen, currentProcess, transitionCount]);
+    }, [modal?.isAnyOpen, modal?.openOrder, currentProcess, transitionCount]);
 
     return null;
 };

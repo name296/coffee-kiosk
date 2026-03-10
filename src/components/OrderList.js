@@ -2,7 +2,8 @@ import React, { memo, useContext } from "react";
 import Button from "./Button";
 import { DeleteIcon, MinusIcon, PlusIcon } from "../Icon";
 import { formatNumber, convertToKoreanQuantity } from "../utils";
-import { OrderContext, ModalContext } from "../contexts";
+import { OrderContext, ModalContext, ScreenRouteContext } from "../contexts";
+import { PROCESS_NAME } from "../constants";
 
 // 주문 행
 const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity }) => {
@@ -32,10 +33,18 @@ OrderRow.displayName = 'OrderRow';
 const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     const order = useContext(OrderContext);
     const modal = useContext(ModalContext);
+    const { currentProcess } = useContext(ScreenRouteContext);
 
     const openDeleteModal = (itemId) => {
         modal.setModalDeleteItemId(itemId);
-        (order.orderItems.length > 1) ? modal.ModalDelete.open() : modal.ModalDeleteCheck.open();
+        const isLastItem = order.orderItems.length === 1;
+        const isMenuProcess = currentProcess === PROCESS_NAME.MENU;
+
+        if (isMenuProcess) {
+            modal.ModalDelete.open();
+        } else {
+            isLastItem ? modal.ModalDeleteCheck.open() : modal.ModalDelete.open();
+        }
     };
 
     const handleItemDecrease = (itemId) => (e, target) => {

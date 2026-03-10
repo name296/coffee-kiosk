@@ -16,13 +16,11 @@ export const RefProvider = ({ children }) => {
     const useSound_audioRefs = useRef({});
 
     const BaseModal_modalConfirmButtonsRef = useRef(null);
-    const ModalAccessibility_originalSettingsRef = useRef(null);
 
     const contextValue = useMemo(() => ({
         refs: {
             useSound: { timerInstanceRef: useSound_timerInstanceRef, audioRefs: useSound_audioRefs },
-            BaseModal: { modalConfirmButtonsRef: BaseModal_modalConfirmButtonsRef },
-            ModalAccessibility: { originalSettingsRef: ModalAccessibility_originalSettingsRef }
+            BaseModal: { modalConfirmButtonsRef: BaseModal_modalConfirmButtonsRef }
         }
     }), []);
 

@@ -34,21 +34,22 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
     const config = MODAL_CONFIG[type];
     if (!isOpen || (!config && !customContent)) return null;
 
-    const finalIcon = customIcon || config?.icon;
-    const finalTitle = customTitle || config?.title;
-    const finalTts = customTts || config?.tts;
-    const finalCancelLabel = cancelLabel !== undefined ? cancelLabel : (config?.cancelLabel ?? "취소");
-    const finalCancelIcon = cancelIcon || config?.cancelIcon || "Cancel";
-    const finalConfirmIcon = confirmIcon || finalIcon || config?.confirmIcon || "Ok";
-    const finalConfirmLabel = confirmLabel || finalTitle || config?.confirmLabel || "확인";
+    const finalIcon = customIcon ?? config?.icon;
+    const finalTitle = customTitle ?? config?.title;
+    const finalTts = customTts ?? config?.tts;
+    const finalCancelLabel = cancelLabel ?? (config && 'cancelLabel' in config ? config.cancelLabel : "취소");
+    const finalCancelIcon = cancelIcon ?? config?.cancelIcon ?? "Cancel";
+    const finalConfirmIcon = confirmIcon ?? config?.confirmIcon ?? "Ok";
+    const finalConfirmLabel = confirmLabel ?? config?.confirmLabel ?? "확인";
 
     return (
-        <div
-            className="main"
-            ref={containerRef}
-            data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}
-            tabIndex={-1}
-        >
+        <div className="modal" aria-hidden={!isOpen}>
+            <div
+                className="main"
+                ref={containerRef}
+                data-tts-text={finalTts ? (finalTts + TTS.replay) : ''}
+                tabIndex={-1}
+            >
             <div className="up-content">
                 {finalIcon && <Icon name={finalIcon} className="modal-image" />}
                 {finalTitle && <div className="modal-title">{finalTitle}</div>}
@@ -72,6 +73,7 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
                 )}
             </div>
         </div>
+        </div>
     );
 });
 BaseModal.displayName = "BaseModal";
@@ -83,12 +85,18 @@ export const Modal = () => {
     const modal = useContext(ModalContext);
     if (!modal) return null;
 
+    const orderedKeys = modal.openOrder?.length
+        ? modal.openOrder.filter((key) => modal.modalStates?.[key])
+        : MODAL_REGISTRY.map(({ key }) => key).filter((key) => modal.modalStates?.[key]);
+
+    if (!modal.isAnyOpen) return null;
+
     return (
-        <div className={`modal ${modal.isAnyOpen ? 'active' : ''}`} aria-hidden={!modal.isAnyOpen} tabIndex={-1}>
-            {MODAL_REGISTRY.map(({ key }) => {
+        <>
+            {orderedKeys.map((key) => {
                 const Component = MODAL_COMPONENT_BY_KEY[key];
-                return modal.modalStates?.[key] && Component ? <Component key={key} /> : null;
+                return Component ? <Component key={key} /> : null;
             })}
-        </div>
+        </>
     );
 };

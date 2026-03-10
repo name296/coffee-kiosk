@@ -1,4 +1,4 @@
-import React, { memo, useContext, useCallback, useEffect } from "react";
+import React, { memo, useContext, useCallback } from "react";
 import { BaseModal } from "./Modal";
 import { Button } from "../components";
 import Icon from "../Icon";
@@ -24,22 +24,6 @@ export const ModalAccessibility = memo(() => {
         isLarge: accessibility.isLarge,
         volume: accessibility.volume
     });
-
-    const originalSettingsRef = refsData.refs.ModalAccessibility.originalSettingsRef;
-
-    // 원래 설정 저장 및 관리
-    useEffect(() => {
-        if (isOpen && !originalSettingsRef.current) {
-            originalSettingsRef.current = {
-                isDark: accessibility.isDark,
-                isLow: accessibility.isLow,
-                isLarge: accessibility.isLarge,
-                volume: accessibility.volume
-            };
-        } else if (!isOpen) {
-            originalSettingsRef.current = null;
-        }
-    }, [isOpen, originalSettingsRef, accessibility]);
 
     // 핸들러들
     const handleDarkChange = useCallback((val) => {
@@ -73,16 +57,8 @@ export const ModalAccessibility = memo(() => {
     }, [updateAllSettings, accessibility, setAudioVolume]);
 
     const handleCancelPress = useCallback(() => {
-        const original = originalSettingsRef.current;
-        if (original) {
-            accessibility.setIsDark(original.isDark);
-            accessibility.setVolume(original.volume);
-            accessibility.setIsLarge(original.isLarge);
-            accessibility.setIsLow(original.isLow);
-            setAudioVolume('audioPlayer', VOLUME_MAP[original.volume]);
-        }
         modal.ModalAccessibility.close();
-    }, [originalSettingsRef, accessibility, modal, setAudioVolume]);
+    }, [modal]);
 
     const handleConfirmPress = useCallback(() => {
         modal.ModalAccessibility.close();
@@ -94,7 +70,7 @@ export const ModalAccessibility = memo(() => {
         <>
             <div className="modal-message">
                 <div>원하시는&nbsp;<span className="primary">접근성 옵션</span>을 선택하시고</div>
-                <div><span className="primary">적용하기</span>&nbsp;버튼을 누르세요</div>
+                <div><span className="primary">적용하기</span>&nbsp;버튼을 누릅니다</div>
             </div>
             <div className="setting-row" data-tts-text="초기설정으로 일괄선택,">
                 <span className="setting-name"><span className="primary">초기설정</span>으로 일괄선택</span>

@@ -4,10 +4,10 @@ import { PROCESS_NAME } from "../constants";
 import { AccessibilityContext } from "../contexts";
 
 const titleWithBr = (
-    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에<br /><span className="primary">모바일페이</span>를 켜고 접근시키세요</span>
+    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에<br /><span className="primary">모바일페이</span>를 켜고 접근시킵니다</span>
 );
 const titleWithoutBr = (
-    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에 <span className="primary">모바일페이</span>를 켜고 접근시키세요</span>
+    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에 <span className="primary">모바일페이</span>를 켜고 접근시킵니다</span>
 );
 
 const ProcessMobilePay = memo(() => {

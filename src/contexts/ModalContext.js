@@ -21,6 +21,7 @@ const createInitialModalState = () =>
 
 export const ModalProvider = ({ children }) => {
     const [modals, setModals] = useState(createInitialModalState);
+    const [openOrder, setOpenOrder] = useState([]);
     const [deleteItemId, setDeleteItemId] = useState(null);
 
     const openModal = useCallback((key) => {
@@ -30,6 +31,7 @@ export const ModalProvider = ({ children }) => {
             }
             return { ...prev, [key]: true };
         });
+        setOpenOrder((prev) => prev.includes(key) ? prev : [...prev.filter((k) => k !== key), key]);
     }, []);
 
     const closeModal = useCallback((key) => {
@@ -39,6 +41,7 @@ export const ModalProvider = ({ children }) => {
             }
             return { ...prev, [key]: false };
         });
+        setOpenOrder((prev) => prev.filter((k) => k !== key));
     }, []);
 
     const closeAllModals = useCallback(() => {
@@ -50,6 +53,7 @@ export const ModalProvider = ({ children }) => {
                 return acc;
             }, {});
         });
+        setOpenOrder([]);
     }, []);
 
     const modalHandlers = useMemo(
@@ -71,12 +75,13 @@ export const ModalProvider = ({ children }) => {
         isAnyOpen,
         ...modalHandlers,
         modalStates: modals,
+        openOrder,
         openModal,
         closeModal,
         closeAllModals,
         ModalDeleteItemId: deleteItemId,
         setModalDeleteItemId: setDeleteItemId
-    }), [isAnyOpen, modalHandlers, modals, openModal, closeModal, closeAllModals, deleteItemId]);
+    }), [isAnyOpen, modalHandlers, modals, openOrder, openModal, closeModal, closeAllModals, deleteItemId]);
 
     return (
         <ModalContext.Provider value={value}>

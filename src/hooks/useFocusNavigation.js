@@ -19,13 +19,14 @@ export const useFocusNavigationHandler = (enableFocusNavigation = true) => {
             const activeEl = document.activeElement;
             if (!activeEl) return;
 
-            // 모달 상태 확인
-            const modalElement = document.querySelector('.modal');
-            const isModalOpen = modalElement?.classList.contains('active');
+            // 모달 상태 확인 (최상단 모달만 포커스)
+            const modalElements = document.querySelectorAll('.modal');
+            const topmostModal = modalElements.length ? modalElements[modalElements.length - 1] : null;
+            const isModalOpen = !!topmostModal;
             const allFocusable = getFocusableElements();
-            const scopedFocusable = (isModalOpen && modalElement)
-                ? allFocusable.filter(el => modalElement.contains(el) && !el.classList.contains('modal'))
-                : allFocusable.filter(el => !el.classList.contains('modal'));
+            const scopedFocusable = isModalOpen
+                ? allFocusable.filter(el => topmostModal.contains(el))
+                : allFocusable.filter(el => !el.closest('.modal'));
 
             // 좌우 방향키: 모든 포커스 가능한 개체를 선형으로 탐색
             if (key === 'ArrowLeft' || key === 'ArrowRight') {

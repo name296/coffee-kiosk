@@ -7,6 +7,7 @@ export * from "./useDOM";
 export * from "./useFocusElementFinder";
 export * from "./useFocusTrap";
 export * from "./useFocusNavigation";
+export * from "./useCallHotkey";
 export * from "./useMenuData";
 export * from "./usePageSlicer";
 export * from "./useSound";

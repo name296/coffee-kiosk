@@ -14,13 +14,14 @@ export const getFocusableElements = () => {
     const elements = Array.from(document.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
         .filter(el => isVisible(el));
 
-    // 모달 상태 확인
-    const modalElement = document.querySelector('.modal');
-    const isModalOpen = modalElement?.classList.contains('active');
+    // 모달 상태 확인 (.modal 존재 시 모달 열림)
+    const modalElements = document.querySelectorAll('.modal');
+    const isModalOpen = modalElements.length > 0;
 
-    // 화면/모달의 .main 모두 포커스 루프에 포함
+    // 화면/모달의 .main 모두 포커스 루프에 포함 (최상단 모달의 .main)
     const processMain = document.querySelector('.process .main');
-    const modalMain = isModalOpen ? document.querySelector('.modal .main') : null;
+    const modalMains = Array.from(modalElements).map((el) => el.querySelector('.main')).filter(Boolean);
+    const modalMain = modalMains.length ? modalMains[modalMains.length - 1] : null;
     const prepend = [];
 
     if (modalMain && isVisible(modalMain)) prepend.push(modalMain);

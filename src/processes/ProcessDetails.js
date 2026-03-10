@@ -18,11 +18,11 @@ const ProcessDetails = memo(() => {
         <>
             <div className="title">
                 {accessibility.isLow ? (
-                    <span><span className="primary">내역</span>을 확인하시고 <span className="primary">결제하기</span> 버튼을 누르세요</span>
+                    <span><span className="primary">내역</span>을 확인하시고 <span className="primary">결제하기</span> 버튼을 누릅니다</span>
                 ) : (
                     <>
                         <span><span className="primary">내역</span>을 확인하시고</span>
-                        <span><span className="primary">결제하기</span>&nbsp;버튼을 누르세요</span>
+                        <span><span className="primary">결제하기</span>&nbsp;버튼을 누릅니다</span>
                     </>
                 )}
             </div>

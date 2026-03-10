@@ -18,11 +18,11 @@ const ProcessReceiptPrint = memo(() => {
     const titleWithBr = (
         <>
             <div>왼쪽 아래의 <span className="primary">프린터</span>에서 <span className="primary">영수증</span>을</div>
-            <div>받으시고 <span className="primary">마무리</span>&nbsp;버튼을 누르세요</div>
+            <div>받으시고 <span className="primary">마무리</span>&nbsp;버튼을 누릅니다</div>
         </>
     );
     const titleWithoutBr = (
-        <span>왼쪽 아래의 <span className="primary">프린터</span>에서 <span className="primary">영수증</span>을 받으시고 <span className="primary">마무리</span> 버튼을 누르세요</span>
+        <span>왼쪽 아래의 <span className="primary">프린터</span>에서 <span className="primary">영수증</span>을 받으시고 <span className="primary">마무리</span> 버튼을 누릅니다</span>
     );
     const titleContent = isLow ? titleWithoutBr : titleWithBr;
     const titleAndTask = (

@@ -2,14 +2,14 @@ import React from "react";
 
 const MODAL_CONFIG = {
     deleteCheck: {
-        tts: "알림, 내역이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 확인 버튼을 누릅니다, ",
+        tts: "알림, 주문없음, 주문이 없으면 메뉴선택으로 돌아갑니다, 계속 진행하시려면 메뉴 버튼을 누릅니다, ",
         icon: "GraphicWarning",
-        title: "확인",
+        title: "주문없음",
         cancelIcon: "Cancel",
         cancelLabel: "취소",
-        confirmIcon: "Ok",
-        confirmLabel: "확인",
-        message: <><span>내역이 없으면 <span className="highlight">메뉴선택</span>으로 돌아갑니다</span><span>계속 진행하시려면 <span className="highlight">확인</span> 버튼을 누르세요</span></>,
+        confirmIcon: "Add",
+        confirmLabel: "메뉴",
+        message: <><span>주문이 없으면 <span className="highlight">메뉴선택</span>으로 돌아갑니다</span><span>계속 진행하시려면 <span className="highlight">메뉴</span> 버튼을 누릅니다</span></>,
     },
     delete: {
         tts: "알림, 상품삭제, 주문 상품을 삭제합니다, 계속 진행하시려면 삭제 버튼을 누릅니다, ",
@@ -43,11 +43,11 @@ const MODAL_CONFIG = {
     },
     call: {
         tts: "알림, 직원 호출, 직원을 호출합니다, 계속 진행하시려면 호출 버튼을 누릅니다,",
-        icon: "GraphicCall",
+        icon: "GraphicBell",
         title: "직원 호출",
         cancelIcon: "Cancel",
         cancelLabel: "취소",
-        confirmIcon: "Call",
+        confirmIcon: "GraphicBell",
         confirmLabel: "호출",
         message: <><span>직원을 <span className="highlight">호출</span>합니다</span><span>계속 진행하시려면 <span className="highlight">호출</span> 버튼을 누릅니다</span></>,
     },
@@ -62,15 +62,15 @@ const MODAL_CONFIG = {
         message: (countdown) => <><span>사용시간이 <span className="highlight">{countdown !== undefined ? `${Math.ceil(countdown / 1000)}초` : '20초'}</span> 남았습니다</span><span>계속 사용하시려면 <span className="highlight">연장</span> 버튼을 누릅니다</span></>,
     },
     paymentError: {
-        tts: "알림, 결제 경고, 카드가 잘못 삽입되었습니다, 카드를 제거하시고 다시결제 버튼을 누릅니다, ",
+        tts: "알림, 결제 경고, 카드가 잘못 삽입되었습니다, 카드를 제거하시고 다시 결제 버튼을 누릅니다, ",
         icon: "GraphicWarning",
         title: "결제 경고",
         cancelIcon: null,
         cancelLabel: null,
         confirmIcon: "Warning",
-        confirmLabel: "다시결제",
+        confirmLabel: "다시 결제",
         confirmButtonStyle: "delete",
-        message: <><span>카드가 <span className="highlight">잘못 삽입</span>되었습니다</span><span>카드를 제거하시고</span><span><span className="highlight">다시결제</span> 버튼을 누릅니다</span></>,
+        message: <><span>카드가 <span className="highlight">잘못 삽입</span>되었습니다</span><span>카드를 제거하시고 <span className="highlight">다시 결제</span> 버튼을 누릅니다</span></>,
     },
     accessibility: {
         tts: "알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, ",
@@ -80,7 +80,7 @@ const MODAL_CONFIG = {
         cancelLabel: "적용안함",
         confirmIcon: "Ok",
         confirmLabel: "적용하기",
-        message: <><span>원하시는 <span className="highlight">접근성 옵션</span>을 선택하시고</span><span><span className="highlight">적용하기</span> 버튼을 누르세요</span></>,
+        message: <><span>원하시는 <span className="highlight">접근성 옵션</span>을 선택하시고</span><span><span className="highlight">적용하기</span> 버튼을 누릅니다</span></>,
     },
 };
 

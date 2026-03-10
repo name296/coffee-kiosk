@@ -1,6 +1,6 @@
 import React, { memo, useContext, useEffect } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "../contexts";
-import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler } from "../hooks";
+import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler, useCallHotkey } from "../hooks";
 import { Main, Step, Bottom, Summary, DetailsContent } from "../components";
 import { PROCESS_NAME } from "../constants";
 import PROCESS_CONFIG from "./ProcessConfig";
@@ -29,6 +29,7 @@ const Process = memo(() => {
 
     useInteractiveTTSHandler(true, handleText);
     useFocusNavigationHandler(true);
+    useCallHotkey(true);
 
     const processClassName = [
         "process",

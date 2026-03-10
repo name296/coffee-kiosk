@@ -6,11 +6,11 @@ import { AccessibilityContext } from "../contexts";
 const titleWithBr = (
     <>
         <div>가운데 아래에 있는 <span className="primary">카드리더기</span>에</div>
-        <div><span className="primary">신용카드</span>를 끝까지 넣으세요</div>
+        <div><span className="primary">신용카드</span>를 끝까지 넣습니다</div>
     </>
 );
 const titleWithoutBr = (
-    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에 <span className="primary">신용카드</span>를 끝까지 넣으세요</span>
+    <span>가운데 아래에 있는 <span className="primary">카드리더기</span>에 <span className="primary">신용카드</span>를 끝까지 넣습니다</span>
 );
 
 const ProcessCardInsert = memo(() => {

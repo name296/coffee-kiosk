@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, u
 import { useSound } from "../hooks";
 import { ScreenRouteContext, ModalContext } from "../contexts";
 
-export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter';
+export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter' || e.code === 'Numpad5';
 
 const BUTTON_RELEASE_DELAY_MS = 60;
 const BUTTON_ACTION_DELAY_MS = 180;
