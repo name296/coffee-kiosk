@@ -18,13 +18,14 @@ export const OrderProvider = ({ children }) => {
     const PLACEHOLDER_MENU_DEFAULT = { id: 0, name: "추가예정", price: "0", img: "item-americano.png" };
 
     // 상태
-    const [selectedTab, setSelectedTab] = useState("전체메뉴");
+    const firstTab = tabs?.[0] ?? categoryInfo?.[0]?.cate_name ?? "전체메뉴";
+    const [selectedTab, setSelectedTab] = useState(firstTab);
     const [quantities, setQuantities] = useState({});
 
     useEffect(() => {
-        const firstTab = tabs?.[0] ?? "전체메뉴";
-        setSelectedTab(firstTab);
-    }, [tabs]);
+        const next = tabs?.[0] ?? categoryInfo?.[0]?.cate_name ?? "전체메뉴";
+        setSelectedTab(next);
+    }, [tabs, categoryInfo]);
 
     // 메모이즈된 값
     const menuItems = useMemo(() =>

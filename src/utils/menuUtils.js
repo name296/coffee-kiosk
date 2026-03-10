@@ -35,11 +35,12 @@ export const getTabNames = (categories = []) =>
 
 /**
  * 카테고리별 메뉴 필터링 (UI 그리드용)
+ * 첫 번째 카테고리(cate_id 0)는 전체메뉴로, 모든 아이템 반환
  */
 export const categorizeMenu = (items, tabName, categories = [], placeholderMenu) => {
-    if (tabName === "전체메뉴") return items;
     const category = categories.find(c => c.cate_name === tabName);
     if (!category) return [placeholderMenu];
+    if (category.cate_id === 0) return items; // 전체메뉴
     const filtered = items.filter(item => item.cate_id === category.cate_id);
     return filtered.length > 0 ? filtered : [placeholderMenu];
 };

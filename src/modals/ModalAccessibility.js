@@ -1,4 +1,4 @@
-import React, { memo, useContext, useCallback } from "react";
+import React, { memo, useContext, useCallback, useEffect, useRef } from "react";
 import { BaseModal } from "./Modal";
 import { Button } from "../components";
 import Icon from "../Icon";
@@ -12,6 +12,21 @@ export const ModalAccessibility = memo(() => {
     const refsData = useContext(RefContext);
     const { setAudioVolume } = useDOM();
     const isOpen = modal.ModalAccessibility.isOpen;
+    const originalSettingsRef = useRef(null);
+
+    // 모달 열릴 때 원본 설정 저장
+    useEffect(() => {
+        if (isOpen && !originalSettingsRef.current) {
+            originalSettingsRef.current = {
+                isDark: accessibility.isDark,
+                isLow: accessibility.isLow,
+                isLarge: accessibility.isLarge,
+                volume: accessibility.volume
+            };
+        } else if (!isOpen) {
+            originalSettingsRef.current = null;
+        }
+    }, [isOpen, accessibility.isDark, accessibility.isLow, accessibility.isLarge, accessibility.volume]);
 
     // 접근성 설정 로직 (Hook)
     const {
@@ -57,8 +72,16 @@ export const ModalAccessibility = memo(() => {
     }, [updateAllSettings, accessibility, setAudioVolume]);
 
     const handleCancelPress = useCallback(() => {
+        const original = originalSettingsRef.current;
+        if (original) {
+            accessibility.setIsDark(original.isDark);
+            accessibility.setIsLow(original.isLow);
+            accessibility.setIsLarge(original.isLarge);
+            accessibility.setVolume(original.volume);
+            setAudioVolume('audioPlayer', VOLUME_MAP[original.volume]);
+        }
         modal.ModalAccessibility.close();
-    }, [modal]);
+    }, [accessibility, modal, setAudioVolume]);
 
     const handleConfirmPress = useCallback(() => {
         modal.ModalAccessibility.close();

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePageSlicer } from "./usePageSlicer";
 
 // 카테고리 조립 (가변 너비 버튼 + 페이지네이션 제어)
-const ACTUAL_GAP_THRESHOLD = 96;
+const ACTUAL_GAP_THRESHOLD = 128;
 
 export const useCategoryAssemble = (items, isLarge = false) => {
     const containerRef = useRef(null);

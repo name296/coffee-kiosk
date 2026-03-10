@@ -52,13 +52,13 @@
     --font-family: 'MyFont', serif;
 
     /* === font / size === */
-    --font-size-b1: 5.2rem;
-    --font-size-h1: 5.2rem;
-    --font-size-h2: 5.8rem;
-    --font-size-d1: 6.7rem;
-    --font-size-d2: 8.3rem;
-    --font-size-d3: 12.8rem;
-    --font-size-d4: 18rem;
+    --font-size-b1: 72.5px;
+    --font-size-h1: 52px;
+    --font-size-h2: 58px;
+    --font-size-d1: 67px;
+    --font-size-d2: 83px;
+    --font-size-d3: 128px;
+    --font-size-d4: 180px;
 
     /* === font / weight === */
     --font-weight-semibold: 600;
@@ -325,7 +325,6 @@
 
       &:hover,
       &:focus-visible {
-        z-index: 100;
         outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--color-system-01);
       }
 
@@ -485,8 +484,8 @@
     & .icon {
       display: flex;
       aspect-ratio: 1 / 1;
-      width: 1em;
-      height: 1em;
+      width: 72.5px;
+      height: 72.5px;
 
       & svg {
         display: block;
@@ -516,7 +515,7 @@
     font-size: var(--font-size-b1);
     font-weight: 600;
     line-height: 1.1;
-    letter-spacing: -0.04em;
+    letter-spacing: -3px;
     font-stretch: 96%;
 
     /* .process */
@@ -734,8 +733,8 @@
               font-size: var(--font-size-h2);
 
               & .icon {
-                width: 9.6rem;
-                height: 9.6rem;
+                width: 96px;
+                height: 96px;
               }
             }
           }
@@ -834,8 +833,8 @@
               position: relative;
 
               & .icon {
-                width: 14rem;
-                height: 14rem;
+                width: 140px;
+                height: 140px;
                 position: absolute;
                 top: 0%;
                 left: 50%;
@@ -848,7 +847,7 @@
                 min-height: 75%;
                 bottom: 0%;
                 left: 0%;
-                padding-top: 2.5rem;
+                padding-top: 25px;
                 text-align: center;
                 display: flex;
                 flex-direction: column;
@@ -933,8 +932,8 @@
               flex-direction: column;
 
               & .icon {
-                width: 25.6rem;
-                height: 25.6rem;
+                width: 256px;
+                height: 256px;
               }
             }
           }
@@ -1063,8 +1062,8 @@
           color: var(--body2-secondary1-color);
 
           & .modal-image {
-            width: 10rem;
-            height: 10rem;
+            width: 100px;
+            height: 100px;
             color: var(--body2-primary1-color);
           }
 
@@ -1565,13 +1564,13 @@
 
     /* 큰글씨 모드 */
     &.large {
-      --font-size-b1: 5.2rem;
-      --font-size-h1: 5.76rem;
-      --font-size-h2: 6.96rem;
-      --font-size-d1: 8.04rem;
-      --font-size-d2: 9.96rem;
-      --font-size-d3: 15.36rem;
-      --font-size-d4: 21.6rem;
+      --font-size-b1: 52px;
+      --font-size-h1: 57.6px;
+      --font-size-h2: 69.6px;
+      --font-size-d1: 80.4px;
+      --font-size-d2: 99.6px;
+      --font-size-d3: 153.6px;
+      --font-size-d4: 216px;
     }
 
     /* 고대비 모드 (.dark) */
@@ -1899,7 +1898,7 @@
         gap: var(--spacing-md);
 
         & .payment-amount-large {
-          font-size: 8rem;
+          font-size: 80px;
         }
       }
 
