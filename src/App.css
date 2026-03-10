@@ -6,12 +6,20 @@
 /* ==============================
   폰트 정의 (Font Faces)
   ============================== */
+@font-face {
+  font-family: "MyFont";
+  src: url("./fonts/NotoSansKR-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  unicode-range: U+0020-002F, U+0030-0039, U+003A-0040, U+005B-0060, U+007B-007E, U+20A0-20CF;
+}
 
 @font-face {
   font-family: "MyFont";
   src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
+  unicode-range: U+0041-005A, U+0061-007A, U+00A0-00FF, U+0100-024F, U+1100-11FF, U+3130-318F, U+AC00-D7AF, U+3000-303F, U+4E00-9FFF, U+FF00-FFEF;
 }
 
 /* ==============================
@@ -52,7 +60,7 @@
     --font-family: 'MyFont', serif;
 
     /* === font / size === */
-    --font-size-b1: 72.5px;
+    --font-size-b1: 52px;
     --font-size-h1: 52px;
     --font-size-h2: 58px;
     --font-size-d1: 67px;
@@ -85,6 +93,7 @@
     --layout-height: 1920px;
     --layout-width: 1080px;
     --layout-padding-inline: 32px;
+    --icon-size: 40px;
 
     /* 원시 팔레트(Primitive Palette) */
     --color-brown-01: #4C3F37FF;
@@ -326,6 +335,7 @@
       &:hover,
       &:focus-visible {
         outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--color-system-01);
+        z-index: 2;
       }
 
       &.pressing:not([aria-disabled="true"]) {
@@ -484,8 +494,8 @@
     & .icon {
       display: flex;
       aspect-ratio: 1 / 1;
-      width: 72.5px;
-      height: 72.5px;
+      width: var(--font-size-b1);
+      height: var(--font-size-b1);
 
       & svg {
         display: block;
@@ -693,6 +703,7 @@
         &:focus-visible {
           outline: 12px dashed var(--color-system-01);
           outline-offset: -12px;
+          z-index: 2;
         }
 
         & .title {
@@ -1048,6 +1059,7 @@
         &:focus-visible {
           outline: 12px dashed var(--color-system-01);
           outline-offset: -12px;
+          z-index: 2;
         }
 
         & .up-content {
