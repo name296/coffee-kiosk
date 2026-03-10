@@ -102,7 +102,7 @@ const config = {
 // ============================================================================
 const copyStatic = () => {
   mkdirSync(config.outdir, { recursive: true });
-  ["images", "fonts", "sounds"].forEach((dir) => {
+  ["images", "sounds"].forEach((dir) => {
     const src = `./src/${dir}`;
     if (existsSync(src)) cpSync(src, `${config.outdir}/${dir}`, { recursive: true });
   });

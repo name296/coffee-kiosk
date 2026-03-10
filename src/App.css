@@ -3,81 +3,15 @@
   ============================== */
 @layer reset, design-system, layout, components, utilities;
 
-/* 큰글씨 모드는 body.large + design-system 폰트 변수 오버라이드로 적용 */
-
 /* ==============================
   폰트 정의 (Font Faces)
   ============================== */
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Thin.otf") format("opentype");
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
 
 @font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-ExtraLight.otf") format("opentype");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Light.otf") format("opentype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Medium.otf") format("opentype");
-  font-weight: var(--font-weight-medium);
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
+  font-family: "MyFont";
   src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-ExtraBold.otf") format("opentype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Pretendard GOV";
-  src: url("./fonts/PretendardGOV-Black.otf") format("opentype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
 }
 
 /* ==============================
@@ -115,7 +49,7 @@
 @layer design-system {
   :root {
     /* === 전체 타이포그래피 시스템 === */
-    --font-family: 'Pretendard GOV', sans-serif;
+    --font-family: 'MyFont', serif;
 
     /* === font / size === */
     --font-size-b1: 5.2rem;
@@ -127,7 +61,6 @@
     --font-size-d4: 18rem;
 
     /* === font / weight === */
-    --font-weight-medium: 500;
     --font-weight-semibold: 600;
 
     /* === spacing === */
@@ -581,7 +514,7 @@
     box-sizing: border-box;
     font-family: var(--font-family);
     font-size: var(--font-size-b1);
-    font-weight: var(--font-weight-medium);
+    font-weight: 600;
     line-height: 1.1;
     letter-spacing: -0.04em;
     font-stretch: 96%;
@@ -768,7 +701,6 @@
           height: var(--height-title);
           flex-shrink: 0;
           font-size: var(--font-size-h2);
-          font-weight: var(--font-weight-semibold);
           display: flex;
           flex-flow: column nowrap;
           justify-content: center;
@@ -800,7 +732,6 @@
               white-space: nowrap;
               flex-direction: column;
               font-size: var(--font-size-h2);
-              font-weight: var(--font-weight-semibold);
 
               & .icon {
                 width: 9.6rem;
@@ -937,7 +868,6 @@
                   flex-shrink: 0;
                   font-size: var(--font-size-b1);
                   color: var(--primary3-content2-color-default2);
-                  font-weight: var(--font-weight-medium);
                 }
               }
 
@@ -1146,9 +1076,6 @@
             color: var(--body2-primary1-color);
           }
 
-          & .modal-title {
-            font-weight: var(--font-weight-semibold);
-          }
         }
 
         & .down-content {
@@ -1171,7 +1098,6 @@
             & .highlight,
             & .primary {
               color: var(--body1-content-primary-color);
-              font-weight: var(--font-weight-semibold);
             }
           }
 
@@ -1212,7 +1138,6 @@
 
             & .primary {
               color: var(--body1-content-primary-color);
-              font-weight: var(--font-weight-semibold);
             }
           }
 
@@ -1260,7 +1185,6 @@
         justify-content: space-between;
         width: 100%;
         height: fit-content;
-        font-weight: var(--font-weight-semibold);
 
         & .summary-text {
           text-align: left;
@@ -1571,7 +1495,6 @@
       justify-content: center;
       align-items: center;
       color: #000000FF;
-      font-weight: var(--font-weight-semibold);
     }
 
     & .end-countdown {
@@ -1589,7 +1512,6 @@
       background-color: var(--body2-primary1-color);
       border: 9px solid var(--body2-primary2-color);
       color: var(--body2-progress-content-complete-color);
-      font-weight: var(--font-weight-medium);
       font-size: var(--font-size-d4);
     }
 
@@ -1982,7 +1904,6 @@
       &.price {
         height: 200px;
         font-size: var(--font-size-b1);
-        font-weight: var(--font-weight-semibold);
         gap: var(--spacing-md);
 
         & .payment-amount-large {

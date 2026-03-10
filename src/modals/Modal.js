@@ -84,7 +84,7 @@ export const Modal = () => {
     if (!modal) return null;
 
     return (
-        <div className={`modal ${modal.isAnyOpen ? 'active' : ''}`} aria-hidden="true" tabIndex={-1}>
+        <div className={`modal ${modal.isAnyOpen ? 'active' : ''}`} aria-hidden={!modal.isAnyOpen} tabIndex={-1}>
             {MODAL_REGISTRY.map(({ key }) => {
                 const Component = MODAL_COMPONENT_BY_KEY[key];
                 return modal.modalStates?.[key] && Component ? <Component key={key} /> : null;

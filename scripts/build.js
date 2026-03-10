@@ -92,14 +92,6 @@ if (existsSync('./src/images')) {
   console.log('  ⚠️  images folder not found, skipping');
 }
 
-// fonts 폴더 복사
-if (existsSync('./src/fonts')) {
-  cpSync('./src/fonts', './dist/fonts', { recursive: true });
-  console.log('  ✅ Copied fonts folder');
-} else {
-  console.log('  ⚠️  fonts folder not found, skipping');
-}
-
 // sounds 폴더 복사 (존재하는 경우에만)
 if (existsSync('./src/sounds')) {
   cpSync('./src/sounds', './dist/sounds', { recursive: true });
@@ -153,6 +145,7 @@ try {
   console.error('❌ Build error:', error);
   process.exit(1);
 }
+
 
 // 4. index.html 복사
 console.log('📄 Copying index.html...');
