@@ -1,5 +1,5 @@
 import { build, serve } from "bun";
-import { watch, existsSync, cpSync, mkdirSync, rmSync, statSync } from "fs";
+import { watch, existsSync, cpSync, mkdirSync, rmSync, statSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { z } from "zod";
 
@@ -12,7 +12,7 @@ const envSchema = z.object({
   ENTRY_FILE: z.string().default("./src/App.js"),
   BUNDLE_OUTPUT_DIR: z.string().default("./dist"),
   ICONS_DIR: z.string().default("./src/svg"),
-  BUILD_MINIFY: z.coerce.boolean().default(true),
+  BUILD_MINIFY: z.coerce.boolean().default(false), // true 시 CSS unicode-range 등 깨짐
   BUILD_SOURCEMAP: z.string().default("external"),
 });
 
@@ -125,6 +125,30 @@ const waitDelete = async (path, retries = 10) => {
 };
 
 // ============================================================================
+// CSS unicode-range 복구 (Bun이 U+ 를 깨뜨리는 문제 회피)
+// ============================================================================
+const fixCssUnicodeRange = (outdir) => {
+  const cssPath = resolve(outdir, "App.css");
+  if (!existsSync(cssPath)) return;
+  let css = readFileSync(cssPath, "utf8");
+  css = css
+    .replace(/\s*U\s*\+\s*/g, "U+")
+    .replace(/unicode-range:\s*([^;]+);/g, (_, value) => {
+      const pad = (h) => (h.length >= 4 ? h : h.padStart(4, "0"));
+      const fixed = value.split(",").map((part) => {
+        part = part.trim();
+        const m = part.match(/U\+?([0-9A-Fa-f]+)-?([0-9A-Fa-f]*)/);
+        if (!m) return part;
+        const [, start, end] = m;
+        if (start === "4" && end === "9FFF") return "U+4E00-9FFF";
+        return "U+" + pad(start) + (end ? "-" + pad(end) : "");
+      }).join(", ");
+      return `unicode-range: ${fixed};`;
+    });
+  writeFileSync(cssPath, css);
+};
+
+// ============================================================================
 // 번들러
 // ============================================================================
 let building = false;
@@ -147,7 +171,12 @@ const bundle = async (tag = "manual") => {
       ...config.buildOptions,
     });
 
-    console.log(result.success ? "✅ Build successful!" : `❌ Build failed: ${result.logs}`);
+    if (result.success) {
+      fixCssUnicodeRange(config.outdir);
+      console.log("✅ Build successful!");
+    } else {
+      console.log(`❌ Build failed: ${result.logs}`);
+    }
   } catch (e) {
     console.error("❌ Build error:", e);
   } finally {

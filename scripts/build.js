@@ -121,7 +121,7 @@ try {
     entrypoints: ['./src/App.js'],
     outdir: './dist',
     target: 'browser',
-    minify: true,
+    minify: false, // CSS 미니파이 시 unicode-range 등 깨짐 방지
     sourcemap: 'external',
     define: {
       'process.env.NODE_ENV': JSON.stringify(nodeEnv)
@@ -140,6 +140,28 @@ try {
     console.error(buildResult.logs);
     process.exit(1);
   }
+
+  const cssPath = resolve(process.cwd(), 'dist', 'App.css');
+  if (existsSync(cssPath)) {
+    let css = readFileSync(cssPath, 'utf8');
+    css = css
+      .replace(/\s*U\s*\+\s*/g, 'U+')
+      .replace(/unicode-range:\s*([^;]+);/g, (_, value) => {
+        const pad = (h) => (h.length >= 4 ? h : h.padStart(4, '0'));
+        const fixed = value.split(',').map((part) => {
+          part = part.trim();
+          const m = part.match(/U\+?([0-9A-Fa-f]+)-?([0-9A-Fa-f]*)/);
+          if (!m) return part;
+          const [, start, end] = m;
+          if (start === '4' && end === '9FFF') return 'U+4E00-9FFF';
+          return 'U+' + pad(start) + (end ? '-' + pad(end) : '');
+        }).join(', ');
+        return `unicode-range: ${fixed};`;
+      });
+    writeFileSync(cssPath, css);
+    console.log('  ✅ CSS unicode-range 복구');
+  }
+
   console.log('  ✅ JavaScript and CSS built successfully');
 } catch (error) {
   console.error('❌ Build error:', error);

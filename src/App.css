@@ -8,10 +8,10 @@
   ============================== */
 @font-face {
   font-family: "MyFont";
-  src: url("./fonts/NotoSansKR-SemiBold.ttf") format("truetype");
+  src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
-  unicode-range: U+0020-002F, U+0030-0039, U+003A-0040, U+005B-0060, U+007B-007E, U+20A0-20CF;
+  unicode-range: U+0000-001F, U+0021-002F, U+003A-10FFFF;
 }
 
 @font-face {
@@ -19,7 +19,17 @@
   src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
-  unicode-range: U+0041-005A, U+0061-007A, U+00A0-00FF, U+0100-024F, U+1100-11FF, U+3130-318F, U+AC00-D7AF, U+3000-303F, U+4E00-9FFF, U+FF00-FFEF;
+  size-adjust: 111%;
+  unicode-range: U+0020;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 110%;
+  unicode-range: U+0030-0039;
 }
 
 /* ==============================
@@ -27,27 +37,33 @@
   ============================== */
 @layer reset {
   :root {
-    & *,
-    & *::before,
-    & *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     font-size: 62.5%;
-    font-family: var(--font-family);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+  }
 
-    & body {
-      user-select: none;
-      -webkit-user-select: none;
-    }
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    & button {
-      all: unset;
-    }
+  body {
+    font-family: "MyFont", sans-serif;
+    font-stretch: 50%;
+    font-size: var(--font-size-b1);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.08em;
+    user-select: none;
+    -webkit-user-select: none;
+
+  }
+
+  button {
+    all: unset;
   }
 }
 
@@ -56,9 +72,6 @@
    ======================================== */
 @layer design-system {
   :root {
-    /* === 전체 타이포그래피 시스템 === */
-    --font-family: 'MyFont', serif;
-
     /* === font / size === */
     --font-size-b1: 52px;
     --font-size-h1: 52px;
@@ -93,8 +106,6 @@
     --layout-height: 1920px;
     --layout-width: 1080px;
     --layout-padding-inline: 32px;
-    --icon-size: 40px;
-
     /* 원시 팔레트(Primitive Palette) */
     --color-brown-01: #4C3F37FF;
     --color-brown-02: #8C532CFF;
@@ -238,9 +249,6 @@
     --delete-content-color-default: var(--color-gray-14);
     --delete-content-color-pressed: var(--color-gray-14);
     --delete-content-color-disabled: var(--color-gray-06);
-
-    /* 텍스트 하이라이트 색상 */
-    --highlight-color: var(--color-brown-02);
 
     /* ========================================
        버튼 시스템 (Button System)
@@ -518,16 +526,8 @@
    전체 레이아웃 (Layout)
    ======================================== */
 @layer layout {
-  body {
-    margin: 0;
-    box-sizing: border-box;
-    font-family: var(--font-family);
-    font-size: var(--font-size-b1);
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -3px;
-    font-stretch: 96%;
 
+  body {
     /* .process */
     & .process {
       --process-main-position: static;
@@ -1677,7 +1677,6 @@
       --delete-content-color-default: var(--color-gray-14);
       --delete-content-color-pressed: var(--color-gray-14);
       --delete-content-color-disabled: var(--color-gray-07);
-      --highlight-color: var(--color-yellow-03);
     }
 
     /* 낮은화면 모드 (.low) – process/second/third별 오버라이드만 중첩, 동일 트리 반복 최소화 */
