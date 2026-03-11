@@ -1,23 +1,15 @@
-import { SCREEN } from "../constants";
-
+/**
+ * 뷰포트 맞춤: body(캔버스) 스케일·중앙 정렬만 담당.
+ * body 기준 크기는 CSS(design-system --layout-width/height)에서 정의.
+ */
 export function setViewportZoom() {
-    const { WIDTH: bw, HEIGHT: bh } = SCREEN;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const zoom = Math.min(vw / bw, vh / bh);
-    const html = document.documentElement;
-
-    if (html) {
-        html.style.transform = `scale(${zoom})`;
-        html.style.transformOrigin = 'top left';
-        const sw = bw * zoom;
-        const sh = bh * zoom;
-        html.style.position = 'fixed';
-        html.style.top = `${(vh - sh) / 2}px`;
-        html.style.left = `${(vw - sw) / 2}px`;
-        html.style.width = `${bw}px`;
-        html.style.height = `${bh}px`;
-    }
+    const body = document.body;
+    if (!body) return;
+    body.style.position = 'fixed';
+    body.style.top = '50%';
+    body.style.left = '50%';
+    body.style.transform = `translate(-50%, -50%) scale(${Math.min(window.innerWidth / body.offsetWidth, window.innerHeight / body.offsetHeight)})`;
+    body.style.transformOrigin = 'center center';
 }
 
 export function setupViewportResize() {

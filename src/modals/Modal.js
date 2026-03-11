@@ -63,7 +63,7 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
                                 <Button svg={<Icon name={finalCancelIcon} />} label={finalCancelLabel} onClick={onCancel} />
                             )}
                             <Button
-                                className={config.confirmButtonStyle === 'delete' ? 'delete-item' : ''}
+                                className={config.confirmButtonStyle === 'delete' ? 'warning' : ''}
                                 svg={<Icon name={finalConfirmIcon} />}
                                 label={finalConfirmLabel}
                                 onClick={onConfirm}

@@ -30,14 +30,14 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.MENU && (
                     <>
                         <Button
-                            svg={<ResetIcon className="summary-btn-icon" />}
+                            svg={<ResetIcon />}
                             label="초기화"
                             modal="Reset"
                             disabled={isDisabledBtn}
                         />
                         <Button
                             className="primary1"
-                            svg={<OrderIcon className="summary-btn-icon" />}
+                            svg={<OrderIcon />}
                             label="주문"
                             disabled={isDisabledBtn}
                             navigate={PROCESS_NAME.DETAILS}
@@ -47,13 +47,13 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.DETAILS && (
                     <>
                         <Button
-                            svg={<AddIcon className="summary-btn-icon" />}
+                            svg={<AddIcon />}
                             label="메뉴"
                             navigate={PROCESS_NAME.MENU}
                         />
                         <Button
                             className="primary1"
-                            svg={<PayIcon className="summary-btn-icon" />}
+                            svg={<PayIcon />}
                             label="결제"
                             navigate={PROCESS_NAME.PAYMENTS}
                         />
