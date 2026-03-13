@@ -6,7 +6,7 @@ import { RefContext, ModalContext, MODAL_REGISTRY } from "../contexts";
 import { useFocusTrap } from "../hooks";
 import MODAL_CONFIG from "./ModalConfig";
 import ModalRestart from "./ModalRestart";
-import ModalReset from "./ModalReset";
+import ModalReselect from "./ModalReselect";
 import { ModalDelete, ModalDeleteCheck } from "./ModalDelete";
 import ModalCall from "./ModalCall";
 import ModalTimeout from "./ModalTimeout";
@@ -16,7 +16,7 @@ import ModalAccessibility from "./ModalAccessibility";
 const MODAL_COMPONENT_BY_KEY = {
     restart: ModalRestart,
     accessibility: ModalAccessibility,
-    reset: ModalReset,
+    reselect: ModalReselect,
     delete: ModalDelete,
     deleteCheck: ModalDeleteCheck,
     call: ModalCall,
@@ -51,8 +51,8 @@ export const BaseModal = memo(({ isOpen, type, onCancel, onConfirm, cancelLabel,
                 tabIndex={-1}
             >
             <div className="up-content">
-                {finalIcon && <Icon name={finalIcon} className="modal-image" />}
-                {finalTitle && <div className="modal-title">{finalTitle}</div>}
+                {finalIcon && <Icon className="primary" name={finalIcon} />}
+                {finalTitle && <span className="primary">{finalTitle}</span>}
             </div>
             <div className="down-content">
                 {customContent || (

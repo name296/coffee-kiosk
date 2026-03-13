@@ -5,7 +5,7 @@ export const ModalContext = createContext();
 export const MODAL_REGISTRY = Object.freeze([
     { key: "restart", contextName: "ModalRestart" },
     { key: "accessibility", contextName: "ModalAccessibility" },
-    { key: "reset", contextName: "ModalReset" },
+    { key: "reselect", contextName: "ModalReselect" },
     { key: "delete", contextName: "ModalDelete" },
     { key: "deleteCheck", contextName: "ModalDeleteCheck" },
     { key: "call", contextName: "ModalCall" },

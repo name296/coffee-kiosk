@@ -4,8 +4,8 @@ import { ScreenRouteContext, ModalContext } from "../contexts";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter' || e.code === 'Numpad5';
 
-const BUTTON_RELEASE_DELAY_MS = 60;
-const BUTTON_ACTION_DELAY_MS = 180;
+const BUTTON_RELEASE_DELAY_MS = 120;
+const BUTTON_ACTION_DELAY_MS = 240;
 
 // 포커스 가능한 요소에 --button-min-side 계산하기기
 const applyFocusableMinSide = (el) => {

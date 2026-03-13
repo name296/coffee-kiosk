@@ -5,7 +5,7 @@ import { OrderContext, AccessibilityContext } from "../contexts";
 import { usePageSlicer } from "../hooks";
 
 /**
- * details-content 래퍼 + OrderList.
+ * cart 래퍼 + OrderList.
  * ProcessMenu(Summary 아래), ProcessDetails(Main 내) 공통 사용.
  */
 const DetailsContent = memo(({ className = "", paginationDirection, itemsPerPageOverride, showFieldHeader = false, style } = {}) => {
@@ -28,7 +28,7 @@ const DetailsContent = memo(({ className = "", paginationDirection, itemsPerPage
     );
 
     const detailsContentClassName = [
-        "details-content",
+        "cart",
         className,
         showFieldHeader ? "" : "without-field-header"
     ].filter(Boolean).join(" ");

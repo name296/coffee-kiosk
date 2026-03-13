@@ -19,10 +19,10 @@ const Summary = memo(() => {
             {/* 수량/금액 표시 영역 */}
             <div className="summary-content">
                 <span className="summary-text">수량</span>
-                <span className="summary-count num">{totalCount}개</span>
+                <span className="summary-count num primary">{totalCount}개</span>
                 <span className="summary-line">|</span>
                 <span className="summary-text">금액</span>
-                <span className="summary-count price">{formatNumber(totalSum)}원</span>
+                <span className="summary-count price primary">{formatNumber(totalSum)}원</span>
             </div>
 
             {/* 버튼 영역 */}
@@ -31,8 +31,8 @@ const Summary = memo(() => {
                     <>
                         <Button
                             svg={<ResetIcon />}
-                            label="초기화"
-                            modal="Reset"
+                            label="비우기"
+                            modal="Reselect"
                             disabled={isDisabledBtn}
                         />
                         <Button

@@ -19,7 +19,7 @@ const MenuItem = memo(({ item, disabled, onPress }) => (
         </span>
         <div className="label">
             <span>{item.name}</span>
-            <span>{Number(item.price).toLocaleString()}원</span>
+            <span className="primary">{Number(item.price).toLocaleString()}원</span>
         </div>
     </Button>
 ));

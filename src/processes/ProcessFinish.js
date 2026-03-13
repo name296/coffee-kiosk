@@ -34,8 +34,10 @@ const ProcessFinish = memo(() => {
     ) : (
         <>
             <div className="title"><span>이용해 주셔서 감사합니다</span></div>
-            <div className="end-countdown">
-                {countdownContent}
+            <div className="content-container">
+                <div className="end-countdown">
+                    {countdownContent}
+                </div>
             </div>
         </>
     );

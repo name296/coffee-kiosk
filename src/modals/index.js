@@ -9,6 +9,6 @@ export { default as ModalAccessibility } from "./ModalAccessibility";
 export { default as ModalPaymentError } from "./ModalPaymentError";
 export { default as ModalCall } from "./ModalCall";
 export { ModalDelete, ModalDeleteCheck } from "./ModalDelete";
-export { default as ModalReset } from "./ModalReset";
+export { default as ModalReselect } from "./ModalReselect";
 export { default as ModalRestart } from "./ModalRestart";
 export { default as ModalTimeout } from "./ModalTimeout";

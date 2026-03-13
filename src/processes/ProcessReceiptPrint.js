@@ -38,14 +38,14 @@ const ProcessReceiptPrint = memo(() => {
             {isLow ? (
                 <>
                     <div className="content-container">
-                        <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
+                        <img src="./images/device-printer-receipt.png" alt="" className="pay-guide" />
                     </div>
                     <div className="content-control">{titleAndTask}</div>
                 </>
             ) : (
                 <>
                     <div className="title">{titleContent}</div>
-                    <img src="./images/device-printer-receipt.png" alt="" className="credit-pay-image" />
+                    <img src="./images/device-printer-receipt.png" alt="" className="pay-guide" />
                     <div className="task-manager">
                         <Button navigate={PROCESS_NAME.FINISH} label={`마무리${countdown}`} ttsText="마무리하기" />
                     </div>

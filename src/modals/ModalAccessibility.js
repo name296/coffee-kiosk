@@ -95,13 +95,13 @@ export const ModalAccessibility = memo(() => {
                 <div>원하시는&nbsp;<span className="primary">접근성 옵션</span>을 선택하시고</div>
                 <div><span className="primary">적용하기</span>&nbsp;버튼을 누릅니다</div>
             </div>
+            <div className="setting-list">
             <div className="setting-row" data-tts-text="초기설정으로 일괄선택,">
                 <span className="setting-name"><span className="primary">초기설정</span>으로 일괄선택</span>
                 <div className="task-manager">
                     <Button svg={<Icon name="Restart" />} label="초기화" onClick={handleInitialSettingsPress} />
                 </div>
             </div>
-            <hr className="setting-line" />
             <div className="setting-row">
                 <span className="setting-name"><span className="icon"><Icon name="Contrast" /></span>고대비화면</span>
                 <div className="task-manager" data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark},`}>
@@ -109,7 +109,6 @@ export const ModalAccessibility = memo(() => {
                     <Button toggle value={currentSettings.isDark} selectedValue={true} onChange={handleDarkChange} label="켬" />
                 </div>
             </div>
-            <hr className="setting-line" />
             <div className="setting-row">
                 <span className="setting-name"><span className="icon"><Icon name="Volume" /></span>소리크기</span>
                 <div className="task-manager" data-tts-text={`소리크기, 선택상태, ${getStatusText.volume},`}>
@@ -119,7 +118,6 @@ export const ModalAccessibility = memo(() => {
                     <Button toggle value={currentSettings.volume} selectedValue={3} onChange={handleVolumeChange} label="강" />
                 </div>
             </div>
-            <hr className="setting-line" />
             <div className="setting-row">
                 <span className="setting-name"><span className="icon"><Icon name="Large" /></span>큰글씨화면</span>
                 <div className="task-manager" data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large},`}>
@@ -127,13 +125,13 @@ export const ModalAccessibility = memo(() => {
                     <Button toggle value={currentSettings.isLarge} selectedValue={true} onChange={handleLargeChange} label="켬" />
                 </div>
             </div>
-            <hr className="setting-line" />
             <div className="setting-row">
                 <span className="setting-name"><span className="icon"><Icon name="Wheelchair" /></span>낮은화면</span>
                 <div className="task-manager" data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low},`}>
                     <Button toggle value={currentSettings.isLow} selectedValue={false} onChange={handleLowChange} label="끔" />
                     <Button toggle value={currentSettings.isLow} selectedValue={true} onChange={handleLowChange} label="켬" />
                 </div>
+            </div>
             </div>
         </>
     );

@@ -40,10 +40,12 @@ const ProcessOrderComplete = memo(() => {
             {isLow ? (
                 <>
                     <div className="content-container">
-                        <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
-                        <div className="order-num">
-                            <span>주문</span>
-                            <span>{order.orderNumber || 100}</span>
+                        <div className="pay-guide">
+                            <img src="./images/device-printer-order.png" alt="" />
+                            <div className="order-num">
+                                <span>주문</span>
+                                <span>{order.orderNumber || 100}</span>
+                            </div>
                         </div>
                     </div>
                     <div className="content-control">{titleAndTask}</div>
@@ -51,10 +53,12 @@ const ProcessOrderComplete = memo(() => {
             ) : (
                 <>
                     <div className="title">{titleContent}</div>
-                    <img src="./images/device-printer-order.png" alt="" className="credit-pay-image" />
-                    <div className="order-num">
-                        <span>주문</span>
-                        <span>{order.orderNumber || 100}</span>
+                    <div className="pay-guide">
+                        <img src="./images/device-printer-order.png" alt="" />
+                        <div className="order-num">
+                            <span>주문</span>
+                            <span>{order.orderNumber || 100}</span>
+                        </div>
                     </div>
                     <div className="task-manager">
                         <Button onClick={() => order.sendPrintReceiptToApp()} navigate={PROCESS_NAME.RECEIPT_PRINT} label="영수증 출력" />

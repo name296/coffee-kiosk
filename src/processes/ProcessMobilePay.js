@@ -27,14 +27,14 @@ const ProcessMobilePay = memo(() => {
             {isLow ? (
                 <>
                     <div className="content-container">
-                        <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" />
+                        <img src="./images/device-cardReader-mobile.png" alt="" className="pay-guide" />
                     </div>
                     <div className="content-control">{titleAndTask}</div>
                 </>
             ) : (
                 <>
                     <div className="title">{titleContent}</div>
-                    <img src="./images/device-cardReader-mobile.png" alt="" className="credit-pay-image" />
+                    <img src="./images/device-cardReader-mobile.png" alt="" className="pay-guide" />
                     <div className="task-manager">
                         <Button navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                         <Button navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />

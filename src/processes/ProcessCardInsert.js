@@ -31,14 +31,14 @@ const ProcessCardInsert = memo(() => {
             {isLow ? (
                 <>
                     <div className="content-container">
-                        <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
+                        <img src="./images/device-cardReader-insert.png" alt="" className="pay-guide"/>
                     </div>
                     <div className="content-control">{titleAndTask}</div>
                 </>
             ) : (
                 <>
                     <div className="title">{titleContent}</div>
-                    <img src="./images/device-cardReader-insert.png" alt="" className="credit-pay-image"/>
+                    <img src="./images/device-cardReader-insert.png" alt="" className="pay-guide"/>
                     <div className="task-manager">
                         <Button navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                         <Button style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />

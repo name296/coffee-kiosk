@@ -19,14 +19,14 @@ const ProcessCardRemoval = memo(() => {
             {isLow ? (
                 <>
                     <div className="content-container">
-                        <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" />
+                        <img src="./images/device-cardReader-remove.png" alt="" className="pay-guide" />
                     </div>
                     <div className="content-control">{titleAndTask}</div>
                 </>
             ) : (
                 <>
                     <div className="title"><span><span className="primary">카드</span>를 뽑습니다.</span></div>
-                    <img src="./images/device-cardReader-remove.png" alt="" className="credit-pay-image" />
+                    <img src="./images/device-cardReader-remove.png" alt="" className="pay-guide" />
                     <div className="task-manager">
                         <Button navigate={PROCESS_NAME.CARD_INSERT} label="가상취소" />
                         <Button navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상제거" />

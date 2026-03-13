@@ -15,10 +15,10 @@ PaginationPrevButton.displayName = 'PaginationPrevButton';
 
 // 쪽매김 (페이지 번호) 컴포넌트
 const PaginationPageNumber = memo(({ pageNumber, totalPages }) => (
-    <span className="pagination-page-number">
-        <span className="pagination-page-current">{pageNumber}</span>
+    <span className="indicator">
+        <span className="primary current">{pageNumber}</span>
         <span className="pagination-separator">&nbsp;/&nbsp;</span>
-        <span className="pagination-page-total">{totalPages || 1}</span>
+        <span className="total">{totalPages || 1}</span>
     </span>
 ));
 PaginationPageNumber.displayName = 'PaginationPageNumber';
