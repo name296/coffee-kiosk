@@ -11,12 +11,12 @@ const ProcessPayments = memo(() => {
     const paymentAndTask = (
         <>
             <div className="payment" data-tts-text="결제 선택,">
-                <Button navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
-                <Button navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
-                <Button navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
+                <Button className="primary1" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
+                <Button className="primary1" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
+                <Button className="primary1" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
             </div>
             <div className="task-manager">
-                <Button navigate={PROCESS_NAME.DETAILS} label="취소" />
+                <Button className="secondary1" navigate={PROCESS_NAME.DETAILS} label="취소" />
             </div>
         </>
     );

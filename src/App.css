@@ -404,6 +404,7 @@
     &:hover,
     &:focus-visible {
       outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--color-system-01);
+      outline-radius: 0;
       z-index: 1;
       }
     
@@ -938,7 +939,6 @@
         }
       
       & .task-manager {
-
         & .button {
           width: 199px;
           height: 134px;
@@ -1597,13 +1597,13 @@
     --primary3-content2-color-pressed: var(--color-gray-01);
     --primary3-content2-color-disabled: var(--color-gray-12);
 
-    --secondary1-background-color-default: var(--color-gray-07);
+    --secondary1-background-color-default: var(--color-gray-09);
     --secondary1-background-color-pressed: var(--color-gray-03);
     --secondary1-background-color-disabled: transparent;
     --secondary1-border-color-default: var(--color-gray-14);
     --secondary1-border-color-pressed: var(--color-gray-07);
     --secondary1-border-color-disabled: var(--color-gray-07);
-    --secondary1-content-color-default: var(--color-gray-14);
+    --secondary1-content-color-default: var(--color-gray-01);
     --secondary1-content-color-pressed: var(--color-gray-12);
     --secondary1-content-color-disabled: var(--color-gray-07);
 
@@ -1620,7 +1620,7 @@
     --secondary3-background-color-default: var(--color-gray-14);
     --secondary3-background-color-pressed: var(--color-gray-07);
     --secondary3-background-color-disabled: transparent;
-    --secondary3-border-color-default: var(--color-gray-14);
+    --secondary3-border-color-default: var(--color-gray-09);
     --secondary3-border-color-pressed: var(--color-gray-07);
     --secondary3-border-color-disabled: var(--color-gray-07);
     --secondary3-content-color-default: var(--color-gray-01);

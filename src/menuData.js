@@ -5,7 +5,7 @@
 
 const categories = [
   {
-    name: "전체메뉴뉴뉴뉴뉴",
+    name: "전체",
     items: [], // 전체메뉴는 모든 카테고리 아이템 합산
   },
   {

@@ -30,6 +30,7 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.MENU && (
                     <>
                         <Button
+                            className="secondary1"
                             svg={<ResetIcon />}
                             label="비우기"
                             modal="Reselect"
@@ -47,6 +48,7 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.DETAILS && (
                     <>
                         <Button
+                            className="secondary1"
                             svg={<AddIcon />}
                             label="메뉴"
                             navigate={PROCESS_NAME.MENU}
