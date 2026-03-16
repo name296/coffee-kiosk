@@ -13,14 +13,27 @@ const PaginationPrevButton = memo(({ label, icon, onClick, className }) => (
 ));
 PaginationPrevButton.displayName = 'PaginationPrevButton';
 
-// 쪽매김 (페이지 번호) 컴포넌트
-const PaginationPageNumber = memo(({ pageNumber, totalPages }) => (
-    <span className="indicator">
-        <span className="primary current">{pageNumber}</span>
-        <span className="pagination-separator">&nbsp;/&nbsp;</span>
-        <span className="total">{totalPages || 1}</span>
-    </span>
-));
+// 쪽매김 (페이지 번호) 컴포넌트. textOnly 시 카테고리탭용 "1/3" 텍스트만
+const PaginationPageNumber = memo(({ pageNumber, totalPages, direction = "horizontal", textOnly = false }) => {
+    const total = totalPages || 1;
+    const cn = `indicator ${direction === "vertical" ? "indicator-vertical" : ""}`;
+    if (textOnly) {
+        return (
+            <span className={cn}>
+                <span className="primary current">{pageNumber}</span>
+                <span className="pagination-separator">/</span>
+                <span className="total">{total}</span>
+            </span>
+        );
+    }
+    return (
+        <span className={cn}>
+            <span className="primary current">{pageNumber}</span>
+            <span className="pagination-separator">/</span>
+            <span className="total">{total}</span>
+        </span>
+    );
+});
 PaginationPageNumber.displayName = 'PaginationPageNumber';
 
 // 다음 버튼 컴포넌트

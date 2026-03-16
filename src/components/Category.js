@@ -1,5 +1,6 @@
 import React, { memo, useContext, useMemo } from "react";
 import Button from "./Button";
+import { PaginationPageNumber } from "./Pagination";
 import { OrderContext, AccessibilityContext } from "../contexts";
 import { useCategoryAssemble } from "../hooks";
 
@@ -28,6 +29,8 @@ const Category = memo(() => {
     const {
         containerRef: catContainerRef,
         measureRef: catMeasureRef,
+        currentPage: catCurrentPage,
+        totalPages: catTotalPages,
         currentItems: catItems,
         hasPrev: catHasPrev,
         hasNext: catHasNext,
@@ -52,7 +55,6 @@ const Category = memo(() => {
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="이전" className="secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
             <div
                 className={categoryClassName}
                 ref={catContainerRef}
@@ -65,7 +67,14 @@ const Category = memo(() => {
                     </React.Fragment>
                 ))}
             </div>
-            <Button toggle label="다음" className="secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
+            <div
+                className="pagination"
+                data-tts-text={`페이지네이션, 메뉴 카테고리, ${catTotalPages} 탭 중 ${catCurrentPage} 탭,`}
+            >
+                <Button toggle label="◀" className="secondary1" disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
+                <PaginationPageNumber pageNumber={catCurrentPage} totalPages={catTotalPages} textOnly />
+                <Button toggle label="▶" className="secondary1" disabled={!catHasNext} onClick={catNext} ttsText="다음" />
+            </div>
         </div>
     );
 });

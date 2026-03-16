@@ -186,7 +186,7 @@
     
     /* 버튼 팔레트(Primary3) */
     --primary3-background-color-default: var(--color-gray-14);
-    --primary3-background-color-pressed: var(--color-gray-01);
+    --primary3-background-color-pressed: var(--color-gray-14);
     --primary3-background-color-disabled: var(--color-gray-14);
     --primary3-border-color-default: var(--color-gray-09);
     --primary3-border-color-pressed: var(--color-brown-03);
@@ -776,6 +776,18 @@
               flex-shrink: 0;
               }
             }
+          
+          & .pagination {
+            & .button {
+              width: fit-content;
+              }
+              
+            & .indicator {
+              & * {
+                min-width: fit-content;
+                }
+              }
+            }
           }
         
         & .menu {
@@ -926,9 +938,7 @@
         }
       
       & .task-manager {
-        width: fit-content;
-        justify-content: space-between;
-        
+
         & .button {
           width: 199px;
           height: 134px;
@@ -1038,15 +1048,16 @@
           flex-flow: row nowrap;
           
           & .counter {
+            flex: 1 1 auto;
             display: flex;
             justify-content: center;
             aspect-ratio: 1 / 1;
             }
           
           & .qty {
+            flex: 1 1 auto;
             display: flex;
             justify-content: center;
-            align-items: center;
             aspect-ratio: 1 / 1;
             }
           }
@@ -1306,6 +1317,11 @@
           min-width: 2ch;
           }
         }
+
+      & .indicator.indicator-vertical {
+        flex-flow: column nowrap;
+        width: auto;
+        }
       }
     }
     
@@ -1471,7 +1487,10 @@
       color: var(--body1-background-color);
       }
     
-    & .pagination {      
+    & .pagination {
+      & .indicator .primary.current {
+        color: var(--body2-content2-color);
+        }
       & .pagination-separator {
         color: var(--body2-border-color);
         }
@@ -1629,10 +1648,9 @@
       font-size: var(--font-size-h1);
       height: 100px;
       }
-
+      
     & .summary {
       height: 122px;
-
       }
     
     & .summary .task-manager .button {
@@ -1645,7 +1663,9 @@
       }
 
     & .process {        
-      &.second {          
+
+      &.second { 
+
         & .cart {
           display: none;
           }

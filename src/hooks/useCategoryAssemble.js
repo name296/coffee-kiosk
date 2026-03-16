@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { usePageSlicer } from "./usePageSlicer";
 
 // 카테고리 조립 (가변 너비 버튼 + 페이지네이션 제어)
+/** getBoundingClientRect() 기준이므로 스케일 적용된 화면 픽셀. 이 값보다 갭이 크면 isCompact */
 const ACTUAL_GAP_THRESHOLD = 128;
 
 export const useCategoryAssemble = (items, isLarge = false) => {
@@ -17,11 +18,17 @@ export const useCategoryAssemble = (items, isLarge = false) => {
     }, []);
 
     const prevIsLargeRef = useRef(isLarge);
+    const resetPageRef = useRef(null);
     const lastWidthRef = useRef(null);
     const lastContainerWidthRef = useRef(0);
+    const lastGapRef = useRef(0);
+    const lastSeparatorWidthRef = useRef(0);
     const isCalculatingRef = useRef(false);
+    const rafCalculateRef = useRef(null);
     const itemsRef = useRef(items);
 
+    // items 변경 시 breakpoint 재계산 트리거. 비교는 id/name만 사용(목록 교체·이름 변경 감지).
+    // 다른 필드만 바뀌면 감지 안 됨. 필요 시 비교 필드 확대 또는 상위에서 items 참조 안정화.
     useEffect(() => {
         const currentItems = itemsRef.current;
         const changed = items.length !== currentItems.length ||
@@ -41,14 +48,15 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         resetPage,
         setPageNumber
     } = usePageSlicer(items, 1, 1, false, pageBreakpoints);
+    resetPageRef.current = resetPage;
 
     useEffect(() => {
         if (prevIsLargeRef.current !== isLarge) {
             prevIsLargeRef.current = isLarge;
             setCalcTrigger(t => t + 1);
-            resetPage();
+            resetPageRef.current?.();
         }
-    }, [isLarge, resetPage]);
+    }, [isLarge]);
 
     useEffect(() => {
         const maxPage = Math.max(1, totalPages);
@@ -63,9 +71,8 @@ export const useCategoryAssemble = (items, isLarge = false) => {
         const currentItems = itemsRef.current;
 
         if (!measureRef.current || !containerRef.current) {
-            if (currentItems.length === 0) {
-                setIsReady(true);
-            }
+            if (currentItems.length === 0) setIsReady(true);
+            isCalculatingRef.current = false;
             return;
         }
 
@@ -134,6 +141,8 @@ export const useCategoryAssemble = (items, isLarge = false) => {
             return;
         }
 
+        const separator = measureRef.current.querySelector('.category-separator');
+
         const observer = new ResizeObserver((entries) => {
             if (isCalculatingRef.current) return;
 
@@ -152,6 +161,14 @@ export const useCategoryAssemble = (items, isLarge = false) => {
                     continue;
                 }
 
+                if (target === separator) {
+                    if (Math.abs(newWidth - lastSeparatorWidthRef.current) > 1) {
+                        lastSeparatorWidthRef.current = newWidth;
+                        shouldRecalc = true;
+                    }
+                    continue;
+                }
+
                 if (!observedWidths) continue;
                 const key = target?.dataset?.observeKey ?? Array.from(buttons).indexOf(target);
                 if (key === -1) continue;
@@ -161,7 +178,22 @@ export const useCategoryAssemble = (items, isLarge = false) => {
                     shouldRecalc = true;
                 }
             }
-            if (shouldRecalc) calculate();
+
+            if (containerRef.current) {
+                const gap = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
+                if (Math.abs(gap - lastGapRef.current) > 1) {
+                    lastGapRef.current = gap;
+                    shouldRecalc = true;
+                }
+            }
+
+            if (shouldRecalc) {
+                if (rafCalculateRef.current != null) cancelAnimationFrame(rafCalculateRef.current);
+                rafCalculateRef.current = requestAnimationFrame(() => {
+                    rafCalculateRef.current = null;
+                    calculate();
+                });
+            }
         });
 
         const observedWidths = {};
@@ -174,18 +206,28 @@ export const useCategoryAssemble = (items, isLarge = false) => {
 
         if (containerRef.current) {
             lastContainerWidthRef.current = containerRef.current.clientWidth;
+            lastGapRef.current = parseFloat(getComputedStyle(containerRef.current).gap) || 0;
             observer.observe(containerRef.current);
         }
 
-        const handleResize = () => requestAnimationFrame(calculate);
-        window.addEventListener('resize', handleResize);
+        if (separator) {
+            lastSeparatorWidthRef.current = separator.offsetWidth;
+            observer.observe(separator);
+        }
+
+        // calcTrigger/items.length가 바뀌었을 때는 ResizeObserver만 믿지 않고 한 번은 반드시 재계산
+        const rafId = requestAnimationFrame(() => {
+            calculate();
+        });
 
         return () => {
+            cancelAnimationFrame(rafId);
+            if (rafCalculateRef.current != null) cancelAnimationFrame(rafCalculateRef.current);
             observer.disconnect();
-            window.removeEventListener('resize', handleResize);
         };
     }, [items.length, calcTrigger, calculate]);
 
+    // 현재 미사용(반환값은 usePageSlicer의 currentItems). 사용할 경우 deps에 items 포함해 stale 방지.
     const pagedItems = useMemo(() => {
         const currentItems = itemsRef.current;
         return pageBreakpoints.map((start, idx) => {
