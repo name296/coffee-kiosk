@@ -1,5 +1,13 @@
 import { useState, useMemo, useCallback } from "react";
 
+/**
+ * breakpoints 모드 전용: items를 구간(breakpoints) 기준으로만 슬라이스. 카테고리 탭 등 고정 구간 페이징용
+ * @param {Array} items - 슬라이스할 목록
+ * @param {number[]} [breakpoints] - 구간 시작 인덱스 배열(예: [0, 4, 7]). 비어 있거나 배열이 아니면 usePageSlicer가 일반 페이징 모드로 동작
+ */
+export const useBreakpointsPageSlicer = (items, breakpoints) =>
+    usePageSlicer(items, 1, 1, false, breakpoints);
+
 export const usePageSlicer = (items, itemsPerPageNormal, itemsPerPageLow, isLow, breakpoints) => {
     const useBreakpoints = Array.isArray(breakpoints) && breakpoints.length > 0;
     const normalizedBreakpoints = useMemo(() => {

@@ -46,7 +46,6 @@ const MenuGrid = memo(() => {
     }, [order.selectedTab, resetPage]);
 
     const handleItemPress = (e, id, target) => {
-        target?.focus?.();
         if (id !== 0) {
             order.handleIncrease(id);
         }
@@ -81,8 +80,8 @@ const MenuGrid = memo(() => {
                     direction="vertical"
                     pageNumber={pageNumber}
                     totalPages={totalPages}
-                    onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
-                    onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
+                    onPrev={(e, target) => handlePrevPage()}
+                    onNext={(e, target) => handleNextPage()}
                     ttsPrefix="메뉴"
                 />
             </div>

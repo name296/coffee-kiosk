@@ -48,17 +48,14 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     };
 
     const handleItemDecrease = (itemId) => (e, target) => {
-        target?.focus?.();
         (order.quantities[itemId] === 1) ? openDeleteModal(itemId) : order.handleDecrease(itemId);
     };
 
     const handleItemIncrease = (itemId) => (e, target) => {
-        target?.focus?.();
         order.handleIncrease(itemId);
     };
 
     const handleItemDelete = (itemId) => (e, target) => {
-        target?.focus?.();
         openDeleteModal(itemId);
     };
 

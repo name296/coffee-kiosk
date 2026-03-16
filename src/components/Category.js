@@ -38,7 +38,7 @@ const Category = memo(() => {
         nextPage: catNext,
         isCompact: catIsCompact,
         isReady: catIsReady
-    } = useCategoryAssemble(categories, accessibility.isLarge);
+    } = useCategoryAssemble(categories, accessibility.isLarge, order.selectedTab);
 
     const categoryClassName = useMemo(() => `category${catIsCompact ? ' compact' : ''}`, [catIsCompact]);
 

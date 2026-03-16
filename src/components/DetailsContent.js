@@ -56,8 +56,8 @@ const DetailsContent = memo(({ className = "", paginationDirection, itemsPerPage
                 direction={paginationDirection ?? (isCompact ? "vertical" : "horizontal")}
                 pageNumber={pageNumber}
                 totalPages={totalPages}
-                onPrev={(e, target) => { target?.focus?.(); handlePrevPage(); }}
-                onNext={(e, target) => { target?.focus?.(); handleNextPage(); }}
+                onPrev={(e, target) => handlePrevPage()}
+                onNext={(e, target) => handleNextPage()}
                 ttsPrefix="주문목록"
             />
         </div>
