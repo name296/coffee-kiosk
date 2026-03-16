@@ -404,7 +404,7 @@
     &:hover,
     &:focus-visible {
       outline: calc(var(--button-min-side-clamped) * 0.09375) dashed var(--color-system-01);
-      outline-radius: 0;
+      outline-offset: 0;
       z-index: 1;
       }
     
