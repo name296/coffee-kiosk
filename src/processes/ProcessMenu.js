@@ -1,6 +1,8 @@
 import React, { memo, useContext, useLayoutEffect } from "react";
-import { Category, MenuGrid } from "../components";
+import { Category, MenuGrid, Main, Step, Bottom, Summary, Cart } from "../components";
+import { PROCESS_NAME } from "../constants";
 import { OrderContext } from "../contexts";
+import { processTts } from "./processTts";
 
 const ProcessMenu = memo(() => {
     const order = useContext(OrderContext);
@@ -11,10 +13,18 @@ const ProcessMenu = memo(() => {
     }, [order?.categoryInfo, order?.setSelectedTab]);
 
     return (
-        <>
-            <Category />
-            <MenuGrid />
-        </>
+        <div className="process second" tabIndex={-1}>
+            <div className="black" />
+            <div className="top body1" />
+            <Step />
+            <Main ttsText={processTts[PROCESS_NAME.MENU]}>
+                <Category />
+                <MenuGrid />
+            </Main>
+            <Summary />
+            <Cart className="compact" />
+            <Bottom />
+        </div>
     );
 });
 

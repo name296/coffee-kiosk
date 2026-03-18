@@ -15,7 +15,7 @@ const Summary = memo(() => {
     const summaryTtsText = `주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
 
     return (
-        <div className="summary">
+        <div className="summary body1">
             {/* 수량/금액 표시 영역 */}
             <div className="summary-content">
                 <span className="summary-text">수량</span>
@@ -30,14 +30,14 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.MENU && (
                     <>
                         <Button
-                            className="secondary1"
+                            className="skel-inline skin-secondary"
                             svg={<ResetIcon />}
                             label="비우기"
                             modal="Reselect"
                             disabled={isDisabledBtn}
                         />
                         <Button
-                            className="primary1"
+                            className="skel-inline skin-primary"
                             svg={<OrderIcon />}
                             label="주문"
                             disabled={isDisabledBtn}
@@ -48,13 +48,13 @@ const Summary = memo(() => {
                 {currentProcess === PROCESS_NAME.DETAILS && (
                     <>
                         <Button
-                            className="secondary1"
+                            className="skel-inline skin-secondary"
                             svg={<AddIcon />}
                             label="메뉴"
                             navigate={PROCESS_NAME.MENU}
                         />
                         <Button
-                            className="primary1"
+                            className="skel-inline skin-primary"
                             svg={<PayIcon />}
                             label="결제"
                             navigate={PROCESS_NAME.PAYMENTS}

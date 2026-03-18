@@ -1,12 +1,13 @@
 import React, { memo, useContext, useEffect } from "react";
-import { DetailsContent } from "../components";
+import { Cart, Main, Step, Bottom, Summary } from "../components";
 import { PROCESS_NAME } from "../constants";
 import { AccessibilityContext, OrderContext, ScreenRouteContext } from "../contexts";
+import { processTts } from "./processTts";
 
 const ProcessDetails = memo(() => {
-    const accessibility = useContext(AccessibilityContext);
     const order = useContext(OrderContext);
     const { navigateTo } = useContext(ScreenRouteContext);
+    const accessibility = useContext(AccessibilityContext);
 
     useEffect(() => {
         if (!order.orderItems || order.orderItems.length === 0) {
@@ -15,22 +16,31 @@ const ProcessDetails = memo(() => {
     }, [order.orderItems, navigateTo]);
 
     return (
-        <>
-            <div className="title">
-                {accessibility.isLow ? (
-                    <span><span className="primary">내역</span>을 확인하시고 <span className="primary">결제하기</span> 버튼을 누릅니다</span>
-                ) : (
-                    <>
-                        <span><span className="primary">내역</span>을 확인하시고</span>
-                        <span><span className="primary">결제하기</span>&nbsp;버튼을 누릅니다</span>
-                    </>
-                )}
-            </div>
-
-            <DetailsContent className={accessibility.isLow ? "compact" : ""} showFieldHeader />
-        </>
+        <div className="process third" tabIndex={-1}>
+            <div className="black" />
+            <div className="top body1" />
+            <Step />
+            <Main ttsText={processTts[PROCESS_NAME.DETAILS]}>
+                <div className="title">
+                    {accessibility.isLow ? (
+                        <span><span className="primary">내역</span>을 확인하시고 <span className="primary">결제하기</span> 버튼을 누릅니다</span>
+                    ) : (
+                        <>
+                            <span><span className="primary">내역</span>을 확인하시고</span>
+                            <span><span className="primary">결제하기</span>&nbsp;버튼을 누릅니다</span>
+                        </>
+                    )}
+                </div>
+                <Cart
+                    className={accessibility.isLow ? "compact" : ""}
+                    showFieldHeader
+                />
+            </Main>
+            <Summary />
+            <Bottom />
+        </div>
     );
 });
 
-ProcessDetails.displayName = 'ProcessDetails';
+ProcessDetails.displayName = "ProcessDetails";
 export default ProcessDetails;

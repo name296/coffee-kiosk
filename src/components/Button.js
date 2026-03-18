@@ -1,3 +1,7 @@
+/**
+ * 키오스크 버튼. className에 skel-* · skin-* (미지정 시 skel-inline · skin-neutral).
+ * 상태: toggle, state-pressed, state-pressing — docs/BUTTON_AXES.md
+ */
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
 import { useSound } from "../hooks";
 import { ScreenRouteContext, ModalContext } from "../contexts";
@@ -98,15 +102,19 @@ const Button = memo(({
         return disabled ? `${cleanedText}, 비활성, ` : cleanedText;
     }, [ttsText, label, toggle, pressed, disabled]);
 
-    // 버튼 클래스명 생성
     const buttonClassName = useMemo(() => {
-        const classNames = ['button'];
-        if (!/primary[123]|secondary[123]/.test(className)) classNames.push('primary2');
-        if (toggle) classNames.push('toggle');
-        if (pressed || (isPressing && !toggle)) classNames.push('pressed');
-        if (isPressing) classNames.push('pressing');
-        if (className) classNames.push(className);
-        return classNames.join(' ');
+        const parts = ['button'];
+        const tokens = (className || '').trim().split(/\s+/).filter(Boolean);
+        const skel = tokens.find((t) => t.startsWith('skel-'));
+        const skin = tokens.find((t) => t.startsWith('skin-'));
+        const extras = tokens.filter((t) => !t.startsWith('skel-') && !t.startsWith('skin-'));
+        parts.push(skel || 'skel-inline');
+        parts.push(skin || 'skin-neutral');
+        if (toggle) parts.push('toggle');
+        if (pressed || (isPressing && !toggle)) parts.push('state-pressed');
+        if (isPressing) parts.push('state-pressing');
+        parts.push(...extras);
+        return parts.join(' ');
     }, [className, toggle, pressed, isPressing]);
 
     // 다운 시점에 액션 실행 (mousedown, touchstart, keydown)
@@ -203,9 +211,6 @@ const Button = memo(({
                 </>
             )}
             {children}
-            {toggle && (
-                <span className="icon checked" aria-hidden="true"></span>
-            )}
         </button>
     );
 });

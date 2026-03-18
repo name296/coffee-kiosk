@@ -9,7 +9,7 @@ const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 11, ITEMS_PER_PAGE_LOW: 3 };
 // 메뉴 아이템
 const MenuItem = memo(({ item, disabled, onPress }) => (
     <Button
-        className="primary3"
+        className="skel-stacked skin-menu"
         ttsText={disabled ? `${item.name}, 비활성,` : `${item.name}, ${item.price}원`}
         disabled={disabled}
         onClick={onPress}
@@ -77,7 +77,6 @@ const MenuGrid = memo(() => {
                 }}
             >
                 <Pagination
-                    direction="vertical"
                     pageNumber={pageNumber}
                     totalPages={totalPages}
                     onPrev={(e, target) => handlePrevPage()}

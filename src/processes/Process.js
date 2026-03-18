@@ -1,15 +1,11 @@
 import React, { memo, useContext, useEffect } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "../contexts";
 import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler, useCallHotkey } from "../hooks";
-import { Main, Step, Bottom, Summary, DetailsContent } from "../components";
 import { PROCESS_NAME } from "../constants";
 import PROCESS_CONFIG from "./ProcessConfig";
 
 /**
- * Process 컴포넌트
- * - ProcessConfig로 레이아웃 + 콘텐츠 결정.
- * - 스크린 레이아웃(first|second|third|forth|fifth)은 div.process에 지정 → CSS body .process.first 등으로 제어.
- * - black/top/step/main/summary/bottom은 CSS로 제어.
+ * 현재 라우트에 해당하는 화면 컴포넌트만 렌더한다. 레이아웃은 각 Process* 가 직접 조립.
  */
 const Process = memo(() => {
     const { currentProcess, navigateTo } = useContext(ScreenRouteContext);
@@ -18,8 +14,7 @@ const Process = memo(() => {
 
     const hasConfig = Boolean(PROCESS_CONFIG[currentProcess]);
     const effectiveProcess = hasConfig ? currentProcess : PROCESS_NAME.START;
-    const config = PROCESS_CONFIG[effectiveProcess];
-    const { layoutType, Component, className = "", ttsText = "", ...rest } = config;
+    const { Component } = PROCESS_CONFIG[effectiveProcess];
 
     useEffect(() => {
         if (!hasConfig) {
@@ -31,29 +26,11 @@ const Process = memo(() => {
     useFocusNavigationHandler(true);
     useCallHotkey(true);
 
-    const processClassName = [
-        "process",
-        layoutType
-    ].filter(Boolean).join(" ");
+    if (!Component) {
+        return null;
+    }
 
-    return (
-        <div className={processClassName} tabIndex={-1}>
-            <div className="black" />
-            <div className="top" />
-            <Step />
-            <Main
-                className={className}
-                ttsText={ttsText}
-                Component="div"
-                {...rest}
-            >
-                <Component />
-            </Main>
-            <Summary />
-            <DetailsContent className="compact" />
-            <Bottom />
-        </div>
-    );
+    return <Component />;
 });
 
 Process.displayName = "Process";

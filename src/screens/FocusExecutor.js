@@ -9,7 +9,7 @@ export const FocusExecutor = () => {
     useLayoutEffect(() => {
         if (typeof document === 'undefined') return;
         if (modal?.isAnyOpen) {
-            const mains = document.querySelectorAll('.modal .main');
+            const mains = document.querySelectorAll('.modal .modal-panel');
             focusWithRefire(mains.length ? mains[mains.length - 1] : null);
             return;
         }

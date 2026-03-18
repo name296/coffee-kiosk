@@ -12,18 +12,18 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
     return (
         <>
             <div className="order-row" data-tts-text={`주문목록,${index}번, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`}>
-                <div className="order-item">
-                    <div className="order-index">{index}</div>
+                <div className="order-item body2">
+                    <div className="order-index body1">{index}</div>
                     <img src={`./images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
                 <span className="order-name">{item.name}</span>
                 <div className="order-quantity">
-                    <Button className="counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
-                    <Button className="qty" label={quantity} ttsText={`${formatNumber(quantity)}개`}></Button>
-                    <Button className="counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
+                    <Button className="skel-inline skin-secondary counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
+                    <Button className="skel-inline skin-neutral qty" label={quantity} ttsText={`${formatNumber(quantity)}개`}></Button>
+                    <Button className="skel-inline skin-secondary counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
                 <span className="order-price">{`${formatNumber(totalPrice)}원`}</span>
-                <Button className="warning" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
+                <Button className="skel-inline skin-danger" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
             </div>
         </>
     );

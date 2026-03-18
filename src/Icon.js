@@ -738,6 +738,38 @@ const WheelchairIcon = (props) => (
   </svg>
 );
 
+// ArrowDownIcon 아이콘
+const ArrowDownIcon = (props) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    {...props}
+  >
+    <path fillRule="evenodd" clipRule="evenodd" d="M19.7344 8.40847C20.0628 8.70402 20.0894 9.20985 19.7939 9.53827L12.5947 17.5383C12.443 17.7069 12.2268 17.8031 12 17.8031C11.7732 17.8031 11.5571 17.7069 11.4054 17.5383L4.20537 9.5383C3.9098 9.2099 3.93643 8.70406 4.26484 8.4085C4.59324 8.11293 5.09908 8.13955 5.39464 8.46796L12 15.8072L18.6046 8.46799C18.9001 8.13957 19.4059 8.11292 19.7344 8.40847Z" fill="currentColor">
+      </path>
+  </svg>
+);
+
+// ArrowTopIcon 아이콘
+const ArrowTopIcon = (props) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    {...props}
+  >
+    <path fillRule="evenodd" clipRule="evenodd" d="M19.7352 15.5915C19.4068 15.8871 18.9009 15.8604 18.6054 15.532L12 8.19275L5.39463 15.532C5.09906 15.8604 4.59323 15.8871 4.26482 15.5915C3.93641 15.2959 3.90979 14.7901 4.20536 14.4617L11.4054 6.4617C11.5571 6.29312 11.7732 6.19687 12 6.19687C12.2268 6.19687 12.4429 6.29312 12.5946 6.4617L19.7946 14.4617C20.0902 14.7901 20.0636 15.2959 19.7352 15.5915Z" fill="currentColor">
+      </path>
+  </svg>
+);
+
 // 아이콘 맵
 const iconMap = {
   'Add': AddIcon,
@@ -777,7 +809,9 @@ const iconMap = {
   'Toggle': ToggleIcon,
   'Volume': VolumeIcon,
   'Warning': WarningIcon,
-  'Wheelchair': WheelchairIcon
+  'Wheelchair': WheelchairIcon,
+  'arrow-down': ArrowDownIcon,
+  'arrow-top': ArrowTopIcon
 };
 
 // 통합 아이콘 컴포넌트
@@ -833,5 +867,7 @@ export {
   ToggleIcon,
   VolumeIcon,
   WarningIcon,
-  WheelchairIcon
+  WheelchairIcon,
+  ArrowDownIcon,
+  ArrowTopIcon
 };

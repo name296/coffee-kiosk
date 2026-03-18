@@ -18,9 +18,9 @@ export const getFocusableElements = () => {
     const modalElements = document.querySelectorAll('.modal');
     const isModalOpen = modalElements.length > 0;
 
-    // 화면/모달의 .main 모두 포커스 루프에 포함 (최상단 모달의 .main)
+    // 화면/모달의 .main·.modal-panel 포커스 루프에 포함 (최상단 모달의 .modal-panel)
     const processMain = document.querySelector('.process .main');
-    const modalMains = Array.from(modalElements).map((el) => el.querySelector('.main')).filter(Boolean);
+    const modalMains = Array.from(modalElements).map((el) => el.querySelector('.modal-panel')).filter(Boolean);
     const modalMain = modalMains.length ? modalMains[modalMains.length - 1] : null;
     const prepend = [];
 

@@ -1,36 +1,56 @@
 import React, { memo, useContext } from "react";
-import { Button } from "../components";
+import { Button, Main, Step, Bottom } from "../components";
 import { PROCESS_NAME } from "../constants";
 import { AccessibilityContext, OrderContext } from "../contexts";
+import { processTts } from "./processTts";
 
 const ProcessPayments = memo(() => {
     const order = useContext(OrderContext);
-    const accessibility = useContext(AccessibilityContext);
-    const isLow = accessibility.isLow;
-
-    const paymentAndTask = (
-        <>
-            <div className="payment" data-tts-text="결제 선택,">
-                <Button className="primary1" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
-                <Button className="primary1" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
-                <Button className="primary1" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
-            </div>
-            <div className="task-manager">
-                <Button className="secondary1" navigate={PROCESS_NAME.DETAILS} label="취소" />
-            </div>
-        </>
-    );
+    const isLow = useContext(AccessibilityContext).isLow;
 
     return (
-        <>
-            <div className="title"><span><span className="primary">결제방법</span>을 선택합니다</span></div>
-            <div className="banner price">
-                <span>결제금액</span><span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
-            </div>
-            {isLow ? <div className="content-control">{paymentAndTask}</div> : paymentAndTask}
-        </>
+        <div className="process forth" tabIndex={-1}>
+            <div className="black" />
+            <div className="top body1" />
+            <Step />
+            <Main ttsText={processTts[PROCESS_NAME.PAYMENTS]}>
+                <div className="title">
+                    <span>
+                        <span className="primary">결제방법</span>을 선택합니다
+                    </span>
+                </div>
+                <div className="banner body3 price">
+                    <span>결제금액</span>
+                    <span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
+                </div>
+                {isLow ? (
+                    <div className="content-control">
+                        <div className="payment" data-tts-text="결제 선택,">
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
+                        </div>
+                        <div className="task-manager">
+                            <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.DETAILS} label="취소" />
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="payment" data-tts-text="결제 선택,">
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
+                        </div>
+                        <div className="task-manager">
+                            <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.DETAILS} label="취소" />
+                        </div>
+                    </>
+                )}
+            </Main>
+            <Bottom />
+        </div>
     );
 });
 
-ProcessPayments.displayName = 'ProcessPayments';
+ProcessPayments.displayName = "ProcessPayments";
 export default ProcessPayments;

@@ -15,7 +15,7 @@ function numState(stepIndex, i) {
     return "clear";
 }
 
-/** .name / .separator: 현재이거나 지나감이면 current만 (clear 없음) */
+/** .name / 구분 SVG(.separator): 현재이거나 지나감이면 current만 (clear 없음) */
 function nameState(stepIndex, i) {
     return stepIndex >= i ? "current" : "";
 }
@@ -23,22 +23,26 @@ function sepState(stepIndex, afterStep) {
     return stepIndex >= afterStep ? "current" : "";
 }
 
-/** UI 컴포넌트: 단계 표시(메뉴선택 → 내역확인 → 결제 → 완료). .num/.name/.separator 상태(current|clear) 로 제어 */
+function separatorClass(stepIndex, afterStep) {
+    return ["separator", sepState(stepIndex, afterStep)].filter(Boolean).join(" ");
+}
+
+/** UI 컴포넌트: 단계 표시. .num / .name / StepIcon.separator */
 const Step = memo(() => {
     const { currentProcess } = useContext(ScreenRouteContext);
     const stepIndex = getStepIndex(currentProcess) ?? 1;
 
     return (
-        <div className="step">
+        <div className="step body1">
             <span className={`num ${numState(stepIndex, 1)}`}>{stepIndex > 1 ? "✓" : "1"}</span>
             <span className={`name ${nameState(stepIndex, 1)}`}>메뉴선택</span>
-            <span className={`separator icon ${sepState(stepIndex, 1)}`}><StepIcon /></span>
+            <StepIcon className={separatorClass(stepIndex, 1)} aria-hidden />
             <span className={`num ${numState(stepIndex, 2)}`}>{stepIndex > 2 ? "✓" : "2"}</span>
             <span className={`name ${nameState(stepIndex, 2)}`}>내역확인</span>
-            <span className={`separator icon ${sepState(stepIndex, 2)}`}><StepIcon /></span>
+            <StepIcon className={separatorClass(stepIndex, 2)} aria-hidden />
             <span className={`num ${numState(stepIndex, 3)}`}>{stepIndex > 3 ? "✓" : "3"}</span>
             <span className={`name ${nameState(stepIndex, 3)}`}>결제</span>
-            <span className={`separator icon ${sepState(stepIndex, 3)}`}><StepIcon /></span>
+            <StepIcon className={separatorClass(stepIndex, 3)} aria-hidden />
             <span className={`num ${numState(stepIndex, 4)}`}>{stepIndex > 4 ? "✓" : "4"}</span>
             <span className={`name ${nameState(stepIndex, 4)}`}>완료</span>
         </div>

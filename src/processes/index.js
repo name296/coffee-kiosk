@@ -5,7 +5,7 @@
  */
 export { default as Process } from "./Process";
 export { default as PROCESS_CONFIG } from "./ProcessConfig";
-export { default as ProcessStart } from "./ProcessStart";
+export { default as ProcessStart, ProcessStartPoster } from "./ProcessStart";
 export { default as ProcessMenu } from "./ProcessMenu";
 export { default as ProcessDetails } from "./ProcessDetails";
 export { default as ProcessPayments } from "./ProcessPayments";

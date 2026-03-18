@@ -1,7 +1,7 @@
 import React, { memo, useContext, useMemo } from "react";
 import Button from "./Button";
 import Icon from "../Icon";
-import { PaginationPageNumber } from "./Pagination";
+import { PaginationIndicator } from "./Pagination";
 import { OrderContext, AccessibilityContext } from "../contexts";
 import { useCategoryAssemble } from "../hooks";
 
@@ -73,7 +73,7 @@ const Category = memo(() => {
                 data-tts-text={`페이지네이션, 메뉴 카테고리, ${catTotalPages} 탭 중 ${catCurrentPage} 탭,`}
             >
                 <Button toggle svg={<Icon name="ArrowLeft" />} disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
-                <PaginationPageNumber pageNumber={catCurrentPage} totalPages={catTotalPages} textOnly />
+                <PaginationIndicator pageNumber={catCurrentPage} totalPages={catTotalPages} />
                 <Button toggle svg={<Icon name="ArrowRight" />} disabled={!catHasNext} onClick={catNext} ttsText="다음" />
             </div>
         </div>

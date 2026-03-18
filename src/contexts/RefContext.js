@@ -15,12 +15,12 @@ export const RefProvider = ({ children }) => {
     const useSound_timerInstanceRef = useRef(null);
     const useSound_audioRefs = useRef({});
 
-    const BaseModal_modalConfirmButtonsRef = useRef(null);
+    const modalFooterButtonsRef = useRef(null);
 
     const contextValue = useMemo(() => ({
         refs: {
             useSound: { timerInstanceRef: useSound_timerInstanceRef, audioRefs: useSound_audioRefs },
-            BaseModal: { modalConfirmButtonsRef: BaseModal_modalConfirmButtonsRef }
+            Modal: { footerButtonsRef: modalFooterButtonsRef }
         }
     }), []);
 
