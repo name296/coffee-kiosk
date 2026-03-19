@@ -13,7 +13,7 @@ export const safeQuerySelector = (s, c = null) => {
 
 export const focusWithRefire = (el) => {
     if (!el) return;
-    if (document.activeElement === el && el.blur) el.blur();
+    if (el.blur) el.blur();
     requestAnimationFrame(() => el.focus());
 };
 
