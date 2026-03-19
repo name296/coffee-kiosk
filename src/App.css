@@ -1144,7 +1144,7 @@
 
         & .button.skin-danger {        
           padding: 0;
-          inline-size: 100%;
+          inline-size: 60px;
         }
       }
 
