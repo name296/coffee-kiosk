@@ -39,12 +39,14 @@ const Cart = memo(({ className = "", paginationDirection, itemsPerPageOverride, 
     return (
         <div className={rootClassName} style={style}>
             {showFieldHeader ? (
-                <div className="banner body3 field">
-                    <div className="one-num"><span>순서</span></div>
-                    <div className="one-normal"><span>상품명</span></div>
-                    <div className="one-qty-normal"><span>수량</span></div>
-                    <div className="one-price-normal"><span>가격</span></div>
-                    <div className="one-delete-normal"><span>삭제</span></div>
+                <div className="header body3">
+                    <div className="field">
+                        <div className="one-num"><span>순서</span></div>
+                        <div className="one-normal"><span>상품명</span></div>
+                        <div className="one-qty-normal"><span>수량</span></div>
+                        <div className="one-price-normal"><span>가격</span></div>
+                        <div className="one-delete-normal"><span>삭제</span></div>
+                    </div>
                 </div>
             ) : null}
             <OrderList

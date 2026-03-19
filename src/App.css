@@ -2,7 +2,7 @@
 
 /* ==============================
    큰글씨 폰트 정의 (Large Font Faces)
-   ============================== */
+  ============================== */
 @font-face {
   font-family: "MyFontLarge";
   src: url("./fonts/PretendardGOV-SemiBold.otf") format("opentype");
@@ -88,9 +88,9 @@
 }
 
 @layer root {
-  /* ========================================
+/* ========================================
      :root (Primitive · System · Semantic)
-     ======================================== */
+   ======================================== */
   :root {
     /* ========================================
        Primitive: 간격·폰트·색상
@@ -171,9 +171,9 @@
     --body3-content-color: var(--color-gray-01);
     --body3-content2-color: var(--color-brown-02);
 
-    /* ========================================
+  /* ========================================
        Semantic: 버튼 팔레트 (--buttonN-* 는 프리미티브만. 스킨 클래스는 이 토큰만 참조)
-       ======================================== */
+     ======================================== */
     --button1-background-color-default: var(--color-brown-03);
     --button1-border-color-default: var(--color-brown-03);
     --button1-content-color-default: var(--color-gray-14);
@@ -332,13 +332,12 @@
           justify-items: center;
           align-items: center;
         }
-        }
+      }
 
       & .cart.compact {
         flex-shrink: 0;
         width: var(--layout-width);
         padding-inline: 0;
-        margin-inline: calc(var(--layout-padding-inline) * -1);
         }
       }
 
@@ -749,12 +748,12 @@
       }
 
       & .label {
-        display: flex;
         position: relative;
         border-radius: 0 0 var(--button-border-width) var(--button-border-width);
         overflow: hidden;
         height: 100%;
         width: 100%;
+        display: flex;
         justify-content: flex-end;
         align-items: center;
         flex-flow: column nowrap;
@@ -998,10 +997,20 @@
   }
 
   /* 메뉴 그리드: 동일 레이어의 .pagination(row)보다 특이도 높여 세로 배치 */
-  .process.second .main .menu .menu-pagination .pagination {
-    flex-flow: column nowrap;
-    align-items: center;
-    gap: var(--spacing-sm);
+  .process {
+    &.second {
+      & .main {
+        & .menu {
+          & .menu-pagination {
+            & .pagination {
+              flex-flow: column nowrap;
+              align-items: center;
+              gap: var(--spacing-sm);
+            }
+          }
+        }
+      }
+    }
   }
 
   .payment-amount-large {
@@ -1021,23 +1030,63 @@
     grid-template-rows: auto repeat(7, 1fr);
     align-items: stretch;
     justify-items: stretch;
-    column-gap: var(--spacing-sm);
+    column-gap: 0;
     width: var(--layout-width);
     height: 100%;
 
-    & .banner.field {
+    & .header {
       grid-column: 1 / -1;
       grid-row: 1 / 2;
+      position: relative;
       display: grid;
       grid-template-columns: subgrid;
       align-items: center;
+      height: 70px;
 
-      & .one-num { grid-column: 2; }
-      & .one-normal { grid-column: 3; }
-      & .one-qty-normal { grid-column: 4; }
-      & .one-price-normal { grid-column: 5; }
-      & .one-delete-normal { grid-column: 6; }
+      & .field {
+        grid-column: 2 / -2;
+        grid-row: 1 / 2;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: grid;
+        column-gap: var(--spacing-sm);
+        grid-template-columns: subgrid;
+        align-items: center;
+
+        & .one-num { grid-column: 1; }
+        & .one-normal { grid-column: 2; }
+        & .one-qty-normal { grid-column: 3; }
+        & .one-price-normal { grid-column: 4; }
+        & .one-delete-normal { grid-column: 5; }
+
+        & .one-num,
+        & .one-normal,
+        & .one-qty-normal,
+        & .one-price-normal,
+        & .one-delete-normal,
+        & .one-pagination-normal {
+          position: relative;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+        }
+
+        & .one-num span,
+        & .one-normal span,
+        & .one-qty-normal span,
+        & .one-price-normal span,
+        & .one-delete-normal span {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: max-content;
+          white-space: nowrap;
+          text-align: center;
+        }
       }
+    }
 
     & .order-list {
       grid-column: 2 / -2;
@@ -1047,6 +1096,7 @@
       display: grid;
       grid-template-columns: subgrid;
       grid-template-rows: repeat(6, 1fr);
+      column-gap: var(--spacing-sm);
       row-gap: 0;
       width: 100%;
       height: 100%;
@@ -1161,7 +1211,6 @@
       height: 300px;
       grid-template-columns: 16px 76px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 2ch 16px fit-content(var(--layout-width)) 16px;
       grid-template-rows: auto 1fr;
-      column-gap: 0px;
 
       & .order-list {
         grid-column: 2 / 7;
@@ -1290,45 +1339,9 @@
     align-items: center;
     flex-flow: row nowrap;
     justify-content: center;
-
-    &.price {
-      height: 200px;
-      gap: var(--spacing-lg);
-      }
-
-    &.field {
-      height: 70px;
-      display: grid;
-      grid-template-columns: subgrid;
-      align-items: center;
-
-      & .one-num,
-      & .one-normal,
-      & .one-qty-normal,
-      & .one-price-normal,
-      & .one-delete-normal,
-      & .one-pagination-normal {
-        position: relative;
-        overflow: visible;
-        white-space: nowrap;
-        text-align: center;
-      }
-
-      & .one-num span,
-      & .one-normal span,
-      & .one-qty-normal span,
-      & .one-price-normal span,
-      & .one-delete-normal span {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: max-content;
-        white-space: nowrap;
-        text-align: center;
-      }
+    height: 200px;
+    gap: var(--spacing-lg);
     }
-  }
 
   /* ========================================
      .modal (배경 · 라운드)
@@ -1368,168 +1381,228 @@
   /* ========================================
      버튼·아이콘 치수 (모달·메뉴·결제·summary·bottom 등)
      ======================================== */
-  .modal .modal-panel .modal-body .modal-settings .modal-setting-row .task-manager .button {
-    width: 113px;
-    height: 90px;
-    }
+  .modal {
+    & .modal-panel {
+      & .modal-body {
+        & .modal-settings {
+          & .modal-setting-row {
+            & .task-manager {
+              & .button {
+                width: 113px;
+                height: 90px;
+              }
 
-  .modal .modal-panel .modal-body .modal-settings .modal-setting-row .task-manager:has(.button:only-child) .button {
-    width: 242px;
-    }
+              &:has(.button:only-child) .button {
+                width: 242px;
+              }
 
-  .modal .modal-panel .modal-body .modal-settings .modal-setting-row .task-manager:has(.button:nth-child(4)) .button {
-    width: 70px;
-    }
+              &:has(.button:nth-child(4)) .button {
+                width: 70px;
+              }
+            }
+          }
+        }
 
-  .modal .modal-panel .modal-body > .task-manager .button {
-    width: 285px;
-    height: 90px;
-    }
-
-  .pagination .button {
-    width: 184px;
-    }
-
-  .process.second .main .category-full .pagination .button {
-    width: fit-content;
-    }
-
-  .process.second .main .category-full .pagination .indicator {
-    width: fit-content;
-    }
-
-  .process.second .main .category-full .pagination .indicator .current,
-  .process.second .main .category-full .pagination .indicator .total {
-    width: fit-content;
-    }
-
-  .process.second .main .category-full .pagination .indicator > * {
-    min-width: 0;
-    }
-
-  /* 인덱스: aspect-ratio·min-height가 가로까지 묶어 2ch 고정되므로 utilities에서 해제 */
-  .cart.compact .order-row .order-item .order-index {
-    width: fit-content;
-    min-width: 0;
-    aspect-ratio: unset;
-    min-height: unset;
-    height: fit-content;
-  }
-
-  .cart.compact .details-pagination .button {
-    width: fit-content;
-    }
-
-  /* 카트 컴팩트 페이지네이션 인디케이터 = 카테고리와 동일 */
-  .cart.compact .details-pagination .indicator {
-    width: fit-content;
-    }
-
-  .cart.compact .details-pagination .indicator .current,
-  .cart.compact .details-pagination .indicator .total {
-    width: fit-content;
-    }
-
-  .cart.compact .details-pagination .indicator > * {
-    min-width: 0;
-    }
-
-  .process.second .summary .task-manager .button,
-  .process.third .summary .task-manager .button {
-    width: 199px;
-    height: 134px;
-    overflow: hidden;
-    white-space: nowrap;
-    flex-flow: column nowrap;
-    gap: var(--spacing-xs);
-    }
-
-  .process.second .main .menu > .button {
-    width: 242px;
-    height: 280px;
-
-    & .icon {
-      width: 140px;
-      height: 140px;
+        & > .task-manager .button {
+          width: 285px;
+          height: 90px;
+        }
+      }
     }
   }
 
-  .process.forth .main .payment .button,
-  .process.fifth .main .payment .button {
-    width: 328px;
-    height: 460px;
-    flex-direction: column;
-
-    & .icon {
-      width: 256px;
-      height: 256px;
+  .pagination {
+    & .button {
+      width: 184px;
     }
   }
 
-  .process:not(.first) .main .task-manager .button {
-    width: 371px;
-    height: 120px;
+  .process {
+    &.second {
+      & .main {
+        & .category-full {
+          & .pagination {
+            & .button {
+              width: fit-content;
+            }
+
+            & .indicator {
+              width: fit-content;
+
+              & .current,
+              & .total {
+                width: fit-content;
+              }
+
+              & > * {
+                min-width: 0;
+              }
+            }
+          }
+        }
+
+        & .menu {
+          & > .button {
+            width: 242px;
+            height: 280px;
+
+            & .icon {
+              width: 140px;
+              height: 140px;
+            }
+          }
+        }
+      }
+
+      & .summary {
+        & .task-manager {
+          & .button {
+            width: 199px;
+            height: 134px;
+            overflow: hidden;
+            white-space: nowrap;
+            flex-flow: column nowrap;
+            gap: var(--spacing-xs);
+          }
+        }
+      }
     }
 
-  .process:not(.first) .main .task-manager .button:only-child {
-    width: 500px;
+    &.third {
+      & .summary {
+        & .task-manager {
+          & .button {
+            width: 199px;
+            height: 134px;
+            overflow: hidden;
+            white-space: nowrap;
+            flex-flow: column nowrap;
+            gap: var(--spacing-xs);
+          }
+        }
+      }
     }
 
-  .process .bottom .button {
-    height: 84px;
+    &.forth {
+      & .main {
+        & .payment {
+          & .button {
+            width: 328px;
+            height: 460px;
+            flex-direction: column;
+
+            & .icon {
+              width: 256px;
+              height: 256px;
+            }
+          }
+        }
+      }
     }
 
-  .process.first .main .title {
-    display: block;
-    width: 100%;
-    height: fit-content;
-    font-size: var(--font-size-h1);
-    white-space: normal;
-    overflow-wrap: break-word;
-    text-align: center;
+    &.fifth {
+      & .main {
+        & .payment {
+          & .button {
+            width: 328px;
+            height: 460px;
+            flex-direction: column;
+
+            & .icon {
+              width: 256px;
+              height: 256px;
+            }
+          }
+        }
+      }
+    }
+
+    &:not(.first) {
+      & .main {
+        & .task-manager {
+          & .button {
+            width: 371px;
+            height: 120px;
+
+            &:only-child {
+              width: 500px;
+            }
+          }
+        }
+      }
+    }
+
+    & .bottom {
+      & .button {
+        height: 84px;
+      }
+    }
+
+    &.first {
+      & .main {
+        & .title {
+          display: block;
+          width: 100%;
+          height: fit-content;
+          font-size: var(--font-size-h1);
+          white-space: normal;
+          overflow-wrap: break-word;
+          text-align: center;
+        }
+
+        & .task-manager {
+          & .button {
+            width: 285px;
+            height: 285px;
+            white-space: nowrap;
+            flex-direction: column;
+            font-size: var(--font-size-h2);
+
+            & .icon {
+              width: 96px;
+              height: 96px;
+              font-size: inherit;
+            }
+          }
+        }
+      }
+    }
   }
 
-  .process.first .main .task-manager .button {
-    width: 285px;
-    height: 285px;
-    white-space: nowrap;
-    flex-direction: column;
-    font-size: var(--font-size-h2);
+  .cart {
+    &.compact {
+      & .order-row {
+        & .order-item {
+          & .order-index {
+            width: fit-content;
+            min-width: 0;
+            aspect-ratio: unset;
+            min-height: unset;
+            height: fit-content;
+          }
+        }
+      }
 
-    & .icon {
-      width: 96px;
-      height: 96px;
-      font-size: inherit;
+      & .details-pagination {
+        & .button {
+          width: fit-content;
+        }
+
+        & .indicator {
+          width: fit-content;
+
+          & .current,
+          & .total {
+            width: fit-content;
+          }
+
+          & > * {
+            min-width: 0;
+          }
+        }
+      }
     }
   }
-
-  .low .process.forth .main .content-control .payment .button {
-    width: 242px;
-    height: 310px;
-
-    & .icon {
-      width: 144px;
-      height: 144px;
-    }
-  }
-
-  .low .process.forth .main .content-control .task-manager .button {
-    width: 199px;
-    height: 310px;
-    }
-
-  .low .process.fifth .main .content-control .task-manager .button {
-    width: 100%;
-    height: 134px;
-    flex-grow: 1;
-    flex-shrink: 1;
-    gap: 0;
-    flex-flow: column nowrap;
-    }
-
-  .low .process.fifth .main .content-control .task-manager .button.icon {
-    display: none;
-    }
 
   /* ========================================
      .large — 큰글씨 (타이포 토큰)
@@ -1584,7 +1657,7 @@
     --button3-content-color-pressed: var(--color-gray-01);
     --button3-content-color-disabled: var(--color-gray-07);
 
-    --button3-background2-color-default: linear-gradient(180deg, #00000000 0%, #00000000 30%, #000000FF 35%, #000000FF 100%);
+    --button3-background2-color-default: linear-gradient(180deg, #25252500 0%, #25252500 30%, #252525FF 35%, #252525FF 100%);
     --button3-background2-color-pressed: linear-gradient(180deg, #FFE10000 0%, #FFE10000 30%, #FFE100FF 35%, #FFE100FF 100%);
     --button3-background2-color-disabled: linear-gradient(180deg, #00000000 0%, #00000000 30%, #000000FF 35%, #000000FF 100%);
     --button3-content2-color-default: var(--color-yellow-03);
@@ -1643,7 +1716,7 @@
     & .title {
       font-size: var(--font-size-h1);
       height: 100px;
-      }
+    }
 
     & .summary {
       height: 122px;
@@ -1654,17 +1727,6 @@
       }
     }
 
-    /* 낮은화면: 서머리 액션 버튼 (세로 스택 대신 가로·얕게) */
-    & .process.second .summary .task-manager .button,
-    & .process.third .summary .task-manager .button {
-      width: 199px;
-      height: 90px;
-      flex-flow: row nowrap;
-      gap: var(--spacing-xs);
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
     & .black {
       height: 1020px;
     }
@@ -1673,7 +1735,20 @@
       &.second {
         & .cart {
           display: none;
+        }
+
+        & .summary {
+          & .task-manager {
+            & .button {
+              width: 199px;
+              height: 90px;
+              flex-flow: row nowrap;
+              gap: var(--spacing-xs);
+              overflow: hidden;
+              white-space: nowrap;
+            }
           }
+        }
 
         & .main {
           padding-top: 84px;
@@ -1684,19 +1759,34 @@
             & .menu-pagination {
               grid-row: 1;
               grid-column: 4;
-              }
             }
           }
         }
+      }
+
+      &.third {
+        & .summary {
+          & .task-manager {
+            & .button {
+              width: 199px;
+              height: 90px;
+              flex-flow: row nowrap;
+              gap: var(--spacing-xs);
+              overflow: hidden;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
 
       &.forth {
         & .main {
           padding-block: 0;
 
-          & .banner.price {
+          & .banner {
             height: 150px;
             flex-shrink: 0;
-            }
+          }
 
           & .content-control {
             width: 100%;
@@ -1708,10 +1798,23 @@
 
             & .payment {
               gap: var(--spacing-md);
+
+              & .button {
+                width: 242px;
+                height: 310px;
+
+                & .icon {
+                  width: 144px;
+                  height: 144px;
+                }
+              }
             }
 
             & .task-manager {
-              gap: var(--spacing-md);
+              & .button {
+                width: 199px;
+                height: 310px;
+              }
             }
           }
         }
@@ -1783,6 +1886,18 @@
 
           & .task-manager {
             width: 100%;
+
+            & .button {
+              height: 134px;
+              flex-grow: 1;
+              flex-shrink: 1;
+              gap: 0;
+              flex-flow: column nowrap;
+
+              &.icon {
+                display: none;
+              }
+            }
           }
         }
       }

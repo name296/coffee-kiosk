@@ -19,7 +19,7 @@ const ProcessPayments = memo(() => {
                         <span className="primary">결제방법</span>을 선택합니다
                     </span>
                 </div>
-                <div className="banner body3 price">
+                <div className="banner body3">
                     <span>결제금액</span>
                     <span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
                 </div>
