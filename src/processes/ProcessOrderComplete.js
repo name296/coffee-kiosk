@@ -26,7 +26,7 @@ const ProcessOrderComplete = memo(() => {
                 {isLow ? (
                     <>
                         <div className="content-container">
-                            <div className="pay-guide">
+                            <div className="device-guide">
                                 <img src="./images/device-printer-order.png" alt="" />
                                 <div className="order-num">
                                     <span>주문</span>
@@ -61,7 +61,7 @@ const ProcessOrderComplete = memo(() => {
                                     label={
                                         <>
                                             <span>출력 안함</span>
-                                            <span>{countdown}</span>
+                                            <span>{countdown}초</span>
                                         </>
                                     }
                                 />
@@ -81,11 +81,13 @@ const ProcessOrderComplete = memo(() => {
                                 </div>
                             </>
                         </div>
-                        <div className="pay-guide">
-                            <img src="./images/device-printer-order.png" alt="" />
-                            <div className="order-num">
-                                <span>주문</span>
-                                <span>{order.orderNumber || 100}</span>
+                        <div className="content-container">
+                            <div className="device-guide">
+                                <img src="./images/device-printer-order.png" alt="" />
+                                <div className="order-num">
+                                    <span>주문</span>
+                                    <span>{order.orderNumber || 100}</span>
+                                </div>
                             </div>
                         </div>
                         <div className="task-manager">
@@ -99,7 +101,12 @@ const ProcessOrderComplete = memo(() => {
                                 className="skel-inline skin-primary"
                                 ttsText="출력 안함,"
                                 navigate={PROCESS_NAME.FINISH}
-                                label={`출력 안함${countdown}`}
+                                label={
+                                    <>
+                                        <span>출력 안함</span>
+                                        <span>{countdown}초</span>
+                                    </>
+                                }
                             />
                         </div>
                     </>

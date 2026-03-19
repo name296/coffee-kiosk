@@ -5,7 +5,7 @@ import { TTS } from "../constants";
 import { ModalContext, OrderContext, RefContext } from "../contexts";
 import { useFocusTrap } from "../hooks";
 
-const MODAL_TTS = "알림, 비우기, 주문 내역을 비웁니다, 실행하시려면 비우기 버튼을 누릅니다, ";
+const MODAL_TTS = "알림, 비움, 주문 내역을 비웁니다, 실행하시려면 비움 버튼을 누릅니다, ";
 
 export const ModalReselect = memo(() => {
     const modal = useContext(ModalContext);
@@ -26,7 +26,7 @@ export const ModalReselect = memo(() => {
             >
                 <div className="modal-head body1">
                     <Icon className="primary" name="GraphicReset" />
-                    <span className="primary">비우기</span>
+                    <span className="primary">비움</span>
                 </div>
                 <div className="modal-body body2">
                     <div className="modal-message">
@@ -34,7 +34,7 @@ export const ModalReselect = memo(() => {
                             주문 내역을 <span className="primary">비웁니다</span>
                         </span>
                         <span>
-                            실행하시려면 <span className="primary">비우기</span> 버튼을 누릅니다
+                            실행하시려면 <span className="primary">비움</span> 버튼을 누릅니다
                         </span>
                     </div>
                     <div
@@ -46,7 +46,7 @@ export const ModalReselect = memo(() => {
                         <Button
                             className="skel-inline skin-primary"
                             svg={<Icon name="Reset" />}
-                            label="비우기"
+                            label="비움"
                             onClick={() => {
                                 modal.ModalReselect.close();
                                 order?.setQuantities?.({});

@@ -21,7 +21,7 @@ const ProcessPayments = memo(() => {
                 </div>
                 <div className="banner body3">
                     <span>결제금액</span>
-                    <span className="payment-amount-large">{order.totalSum.toLocaleString("ko-KR")}원</span>
+                    <span className="price">{order.totalSum.toLocaleString("ko-KR")}원</span>
                 </div>
                 {isLow ? (
                     <div className="content-control">

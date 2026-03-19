@@ -15,7 +15,9 @@ const ProcessCardInsert = memo(() => {
                 {isLow ? (
                     <>
                         <div className="content-container">
-                            <img src="./images/device-cardReader-insert.png" alt="" className="pay-guide" />
+                            <div className="device-guide">
+                                <img src="./images/device-cardReader-insert.png" alt="" />
+                            </div>
                         </div>
                         <div className="content-control">
                             <div className="title">
@@ -43,7 +45,11 @@ const ProcessCardInsert = memo(() => {
                                 </div>
                             </>
                         </div>
-                        <img src="./images/device-cardReader-insert.png" alt="" className="pay-guide" />
+                        <div className="content-container">
+                            <div className="device-guide">
+                                <img src="./images/device-cardReader-insert.png" alt="" />
+                            </div>
+                        </div>
                         <div className="task-manager">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                             <Button className="skel-inline skin-primary" style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />

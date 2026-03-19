@@ -32,7 +32,7 @@ const Summary = memo(() => {
                         <Button
                             className="skel-inline skin-secondary"
                             svg={<ResetIcon />}
-                            label="비우기"
+                            label="비움"
                             modal="Reselect"
                             disabled={isDisabledBtn}
                         />

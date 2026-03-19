@@ -25,7 +25,9 @@ const ProcessReceiptPrint = memo(() => {
                 {isLow ? (
                     <>
                         <div className="content-container">
-                            <img src="./images/device-printer-receipt.png" alt="" className="pay-guide" />
+                            <div className="device-guide">
+                                <img src="./images/device-printer-receipt.png" alt="" />
+                            </div>
                         </div>
                         <div className="content-control">
                             <div className="title">
@@ -42,7 +44,7 @@ const ProcessReceiptPrint = memo(() => {
                                     label={
                                         <>
                                             <span>마무리</span>
-                                            <span>{countdown}</span>
+                                            <span>{countdown}초</span>
                                         </>
                                     }
                                     ttsText="마무리하기"
@@ -63,12 +65,21 @@ const ProcessReceiptPrint = memo(() => {
                                 </div>
                             </>
                         </div>
-                        <img src="./images/device-printer-receipt.png" alt="" className="pay-guide" />
+                        <div className="content-container">
+                            <div className="device-guide">
+                                <img src="./images/device-printer-receipt.png" alt="" />
+                            </div>
+                        </div>
                         <div className="task-manager">
                             <Button
                                 className="skel-inline skin-secondary"
                                 navigate={PROCESS_NAME.FINISH}
-                                label={`마무리${countdown}`}
+                                label={
+                                    <>
+                                        <span>마무리</span>
+                                        <span>{countdown}초</span>
+                                    </>
+                                }
                                 ttsText="마무리하기"
                             />
                         </div>

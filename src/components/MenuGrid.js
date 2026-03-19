@@ -64,26 +64,13 @@ const MenuGrid = memo(() => {
                     onPress={(e, target) => handleItemPress(e, item.id, target)}
                 />
             ))}
-            <div
-                className="menu-pagination"
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                    height: "100%",
-                    gridColumn: "4",
-                    gridRow: accessibility.isLow ? "1" : "3"
-                }}
-            >
-                <Pagination
-                    pageNumber={pageNumber}
-                    totalPages={totalPages}
-                    onPrev={(e, target) => handlePrevPage()}
-                    onNext={(e, target) => handleNextPage()}
-                    ttsPrefix="메뉴"
-                />
-            </div>
+            <Pagination
+                pageNumber={pageNumber}
+                totalPages={totalPages}
+                onPrev={(e, target) => handlePrevPage()}
+                onNext={(e, target) => handleNextPage()}
+                ttsPrefix="메뉴"
+            />
         </div>
     );
 });

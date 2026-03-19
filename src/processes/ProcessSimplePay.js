@@ -15,7 +15,9 @@ const ProcessSimplePay = memo(() => {
                 {isLow ? (
                     <>
                         <div className="content-container">
-                            <img src="./images/device-codeReader-simple.png" alt="" className="pay-guide" />
+                            <div className="device-guide">
+                                <img src="./images/device-codeReader-simple.png" alt="" />
+                            </div>
                         </div>
                         <div className="content-control">
                             <div className="title">
@@ -42,7 +44,11 @@ const ProcessSimplePay = memo(() => {
                                 </div>
                             </>
                         </div>
-                        <img src="./images/device-codeReader-simple.png" alt="" className="pay-guide" />
+                        <div className="content-container">
+                            <div className="device-guide">
+                                <img src="./images/device-codeReader-simple.png" alt="" />
+                            </div>
+                        </div>
                         <div className="task-manager">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                             <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
