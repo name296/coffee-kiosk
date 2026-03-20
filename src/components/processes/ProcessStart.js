@@ -3,12 +3,11 @@ import { Button, Main, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
 import { TakeinIcon, TakeoutIcon } from "@/components/Icon";
 import { processTts } from "@/lib/processTts";
-import { publicAsset } from "@/lib/publicPath";
 
 const ProcessStart = memo(() => (
     <div className="process first" tabIndex={-1}>
         <div className="poster">
-            <img src={publicAsset("/images/poster.png")} alt="커피포스터" />
+            <img src="images/poster.png" alt="커피포스터" />
         </div>
         <Main ttsText={processTts[PROCESS_NAME.START]}>
             <span className="title">화면 하단의 접근성 버튼을 눌러 고대비화면, 소리크기, 큰글씨화면, 낮은화면을 설정할 수 있습니다</span>

@@ -6,8 +6,6 @@ const __dirname = path.dirname(__filename);
 
 /**
  * GitHub Pages 프로젝트 사이트: /저장소명
- * - 워크플로에서 NEXT_PUBLIC_BASE_PATH를 주거나
- * - Actions에서는 GITHUB_REPOSITORY(자동)로 복구 (Bun/환경에 따라 PUBLIC이 누락되는 경우 대비)
  */
 function resolveBasePathString() {
   const explicit = process.env.NEXT_PUBLIC_BASE_PATH?.trim().replace(/\/$/, "");
@@ -27,10 +25,8 @@ const nextConfig = {
   output: process.env.NEXT_OUTPUT_EXPORT === "1" ? "export" : undefined,
   basePath,
   assetPrefix: basePath,
-  // 클라이언트 번들의 publicAsset()과 동일 값 보장 (CI에서 PUBLIC 누락 시에도)
-  env: {
-    NEXT_PUBLIC_BASE_PATH: basePathStr,
-  },
+  // 상대경로(images/...)가 항상 /coffee-kiosk/ 기준으로 풀리도록 (슬래시 없는 URL은 상대경로 깨짐)
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },

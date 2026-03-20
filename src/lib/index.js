@@ -1,4 +1,3 @@
-export { basePath, publicAsset } from "./publicPath";
 export * from "./format";
 export * from "./viewport";
 export * from "./storage";

@@ -3,7 +3,6 @@ import { Button, Main, Step, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
 import { AccessibilityContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
-import { publicAsset } from "@/lib/publicPath";
 
 const ProcessCardRemoval = memo(() => {
     const { isLow } = useContext(AccessibilityContext);
@@ -17,7 +16,7 @@ const ProcessCardRemoval = memo(() => {
                     <>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-cardReader-remove.png")} alt="" />
+                                <img src="images/device-cardReader-remove.png" alt="" />
                             </div>
                         </div>
                         <div className="content-control">
@@ -41,7 +40,7 @@ const ProcessCardRemoval = memo(() => {
                         </div>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-cardReader-remove.png")} alt="" />
+                                <img src="images/device-cardReader-remove.png" alt="" />
                             </div>
                         </div>
                         <div className="task-manager">

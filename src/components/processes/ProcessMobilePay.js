@@ -3,7 +3,6 @@ import { Button, Main, Step, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
 import { AccessibilityContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
-import { publicAsset } from "@/lib/publicPath";
 
 const ProcessMobilePay = memo(() => {
     const { isLow } = useContext(AccessibilityContext);
@@ -17,7 +16,7 @@ const ProcessMobilePay = memo(() => {
                     <>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-cardReader-mobile.png")} alt="" />
+                                <img src="images/device-cardReader-mobile.png" alt="" />
                             </div>
                         </div>
                         <div className="content-control">
@@ -44,7 +43,7 @@ const ProcessMobilePay = memo(() => {
                         </div>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-cardReader-mobile.png")} alt="" />
+                                <img src="images/device-cardReader-mobile.png" alt="" />
                             </div>
                         </div>
                         <div className="task-manager">

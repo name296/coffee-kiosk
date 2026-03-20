@@ -4,7 +4,6 @@ import { PROCESS_NAME } from "@/constants";
 import { AccessibilityContext, OrderContext, ScreenRouteContext } from "@/contexts";
 import { useTimeoutCountdown } from "@/hooks";
 import { processTts } from "@/lib/processTts";
-import { publicAsset } from "@/lib/publicPath";
 
 const ProcessOrderComplete = memo(() => {
     const order = useContext(OrderContext);
@@ -28,7 +27,7 @@ const ProcessOrderComplete = memo(() => {
                     <>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-printer-order.png")} alt="" />
+                                <img src="images/device-printer-order.png" alt="" />
                                 <div className="order-num">
                                     <span>주문</span>
                                     <span>{order.orderNumber || 100}</span>
@@ -84,7 +83,7 @@ const ProcessOrderComplete = memo(() => {
                         </div>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src={publicAsset("/images/device-printer-order.png")} alt="" />
+                                <img src="images/device-printer-order.png" alt="" />
                                 <div className="order-num">
                                     <span>주문</span>
                                     <span>{order.orderNumber || 100}</span>

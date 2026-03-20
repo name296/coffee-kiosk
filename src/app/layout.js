@@ -1,8 +1,7 @@
 import './globals.css';
 
-import { publicAsset } from '@/lib/publicPath';
-
-const fontUrl = publicAsset('/fonts/pretendard-gov-semibold.otf');
+/** public/ 기준 상대경로 — basePath + trailingSlash 일 때 문서가 .../coffee-kiosk/ 로 끝나 경로가 맞음 */
+const fontUrl = 'fonts/pretendard-gov-semibold.otf';
 
 const fontFaceCss = `
 @font-face {
@@ -40,7 +39,7 @@ export const metadata = {
   title: 'Coffee Kiosk',
   description: 'Coffee Kiosk Application',
   icons: {
-    icon: publicAsset('/favicon.png'),
+    icon: '/favicon.png',
   },
 };
 

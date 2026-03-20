@@ -18,7 +18,7 @@ alwaysApply: true
 - **`src/lib/`**, **`src/constants/`**: **camelCase** 파일명.
 - **스타일**: 전역은 `src/app/globals.css`만 (또는 공식 문서 패턴).
 - **import**: **`@/`** 별칭 (`jsconfig` → `src/`). `components/` 루트끼리·타 폴더 간은 `@/`로 통일.
-- **`public/`**: URL 경로 = 파일명 — **소문자·kebab-case** (예: `favicon.png`).
+- **`public/`**: 파일명 **소문자·kebab-case**. JSX에서 참조할 때는 **`images/...`, `sounds/...` (앞에 `/` 금지)** — GitHub Pages `basePath` + `trailingSlash`와 맞춤. `/images/...`는 도메인 루트로 나가 404.
 
 ## 금지
 

@@ -5,7 +5,6 @@
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
 import { useSound } from "@/hooks";
 import { ScreenRouteContext, ModalContext } from "@/contexts";
-import { publicAsset } from "@/lib/publicPath";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter' || e.code === 'Numpad5';
 
@@ -48,11 +47,11 @@ const Button = memo(({
     const actionTimerRef = useRef(null);
     const { play: playSound } = useSound();
 
-    /** GitHub Pages basePath 대응: /images, ./images → public */
+    /** public/images — 루트 절대경로(/images) 금지, 상대경로(images/...)만 (GitHub Pages + trailingSlash) */
     const imgSrc = useMemo(() => {
         if (img == null || typeof img !== "string") return img;
-        if (img.startsWith("/images/")) return publicAsset(img);
-        if (img.startsWith("./images/")) return publicAsset(`/${img.slice(2)}`);
+        if (img.startsWith("/images/")) return img.slice(1);
+        if (img.startsWith("./images/")) return img.slice(2);
         return img;
     }, [img]);
 

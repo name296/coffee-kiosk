@@ -26,9 +26,9 @@ const ProcessPayments = memo(() => {
                 {isLow ? (
                     <div className="content-control">
                         <div className="payment" data-tts-text="결제 선택,">
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="images/payment-card.png" label="신용카드" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="images/payment-mobile.png" label="모바일페이" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="images/payment-simple.png" label="간편결제" />
                         </div>
                         <div className="task-manager">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.DETAILS} label="취소" />
@@ -37,9 +37,9 @@ const ProcessPayments = memo(() => {
                 ) : (
                     <>
                         <div className="payment" data-tts-text="결제 선택,">
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="./images/payment-card.png" label="신용카드" />
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="./images/payment-mobile.png" label="모바일페이" />
-                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="./images/payment-simple.png" label="간편결제" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.CARD_INSERT} img="images/payment-card.png" label="신용카드" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.MOBILE_PAY} img="images/payment-mobile.png" label="모바일페이" />
+                            <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.SIMPLE_PAY} img="images/payment-simple.png" label="간편결제" />
                         </div>
                         <div className="task-manager">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.DETAILS} label="취소" />
