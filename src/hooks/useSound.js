@@ -1,11 +1,12 @@
 import { useRef, useCallback } from "react";
+import { publicAsset } from "@/lib/publicPath";
 
 export const useSound = () => {
     const audioRefs = useRef({});
     const volumeRef = useRef(0.5);
 
     const play = useCallback((name) => {
-        const src = name === 'onPressed' ? '/sounds/sound-on-pressed.mp3' : name === 'note' ? '/sounds/sound-note.wav' : null;
+        const src = name === 'onPressed' ? publicAsset('/sounds/sound-on-pressed.mp3') : name === 'note' ? publicAsset('/sounds/sound-note.wav') : null;
         if (!src) return;
 
         // onPressed 사운드는 재생 중단 제외

@@ -4,6 +4,7 @@ import { PROCESS_NAME } from "@/constants";
 import { useTimeoutCountdown } from "@/hooks";
 import { AccessibilityContext, ScreenRouteContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
+import { publicAsset } from "@/lib/publicPath";
 
 const ProcessReceiptPrint = memo(() => {
     const { navigateTo } = useContext(ScreenRouteContext);
@@ -26,7 +27,7 @@ const ProcessReceiptPrint = memo(() => {
                     <>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src="/images/device-printer-receipt.png" alt="" />
+                                <img src={publicAsset("/images/device-printer-receipt.png")} alt="" />
                             </div>
                         </div>
                         <div className="content-control">
@@ -67,7 +68,7 @@ const ProcessReceiptPrint = memo(() => {
                         </div>
                         <div className="content-container">
                             <div className="device-guide">
-                                <img src="/images/device-printer-receipt.png" alt="" />
+                                <img src={publicAsset("/images/device-printer-receipt.png")} alt="" />
                             </div>
                         </div>
                         <div className="task-manager">
