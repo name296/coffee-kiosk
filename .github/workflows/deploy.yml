@@ -62,24 +62,33 @@ jobs:
         env:
           NODE_ENV: production
           NEXT_OUTPUT_EXPORT: 1
-          # GitHub Pages 프로젝트 사이트: /저장소명 — basePath·자산 경로·out/하위 폴더와 일치
+          # next.config가 GITHUB_REPOSITORY로 basePath 복구 — 명시도 유지
           NEXT_PUBLIC_BASE_PATH: "/${{ github.event.repository.name }}"
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
-      # 7. 빌드 결과물 검증 (basePath 사용 시 out/<저장소명>/index.html)
+      # 7. 빌드 결과물 검증 + 업로드 경로 (basePath 유무에 따라 out/ 또는 out/<repo>/)
       - name: Verify build output
+        id: pages_out
         env:
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          OUT_SUB="out/${REPO_NAME}"
+          set -e
           if [ ! -d "./out" ]; then
             echo "❌ Error: out folder not found"
             exit 1
           fi
-          if [ ! -f "./${OUT_SUB}/index.html" ]; then
-            echo "❌ Error: index.html not found at ${OUT_SUB}"
+          REPO_LOWER=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
+          if [ -f "./out/index.html" ]; then
+            echo "path=out" >> "$GITHUB_OUTPUT"
+            echo "✅ Build output: out/index.html (flat)"
+          elif [ -f "./out/${REPO_LOWER}/index.html" ]; then
+            echo "path=out/${REPO_LOWER}" >> "$GITHUB_OUTPUT"
+            echo "✅ Build output: out/${REPO_LOWER}/index.html"
+          else
+            echo "❌ index.html not found. Contents of out/:"
+            find out -maxdepth 3 -type f -name "*.html" 2>/dev/null || ls -laR out
             exit 1
           fi
-          echo "✅ Build output verified (${OUT_SUB}/index.html)"
 
       # 8. GitHub Pages 설정
       - name: Setup Pages
@@ -89,8 +98,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # out 전체가 아니라 basePath 디렉터리만 — 사이트 루트에 index.html 이 오도록
-          path: ./out/${{ github.event.repository.name }}
+          path: ${{ steps.pages_out.outputs.path }}
 
   # 배포 작업: 빌드된 아티팩트를 GitHub Pages에 배포
   deploy:
