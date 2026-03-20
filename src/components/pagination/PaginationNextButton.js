@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import Button from "../Button";
+import Button from "@/components/Button";
 
 /** 다음 버튼. 정보만 받아서 렌더 */
 const PaginationNextButton = memo(({ label, icon, onClick, className }) => (

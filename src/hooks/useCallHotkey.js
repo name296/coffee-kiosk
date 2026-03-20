@@ -1,6 +1,6 @@
 import { useEffect, useContext } from "react";
-import { ModalContext, ScreenRouteContext } from "../contexts";
-import { PROCESS_NAME, PROCESS_PREV_BY_CURRENT } from "../constants";
+import { ModalContext, ScreenRouteContext } from "@/contexts";
+import { PROCESS_NAME, PROCESS_PREV_BY_CURRENT } from "@/constants";
 
 const BACKSPACE_SHOWS_RESTART = [PROCESS_NAME.CARD_REMOVAL, PROCESS_NAME.ORDER_COMPLETE, PROCESS_NAME.RECEIPT_PRINT, PROCESS_NAME.FINISH];
 

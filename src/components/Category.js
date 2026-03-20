@@ -1,9 +1,9 @@
 import React, { memo, useContext, useMemo } from "react";
-import Button from "./Button";
-import Icon from "../Icon";
-import { PaginationIndicator } from "./Pagination";
-import { OrderContext, AccessibilityContext } from "../contexts";
-import { useCategoryAssemble } from "../hooks";
+import Button from "@/components/Button";
+import Icon from "@/components/Icon";
+import { PaginationIndicator } from "@/components/pagination";
+import { OrderContext, AccessibilityContext } from "@/contexts";
+import { useCategoryAssemble } from "@/hooks";
 
 // 카테고리 탭 버튼
 const CategoryTab = memo(({ tab, isSelected, onSelect }) => (
@@ -48,10 +48,10 @@ const Category = memo(() => {
             className="category-full"
             data-tts-text={`메뉴 카테고리, 현재상태, ${order.selectedTab},`}
         >
-            <div ref={catMeasureRef} className="category measure" aria-hidden="true" inert="true">
+            <div ref={catMeasureRef} className="category measure" aria-hidden="true" inert={true}>
                 {categories.map((tab, idx) => (
                     <React.Fragment key={tab.id}>
-                        <Button toggle label={tab.name} tabIndex={-1} />
+                        <Button toggle label={tab.name} tabIndex={0} />
                         {idx < categories.length - 1 && <CategorySeparator />}
                     </React.Fragment>
                 ))}

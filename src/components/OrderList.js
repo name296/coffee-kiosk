@@ -1,9 +1,9 @@
 import React, { memo, useContext } from "react";
-import Button from "./Button";
-import { DeleteIcon, MinusIcon, PlusIcon } from "../Icon";
-import { formatNumber, convertToKoreanQuantity } from "../utils";
-import { OrderContext, ModalContext, ScreenRouteContext } from "../contexts";
-import { PROCESS_NAME } from "../constants";
+import Button from "@/components/Button";
+import { DeleteIcon, MinusIcon, PlusIcon } from "@/components/Icon";
+import { formatNumber, convertToKoreanQuantity } from "@/lib";
+import { OrderContext, ModalContext, ScreenRouteContext } from "@/contexts";
+import { PROCESS_NAME } from "@/constants";
 
 // 주문 행
 const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity }) => {
@@ -14,7 +14,7 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
             <div className="order-row" data-tts-text={`주문목록,${index}번, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`}>
                 <div className="order-item body2">
                     <div className="order-index body1">{index}</div>
-                    <img src={`./images/${item.img}`} alt={item.name} className="order-image" />
+                    <img src={`/images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
                 <span className="order-name">{item.name}</span>
                 <div className="order-quantity">

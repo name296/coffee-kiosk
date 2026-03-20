@@ -1,6 +1,6 @@
 
 import { useEffect, useContext, useRef } from "react";
-import { TTSStateContext } from "../contexts";
+import { TTSStateContext } from "@/contexts";
 
 // 이전 버튼의 부모 요소를 저장하는 전역 ref (같은 부모 안에서 버튼 변경 시 부모 TTS 재생 방지)
 const prevButtonParentRef = { current: null };

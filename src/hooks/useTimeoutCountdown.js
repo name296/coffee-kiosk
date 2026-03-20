@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import { useInitialCountdown } from "./useInitialCountdown";
 import { USER_ACTIVITY_EVENT } from "./useUserActivity";
-import { formatRemainingTime } from "../utils/format";
+import { formatRemainingTime } from "@/lib/format";
 
 export const useTimeoutCountdown = ({
     durationMs,

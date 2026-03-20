@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback, useMemo, useRef } from "react";
-import { PROCESS_NAME } from "../constants";
+import { PROCESS_NAME } from "@/constants";
 
 export const ScreenRouteContext = createContext();
 

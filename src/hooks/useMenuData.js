@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import menuData from "../menuData";
+import menuData from "@/constants/menuData";
 import {
     flattenMenuCategories,
     getCategoryInfo,
     getTabNames
-} from "../utils";
+} from "@/lib";
 
 /**
  * 메뉴 데이터 훅 - menuUtils를 통해 메뉴판 정보를 제공

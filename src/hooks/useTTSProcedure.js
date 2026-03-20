@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { TTSDBContext, TTSStateContext } from "../contexts";
+import { TTSDBContext, TTSStateContext } from "@/contexts";
 import {
     stopAllTTS,
     playAudio,
@@ -7,8 +7,8 @@ import {
     createTTSAudioErrorHandler,
     fetchTTSFromServer,
     playLocalTTS
-} from "../utils";
-import { VOLUME_MAP } from "../constants";
+} from "@/lib";
+import { VOLUME_MAP } from "@/constants";
 
 // 티티에스 프로시저: TTS 재생 및 텍스트 핸들러
 // 요구사항:

@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from "react";
-import Icon from "../../Icon";
+import Icon from "@/components/Icon";
 import PaginationPrevButton from "./PaginationPrevButton";
 import PaginationIndicator from "./PaginationIndicator";
 import PaginationNextButton from "./PaginationNextButton";

@@ -11,7 +11,7 @@ const Main = memo(({
     children,
     className = "",
     ttsText = "",
-    tabIndex = -1,
+    tabIndex = 0,
     Component = "div",
     ...rest
 }) => {

@@ -1,9 +1,9 @@
 import React, { memo, useContext } from "react";
-import Icon from "../Icon";
-import OrderList from "./OrderList";
-import Pagination from "./Pagination";
-import { OrderContext, AccessibilityContext } from "../contexts";
-import { usePageSlicer } from "../hooks";
+import Icon from "@/components/Icon";
+import OrderList from "@/components/OrderList";
+import Pagination from "@/components/pagination";
+import { OrderContext, AccessibilityContext } from "@/contexts";
+import { usePageSlicer } from "@/hooks";
 
 /**
  * 주문 목록 카트(.cart 그리드) + OrderList.

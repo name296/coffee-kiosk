@@ -1,6 +1,6 @@
 import React, { createContext, useMemo, useRef, useCallback } from "react";
-import { useTimeoutCountdown } from "../hooks/useTimeoutCountdown";
-import { IDLE_TIMEOUT_MS } from "../utils/format";
+import { useTimeoutCountdown } from "@/hooks/useTimeoutCountdown";
+import { IDLE_TIMEOUT_MS } from "@/lib/format";
 
 export const TimeoutContext = createContext();
 

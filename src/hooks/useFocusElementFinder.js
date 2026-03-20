@@ -9,14 +9,29 @@ const isVisible = (el) => {
     return true;
 };
 
+/** div.process 루트(tabIndex 0) — 접근성은 유지하되 방향키 루프 목록에서는 제외(.main·버튼만 사용) */
+const isProcessShell = (el) =>
+    el?.classList?.contains('process') && !!el.querySelector?.('.main');
+
+const dedupeFocusOrder = (list) => {
+    const seen = new Set();
+    const out = [];
+    for (const el of list) {
+        if (el && !seen.has(el)) {
+            seen.add(el);
+            out.push(el);
+        }
+    }
+    return out;
+};
+
 // 포커스 가능한 요소 찾기 (단일책임: 포커스 가능 요소 필터링만)
 export const getFocusableElements = () => {
     const elements = Array.from(document.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
-        .filter(el => isVisible(el));
+        .filter(el => isVisible(el))
+        .filter(el => !isProcessShell(el));
 
-    // 모달 상태 확인 (.modal 존재 시 모달 열림)
     const modalElements = document.querySelectorAll('.modal');
-    const isModalOpen = modalElements.length > 0;
 
     // 화면/모달의 .main·.modal-panel 포커스 루프에 포함 (최상단 모달의 .modal-panel)
     const processMain = document.querySelector('.process .main');
@@ -30,7 +45,7 @@ export const getFocusableElements = () => {
         elements.unshift(...prepend);
     }
 
-    return elements;
+    return dedupeFocusOrder(elements);
 };
 
 // 섹션(부모) 찾기: 자신이 data-tts-text면 상위에서 재탐색

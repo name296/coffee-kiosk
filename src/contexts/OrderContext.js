@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback, useMemo, useEffect } from "react";
-import { useMenuData } from "../hooks";
+import { useMenuData } from "@/hooks";
 import {
     categorizeMenu,
     calculateSum,
@@ -7,7 +7,7 @@ import {
     createOrderItems,
     safeParseInt,
     safeLocalStorage
-} from "../utils";
+} from "@/lib";
 
 export const OrderContext = createContext();
 

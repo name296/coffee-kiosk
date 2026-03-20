@@ -3,8 +3,8 @@
  * 상태: toggle, state-pressed, state-pressing — docs/BUTTON_AXES.md
  */
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
-import { useSound } from "../hooks";
-import { ScreenRouteContext, ModalContext } from "../contexts";
+import { useSound } from "@/hooks";
+import { ScreenRouteContext, ModalContext } from "@/contexts";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter' || e.code === 'Numpad5';
 

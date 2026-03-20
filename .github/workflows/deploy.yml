@@ -51,25 +51,22 @@ jobs:
       - name: Generate icon components from SVG
         run: bun run scripts/svg-to-react.js
 
-      # 6. 프로젝트 빌드 (dist 폴더 생성)
+      # 6. Next.js 빌드 (정적 export → out/)
       - name: Build project
         run: bun run build
         env:
           NODE_ENV: production
+          NEXT_OUTPUT_EXPORT: 1
 
-      # 7. 빌드 결과물 검증 (dist 폴더와 필수 파일 존재 확인)
+      # 7. 빌드 결과물 검증 (out/ 폴더)
       - name: Verify build output
         run: |
-          if [ ! -d "./dist" ]; then
-            echo "❌ Error: dist folder not found"
+          if [ ! -d "./out" ]; then
+            echo "❌ Error: out folder not found"
             exit 1
           fi
-          if [ ! -f "./dist/index.html" ]; then
-            echo "❌ Error: index.html not found in dist"
-            exit 1
-          fi
-          if [ ! -f "./dist/App.js" ]; then
-            echo "❌ Error: App.js not found in dist"
+          if [ ! -f "./out/index.html" ]; then
+            echo "❌ Error: index.html not found in out"
             exit 1
           fi
           echo "✅ Build output verified"
@@ -82,7 +79,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./out
 
   # 배포 작업: 빌드된 아티팩트를 GitHub Pages에 배포
   deploy:

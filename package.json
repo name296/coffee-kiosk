@@ -1,39 +1,20 @@
 {
   "name": "coffee",
   "version": "0.1.0",
-  "private": true,
-  "type": "module",
   "dependencies": {
-    "focus-trap-react": "^10.3.1",
+    "next": "^15.1.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
     "zod": "^4.1.12"
   },
-  "devDependencies": {
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.1",
-    "playwright": "^1.58.1"
-  },
+  "private": true,
   "scripts": {
-    "dev": "bun run server.js",
-    "start": "bun run dev",
-    "build": "bun run scripts/build.js",
-    "build:dev": "bun build ./src/index.js --outdir ./dist --target browser --sourcemap --define:\"process.env.NODE_ENV='development'\" --external:\"/images/*\" --external:\"/sound/*\" --external:\"/fonts/*\"",
+    "dev": "next dev",
+    "start": "bun run scripts/start-full.js",
+    "build": "next build",
     "svg-to-react": "bun run scripts/svg-to-react.js",
     "svg-to-react:watch": "bun run scripts/svg-to-react.js --watch",
     "test": "bun test"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "type": "module"
 }

@@ -1,0 +1,1840 @@
+@layer reset, root, layout, components, utilities;
+
+/* =========================================================
+   폰트
+========================================================= */
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("/fonts/pretendard-gov-semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  unicode-range: U+0000-001F, U+0021-002F, U+003A-10FFFF;
+}
+
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("/fonts/pretendard-gov-semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 110%;
+  unicode-range: U+0020;
+}
+
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("/fonts/pretendard-gov-semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 110%;
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("/fonts/pretendard-gov-semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* =========================================================
+   reset
+   - 브라우저 기본값 초기화만
+========================================================= */
+@layer reset {
+  :root {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+  }
+
+  body {    
+    inline-size: var(--layout-width);
+    block-size: var(--layout-height);
+    font: normal normal var(--font-weight-default) var(--font-size-b1) / 1 var(--font-family-current);
+    letter-spacing: -0.04em;
+    user-select: none;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  button {
+    all: unset;
+    box-sizing: border-box;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    object-fit: cover;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* =========================================================
+   root
+   - 토큰만
+========================================================= */
+@layer root {
+  :root {
+    /* -----------------------------------------
+       Primitive: spacing
+    ----------------------------------------- */
+    --spacing-md: 16px;
+    --spacing-xs: calc(var(--spacing-md) * 0.25);
+    --spacing-sm: calc(var(--spacing-md) * 0.5);
+    --spacing-lg: calc(var(--spacing-md) * 1.5);
+    --spacing-xl: calc(var(--spacing-md) * 2);
+    --spacing-2xl: calc(var(--spacing-md) * 2.25);
+
+    /* -----------------------------------------
+       Primitive: typography
+    ----------------------------------------- */
+    --font-family-default: "MyFont", sans-serif;
+    --font-family-large: "MyFontLarge", sans-serif;
+    --font-family-current: var(--font-family-default);
+
+    --font-size-b1: 52px;
+    --font-size-h1: 52px;
+    --font-size-h2: 58px;
+    --font-size-d1: 67px;
+    --font-size-d2: 83px;
+    --font-size-d3: 128px;
+    --font-size-d4: 180px;
+
+    --font-weight-default: 600;
+
+    /* -----------------------------------------
+       Primitive: palette
+    ----------------------------------------- */
+    --color-brown-01: #4c3f37ff;
+    --color-brown-02: #8c532cff;
+    --color-brown-03: #a4693fff;
+    --color-brown-04: #c4895fff;
+    --color-brown-05: #eb9b63ff;
+    --color-brown-06: #eedcd2ff;
+
+    --color-yellow-01: #241f00ff;
+    --color-yellow-02: #807000ff;
+    --color-yellow-03: #ffe100ff;
+    --color-yellow-04: #ffef80ff;
+
+    --color-gray-01: #000000ff;
+    --color-gray-02: #1f1f1fff;
+    --color-gray-03: #252525ff;
+    --color-gray-04: #4c4c4cff;
+    --color-gray-05: #606060ff;
+    --color-gray-06: #737373ff;
+    --color-gray-07: #757575ff;
+    --color-gray-08: #8c8c8cff;
+    --color-gray-09: #bfbfbfff;
+    --color-gray-10: #dbdbdbff;
+    --color-gray-11: #e8e8e8ff;
+    --color-gray-12: #f2f2f2ff;
+    --color-gray-13: #fafafaff;
+    --color-gray-14: #ffffffff;
+
+    --color-system-01: #ff00e1ff;
+    --color-system-02: #b81a00ff;
+    --color-system-03: #751200ff;
+    --color-system-04: #ff4800ff;
+    --color-system-05: #00000099;
+
+    /* -----------------------------------------
+       System: layout
+    ----------------------------------------- */
+    --layout-height: 1920px;
+    --layout-width: 1080px;
+    --layout-padding-inline: var(--spacing-md);
+
+    /* -----------------------------------------
+       Semantic: body skins
+    ----------------------------------------- */
+    --body1-background-color: var(--color-gray-03);
+    --body1-border-color: var(--color-gray-09);
+    --body1-content-color: var(--color-gray-14);
+    --body1-border2-color: var(--color-brown-03);
+    --body1-content2-color: var(--color-brown-05);
+
+    --body2-background-color: var(--color-gray-14);
+    --body2-border-color: var(--color-gray-09);
+    --body2-content-color: var(--color-gray-01);
+    --body2-content2-color: var(--color-brown-02);
+
+    --body3-background-color: var(--color-gray-11);
+    --body3-border-color: var(--color-gray-09);
+    --body3-content-color: var(--color-gray-01);
+    --body3-content2-color: var(--color-brown-02);
+
+    /* -----------------------------------------
+       Semantic: button skins
+    ----------------------------------------- */
+    --button1-background-color-default: var(--color-brown-03);
+    --button1-border-color-default: var(--color-brown-03);
+    --button1-content-color-default: var(--color-gray-14);
+    --button1-background-color-pressed: var(--color-brown-06);
+    --button1-border-color-pressed: var(--color-brown-02);
+    --button1-content-color-pressed: var(--color-brown-02);
+    --button1-background-color-disabled: transparent;
+    --button1-border-color-disabled: var(--color-brown-05);
+    --button1-content-color-disabled: var(--color-brown-05);
+
+    --button2-background-color-default: var(--color-gray-11);
+    --button2-border-color-default: var(--color-gray-09);
+    --button2-content-color-default: var(--color-gray-03);
+    --button2-background-color-pressed: var(--color-gray-07);
+    --button2-border-color-pressed: var(--color-gray-07);
+    --button2-content-color-pressed: var(--color-gray-14);
+    --button2-background-color-disabled: transparent;
+    --button2-border-color-disabled: var(--color-gray-07);
+    --button2-content-color-disabled: var(--color-gray-07);
+
+    --button3-background-color-default: var(--color-gray-14);
+    --button3-border-color-default: var(--color-gray-09);
+    --button3-content-color-default: var(--color-gray-03);
+    --button3-background2-color-default: linear-gradient(180deg,#e8e8e800 0%,#e8e8e800 30%,#e8e8e8ff 35%,#e8e8e8ff 100%);
+    --button3-content2-color-default: var(--color-brown-02);
+
+    --button3-background-color-pressed: var(--color-gray-14);
+    --button3-border-color-pressed: var(--color-brown-03);
+    --button3-content-color-pressed: var(--color-gray-14);
+    --button3-background2-color-pressed: linear-gradient(180deg,#a4693f00 0%,#a4693f00 30%,#a4693fff 35%,#a4693fff 100%);
+    --button3-content2-color-pressed: var(--color-gray-14);
+
+    --button3-background-color-disabled: var(--color-gray-14);
+    --button3-border-color-disabled: var(--color-gray-09);
+    --button3-content-color-disabled: var(--color-gray-07);
+    --button3-background2-color-disabled: linear-gradient(180deg,#e8e8e800 0%,#e8e8e800 30%,#e8e8e8ff 35%,#e8e8e8ff 100%);
+    --button3-content2-color-disabled: var(--color-brown-02);
+    --button3-content3-color-disabled: var(--color-system-02);
+
+    --button4-background-color-default: var(--color-gray-07);
+    --button4-border-color-default: var(--color-gray-07);
+    --button4-content-color-default: var(--color-gray-14);
+    --button4-background-color-pressed: var(--color-gray-11);
+    --button4-border-color-pressed: var(--color-gray-09);
+    --button4-content-color-pressed: var(--color-gray-03);
+    --button4-background-color-disabled: transparent;
+    --button4-border-color-disabled: var(--color-gray-07);
+    --button4-content-color-disabled: var(--color-gray-07);
+
+    --button6-background-color-default: var(--color-gray-14);
+    --button6-border-color-default: var(--color-gray-09);
+    --button6-content-color-default: var(--color-gray-01);
+    --button6-background2-color-default: var(--color-gray-01);
+    --button6-content2-color-default: var(--color-gray-14);
+    --button6-background-color-pressed: var(--color-gray-07);
+    --button6-border-color-pressed: var(--color-gray-07);
+    --button6-content-color-pressed: var(--color-gray-14);
+    --button6-background-color-disabled: transparent;
+    --button6-border-color-disabled: var(--color-gray-07);
+    --button6-content-color-disabled: var(--color-gray-07);
+
+    --button-delete-background-color-default: var(--color-system-02);
+    --button-delete-border-color-default: var(--color-system-02);
+    --button-delete-content-color-default: var(--color-gray-14);
+    --button-delete-background-color-pressed: var(--color-system-03);
+    --button-delete-border-color-pressed: var(--color-system-02);
+    --button-delete-content-color-pressed: var(--color-gray-14);
+    --button-delete-background-color-disabled: transparent;
+    --button-delete-border-color-disabled: var(--color-gray-07);
+    --button-delete-content-color-disabled: var(--color-gray-07);
+  }
+}
+
+/* =========================================================
+   layout
+   - 앱 캔버스
+   - 화면 슬롯
+   - 화면 문맥의 배치 오브젝트
+========================================================= */
+@layer layout {
+
+  /* -----------------------------------------
+     screen frame
+  ----------------------------------------- */
+  .screen {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    justify-items: stretch;
+
+    &:focus-within {
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    & .screen-1,
+    & .screen-2,
+    & .screen-3,
+    & .screen-4 {
+      width: 100%;
+      height: 100%;
+
+      &:focus {
+        outline: 12px dashed var(--color-system-01);
+        outline-offset: -12px;
+      }
+    }
+
+    & .screen-1 { grid-row: 1; grid-column: 1; }
+    & .screen-2 { grid-row: 1; grid-column: 2; }
+    & .screen-3 { grid-row: 2; grid-column: 1; }
+    & .screen-4 { grid-row: 2; grid-column: 2; }
+  }
+
+  .process {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+    contain: size;
+
+    & > * {
+      padding-inline: var(--layout-padding-inline);
+      flex-shrink: 0;
+      position: relative;
+      align-items: center;
+      display: flex;
+    }
+
+    /* 포스터만 shrink 허용 (.process > * 의 flex-shrink:0 보다 구체성 높음) */
+    & > .poster {
+      flex-shrink: 1;
+      min-block-size: 0;
+    }
+  }
+
+  .black {
+    block-size: 0;
+  }
+
+  .top {
+    block-size: 70px;
+  }
+
+  .step {
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    block-size: 112px;
+
+    & .num {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      inline-size: 74px;
+      block-size: 74px;
+    }
+
+    & .separator {
+      display: block;
+      inline-size: 1em;
+      block-size: 1em;
+      flex-shrink: 0;
+    }
+  }
+
+  .main {
+    flex: 1 0 auto;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+  }
+
+  .summary {
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    block-size: 182px;
+    gap: var(--spacing-md);
+  }
+
+  .bottom {
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    block-size: 112px;
+  }
+
+  /* -----------------------------------------
+     modal overlay placement only
+  ----------------------------------------- */
+  .modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+    padding-inline: var(--layout-padding-inline);
+    padding-block: 200px;
+    contain: size;
+  }
+}
+
+/* =========================================================
+   components
+   - 재사용 위젯
+   - 내부 구조
+   - 시각 스킨
+========================================================= */
+@layer components {
+  /* -----------------------------------------
+     surface / body skins
+  ----------------------------------------- */
+  .body1 {
+    background-color: var(--body1-background-color);
+    border: 2px solid var(--body1-border-color);
+    color: var(--body1-content-color);
+
+    & .primary {
+      color: var(--body1-content2-color);
+    }
+  }
+
+  .body2 {
+    background-color: var(--body2-background-color);
+    border: 2px solid var(--body2-border-color);
+    color: var(--body2-content-color);
+
+    & .primary {
+      color: var(--body2-content2-color);
+    }
+  }
+
+  .body3 {
+    background-color: var(--body3-background-color);
+    border: 2px solid var(--body3-border-color);
+    color: var(--body3-content-color);
+
+    & .primary {
+      color: var(--body3-content2-color);
+    }
+  }
+
+    /* -----------------------------------------
+     button
+     - .button = default skeleton
+     - .button.skel-* = non-default skeleton
+     - .button.skin-* = skin
+     - .button.state-* = state
+  ----------------------------------------- */
+  .button {
+  
+    --button-min-side-lower-limit: calc(var(--layout-width) * 0.08);
+    --button-min-side-raw: var(--button-min-side-lower-limit); /*js에서 덮어씀*/
+    --button-min-side-upper-limit: calc(var(--layout-width) * 0.16);    
+    --button-min-side-clamped: clamp(var(--button-min-side-lower-limit), var(--button-min-side-raw), var(--button-min-side-upper-limit));
+    
+    --button-appearance-ratio: calc(var(--button-min-side-clamped) * 0.05);
+
+    --button-padding-inline: calc(var(--button-appearance-ratio) * 2);
+    --button-padding-block: 0;
+
+    position: relative;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-block-size: 84px;
+    padding: var(--button-padding-block) var(--button-padding-inline);
+    border-width: var(--button-appearance-ratio);
+    border-style: solid;
+    border-radius: calc(var(--button-appearance-ratio) * 2);
+    background-clip: padding-box;
+    box-shadow: 0 0 calc(var(--button-appearance-ratio) * 0.5) calc(var(--button-appearance-ratio) * 0.25) rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+    cursor: pointer;
+    touch-action: none;
+    text-align: center;
+    transition: transform 120ms;
+
+    & .icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      inline-size: 1em;
+      block-size: 1em;
+      flex-shrink: 0;
+
+    & svg,
+    & img {
+      display: block;
+        inline-size: 100%;
+        block-size: 100%;
+      object-fit: contain;
+        fill: currentColor;
+      }
+    }
+
+    &:hover,
+    &:focus-visible {
+      outline: calc(var(--button-appearance-ratio) * 4) dashed var(--color-system-01);
+      outline-offset: calc(var(--button-appearance-ratio) * -1);
+      z-index: 1;
+    }
+
+    &.state-pressing {
+      transform: scale(0.92);
+      will-change: transform;
+    }
+
+    &.toggle.state-pressed::after {
+      content: "";
+      position: absolute;
+      display: block;
+      inline-size: calc(100% - var(--button-appearance-ratio) * 0.5 * 2); /*양쪽값(left, right) 둘다 뺴줘야함: 2배*/
+      block-size: calc(100% - var(--button-appearance-ratio) * 0.5 * 2); /*양쪽값(top, bottom) 둘다 뺴줘야함: 2배*/
+      border-radius: calc(var(--button-appearance-ratio) * 0.5);
+      background-color: currentColor;
+      mask-image:
+        url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,0 24,0 0,24' fill='black'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='24,0 0,0 24,24' fill='black'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,24 0,0 24,24' fill='black'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='24,24 24,0 0,24' fill='black'/%3E%3C/svg%3E");
+      mask-size: calc(var(--button-appearance-ratio) * 4) calc(var(--button-appearance-ratio) * 4);
+      mask-position: 0 0, 100% 0, 0 100%, 100% 100%;
+      mask-repeat: no-repeat;
+    }
+
+    &[aria-disabled="true"] {
+      border-style: dashed;
+      cursor: not-allowed;
+      pointer-events: auto;
+    }
+
+    &.skel-stacked {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr;
+      align-items: center;
+      justify-items: center;
+      padding: 0;
+      gap: 0;
+
+      & .icon {
+        grid-row: 1;
+        grid-column: 1;
+        align-self: start;
+        justify-self: center;
+      }
+
+      & .label {
+        grid-row: 1;
+        grid-column: 1;
+        align-self: stretch;
+        justify-self: stretch;
+        position: relative;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-end;
+        align-items: center;
+        inline-size: 100%;
+        block-size: 100%;
+        overflow: hidden;
+        border-radius: 0 0 var(--button-appearance-ratio) var(--button-appearance-ratio);
+
+        & span:nth-child(1) {
+          overflow: hidden;
+          -webkit-line-clamp: 2;
+          line-clamp: 2;
+          text-align: center;
+          block-size: 2lh;
+        }
+
+        & span:nth-child(2) {
+          block-size: 1lh;
+          letter-spacing: -0.08em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    &.skel-access {
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      padding-inline-start: 0;
+      padding-inline-end: calc(var(--button-min-side-raw) * 0.25);
+      border-radius: calc(var(--button-min-side-raw) * 0.5);
+
+      & .icon {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        inline-size: var(--button-min-side-raw);
+        block-size: var(--button-min-side-raw);
+        margin-inline-start: calc(var(--button-appearance-ratio) * -1);
+        border-style: solid;
+        border-width: var(--button-appearance-ratio);
+        border-radius: calc(var(--button-min-side-raw) * 0.5);
+
+        & svg {
+          inline-size: 1em;
+          block-size: 1em;
+        }
+      }
+    }
+
+    /* skins */
+    &.skin-primary {
+      background-color: var(--button1-background-color-default);
+      border-color: var(--button1-border-color-default);
+      color: var(--button1-content-color-default);
+
+      &.state-pressed {
+        background-color: var(--button1-background-color-pressed);
+        border-color: var(--button1-border-color-pressed);
+        color: var(--button1-content-color-pressed);
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button1-background-color-disabled);
+        border-color: var(--button1-border-color-disabled);
+        color: var(--button1-content-color-disabled);
+      }
+    }
+
+    &.skin-secondary {
+      background-color: var(--button4-background-color-default);
+      border-color: var(--button4-border-color-default);
+      color: var(--button4-content-color-default);
+
+      &.state-pressed {
+        background-color: var(--button4-background-color-pressed);
+        border-color: var(--button4-border-color-pressed);
+        color: var(--button4-content-color-pressed);
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button4-background-color-disabled);
+        border-color: var(--button4-border-color-disabled);
+        color: var(--button4-content-color-disabled);
+      }
+    }
+
+    &.skin-neutral {
+      background-color: var(--button2-background-color-default);
+      border-color: var(--button2-border-color-default);
+      color: var(--button2-content-color-default);
+
+      &.state-pressed {
+        background-color: var(--button2-background-color-pressed);
+        border-color: var(--button2-border-color-pressed);
+        color: var(--button2-content-color-pressed);
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button2-background-color-disabled);
+        border-color: var(--button2-border-color-disabled);
+        color: var(--button2-content-color-disabled);
+      }
+    }
+
+    &.skin-menu {
+      background-color: var(--button3-background-color-default);
+      border-color: var(--button3-border-color-default);
+      color: var(--button3-content-color-default);
+
+      & .label {
+        background-image: var(--button3-background2-color-default);
+
+        & .primary {
+          color: var(--button3-content2-color-default);
+        }
+      }
+
+      &.state-pressed {
+        background-color: var(--button3-background-color-pressed);
+        border-color: var(--button3-border-color-pressed);
+        color: var(--button3-content-color-pressed);
+
+        & .label {
+          background-image: var(--button3-background2-color-pressed);
+
+          & .primary {
+            color: var(--button3-content2-color-pressed);
+          }
+        }
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button3-background-color-disabled);
+        border-color: var(--button3-border-color-disabled);
+        color: var(--button3-content-color-disabled);
+
+        & .label {
+          background-image: var(--button3-background2-color-disabled);
+
+          & .primary {
+            color: var(--button3-content2-color-disabled);
+          }
+        }
+      }
+    }
+
+    &.skin-access {
+      background-color: var(--button6-background-color-default);
+      border-color: var(--button6-border-color-default);
+      color: var(--button6-content-color-default);
+
+      & .icon {
+        background-color: var(--button6-background2-color-default);
+        border-color: var(--button6-border-color-default);
+        color: var(--button6-content2-color-default);
+      }
+
+      &.state-pressed {
+        background-color: var(--button6-background-color-pressed);
+        border-color: var(--button6-border-color-pressed);
+        color: var(--button6-content-color-pressed);
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button6-background-color-disabled);
+        border-color: var(--button6-border-color-disabled);
+        color: var(--button6-content-color-disabled);
+      }
+    }
+
+    &.skin-danger {
+      background-color: var(--button-delete-background-color-default);
+      border-color: var(--button-delete-border-color-default);
+      color: var(--button-delete-content-color-default);
+
+      &.state-pressed {
+        background-color: var(--button-delete-background-color-pressed);
+        border-color: var(--button-delete-border-color-pressed);
+        color: var(--button-delete-content-color-pressed);
+      }
+
+      &[aria-disabled="true"] {
+        background-color: var(--button-delete-background-color-disabled);
+        border-color: var(--button-delete-border-color-disabled);
+        color: var(--button-delete-content-color-disabled);
+      }
+    }
+  }
+  
+  .task-manager {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+
+    & .button {
+      gap: 0;
+      block-size: 134px;
+      flex-flow: column nowrap;
+    }
+  }
+
+  .pagination {
+    position: relative;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    & .button {
+      inline-size: fit-content;
+      flex-flow: row nowrap;
+    }
+
+    & .indicator {
+      display: inline-flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      inline-size: auto;
+      gap: 0;
+
+      & .current,
+      & .total {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        inline-size: 2ch;
+      }
+
+      & .pagination-separator {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;        
+        inline-size: 1ch;
+        color: var(--body2-border-color);
+      }
+    }
+  }
+
+  .banner {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    inline-size: var(--layout-width);
+    block-size: 200px;
+    gap: var(--spacing-lg);
+
+    & .price {
+      font-size: var(--font-size-d2);
+    }
+  }
+  
+  /* -----------------------------------------
+     category / menu / payment
+  ----------------------------------------- */  
+  .category-full {
+    position: relative;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: var(--spacing-xl);
+    inline-size: 100%;
+
+    & .category {
+      position: relative;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-xs);
+      inline-size: 100%;
+      block-size: auto;
+
+      &.measure {
+        position: absolute;
+        inset-block-start: 0;
+        inset-inline-start: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      &.compact {
+        justify-content: flex-start;
+        gap: var(--spacing-sm);
+      }
+
+      & .category-separator {
+        inline-size: 2px;
+        block-size: 40px;
+        align-self: center;
+        flex-shrink: 0;
+        background-color: var(--body2-border-color);
+      }
+    }
+
+    & .pagination {      
+      & .button {
+        inline-size: fit-content;
+      }
+
+      & .indicator {
+        inline-size: fit-content;
+
+        & .current,
+        & .total {
+          inline-size: fit-content;
+        }
+      }
+    }
+  }
+
+  .menu {
+    flex: 1 1 auto;
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    justify-items: center;
+    align-items: center;
+    gap: var(--spacing-md);  
+    
+    & > .button {
+      inline-size: 100%;
+      block-size: 100%;
+      min-inline-size: 242px;
+      min-block-size: 280px;
+
+      & .icon {
+        inline-size: 140px;
+        block-size: 140px;
+      }
+    }
+
+    & .pagination {
+      grid-column: 4;
+      grid-row: 3;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      inline-size: 100%;
+      block-size: 100%;
+    }    
+  }
+
+  .cart {
+    display: grid;
+    grid-template-columns: 16px 113px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 113px 16px;
+    grid-template-rows: auto repeat(7, 1fr);
+    align-items: stretch;
+    justify-items: stretch;
+    column-gap: 0;
+    inline-size: var(--layout-width);
+    block-size: 100%;
+    flex: 1 1 auto;
+    align-self: center;
+
+    & .header {
+      position: relative;
+      display: grid;
+      grid-column: 1 / -1;
+      grid-row: 1 / 2;
+      grid-template-columns: subgrid;
+      align-items: center;
+      block-size: 70px;
+
+      & .field {
+        position: relative;
+        display: grid;
+        grid-column: 2 / -2;
+        grid-row: 1 / 2;
+        grid-template-columns: subgrid;
+        column-gap: var(--spacing-sm);
+        align-items: center;
+        inline-size: 100%;
+        block-size: 100%;
+
+        & .one-num {
+          grid-column: 1;
+        }
+
+        & .one-normal {
+          grid-column: 2;
+        }
+
+        & .one-qty-normal {
+          grid-column: 3;
+        }
+
+        & .one-price-normal {
+          grid-column: 4;
+        }
+
+        & .one-delete-normal {
+          grid-column: 5;
+        }
+
+        & .one-num,
+        & .one-normal,
+        & .one-qty-normal,
+        & .one-price-normal,
+        & .one-delete-normal,
+        & .one-pagination-normal {
+          position: relative;
+          overflow: visible;
+          white-space: nowrap;
+          text-align: center;
+        }
+
+        & .one-num span,
+        & .one-normal span,
+        & .one-qty-normal span,
+        & .one-price-normal span,
+        & .one-delete-normal span {
+          position: absolute;
+          inset-inline-start: 50%;
+          inset-block-start: 50%;
+          transform: translate(-50%, -50%);
+          inline-size: max-content;
+          white-space: nowrap;
+          text-align: center;
+        }
+      }
+    }
+
+    & .order-list {
+      display: grid;
+      grid-column: 2 / -2;
+      grid-row: 2 / 8;
+      grid-template-columns: subgrid;
+      grid-template-rows: repeat(6, 1fr);
+      column-gap: var(--spacing-sm);
+      row-gap: 0;
+      justify-self: stretch;
+      align-self: stretch;
+      inline-size: 100%;
+      block-size: 100%;
+      flex-grow: 1;
+    }
+
+    & .details-pagination {
+      grid-column: 2 / -2;
+      grid-row: 8 / 9;
+      justify-self: center;
+      align-self: center;
+    }
+
+    & .order-row {
+      position: relative;
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      align-items: center;
+      block-size: 100%;
+      padding-block: 8px;
+
+      &:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        inset-block-start: 100%;
+        display: block;
+        inline-size: 100%;
+        border-bottom: 2px solid var(--body1-border-color);
+      }
+
+      & .order-item {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        inline-size: 100%;
+        aspect-ratio: 1 / 1;
+
+        & .order-image {
+          inline-size: 100%;
+          block-size: 100%;
+        }
+
+        & .order-index {
+          position: absolute;
+          inset-block-start: -2px;
+          inset-inline-start: -2px;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          inline-size: 2ch;
+          block-size: 2ch;
+          aspect-ratio: 1 / 1;
+        }
+      }
+
+      & .order-quantity {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+
+        & .counter,
+        & .qty {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0;
+          aspect-ratio: 1 / 1;
+        }
+      }
+
+      & .order-price {
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        inline-size: 258px;
+        text-align: right;
+      }
+
+      & .button.skin-danger {
+        align-self: center;
+        justify-self: center;
+        padding: 0;
+        inline-size: 84px;
+        block-size: 84px;
+      }
+    }
+
+    &.without-field-header {
+      grid-template-rows: repeat(6, 1fr) 1fr;
+
+      & .order-list {
+        grid-row: 1 / 7;
+      }
+
+      & .details-pagination {
+        grid-row: 7 / 8;
+      }
+    }
+
+    &.compact {
+      flex: 1 0 auto;
+      inline-size: var(--layout-width);
+      padding-inline: 0;
+      block-size: 300px;
+      grid-template-columns: 16px 76px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 2ch 16px fit-content(var(--layout-width)) 16px;
+      grid-template-rows: auto 1fr;
+
+      & .order-list {
+        grid-column: 2 / 7;
+        grid-row: 2;
+        grid-template-rows: repeat(3, 1fr);
+      }
+
+      & .order-row {
+        & .order-item {
+          & .order-index {
+            inline-size: fit-content;
+            block-size: auto;
+            aspect-ratio: unset;
+          }
+        }
+
+        & .order-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        & .order-quantity {
+          & .counter,
+          & .qty {
+            inline-size: 60px;
+            justify-content: center;
+            align-items: center;
+          }
+        }
+
+        & .order-price {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        & .button.skin-danger {        
+          padding: 0;
+          inline-size: 60px;
+        }
+      }
+
+      & .details-pagination {
+        grid-column: 8;
+        grid-row: 2;
+        justify-self: center;
+        align-self: center;
+        display: inline-flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        gap: var(--spacing-md);
+
+        & .button {
+          inline-size: fit-content;
+        }
+
+        & .indicator {
+          inline-size: fit-content;
+
+          & .current,
+          & .total {
+            inline-size: fit-content;
+          }
+        }
+      }
+
+      &.without-field-header {
+        grid-template-rows: 1fr;
+
+        & .order-list {
+          grid-row: 1;
+        }
+
+        & .details-pagination {
+          grid-row: 1;
+        }
+      }
+    }
+  }
+
+  .payment {
+    flex: 1 1 auto;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    & .button {
+      flex: 0 0 328px;
+      block-size: 460px;
+      flex-direction: column;
+
+      & .icon {
+        inline-size: 256px;
+        block-size: 256px;
+      }
+    }    
+  }
+
+  /* -----------------------------------------
+     basic reusable blocks
+  ----------------------------------------- */
+  .poster {
+    display: flex;
+    flex: 0 1 auto;
+    padding-inline: 0;
+
+    & img {
+      flex: 0 1 auto;
+      object-fit: cover;
+    }
+  }
+  
+  .title {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    inline-size: 100%;
+    block-size: 200px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: var(--font-size-h2);
+  }
+
+  /* -----------------------------------------
+     guides / banners / content widgets
+  ----------------------------------------- */
+  .content-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+
+    & .device-guide {
+      position: relative;
+      inline-size: 762px;
+      block-size: 612px;
+
+      & img {
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: contain;
+      }
+
+      & .order-num {
+        position: absolute;
+        inset-block-start: 38.25%;
+        inset-inline-end: 1.6%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        inline-size: 26.25%;
+        block-size: 50.32%;
+        transform: translate(-50%, -50%);
+        border: 2px solid currentColor;
+        color: var(--color-gray-01);
+        font-size: var(--font-size-d2);
+        white-space: nowrap;
+      }
+    }
+
+    & .end-countdown {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      inline-size: 278px;
+      block-size: 278px;
+      border: 9px solid var(--body1-border2-color);
+      border-radius: 50%;
+      background-color: var(--body1-content2-color);
+      color: var(--body1-background-color);
+      font-size: var(--font-size-d4);
+    }
+  }
+
+    /* -----------------------------------------
+    black widget (시각/스킨만)
+  ----------------------------------------- */
+  .black {
+    background-color: var(--color-gray-01);
+  }
+
+  /* -----------------------------------------
+     step widget (시각/스킨만)
+  ----------------------------------------- */
+  .step {
+    & .num {
+      border: 8px solid transparent;
+      border-radius: 50%;
+      background-clip: padding-box;
+      background-color: var(--color-gray-07);
+
+      &.current {
+        background-color: var(--body1-content2-color);
+        border-color: var(--body1-border2-color);
+        color: var(--body1-background-color);
+
+        &.clear {
+          border-color: transparent;
+        }
+      }
+    }
+
+    & .name.current,
+    & .separator.current {
+      color: var(--body1-content2-color);
+    }
+  }
+
+  /* -----------------------------------------
+     summary context (summary 내부 컴포넌트 오버라이드)
+  ----------------------------------------- */
+  .summary {
+    & .task-manager {
+      & .button {
+        flex: 0 0 199px;
+      }
+    }
+
+    & .summary-content {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      inline-size: 100%;
+      block-size: auto;
+
+      & .summary-text {
+        text-align: left;
+      }
+
+      & .summary-count {
+        text-align: right;
+
+        &.num {
+          inline-size: 99px;
+        }
+
+        &.price {
+          inline-size: 264px;
+        }
+      }
+
+      & .summary-line {
+        color: var(--body1-border-color);
+      }
+    }
+  }
+
+  /* -----------------------------------------
+     bottom context (bottom 내부 컴포넌트 오버라이드)
+  ----------------------------------------- */
+  .bottom {
+    & .button {
+      block-size: 84px;
+    }
+  }
+
+  /* -----------------------------------------
+     main context (main 포커스/호버 · 내부 task-manager 버튼)
+  ----------------------------------------- */
+  .main {
+    &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+    &:focus-visible {
+      outline: 12px dashed var(--color-system-01);
+      outline-offset: -12px;
+    }
+
+    & .task-manager .button {
+      inline-size: 371px;
+
+      &:only-child {
+        inline-size: 500px;
+      }
+    }
+  }
+
+  /* -----------------------------------------
+     modal widget
+  ----------------------------------------- */
+  .modal {
+    background: var(--color-system-05);
+    backdrop-filter: blur(4px);
+
+    & .modal-panel {
+      position: relative;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: stretch;
+      inline-size: 100%;
+      block-size: auto;
+      overflow: hidden;
+      border-radius: 24px;
+
+      &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
+      &:focus-visible {
+        outline: 12px dashed var(--color-system-01);
+        outline-offset: -12px;
+      }
+
+      & .modal-body {
+        & .modal-settings {
+          & .modal-setting-row {
+            & .task-manager {
+              & .button {
+                inline-size: 113px;
+                block-size: 90px;
+              }
+
+              &:has(.button:only-child) .button {
+                inline-size: 242px;
+                block-size: 134px;
+              }
+
+              &:has(.button:nth-child(4)) .button {
+                inline-size: 70px;
+              }
+            }
+          }
+        }
+
+        & > .task-manager .button {
+          inline-size: 285px;
+        }
+      }
+    }
+
+    & .modal-head,
+    & .modal-body {
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-lg);
+      inline-size: 100%;
+      padding: var(--spacing-2xl);
+    }
+
+    & .modal-head {
+      border-radius: 24px 24px 0 0;
+
+      & svg {
+        inline-size: 100px;
+        block-size: 100px;
+      }
+    }
+
+    & .modal-body {
+      border-radius: 0 0 24px 24px;
+    }
+
+    & .modal-graphic {
+      display: block;
+      inline-size: 1em;
+      block-size: 1em;
+      flex-shrink: 0;
+    }
+
+    & .modal-message {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    & .modal-settings {
+      display: grid;
+      grid-auto-rows: auto;
+      inline-size: 100%;
+      block-size: auto;
+    }
+
+    & .modal-setting-row {
+      position: relative;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      inline-size: 100%;
+      block-size: auto;
+      padding-block: var(--spacing-md);
+
+      &:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        inset-block-start: 100%;
+        display: block;
+        inline-size: 100%;
+        border-bottom: 2px solid var(--body1-border-color);
+      }
+    }
+
+    & .modal-setting-name {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      gap: var(--spacing-md);
+      inline-size: 100%;
+      block-size: auto;
+    }
+  }
+}
+
+/* =========================================================
+   utilities
+   - 화면 문맥 오버라이드
+   - 버튼/아이콘 제약
+   - 테마 / 접근 모드 / low screen
+========================================================= */
+@layer utilities {
+
+  
+  .main.body2,
+  .cart.body2 {
+    border-style: none;
+  }
+
+  .process.first {
+    & .main {
+      & .title {
+        display: block;
+        inline-size: 100%;
+        block-size: auto;
+        font-size: var(--font-size-h1);
+        white-space: normal;
+        overflow-wrap: break-word;
+        text-align: center;
+      }
+
+      & .task-manager {
+        & .button {
+          inline-size: 285px;
+          block-size: 285px;
+          white-space: nowrap;
+          flex-direction: column;
+          font-size: var(--font-size-h2);
+
+          & .icon {
+            inline-size: 96px;
+            block-size: 96px;
+          }
+        }
+      }
+    }
+  }
+  .process.second {
+    & .main {
+      padding-block: var(--spacing-md);
+      gap: var(--spacing-md);
+    }
+  }
+
+  .process.forth,
+  .process.fifth {
+    & .main {
+      padding-block-start: 200px;
+      padding-block-end: 182px;
+    }
+  }
+
+  /* -----------------------------------------
+     large mode
+  ----------------------------------------- */
+  .large {
+    --font-family-current: var(--font-family-large);
+    --font-size-b1: 57.6px;
+    --font-size-h1: 57.6px;
+    --font-size-h2: 69.6px;
+    --font-size-d1: 80.4px;
+    --font-size-d2: 99.6px;
+    --font-size-d3: 153.6px;
+    --font-size-d4: 216px;
+  }
+
+  /* -----------------------------------------
+     dark mode
+  ----------------------------------------- */
+  .dark {
+    --body1-background-color: var(--color-gray-01);
+    --body1-border-color: var(--color-gray-07);
+    --body1-border2-color: var(--color-yellow-02);
+    --body1-content-color: var(--color-gray-14);
+    --body1-content2-color: var(--color-yellow-03);
+
+    --body2-background-color: var(--color-gray-01);
+    --body2-border-color: var(--color-gray-07);
+    --body2-content-color: var(--color-gray-14);
+    --body2-content2-color: var(--color-yellow-03);
+
+    --body3-background-color: var(--color-gray-01);
+    --body3-border-color: var(--color-gray-07);
+    --body3-content-color: var(--color-gray-14);
+    --body3-content2-color: var(--color-yellow-03);
+
+    --button1-background-color-default: var(--color-yellow-03);
+    --button1-background-color-pressed: var(--color-yellow-01);
+    --button1-background-color-disabled: transparent;
+    --button1-border-color-default: var(--color-gray-14);
+    --button1-border-color-pressed: var(--color-yellow-04);
+    --button1-border-color-disabled: var(--body2-content2-color);
+    --button1-content-color-default: var(--color-gray-01);
+    --button1-content-color-pressed: var(--color-yellow-04);
+    --button1-content-color-disabled: var(--body2-content2-color);
+
+    --button2-background-color-default: var(--color-gray-03);
+    --button2-background-color-pressed: var(--color-gray-09);
+    --button2-background-color-disabled: transparent;
+    --button2-border-color-default: var(--color-gray-14);
+    --button2-border-color-pressed: var(--color-gray-14);
+    --button2-border-color-disabled: var(--color-gray-07);
+    --button2-content-color-default: var(--color-gray-12);
+    --button2-content-color-pressed: var(--color-gray-01);
+    --button2-content-color-disabled: var(--color-gray-07);
+    
+    --button3-background-color-default: var(--color-gray-14);
+    --button3-background-color-pressed: var(--color-gray-01);
+    --button3-background-color-disabled: var(--color-gray-14);
+    --button3-border-color-default: var(--color-gray-14);
+    --button3-border-color-pressed: var(--color-yellow-03);
+    --button3-border-color-disabled: var(--color-gray-07);
+    --button3-content-color-default: var(--color-gray-13);
+    --button3-content-color-pressed: var(--color-gray-01);
+    --button3-content-color-disabled: var(--color-gray-07);
+    --button3-background2-color-default: linear-gradient(180deg, #25252500 0%, #25252500 30%, #252525ff 35%, #252525ff 100%);
+    --button3-background2-color-pressed: linear-gradient(180deg, #ffe10000 0%, #ffe10000 30%, #ffe100ff 35%, #ffe100ff 100%);
+    --button3-background2-color-disabled: linear-gradient(180deg, #00000000 0%, #00000000 30%, #000000ff 35%, #000000ff 100%);
+    --button3-content2-color-default: var(--color-yellow-03);
+    --button3-content2-color-pressed: var(--color-gray-01);
+    --button3-content2-color-disabled: var(--color-gray-12);
+
+    --button4-background-color-default: var(--color-gray-09);
+    --button4-background-color-pressed: var(--color-gray-03);
+    --button4-background-color-disabled: transparent;
+    --button4-border-color-default: var(--color-gray-14);
+    --button4-border-color-pressed: var(--color-gray-07);
+    --button4-border-color-disabled: var(--color-gray-07);
+    --button4-content-color-default: var(--color-gray-01);
+    --button4-content-color-pressed: var(--color-gray-12);
+    --button4-content-color-disabled: var(--color-gray-07);
+
+    --button6-background-color-default: var(--color-gray-14);
+    --button6-background-color-pressed: var(--color-gray-07);
+    --button6-background-color-disabled: transparent;
+    --button6-border-color-default: var(--color-gray-09);
+    --button6-border-color-pressed: var(--color-gray-07);
+    --button6-border-color-disabled: var(--color-gray-07);
+    --button6-content-color-default: var(--color-gray-01);
+    --button6-content-color-pressed: var(--color-gray-14);
+    --button6-content-color-disabled: var(--color-gray-07);
+    --button6-background2-color-default: var(--color-gray-01);
+    --button6-content2-color-default: var(--color-gray-14);
+
+    --button-delete-background-color-default: var(--color-system-02);
+    --button-delete-background-color-pressed: var(--color-system-03);
+    --button-delete-background-color-disabled: transparent;
+    --button-delete-border-color-default: var(--color-gray-14);
+    --button-delete-border-color-pressed: var(--color-system-02);
+    --button-delete-border-color-disabled: var(--color-gray-07);
+    --button-delete-content-color-default: var(--color-gray-14);
+    --button-delete-content-color-pressed: var(--color-gray-14);
+    --button-delete-content-color-disabled: var(--color-gray-07);
+  }
+
+  /* -----------------------------------------
+     low screen mode
+  ----------------------------------------- */
+  .low {
+    & .title {
+      font-size: var(--font-size-h1);
+      block-size: 100px;
+    }
+
+    & .summary {
+      block-size: 122px;
+
+      & .task-manager {
+        & .button {
+          inline-size: 199px;
+          block-size: 90px;
+          flex-flow: row nowrap;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    & .black {
+      block-size: 1020px;
+    }
+
+    & .process.second {
+      & .cart {
+        display: none;
+      }
+
+      & .main {
+        padding-block-start: 84px;
+
+        & .menu {
+          grid-template-rows: repeat(1, 1fr);
+
+          & .pagination {
+            grid-column: 4;
+            grid-row: 1;
+          }
+        }
+      }
+    }
+
+    & .process.forth {
+      & .main {
+        padding-block: 0;
+
+        & .banner {
+          block-size: 150px;
+          flex-shrink: 0;
+        }
+
+        & .content-control {
+          display: flex;
+          flex-flow: row-reverse nowrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: var(--spacing-md);
+          inline-size: 100%;
+          block-size: 100%;
+
+          & .payment {
+            display: flex;
+            flex: 1 1 auto;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-items: stretch;
+            gap: var(--spacing-md);
+
+            & .button {
+              flex: 1 1 0;
+              block-size: 310px;
+
+              & .icon {
+                inline-size: 144px;
+                block-size: 144px;
+              }
+            }
+          }
+
+          & .task-manager {
+            & .button {
+              inline-size: 199px;
+              block-size: 310px;
+            }
+          }
+        }
+      }
+    }
+
+    & .process.fifth {
+      & .main {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        align-items: stretch;
+        justify-content: stretch;
+        gap: var(--spacing-md);
+        padding-block: 0;
+      }
+
+        & .content-container {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-inline-size: 0;
+
+        & .device-guide {
+          block-size: fit-content;
+          inline-size: fit-content;
+
+          & .order-num {
+            font-size: var(--font-size-d1);
+          }
+        }
+
+        & .end-countdown {
+          position: relative;
+          inset: auto;
+          transform: none;
+          inline-size: 224px;
+          block-size: 224px;
+          font-size: var(--font-size-d3);
+        }
+      }
+
+      & .content-control {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: var(--spacing-lg);
+        padding-block: var(--spacing-2xl);
+        min-inline-size: 0;
+
+        & .title {
+          flex: 1 1 auto;
+          inline-size: 100%;
+          white-space: normal;
+          overflow-wrap: break-word;
+          text-align: center;
+        }
+
+        & .task-manager {
+          display: flex;
+          inline-size: 100%;
+          align-items: stretch;
+
+          & .button {
+            flex: 1 1 0;
+            block-size: 134px;
+            gap: 0;
+            flex-flow: column nowrap;
+
+            & .icon {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+    & .modal {
+      justify-content: flex-end;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { TTSStateContext } from "../contexts";
+import { TTSStateContext } from "@/contexts";
 
 /**
  * DOM 유틸리티 (에러 방지 및 일관된 포커스 제어)

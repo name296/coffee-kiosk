@@ -1,7 +1,7 @@
 import React, { memo, useContext } from "react";
-import Button from "./Button";
-import { HomeIcon, TimeIcon, WheelchairIcon } from "../Icon";
-import { TimeoutContext } from "../contexts";
+import Button from "@/components/Button";
+import { HomeIcon, TimeIcon, WheelchairIcon } from "@/components/Icon";
+import { TimeoutContext } from "@/contexts";
 
 /** UI 컴포넌트: 하단 시스템 버튼(시작화면, 타임아웃, 접근성) */
 const Bottom = memo(() => {

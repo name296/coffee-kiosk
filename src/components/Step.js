@@ -1,7 +1,7 @@
 import React, { memo, useContext } from "react";
-import { ScreenRouteContext } from "../contexts";
-import { STEP_INDEX_BY_PROCESS } from "../constants";
-import { StepIcon } from "../Icon";
+import { ScreenRouteContext } from "@/contexts";
+import { STEP_INDEX_BY_PROCESS } from "@/constants";
+import { StepIcon } from "@/components/Icon";
 
 /** 단계 인덱스: ProcessMenu=1, ProcessDetails=2, 결제그룹=3, 완료그룹=4, ProcessFinish=5 */
 function getStepIndex(currentProcess) {

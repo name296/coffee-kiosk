@@ -1,9 +1,9 @@
 import React, { memo, useContext } from "react";
-import Button from "./Button";
-import { OrderIcon, ResetIcon, AddIcon, PayIcon } from "../Icon";
-import { PROCESS_NAME } from "../constants";
-import { OrderContext, ScreenRouteContext } from "../contexts";
-import { formatNumber, convertToKoreanQuantity } from "../utils";
+import Button from "@/components/Button";
+import { OrderIcon, ResetIcon, AddIcon, PayIcon } from "@/components/Icon";
+import { PROCESS_NAME } from "@/constants";
+import { OrderContext, ScreenRouteContext } from "@/contexts";
+import { formatNumber, convertToKoreanQuantity } from "@/lib";
 
 const Summary = memo(() => {
     const order = useContext(OrderContext);

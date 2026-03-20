@@ -1,6 +1,6 @@
 import { useContext, useCallback } from "react";
-import { PROCESS_NAME } from "../constants";
-import { MODAL_REGISTRY, OrderContext, AccessibilityContext, ModalContext, TimeoutContext } from "../contexts";
+import { PROCESS_NAME } from "@/constants";
+import { MODAL_REGISTRY, OrderContext, AccessibilityContext, ModalContext, TimeoutContext } from "@/contexts";
 
 const closeAllModals = (modal) => {
     if (modal?.closeAllModals) {

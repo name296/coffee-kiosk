@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 
 // 경로 설정
 const svgDir = path.join(__dirname, '../src/svg/');  // 모든 SVG
-const srcDir = path.join(__dirname, '../src/');
-const iconFile = path.join(srcDir, 'Icon.js');
+const iconFile = path.join(__dirname, '../src/components/Icon.js');
+const iconDir = path.dirname(iconFile);
 
 // 컴포넌트 이름 변환 (kebab-case → PascalCase)
 function toPascalCase(str) {
@@ -129,9 +129,9 @@ const ${componentName} = (props) => (
 function generateIconComponent() {
   console.log('🔍 SVG 파일 스캔 중...\n');
   
-  // src 디렉토리 확인
-  if (!fs.existsSync(srcDir)) {
-    fs.mkdirSync(srcDir, { recursive: true });
+  // 출력 디렉토리 확인
+  if (!fs.existsSync(iconDir)) {
+    fs.mkdirSync(iconDir, { recursive: true });
   }
 
   const iconComponents = [];
@@ -194,16 +194,19 @@ export default Icon;`;
   const content = `import React from "react";
 
 /**
- * 통합 아이콘 컴포넌트
+ * 통합 아이콘 컴포넌트 (React, 인라인 SVG)
  * 자동 생성됨 - 직접 수정하지 마세요!
  * 스크립트: bun run scripts/svg-to-react.js
- * 
+ * 원본 SVG·파생 관계: src/svg/README.md
+ *
+ * Svelte 마이그레이션 시: SvgIcon + 동일 src/svg/*.svg (이 파일은 React 전용)
+ *
  * 사용법:
- *   import Icon from './components/Icon';
+ *   import Icon from './Icon';
  *   <Icon name="toggle" />
- *   
+ *
  *   // 또는 개별 아이콘 import
- *   import { ToggleIcon } from './components/Icon';
+ *   import { ToggleIcon } from './Icon';
  */
 
 // 모든 아이콘 컴포넌트 정의 (인라인)
