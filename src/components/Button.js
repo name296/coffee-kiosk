@@ -5,6 +5,7 @@
 import React, { useState, useRef, useMemo, useLayoutEffect, useCallback, memo, useEffect, useContext } from "react";
 import { useSound } from "@/hooks";
 import { ScreenRouteContext, ModalContext } from "@/contexts";
+import { publicAsset } from "@/lib/publicPath";
 
 export const isActionKey = (e) => e.key === 'Enter' || e.key === ' ' || e.code === 'NumpadEnter' || e.code === 'Numpad5';
 
@@ -46,6 +47,14 @@ const Button = memo(({
     const releaseTimerRef = useRef(null);
     const actionTimerRef = useRef(null);
     const { play: playSound } = useSound();
+
+    /** GitHub Pages basePath 대응: /images, ./images → public */
+    const imgSrc = useMemo(() => {
+        if (img == null || typeof img !== "string") return img;
+        if (img.startsWith("/images/")) return publicAsset(img);
+        if (img.startsWith("./images/")) return publicAsset(`/${img.slice(2)}`);
+        return img;
+    }, [img]);
 
     // Context 직접 주입 (Zero-Abstraction)
     const { navigateTo } = useContext(ScreenRouteContext);
@@ -195,7 +204,7 @@ const Button = memo(({
                 <>
                     {(svg || img) && (
                         <span className="icon" aria-hidden="true">
-                            {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
+                            {svg || <img src={imgSrc} alt={imgAlt} style={imgStyle} />}
                         </span>
                     )}
                     {label}
@@ -205,7 +214,7 @@ const Button = memo(({
                     {label}
                     {(svg || img) && (
                         <span className="icon" aria-hidden="true">
-                            {svg || <img src={img} alt={imgAlt} style={imgStyle} />}
+                            {svg || <img src={imgSrc} alt={imgAlt} style={imgStyle} />}
                         </span>
                     )}
                 </>

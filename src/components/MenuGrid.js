@@ -3,6 +3,7 @@ import Button from "@/components/Button";
 import Pagination from "@/components/pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
 import { usePageSlicer } from "@/hooks";
+import { publicAsset } from "@/lib/publicPath";
 
 const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 11, ITEMS_PER_PAGE_LOW: 3 };
 
@@ -15,7 +16,7 @@ const MenuItem = memo(({ item, disabled, onPress }) => (
         onClick={onPress}
     >
         <span className="icon" aria-hidden="true">
-            <img src={`/images/${item.img}`} alt={item.name} />
+            <img src={publicAsset(`/images/${item.img}`)} alt={item.name} />
         </span>
         <div className="label">
             <span>{item.name}</span>
