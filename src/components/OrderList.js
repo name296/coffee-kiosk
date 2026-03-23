@@ -1,4 +1,4 @@
-import React, { memo, useContext } from "react";
+import React, { memo, useContext, useEffect, useRef } from "react";
 import Button from "@/components/Button";
 import { DeleteIcon, MinusIcon, PlusIcon } from "@/components/Icon";
 import { formatNumber, convertToKoreanQuantity, convertToKoreanOrdinal } from "@/lib";
@@ -44,6 +44,11 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     const { currentProcess } = useContext(ScreenRouteContext);
     const accessibility = useContext(AccessibilityContext);
     const { handleText } = useTextHandler(accessibility.volume);
+    const quantitiesRef = useRef(order.quantities);
+
+    useEffect(() => {
+        quantitiesRef.current = order.quantities;
+    }, [order.quantities]);
 
     const openDeleteModal = (itemId) => {
         modal.setModalDeleteItemId(itemId);
@@ -59,22 +64,25 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
 
     const handleItemDecrease = (item) => (e, target) => {
         const itemId = item.id;
-        const current = order.quantities[itemId] ?? 0;
+        const current = quantitiesRef.current[itemId] ?? 0;
         if (current === 1) {
             openDeleteModal(itemId);
             return;
         }
-        order.handleDecrease(itemId);
+        if (current <= 0) return;
         const nextQty = current - 1;
+        quantitiesRef.current = { ...quantitiesRef.current, [itemId]: nextQty };
+        order.handleDecrease(itemId);
         const lineTotal = item.price * nextQty;
         handleText(`${convertToKoreanQuantity(nextQty)} 개, ${formatNumber(lineTotal)}원,`, false);
     };
 
     const handleItemIncrease = (item) => (e, target) => {
         const itemId = item.id;
-        const current = order.quantities[itemId] ?? 0;
-        order.handleIncrease(itemId);
+        const current = quantitiesRef.current[itemId] ?? 0;
         const nextQty = current + 1;
+        quantitiesRef.current = { ...quantitiesRef.current, [itemId]: nextQty };
+        order.handleIncrease(itemId);
         const lineTotal = item.price * nextQty;
         handleText(`${convertToKoreanQuantity(nextQty)} 개, ${formatNumber(lineTotal)}원,`, false);
     };

@@ -12,7 +12,7 @@ const Summary = memo(() => {
     const totalSum = order?.totalSum || 0;
     const isDisabledBtn = totalCount <= 0;
 
-    const summaryTtsText = `주문요약, 주문수량, ${convertToKoreanQuantity(totalCount)} 개, 주문금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
+    const summaryTtsText = `수량, ${convertToKoreanQuantity(totalCount)}개, 금액, ${formatNumber(totalSum)}원, 버튼 두개,`;
 
     return (
         <div className="summary body1">

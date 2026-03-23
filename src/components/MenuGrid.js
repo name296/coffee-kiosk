@@ -1,8 +1,9 @@
-import React, { memo, useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect, useRef } from "react";
 import Button from "@/components/Button";
 import Pagination from "@/components/Pagination";
+import { formatNumber, convertToKoreanQuantity } from "@/lib";
 import { OrderContext, AccessibilityContext } from "@/contexts";
-import { usePageSlicer } from "@/hooks";
+import { usePageSlicer, useTextHandler } from "@/hooks";
 
 const PAGINATION_CONFIG = { ITEMS_PER_PAGE_NORMAL: 11, ITEMS_PER_PAGE_LOW: 3 };
 
@@ -29,6 +30,12 @@ MenuItem.displayName = 'MenuItem';
 const MenuGrid = memo(() => {
     const order = useContext(OrderContext);
     const accessibility = useContext(AccessibilityContext);
+    const { handleText } = useTextHandler(accessibility.volume);
+    /** 메뉴 탭에서 연타 시에도 주문요약과 동일한 총수량·총금액 기준으로 TTS */
+    const totalsRef = useRef({
+        count: order.totalCount || 0,
+        sum: order.totalSum || 0
+    });
 
     const {
         pageNumber, totalPages, currentItems,
@@ -45,10 +52,21 @@ const MenuGrid = memo(() => {
         return () => clearTimeout(t);
     }, [order.selectedTab, resetPage]);
 
-    const handleItemPress = (e, id, target) => {
-        if (id !== 0) {
-            order.handleIncrease(id);
-        }
+    useEffect(() => {
+        totalsRef.current = {
+            count: order.totalCount || 0,
+            sum: order.totalSum || 0
+        };
+    }, [order.totalCount, order.totalSum]);
+
+    const handleItemPress = (e, item, target) => {
+        if (item.id === 0) return;
+        const price = Number(item.price);
+        const nextCount = totalsRef.current.count + 1;
+        const nextSum = totalsRef.current.sum + price;
+        totalsRef.current = { count: nextCount, sum: nextSum };
+        order.handleIncrease(item.id);
+        handleText(`${convertToKoreanQuantity(nextCount)} 개, ${formatNumber(nextSum)}원,`, false);
     };
 
     return (
@@ -61,7 +79,7 @@ const MenuGrid = memo(() => {
                     key={item.id}
                     item={item}
                     disabled={item.id === 0}
-                    onPress={(e, target) => handleItemPress(e, item.id, target)}
+                    onPress={(e, target) => handleItemPress(e, item, target)}
                 />
             ))}
             <Pagination
