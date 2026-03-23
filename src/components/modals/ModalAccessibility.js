@@ -145,9 +145,9 @@ export const ModalAccessibility = memo(() => {
                         <div className="modal-setting-row">
                             <span className="modal-setting-name">
                                 <Icon name="Wheelchair" className="modal-graphic" aria-hidden />
-                                낮추기
+                                내리기
                             </span>
-                            <div className="task-manager" data-tts-text={`낮추기, 선택상태, ${getStatusText.low},`}>
+                            <div className="task-manager" data-tts-text={`내리기, 선택상태, ${getStatusText.low},`}>
                                 <Button toggle value={currentSettings.isLow} selectedValue={false} onChange={handleLowChange} label="끔" />
                                 <Button toggle value={currentSettings.isLow} selectedValue={true} onChange={handleLowChange} label="켬" />
                             </div>
