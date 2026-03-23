@@ -110,7 +110,7 @@ export const ModalAccessibility = memo(() => {
                         </span>
                     </div>
                     <div className="modal-settings">
-                        <div className="modal-setting-row" data-tts-text="초기설정으로 일괄선택,">
+                        <div className="modal-setting-row modal-setting-row-wide" data-tts-text="초기설정으로 일괄선택,">
                             <span className="modal-setting-name">
                                 <span className="primary">초기설정</span>으로 일괄선택
                             </span>
