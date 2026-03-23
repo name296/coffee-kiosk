@@ -155,7 +155,7 @@
     ----------------------------------------- */
     --layout-height: 1920px;
     --layout-width: 1080px;
-    --layout-padding: var(--spacing-xl);
+    --layout-padding: var(--spacing-md);
 
     /* -----------------------------------------
        Semantic: body skins
@@ -890,7 +890,7 @@
   }
 
   .cart {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     display: grid;
     grid-template-columns: 16px 113px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 113px 16px;
     grid-template-rows: auto repeat(7, 1fr);
@@ -1083,7 +1083,6 @@
 
     &.compact {
       flex: 0 1 auto;
-      flex-shrink: 0;
       padding-inline: 0;
       block-size: 300px;
       grid-template-columns: 16px 76px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 2ch 16px fit-content(var(--layout-width)) 16px;
@@ -1508,12 +1507,14 @@
 
     & .modal-setting-name {
       display: flex;
-      flex-flow: row nowrap;
+      flex-flow: column nowrap;
       align-items: center;
-      gap: 0;
+      justify-content: center;
+      gap: var(--spacing-xs);
       flex: 1 1 auto;
       min-inline-size: 0;
       block-size: auto;
+      text-align: center;
     }
   }
 }
@@ -1545,8 +1546,14 @@
       }
 
       & .task-manager {
+        display: flex;
+        inline-size: 100%;
+        align-items: stretch;
+
         & .button {
-          inline-size: 285px;
+          flex: 1 1 0;
+          min-inline-size: 0;
+          inline-size: auto;
           block-size: 285px;
           white-space: nowrap;
           flex-direction: column;
@@ -1722,6 +1729,12 @@
             grid-row: 1;
           }
         }
+      }
+    }
+
+    & .process.third {
+      & .cart.compact {
+        flex: 1 0 auto;
       }
     }
 
