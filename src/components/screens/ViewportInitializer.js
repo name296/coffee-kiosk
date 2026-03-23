@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import { setViewportZoom, setupViewportResize } from "@/lib";
+import { setupViewportZoom } from "@/lib";
 
 /** 뷰포트 초기화 */
 export const ViewportInitializer = () => {
     useEffect(() => {
-        setViewportZoom();
-        const cleanup = setupViewportResize();
-        return cleanup;
+        setupViewportZoom();
     }, []);
     return null;
 };

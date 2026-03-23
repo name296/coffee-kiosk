@@ -1,5 +1,5 @@
 export * from "./format";
-export * from "./viewport";
+export { setupViewportZoom } from "./viewport";
 export * from "./storage";
 export * from "./orderUtils";
 export * from "./menuUtils";

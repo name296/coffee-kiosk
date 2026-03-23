@@ -41,7 +41,18 @@
     scroll-behavior: smooth;
   }
 
-  body {    
+  /* UA 기본 `body { margin: 8px }` 등 제거 */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    position: fixed;
+    translate: -50% -50%; /* `translate: -50% -50%`만 있으면 기준점이 뷰포트 중앙이 아님 → 50%로 모서리를 중앙에 둔 뒤 당김 */
+    scale: initial; /* viewport.js가 오버라이드 */
+    inset: 50% auto auto 50%;
     inline-size: var(--layout-width);
     block-size: var(--layout-height);
     font: normal normal var(--font-weight-default) var(--font-size-b1) / 1 var(--font-family-current);
@@ -49,19 +60,8 @@
     user-select: none;
   }
 
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-  }
-
   button {
     all: unset;
-    box-sizing: border-box;
-    font: inherit;
-    color: inherit;
-    line-height: inherit;
-    letter-spacing: inherit;
     appearance: none;
     -webkit-appearance: none;
   }
@@ -157,7 +157,7 @@
     ----------------------------------------- */
     --layout-height: 1920px;
     --layout-width: 1080px;
-    --layout-padding-inline: var(--spacing-md);
+    --layout-padding: var(--spacing-md);
 
     /* -----------------------------------------
        Semantic: body skins
@@ -263,7 +263,7 @@
 @layer layout {
 
   /* -----------------------------------------
-     screen frame
+     screen frame(돋보기 레이아웃)
   ----------------------------------------- */
   .screen {
     position: fixed;
@@ -299,6 +299,9 @@
     & .screen-4 { grid-row: 2; grid-column: 2; }
   }
 
+  /* -----------------------------------------
+     업무화면
+  ----------------------------------------- */
   .process {
     position: fixed;
     inset: 0;
@@ -309,16 +312,18 @@
     contain: size;
 
     & > * {
-      padding-inline: var(--layout-padding-inline);
+      padding-inline: var(--layout-padding);
       flex-shrink: 0;
       position: relative;
-      align-items: center;
       display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
     }
   }
 
   .black {
-    block-size: 0;
+    display: none;
   }
 
   .top {
@@ -327,7 +332,6 @@
 
   .step {
     flex-flow: row nowrap;
-    justify-content: space-between;
     block-size: 112px;
 
     & .num {
@@ -353,15 +357,11 @@
   }
 
   .summary {
-    flex-flow: row nowrap;
-    justify-content: space-between;
     block-size: 182px;
     gap: var(--spacing-md);
   }
 
   .bottom {
-    flex-flow: row nowrap;
-    justify-content: space-between;
     block-size: 112px;
   }
 
@@ -375,11 +375,8 @@
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    inline-size: 100%;
-    block-size: 100%;
-    padding-inline: var(--layout-padding-inline);
-    padding-block: 200px;
-    contain: size;
+    padding-inline: var(--layout-padding);
+    padding-block: var(--layout-padding);
   }
 }
 
@@ -803,7 +800,7 @@
     display: inline-flex;
     flex-flow: row nowrap;
     align-items: center;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-lg);
     inline-size: 100%;
 
     & .category {
