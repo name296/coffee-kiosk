@@ -25,7 +25,7 @@ const ProcessCardRemoval = memo(() => {
                                     <span className="primary">카드</span>를 뽑습니다.
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.CARD_INSERT} label="가상취소" />
                                 <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상제거" />
                             </div>
@@ -43,7 +43,7 @@ const ProcessCardRemoval = memo(() => {
                                 <img src="images/device-cardReader-remove.png" alt="" />
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.CARD_INSERT} label="가상취소" />
                             <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상제거" />
                         </div>

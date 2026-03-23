@@ -10,11 +10,15 @@ const applyButtonCounts = () => {
         parents.add(parent);
     });
     parents.forEach(parent => {
+        if (parent.classList?.contains('order-row')) return;
         const count = parent.querySelectorAll(':scope > .button').length;
         if (count <= 0) return;
+        /* task-manager는 버튼 1개일 때 섹션 TTS만 (버튼 n개 접미사 생략) */
+        if (parent.classList?.contains('task-manager') && count === 1) return;
         // 부모의 상위가 이미 섹션(data-tts-text)이면 하위 섹션 생성 방지 (.main은 컨테이너이므로 제외)
         const ancestor = parent.parentElement?.closest('[data-tts-text]');
-        if (ancestor && ancestor.getAttribute('data-tts-text') && !ancestor.classList.contains('main')) return;
+        const isTaskManager = parent.classList?.contains('task-manager');
+        if (ancestor && ancestor.getAttribute('data-tts-text') && !ancestor.classList.contains('main') && !isTaskManager) return;
         const existing = parent.getAttribute('data-tts-text') || '';
         if (existing.includes('버튼')) return;
         const suffix = `버튼 ${convertToKoreanQuantity(count)}개,`;

@@ -1,28 +1,36 @@
 import React, { memo, useContext } from "react";
 import Button from "@/components/Button";
 import { DeleteIcon, MinusIcon, PlusIcon } from "@/components/Icon";
-import { formatNumber, convertToKoreanQuantity } from "@/lib";
-import { OrderContext, ModalContext, ScreenRouteContext } from "@/contexts";
+import { formatNumber, convertToKoreanQuantity, convertToKoreanOrdinal } from "@/lib";
+import { OrderContext, ModalContext, ScreenRouteContext, AccessibilityContext } from "@/contexts";
 import { PROCESS_NAME } from "@/constants";
+import { useTextHandler } from "@/hooks";
 
 // 주문 행
-const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity }) => {
+const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete, convertToKoreanQuantity, convertToKoreanOrdinal }) => {
     const totalPrice = item.price * quantity;
+    const rowTtsText = `${convertToKoreanOrdinal(index)}번 목록, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`;
 
     return (
         <>
-            <div className="order-row" data-tts-text={`주문목록,${index}번, ${item.name}, ${convertToKoreanQuantity(quantity)} 개, ${totalPrice}원,`}>
+            <div className="order-row">
                 <div className="order-item body2">
                     <div className="order-index body1">{index}</div>
                     <img src={`images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
-                <span className="order-name">{item.name}</span>
-                <div className="order-quantity">
+                <span className="button-like skel-inline skin-neutral order-name" tabIndex={0} data-tts-text={rowTtsText}>
+                    <span className="order-name__text">{item.name}</span>
+                </span>
+                <div className="order-quantity" data-tts-text='수량조절,'>
                     <Button className="skel-inline skin-secondary counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
-                    <Button className="skel-inline skin-neutral qty" label={quantity} ttsText={`${formatNumber(quantity)}개`}></Button>
+                    <span className="button-like skel-inline skin-neutral qty" tabIndex={0} data-tts-text={`${formatNumber(quantity)}개`}>
+                        {quantity}
+                    </span>
                     <Button className="skel-inline skin-secondary counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
-                <span className="order-price">{`${formatNumber(totalPrice)}원`}</span>
+                <span className="button-like skel-inline order-price skin-neutral" tabIndex={0} data-tts-text={`${formatNumber(totalPrice)}원`}>
+                    {`${formatNumber(totalPrice)}원`}
+                </span>
                 <Button className="skel-inline skin-danger" svg={<DeleteIcon />} onClick={onDelete} ttsText="삭제" />
             </div>
         </>
@@ -34,6 +42,8 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     const order = useContext(OrderContext);
     const modal = useContext(ModalContext);
     const { currentProcess } = useContext(ScreenRouteContext);
+    const accessibility = useContext(AccessibilityContext);
+    const { handleText } = useTextHandler(accessibility.volume);
 
     const openDeleteModal = (itemId) => {
         modal.setModalDeleteItemId(itemId);
@@ -47,12 +57,26 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
         }
     };
 
-    const handleItemDecrease = (itemId) => (e, target) => {
-        (order.quantities[itemId] === 1) ? openDeleteModal(itemId) : order.handleDecrease(itemId);
+    const handleItemDecrease = (item) => (e, target) => {
+        const itemId = item.id;
+        const current = order.quantities[itemId] ?? 0;
+        if (current === 1) {
+            openDeleteModal(itemId);
+            return;
+        }
+        order.handleDecrease(itemId);
+        const nextQty = current - 1;
+        const lineTotal = item.price * nextQty;
+        handleText(`${convertToKoreanQuantity(nextQty)} 개, ${formatNumber(lineTotal)}원,`, false);
     };
 
-    const handleItemIncrease = (itemId) => (e, target) => {
+    const handleItemIncrease = (item) => (e, target) => {
+        const itemId = item.id;
+        const current = order.quantities[itemId] ?? 0;
         order.handleIncrease(itemId);
+        const nextQty = current + 1;
+        const lineTotal = item.price * nextQty;
+        handleText(`${convertToKoreanQuantity(nextQty)} 개, ${formatNumber(lineTotal)}원,`, false);
     };
 
     const handleItemDelete = (itemId) => (e, target) => {
@@ -67,10 +91,11 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
                     item={item}
                     index={startIndex + i + 1}
                     quantity={order.quantities[item.id]}
-                    onDecrease={(e, target) => handleItemDecrease(item.id)(e, target)}
-                    onIncrease={(e, target) => handleItemIncrease(item.id)(e, target)}
+                    onDecrease={(e, target) => handleItemDecrease(item)(e, target)}
+                    onIncrease={(e, target) => handleItemIncrease(item)(e, target)}
                     onDelete={(e, target) => handleItemDelete(item.id)(e, target)}
                     convertToKoreanQuantity={convertToKoreanQuantity}
+                    convertToKoreanOrdinal={convertToKoreanOrdinal}
                 />
             ))}
         </div>

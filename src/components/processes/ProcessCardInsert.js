@@ -26,7 +26,7 @@ const ProcessCardInsert = memo(() => {
                                     <span className="primary">신용카드</span>를 끝까지 넣습니다
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                                 <Button className="skel-inline skin-primary" style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />
                                 <Button className="skel-inline skin-secondary" style={{ width: "fit-content" }} navigate={PROCESS_NAME.CARD_REMOVAL} label="가상투입" />
@@ -50,7 +50,7 @@ const ProcessCardInsert = memo(() => {
                                 <img src="images/device-cardReader-insert.png" alt="" />
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                             <Button className="skel-inline skin-primary" style={{ width: "fit-content" }} modal="PaymentError" label="가상오류" />
                             <Button className="skel-inline skin-secondary" style={{ width: "fit-content" }} navigate={PROCESS_NAME.CARD_REMOVAL} label="가상투입" />

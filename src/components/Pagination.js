@@ -1,16 +1,33 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useContext, useMemo, useRef, useEffect, useCallback } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
+import { AccessibilityContext } from "@/contexts";
+import { useTextHandler } from "@/hooks";
 
 /** 이전 버튼. 정보만 받아서 렌더 */
-export const PaginationPrevButton = memo(({ label, icon, onClick, className }) => (
-    <Button label={label} svg={icon} onClick={onClick} className={className} />
+export const PaginationPrevButton = memo(({ label, icon, onClick, className, disabled, excludeFromFocus }) => (
+    <Button
+        label={label}
+        svg={icon}
+        onClick={onClick}
+        className={className}
+        disabled={disabled}
+        excludeFromFocus={excludeFromFocus}
+    />
 ));
 PaginationPrevButton.displayName = "PaginationPrevButton";
 
 /** 다음 버튼. 정보만 받아서 렌더 */
-export const PaginationNextButton = memo(({ label, icon, onClick, className }) => (
-    <Button label={label} svg={icon} onClick={onClick} iconFirst={false} className={className} />
+export const PaginationNextButton = memo(({ label, icon, onClick, className, disabled, excludeFromFocus }) => (
+    <Button
+        label={label}
+        svg={icon}
+        onClick={onClick}
+        iconFirst={false}
+        className={className}
+        disabled={disabled}
+        excludeFromFocus={excludeFromFocus}
+    />
 ));
 PaginationNextButton.displayName = "PaginationNextButton";
 
@@ -51,16 +68,53 @@ const Pagination = memo(
         prevIcon = <Icon name="ArrowLeft" />,
         nextIcon = <Icon name="ArrowRight" />
     }) => {
+        const accessibility = useContext(AccessibilityContext);
+        const { handleText } = useTextHandler(accessibility.volume);
         const containerStyle = useMemo(() => style ?? {}, [style]);
+        const current = pageNumber || 1;
+        const total = totalPages || 1;
+        const isSinglePage = total <= 1;
+        /** 섹션 포커스/호버: 총 페이지 포함 */
+        const getPaginationTtsSection = (currentPage) =>
+            `${ttsPrefix} ${currentPage}페이지 총${total}페이지,`;
+        /** 이전·다음 클릭 후: 부모 state 반영 뒤 실제 pageNumber로만 읽음 (순환 페이징·비동기 갱신 대응) */
+        const announceAfterNavRef = useRef(false);
+
+        const handlePrevWithTts = useCallback(
+            (e, target) => {
+                if (isSinglePage) return;
+                announceAfterNavRef.current = true;
+                onPrev?.(e, target);
+            },
+            [isSinglePage, onPrev]
+        );
+
+        const handleNextWithTts = useCallback(
+            (e, target) => {
+                if (isSinglePage) return;
+                announceAfterNavRef.current = true;
+                onNext?.(e, target);
+            },
+            [isSinglePage, onNext]
+        );
+
+        useEffect(() => {
+            if (!announceAfterNavRef.current) return;
+            announceAfterNavRef.current = false;
+            const p = pageNumber || 1;
+            handleText(`${ttsPrefix} ${p}페이지,`, false);
+        }, [pageNumber, handleText, ttsPrefix]);
 
         const prevButtonInfo = useMemo(
             () => ({
                 label: prevLabel,
                 icon: prevIcon,
-                onClick: onPrev,
-                className: undefined
+                onClick: handlePrevWithTts,
+                className: undefined,
+                disabled: isSinglePage,
+                excludeFromFocus: isSinglePage
             }),
-            [prevLabel, prevIcon, onPrev]
+            [prevLabel, prevIcon, handlePrevWithTts, isSinglePage]
         );
 
         const indicatorInfo = useMemo(() => ({ pageNumber, totalPages }), [pageNumber, totalPages]);
@@ -69,10 +123,12 @@ const Pagination = memo(
             () => ({
                 label: nextLabel,
                 icon: nextIcon,
-                onClick: onNext,
-                className: undefined
+                onClick: handleNextWithTts,
+                className: undefined,
+                disabled: isSinglePage,
+                excludeFromFocus: isSinglePage
             }),
-            [nextLabel, nextIcon, onNext]
+            [nextLabel, nextIcon, handleNextWithTts, isSinglePage]
         );
 
         return (
@@ -80,7 +136,7 @@ const Pagination = memo(
                 className={className ? `pagination ${className}` : "pagination"}
                 style={containerStyle}
                 ref={sectionRef}
-                data-tts-text={`${ttsPrefix}, ${totalPages} 페이지 중 ${pageNumber} 페이지,`}
+                data-tts-text={getPaginationTtsSection(current)}
             >
                 <PaginationPrevButton {...prevButtonInfo} />
                 {showPageNumber && <PaginationIndicator {...indicatorInfo} />}

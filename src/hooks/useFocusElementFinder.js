@@ -28,6 +28,7 @@ const dedupeFocusOrder = (list) => {
 export const getFocusableElements = () => {
     const elements = Array.from(document.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
         .filter(el => isVisible(el))
+        .filter(el => el.dataset?.focusExclude !== 'true')
         .filter(el => !isProcessShell(el));
 
     const modalElements = document.querySelectorAll('.modal');

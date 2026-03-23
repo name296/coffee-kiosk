@@ -19,7 +19,7 @@ export const useFocusTrap = (isActive, options = {}) => {
         const elements = Array.from(containerRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
             .filter(el => {
                 const st = window.getComputedStyle(el);
-                return st.display !== 'none' && st.visibility !== 'hidden';
+                return st.display !== 'none' && st.visibility !== 'hidden' && el.dataset?.focusExclude !== 'true';
             });
 
         // .main(컨테이너 자체)을 포커스 루프에 추가

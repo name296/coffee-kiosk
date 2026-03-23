@@ -1,20 +1,11 @@
 import React, { memo, useContext } from "react";
 import { Button, Main, Step, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
-import { useTimeoutCountdown } from "@/hooks";
-import { AccessibilityContext, ScreenRouteContext } from "@/contexts";
+import { AccessibilityContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
 
 const ProcessReceiptPrint = memo(() => {
-    const { navigateTo } = useContext(ScreenRouteContext);
     const { isLow } = useContext(AccessibilityContext);
-
-    const { remainingSeconds: countdown } = useTimeoutCountdown({
-        durationMs: 60000,
-        enabled: true,
-        onTimeout: () => navigateTo(PROCESS_NAME.FINISH),
-        resetOnUserActivity: true
-    });
 
     return (
         <div className="process fifth">
@@ -37,16 +28,11 @@ const ProcessReceiptPrint = memo(() => {
                                     <span className="primary">마무리</span> 버튼을 누릅니다
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button
                                     className="skel-inline skin-secondary"
                                     navigate={PROCESS_NAME.FINISH}
-                                    label={
-                                        <>
-                                            <span>마무리</span>
-                                            <span>{countdown}초</span>
-                                        </>
-                                    }
+                                    label="마무리"
                                     ttsText="마무리하기"
                                 />
                             </div>
@@ -70,16 +56,11 @@ const ProcessReceiptPrint = memo(() => {
                                 <img src="images/device-printer-receipt.png" alt="" />
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button
                                 className="skel-inline skin-secondary"
                                 navigate={PROCESS_NAME.FINISH}
-                                label={
-                                    <>
-                                        <span>마무리</span>
-                                        <span>{countdown}초</span>
-                                    </>
-                                }
+                                label="마무리"
                                 ttsText="마무리하기"
                             />
                         </div>

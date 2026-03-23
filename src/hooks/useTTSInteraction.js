@@ -30,14 +30,14 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
         const getHoverTtsTarget = (target) => {
             if (!target) return null;
 
-            const btn = target.closest?.('.button');
+            const btn = target.closest?.('.button, .button-like');
             if (btn) {
                 return { type: 'button', element: btn };
             }
 
             const main = target.closest?.('.main');
             if (main) {
-                const hasHoveringInteractive = main.querySelector('.button:hover, img:hover, [role="button"]:hover');
+                const hasHoveringInteractive = main.querySelector('.button:hover, .button-like:hover, img:hover, [role="button"]:hover');
                 if (hasHoveringInteractive) return null;
                 return { type: 'main', element: main };
             }
@@ -57,8 +57,9 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
                 if (hoverTarget.type === 'button') {
                     const btn = hoverTarget.element;
                     const currentParent = btn.parentElement?.closest('[data-tts-text]');
-                    const isSameParent = prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
-                    const parentTts = isSameParent ? '' : (currentParent?.dataset?.ttsText || '');
+                    const isButtonLike = btn.classList?.contains('button-like');
+                    const isSameParent = !isButtonLike && prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
+                    const parentTts = isButtonLike ? '' : (isSameParent ? '' : (currentParent?.dataset?.ttsText || ''));
                     const btnTts = btn.dataset?.ttsText || '';
                     const ttsText = parentTts + btnTts;
 
@@ -81,14 +82,15 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
             }
 
             // 버튼인 경우
-            const btn = target.closest?.('.button');
+            const btn = target.closest?.('.button, .button-like');
             if (btn) {
                 // 현재 버튼의 부모 요소 찾기
                 const currentParent = btn.parentElement?.closest('[data-tts-text]');
-                const isSameParent = prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
+                const isButtonLike = btn.classList?.contains('button-like');
+                const isSameParent = !isButtonLike && prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
 
                 // 같은 부모 안에서 버튼이 바뀌면 부모 TTS 재생하지 않음
-                const parentTts = isSameParent ? '' : (currentParent?.dataset?.ttsText || '');
+                const parentTts = isButtonLike ? '' : (isSameParent ? '' : (currentParent?.dataset?.ttsText || ''));
                 const btnTts = btn.dataset?.ttsText || '';
                 const ttsText = parentTts + btnTts;
 

@@ -1,9 +1,9 @@
-import React, { memo, useContext, useMemo } from "react";
+import React, { memo, useContext, useMemo, useRef, useEffect, useCallback } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import { PaginationIndicator } from "@/components/Pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
-import { useCategoryAssemble } from "@/hooks";
+import { useCategoryAssemble, useTextHandler } from "@/hooks";
 
 // 카테고리 탭 버튼
 const CategoryTab = memo(({ tab, isSelected, onSelect }) => (
@@ -21,6 +21,7 @@ const CategorySeparator = () => <span className="category-separator" aria-hidden
 const Category = memo(() => {
     const order = useContext(OrderContext);
     const accessibility = useContext(AccessibilityContext);
+    const { handleText } = useTextHandler(accessibility.volume);
 
     const categories = useMemo(
         () => (order.categoryInfo || []).map(c => ({ id: c.cate_id, name: c.cate_name })),
@@ -43,6 +44,31 @@ const Category = memo(() => {
     } = useCategoryAssemble(categories, accessibility.isLarge, order.selectedTab);
 
     const categoryClassName = useMemo(() => `category${catIsCompact ? ' compact' : ''}`, [catIsCompact]);
+
+    const catTotal = catTotalPages || 1;
+    const getCategoryPaginationTtsSection = () =>
+        `카테고리 ${catCurrentPage}페이지 총${catTotal}페이지,`;
+
+    const announceAfterCatNavRef = useRef(false);
+
+    const handleCatPrev = useCallback(() => {
+        if (!catHasPrev) return;
+        announceAfterCatNavRef.current = true;
+        catPrev();
+    }, [catHasPrev, catPrev]);
+
+    const handleCatNext = useCallback(() => {
+        if (!catHasNext) return;
+        announceAfterCatNavRef.current = true;
+        catNext();
+    }, [catHasNext, catNext]);
+
+    useEffect(() => {
+        if (!announceAfterCatNavRef.current) return;
+        announceAfterCatNavRef.current = false;
+        const p = catCurrentPage || 1;
+        handleText(`카테고리 ${p}페이지,`, false);
+    }, [catCurrentPage, handleText]);
 
     return (
         <div
@@ -71,11 +97,11 @@ const Category = memo(() => {
             </div>
             <div
                 className="pagination"
-                data-tts-text={`페이지네이션, 메뉴 카테고리, ${catTotalPages} 탭 중 ${catCurrentPage} 탭,`}
+                data-tts-text={getCategoryPaginationTtsSection()}
             >
-                <Button toggle svg={<Icon name="ArrowLeft" />} disabled={!catHasPrev} onClick={catPrev} ttsText="이전" />
+                <Button toggle svg={<Icon name="ArrowLeft" />} disabled={!catHasPrev} onClick={handleCatPrev} ttsText="이전" />
                 <PaginationIndicator pageNumber={catCurrentPage} totalPages={catTotalPages} />
-                <Button toggle svg={<Icon name="ArrowRight" />} disabled={!catHasNext} onClick={catNext} ttsText="다음" />
+                <Button toggle svg={<Icon name="ArrowRight" />} disabled={!catHasNext} onClick={handleCatNext} ttsText="다음" />
             </div>
         </div>
     );

@@ -1,8 +1,7 @@
 import React, { memo, useContext, useLayoutEffect } from "react";
 import { Button, Main, Step, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
-import { AccessibilityContext, OrderContext, ScreenRouteContext } from "@/contexts";
-import { useTimeoutCountdown } from "@/hooks";
+import { AccessibilityContext, OrderContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
 
 /** `updateOrderNumber` 실패·지연 시에만 사용 (기존 일반 모드와 동일) */
@@ -10,7 +9,6 @@ const ORDER_NUMBER_FALLBACK = 100;
 
 const ProcessOrderComplete = memo(() => {
     const order = useContext(OrderContext);
-    const { navigateTo } = useContext(ScreenRouteContext);
     const { isLow } = useContext(AccessibilityContext);
 
     useLayoutEffect(() => {
@@ -18,13 +16,6 @@ const ProcessOrderComplete = memo(() => {
     }, [order.updateOrderNumber]);
 
     const displayOrderNumber = order.orderNumber ?? ORDER_NUMBER_FALLBACK;
-
-    const { remainingSeconds: countdown } = useTimeoutCountdown({
-        durationMs: 60000,
-        enabled: true,
-        onTimeout: () => navigateTo(PROCESS_NAME.FINISH),
-        resetOnUserActivity: true
-    });
 
     return (
         <div className="process fifth">
@@ -51,7 +42,7 @@ const ProcessOrderComplete = memo(() => {
                                     <span className="primary">영수증 출력</span>을 선택합니다
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button
                                     className="skel-inline skin-secondary"
                                     onClick={() => order.sendPrintReceiptToApp()}
@@ -67,12 +58,7 @@ const ProcessOrderComplete = memo(() => {
                                     className="skel-inline skin-primary"
                                     ttsText="출력 안함,"
                                     navigate={PROCESS_NAME.FINISH}
-                                    label={
-                                        <>
-                                            <span>출력 안함</span>
-                                            <span>{countdown}초</span>
-                                        </>
-                                    }
+                                    label="출력 안함"
                                 />
                             </div>
                         </div>
@@ -99,7 +85,7 @@ const ProcessOrderComplete = memo(() => {
                                 </div>
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button
                                 className="skel-inline skin-secondary"
                                 onClick={() => order.sendPrintReceiptToApp()}
@@ -110,12 +96,7 @@ const ProcessOrderComplete = memo(() => {
                                 className="skel-inline skin-primary"
                                 ttsText="출력 안함,"
                                 navigate={PROCESS_NAME.FINISH}
-                                label={
-                                    <>
-                                        <span>출력 안함</span>
-                                        <span>{countdown}초</span>
-                                    </>
-                                }
+                                label="출력 안함"
                             />
                         </div>
                     </>

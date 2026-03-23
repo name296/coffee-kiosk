@@ -27,6 +27,7 @@ const Button = memo(({
     label,
     children,
     disabled = false,
+    excludeFromFocus = false,
     pressed: pressedProp = false,
     toggle = false,
     value,
@@ -98,12 +99,12 @@ const Button = memo(({
         let cleanedText = String(baseText).replace(/\s*비활성\s*,?\s*/g, '').trim();
 
         if (toggle) {
-            const statusText = pressed ? '선택됨, ' : '선택가능, ';
+            const statusText = pressed ? '선택됨, ' : '';
             cleanedText = cleanedText
                 .replace(/\s*선택됨\s*,\s*/g, '')
                 .replace(/\s*선택가능\s*,\s*/g, '')
                 .trim();
-            const result = cleanedText ? `${cleanedText}, ${statusText}` : statusText;
+            const result = `${cleanedText}${cleanedText && statusText ? ', ' : ''}${statusText}`;
             return disabled ? `${result}비활성, ` : result;
         }
 
@@ -186,9 +187,10 @@ const Button = memo(({
             style={style}
             data-tts-text={finalTtsText}
             data-react-handler="true"
+            data-focus-exclude={excludeFromFocus ? "true" : undefined}
             aria-disabled={disabled}
             aria-pressed={toggle ? pressed : undefined}
-            tabIndex={disabled ? 0 : undefined}
+            tabIndex={excludeFromFocus ? -1 : (disabled ? 0 : undefined)}
             onMouseDown={onStart}
             onMouseUp={onEnd}
             onMouseLeave={onEnd}

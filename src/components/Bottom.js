@@ -2,6 +2,7 @@ import React, { memo, useContext } from "react";
 import Button from "@/components/Button";
 import { HomeIcon, TimeIcon, WheelchairIcon } from "@/components/Icon";
 import { TimeoutContext } from "@/contexts";
+import { formatRemainingTimeTTS } from "@/lib";
 
 /** UI 컴포넌트: 하단 시스템 버튼(홈, 타임아웃, 접근성) */
 const Bottom = memo(() => {
@@ -19,6 +20,7 @@ const Bottom = memo(() => {
                 className="skel-access skin-access bottom-timeout"
                 svg={<TimeIcon />}
                 label={timeout?.globalRemainingTimeFormatted || "00:00"}
+                ttsText={formatRemainingTimeTTS(timeout?.globalRemainingTime)}
                 modal="Timeout"
             />
             <Button

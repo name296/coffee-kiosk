@@ -26,7 +26,7 @@ const ProcessMobilePay = memo(() => {
                                     <span className="primary">모바일페이</span>를 켜고 접근시킵니다
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                                 <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
                             </div>
@@ -46,7 +46,7 @@ const ProcessMobilePay = memo(() => {
                                 <img src="images/device-cardReader-mobile.png" alt="" />
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                             <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
                         </div>

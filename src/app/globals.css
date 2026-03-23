@@ -423,13 +423,13 @@
   }
 
     /* -----------------------------------------
-     button
-     - .button = default skeleton
-     - .button.skel-* = non-default skeleton
-     - .button.skin-* = skin
+    button / button-like
+     - .button, .button-like = default skeleton
+     - .button(.like).skel-* = non-default skeleton
+     - .button(.like).skin-* = skin
      - .button.state-* = state
   ----------------------------------------- */
-  .button {  
+  :is(.button, .button-like) {
     --button-min-side-lower-limit: calc(var(--layout-width) / 12);
     --button-min-side-raw: var(--button-min-side-lower-limit); /*js에서 덮어씀*/
     --button-min-side-upper-limit: calc(var(--layout-width) / 8);
@@ -998,6 +998,7 @@
       grid-column: 1 / -1;
       grid-template-columns: subgrid;
       align-items: center;
+      justify-items: end;
       block-size: 100%;
       padding-block: 8px;
 
@@ -1054,10 +1055,14 @@
 
       & .order-price {
         display: flex;
-        justify-content: right;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
         align-items: center;
-        inline-size: 258px;
+        inline-size: 100%;
         text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       & .button.skin-danger {
@@ -1067,6 +1072,31 @@
         inline-size: 84px;
         block-size: 84px;
       }
+    }
+
+    /* 바깥: 세로축 중앙 · 안쪽 .order-name__text: 2줄 말줄임 (동시 적용 불가 분리) */
+    & .order-name {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      block-size: fit-content;
+      inline-size: 100%;
+      justify-self: start;
+      align-self: center;
+      text-align: left;
+    }
+
+    & .order-name .order-name__text {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      inline-size: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      word-break: break-word;
     }
 
     &.without-field-header {
@@ -1103,12 +1133,6 @@
           }
         }
 
-        & .order-name {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
         & .order-quantity {
           & .counter,
           & .qty {
@@ -1118,11 +1142,13 @@
           }
         }
 
-        & .order-price {
-          display: block;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        & .order-name {
+          block-size: 1lh;
+        }
+
+        & .order-name .order-name__text {
+          -webkit-line-clamp: 1;
+          line-clamp: 1;
         }
 
         & .button.skin-danger {        

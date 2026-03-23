@@ -26,7 +26,7 @@ const ProcessSimplePay = memo(() => {
                                     <span className="primary">QR코드</span>를 인식시킵니다
                                 </span>
                             </div>
-                            <div className="task-manager">
+                            <div className="task-manager" data-tts-text="작업관리,">
                                 <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                                 <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
                             </div>
@@ -49,7 +49,7 @@ const ProcessSimplePay = memo(() => {
                                 <img src="images/device-codeReader-simple.png" alt="" />
                             </div>
                         </div>
-                        <div className="task-manager">
+                        <div className="task-manager" data-tts-text="작업관리,">
                             <Button className="skel-inline skin-secondary" navigate={PROCESS_NAME.PAYMENTS} label="취소" />
                             <Button className="skel-inline skin-primary" navigate={PROCESS_NAME.ORDER_COMPLETE} label="가상인식" />
                         </div>
