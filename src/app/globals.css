@@ -63,10 +63,6 @@
   button {
     all: unset;
     box-sizing: border-box;
-    font: inherit;
-    color: inherit;
-    line-height: inherit;
-    letter-spacing: inherit;
     appearance: none;
     -webkit-appearance: none;
   }
@@ -521,8 +517,9 @@
       align-items: center;
       justify-items: center;
       padding: 0;
+      grid-gap: 0;
       gap: 0;
-
+      
       & .icon {
         grid-row: 1;
         grid-column: 1;
@@ -1678,6 +1675,7 @@
     }
 
     & .black {
+      display: block;
       block-size: 1020px;
     }
 
