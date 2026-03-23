@@ -53,7 +53,7 @@ export const ModalTimeout = memo(() => {
                         <Button
                             className="skel-inline skin-secondary"
                             svg={<Icon name="Home" />}
-                            label="시작화면"
+                            label="처음으로"
                             onClick={() => {
                                 modal.ModalTimeout.close();
                                 navigateTo(PROCESS_NAME.START);

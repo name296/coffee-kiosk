@@ -89,7 +89,7 @@ export const ModalAccessibility = memo(() => {
     if (!isOpen) return null;
 
     return (
-        <div className="modal" aria-hidden={!isOpen}>
+        <div className="modal modal-accessibility" aria-hidden={!isOpen}>
             <div
                 className="modal-panel"
                 ref={containerRef}
@@ -110,18 +110,10 @@ export const ModalAccessibility = memo(() => {
                         </span>
                     </div>
                     <div className="modal-settings">
-                        <div className="modal-setting-row modal-setting-row-wide" data-tts-text="초기설정으로 일괄선택,">
-                            <span className="modal-setting-name">
-                                <span className="primary">초기설정</span>으로 일괄선택
-                            </span>
-                            <div className="task-manager">
-                                <Button className="skel-inline skin-secondary" svg={<Icon name="Restart" />} label="초기화" onClick={handleInitialSettingsPress} />
-                            </div>
-                        </div>
                         <div className="modal-setting-row">
                             <span className="modal-setting-name">
                                 <Icon name="Contrast" className="modal-graphic" aria-hidden />
-                                고대비화면
+                                고대비
                             </span>
                             <div className="task-manager" data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark},`}>
                                 <Button toggle value={currentSettings.isDark} selectedValue={false} onChange={handleDarkChange} label="끔" />
@@ -131,7 +123,7 @@ export const ModalAccessibility = memo(() => {
                         <div className="modal-setting-row">
                             <span className="modal-setting-name">
                                 <Icon name="Volume" className="modal-graphic" aria-hidden />
-                                소리크기
+                                음량
                             </span>
                             <div className="task-manager" data-tts-text={`소리크기, 선택상태, ${getStatusText.volume},`}>
                                 <Button toggle value={currentSettings.volume} selectedValue={0} onChange={handleVolumeChange} label="끔" />
@@ -143,7 +135,7 @@ export const ModalAccessibility = memo(() => {
                         <div className="modal-setting-row">
                             <span className="modal-setting-name">
                                 <Icon name="Large" className="modal-graphic" aria-hidden />
-                                큰글씨화면
+                                큰글씨
                             </span>
                             <div className="task-manager" data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large},`}>
                                 <Button toggle value={currentSettings.isLarge} selectedValue={false} onChange={handleLargeChange} label="끔" />
@@ -153,9 +145,9 @@ export const ModalAccessibility = memo(() => {
                         <div className="modal-setting-row">
                             <span className="modal-setting-name">
                                 <Icon name="Wheelchair" className="modal-graphic" aria-hidden />
-                                낮은화면
+                                낮추기
                             </span>
-                            <div className="task-manager" data-tts-text={`낮은 화면, 선택상태, ${getStatusText.low},`}>
+                            <div className="task-manager" data-tts-text={`낮추기, 선택상태, ${getStatusText.low},`}>
                                 <Button toggle value={currentSettings.isLow} selectedValue={false} onChange={handleLowChange} label="끔" />
                                 <Button toggle value={currentSettings.isLow} selectedValue={true} onChange={handleLowChange} label="켬" />
                             </div>
@@ -166,6 +158,7 @@ export const ModalAccessibility = memo(() => {
                         ref={refsData.refs.Modal.footerButtonsRef}
                         className="task-manager"
                     >
+                        <Button className="skel-inline skin-danger" svg={<Icon name="Restart" />} label="초기화" ttsText="접근성 설정 초기화," onClick={handleInitialSettingsPress} />
                         <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="적용안함" onClick={handleCancelPress} />
                         <Button className="skel-inline skin-primary" svg={<Icon name="Ok" />} label="적용하기" onClick={handleConfirmPress} />
                     </div>

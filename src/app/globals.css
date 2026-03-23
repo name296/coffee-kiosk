@@ -54,13 +54,13 @@
 
   body {
     position: fixed;
+    inset: 50% auto auto 50%;
     translate: -50% -50%; /* `translate: -50% -50%`만 있으면 기준점이 뷰포트 중앙이 아님 → 50%로 모서리를 중앙에 둔 뒤 당김 */
     scale: initial; /* viewport.js가 오버라이드 */
-    inset: 50% auto auto 50%;
     inline-size: var(--layout-width);
     block-size: var(--layout-height);
     font: normal normal var(--font-weight-default) var(--font-size-b1) / 1 var(--font-family-current);
-    letter-spacing: -0.04em;
+    letter-spacing: -0.06em;
     user-select: none;
   }
 
@@ -347,7 +347,7 @@
   }
 
   .main {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     flex-flow: column nowrap;
     justify-content: space-evenly;
   }
@@ -359,6 +359,8 @@
 
   .bottom {
     block-size: 112px;
+    justify-content: space-between;
+    gap: var(--spacing-md);
   }
 
   /* -----------------------------------------
@@ -373,6 +375,10 @@
     align-items: center;
     padding-inline: var(--layout-padding);
     padding-block: var(--layout-padding);
+
+    &.modal-accessibility {
+      justify-content: flex-end;
+    }
   }
 }
 
@@ -424,9 +430,9 @@
      - .button.state-* = state
   ----------------------------------------- */
   .button {  
-    --button-min-side-lower-limit: calc(var(--layout-width) * 0.08);
+    --button-min-side-lower-limit: calc(var(--layout-width) / 12);
     --button-min-side-raw: var(--button-min-side-lower-limit); /*js에서 덮어씀*/
-    --button-min-side-upper-limit: calc(var(--layout-width) * 0.16);
+    --button-min-side-upper-limit: calc(var(--layout-width) / 8);
     --button-min-side-clamped: clamp(var(--button-min-side-lower-limit), var(--button-min-side-raw), var(--button-min-side-upper-limit));    
     --button-appearance-ratio: calc(var(--button-min-side-clamped) * 0.05);
     --button-padding-inline: calc(var(--button-appearance-ratio) * 2);
@@ -442,7 +448,7 @@
     padding: var(--button-padding-block) var(--button-padding-inline);
     border-width: var(--button-appearance-ratio);
     border-style: solid;
-    border-radius: calc(var(--button-appearance-ratio) * 2);
+    border-radius: calc(var(--button-appearance-ratio) * 2.5);
     background-clip: padding-box;
     box-shadow: 0 0 calc(var(--button-appearance-ratio) * 0.5) calc(var(--button-appearance-ratio) * 0.25) rgba(0, 0, 0, 0.12);
     flex-shrink: 0;
@@ -455,6 +461,7 @@
       display: inline-flex;
       justify-content: center;
       align-items: center;
+
       inline-size: 1em;
       block-size: 1em;
       flex-shrink: 0;
@@ -464,15 +471,14 @@
       display: block;
         inline-size: 100%;
         block-size: 100%;
-      object-fit: contain;
+        object-fit: contain;
         fill: currentColor;
       }
     }
 
     &:hover,
     &:focus-visible {
-      outline: calc(var(--button-appearance-ratio) * 4) dashed var(--color-system-01);
-      outline-offset: calc(var(--button-appearance-ratio) * -1);
+      outline: calc(var(--button-appearance-ratio) * 5) dashed var(--color-system-01);
       z-index: 1;
     }
 
@@ -487,7 +493,7 @@
       display: block;
       inline-size: calc(100% - var(--button-appearance-ratio) * 0.5 * 2); /*양쪽값(left, right) 둘다 뺴줘야함: 2배*/
       block-size: calc(100% - var(--button-appearance-ratio) * 0.5 * 2); /*양쪽값(top, bottom) 둘다 뺴줘야함: 2배*/
-      border-radius: calc(var(--button-appearance-ratio) * 0.5);
+      border-radius: calc(var(--button-appearance-ratio) * 1);
       background-color: currentColor;
       mask-image:
         url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,0 24,0 0,24' fill='black'/%3E%3C/svg%3E"),
@@ -557,21 +563,22 @@
 
     &.skel-access {
       flex-flow: row nowrap;
+      inline-size: fit-content;
       justify-content: flex-start;
       padding-inline-start: 0;
       padding-inline-end: calc(var(--button-min-side-raw) * 0.25);
       border-radius: calc(var(--button-min-side-raw) * 0.5);
 
       & .icon {
+        
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
-        inline-size: var(--button-min-side-raw);
-        block-size: var(--button-min-side-raw);
-        margin-inline-start: calc(var(--button-appearance-ratio) * -1);
-        border-style: solid;
-        border-width: var(--button-appearance-ratio);
+        inline-size: fit-content;
+        block-size: 100%;
+        aspect-ratio: 1 / 1;
+        border: calc(var(--button-appearance-ratio) * 1) solid initial;
         border-radius: calc(var(--button-min-side-raw) * 0.5);
 
         & svg {
@@ -745,7 +752,7 @@
     gap: var(--spacing-md);
 
     & .button {
-      inline-size: fit-content;
+      inline-size: 199px;
       flex-flow: row nowrap;
     }
 
@@ -883,16 +890,16 @@
   }
 
   .cart {
+    flex: 1 0 auto;
     display: grid;
     grid-template-columns: 16px 113px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 113px 16px;
     grid-template-rows: auto repeat(7, 1fr);
     align-items: stretch;
     justify-items: stretch;
+    align-self: center;
+    padding-inline: 0;
     column-gap: 0;
     inline-size: var(--layout-width);
-    block-size: 100%;
-    flex: 1 1 auto;
-    align-self: center;
 
     & .header {
       position: relative;
@@ -963,6 +970,7 @@
     }
 
     & .order-list {
+      flex: 1 0 auto;
       display: grid;
       grid-column: 2 / -2;
       grid-row: 2 / 8;
@@ -973,8 +981,7 @@
       justify-self: stretch;
       align-self: stretch;
       inline-size: 100%;
-      block-size: 100%;
-      flex-grow: 1;
+      block-size: 100%;      
     }
 
     & .details-pagination {
@@ -985,6 +992,7 @@
     }
 
     & .order-row {
+      flex: 1 0 auto;
       position: relative;
       display: grid;
       grid-column: 1 / -1;
@@ -1074,8 +1082,8 @@
     }
 
     &.compact {
-      flex: 1 0 auto;
-      inline-size: var(--layout-width);
+      flex: 0 1 auto;
+      flex-shrink: 0;
       padding-inline: 0;
       block-size: 300px;
       grid-template-columns: 16px 76px 1fr fit-content(var(--layout-width)) fit-content(var(--layout-width)) 2ch 16px fit-content(var(--layout-width)) 16px;
@@ -1091,7 +1099,7 @@
         & .order-item {
           & .order-index {
             inline-size: fit-content;
-            block-size: auto;
+            block-size: fit-content;
             aspect-ratio: unset;
           }
         }
@@ -1128,14 +1136,18 @@
         grid-column: 8;
         grid-row: 2;
         justify-self: center;
-        align-self: center;
+        align-self: stretch;
+        block-size: 100%;
         display: inline-flex;
         flex-flow: column nowrap;
         align-items: center;
         gap: var(--spacing-md);
+        padding-block: var(--spacing-sm);
 
         & .button {
           inline-size: fit-content;
+          flex: 1 1 0;
+          min-block-size: 0;
         }
 
         & .indicator {
@@ -1339,6 +1351,14 @@
     & .button {
       block-size: 84px;
     }
+
+    & .button.bottom-timeout {
+      position: absolute;
+      inset-inline: 0;
+      inset-block: 0;
+      margin-inline: auto;
+      margin-block: auto;
+    }
   }
 
   /* -----------------------------------------
@@ -1347,8 +1367,8 @@
   .main {
     &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
     &:focus-visible {
-      outline: 12px dashed var(--color-system-01);
-      outline-offset: -12px;
+      outline: 16px dashed var(--color-system-01);
+      outline-offset: -16px;
     }
 
     & .task-manager .button {
@@ -1379,8 +1399,8 @@
 
       &:hover:not(:has(.button:hover, img:hover, [role="button"]:hover)),
       &:focus-visible {
-        outline: 12px dashed var(--color-system-01);
-        outline-offset: -12px;
+        outline: 16px dashed var(--color-system-01);
+        outline-offset: -16px;
       }
 
       & .modal-body {
@@ -1451,45 +1471,48 @@
     & .modal-settings {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(2, minmax(0, 1fr));
       inline-size: 100%;
       block-size: auto;
-      border-block-start: 2px solid var(--body1-border-color);
-      border-inline-start: 2px solid var(--body1-border-color);
+      border-radius: 12px;
+      border: 2px solid var(--body1-border-color);
     }
 
     & .modal-setting-row {
       position: relative;
       display: flex;
-      flex-flow: column nowrap;
-      align-items: stretch;
+      flex-flow: row nowrap;
+      align-items: center;
       justify-content: space-between;
       inline-size: 100%;
-      block-size: auto;
-      padding-block: var(--spacing-md);
-      padding-inline: var(--spacing-md);
-      border-block-end: 2px solid var(--body1-border-color);
-      border-inline-end: 2px solid var(--body1-border-color);
+      block-size: 100%;
+      padding-block: var(--spacing-sm);
+      padding-inline: var(--spacing-sm);
       gap: var(--spacing-sm);
       min-inline-size: 0;
 
       & .task-manager {
         justify-content: flex-end;
+        flex-shrink: 0;
       }
-    }
 
-    & .modal-setting-row-wide {
-      grid-column: 1 / -1;
-      flex-flow: row nowrap;
-      align-items: center;
-      gap: var(--spacing-md);
+      /* 2x2 내부선만 표시 (외곽선은 .modal-settings border 사용) */
+      &:nth-child(odd) {
+        border-inline-end: 2px solid var(--body1-border-color);
+      }
+
+      &:nth-child(-n + 2) {
+        border-block-end: 2px solid var(--body1-border-color);
+      }
     }
 
     & .modal-setting-name {
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
-      gap: var(--spacing-md);
-      inline-size: 100%;
+      gap: 0;
+      flex: 1 1 auto;
+      min-inline-size: 0;
       block-size: auto;
     }
   }

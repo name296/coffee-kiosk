@@ -35,10 +35,10 @@ const Step = memo(() => {
     return (
         <div className="step body1">
             <span className={`num ${numState(stepIndex, 1)}`}>{stepIndex > 1 ? "✓" : "1"}</span>
-            <span className={`name ${nameState(stepIndex, 1)}`}>메뉴선택</span>
+            <span className={`name ${nameState(stepIndex, 1)}`}>메뉴</span>
             <StepIcon className={separatorClass(stepIndex, 1)} aria-hidden />
             <span className={`num ${numState(stepIndex, 2)}`}>{stepIndex > 2 ? "✓" : "2"}</span>
-            <span className={`name ${nameState(stepIndex, 2)}`}>내역확인</span>
+            <span className={`name ${nameState(stepIndex, 2)}`}>주문</span>
             <StepIcon className={separatorClass(stepIndex, 2)} aria-hidden />
             <span className={`num ${numState(stepIndex, 3)}`}>{stepIndex > 3 ? "✓" : "3"}</span>
             <span className={`name ${nameState(stepIndex, 3)}`}>결제</span>
