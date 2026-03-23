@@ -9,7 +9,6 @@ const isVisible = (el) => {
     return true;
 };
 
-/** div.process 루트(tabIndex 0) — 접근성은 유지하되 방향키 루프 목록에서는 제외(.main·버튼만 사용) */
 const isProcessShell = (el) =>
     el?.classList?.contains('process') && !!el.querySelector?.('.main');
 

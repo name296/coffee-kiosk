@@ -13,7 +13,7 @@ const ProcessMenu = memo(() => {
     }, [order?.categoryInfo, order?.setSelectedTab]);
 
     return (
-        <div className="process second" tabIndex={-1}>
+        <div className="process second">
             <div className="black" />
             <div className="top body1" />
             <Step />

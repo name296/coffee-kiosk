@@ -1,10 +1,10 @@
 /**
  * 프로세스: 업무 프로세스 + 콘텐츠
- * - ProcessConfig(프로세스 콘피그)가 레이아웃과 콘텐츠 매핑
+ * - 프로세스 ID·맵: `@/constants/processFlow`, 컴포넌트 매핑: `@/constants/processRegistry` (`PROCESS_CONFIG`)
  * - 프로세스 콘텐츠는 processes/ 단일 레벨에 배치
  */
 export { default as Process } from "./Process";
-export { default as PROCESS_CONFIG } from "./ProcessConfig";
+export { PROCESS_CONFIG } from "@/constants";
 export { default as ProcessStart, ProcessStartPoster } from "./ProcessStart";
 export { default as ProcessMenu } from "./ProcessMenu";
 export { default as ProcessDetails } from "./ProcessDetails";

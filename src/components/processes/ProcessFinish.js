@@ -17,7 +17,7 @@ const ProcessFinish = memo(() => {
     });
 
     return (
-        <div className="process fifth" tabIndex={-1}>
+        <div className="process fifth">
             <div className="black" />
             <div className="top body1" />
             <Step />

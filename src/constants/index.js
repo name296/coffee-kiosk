@@ -1,2 +1,3 @@
 export * from "./constants";
-export * from "./processes";
+export * from "./processFlow";
+export { default as PROCESS_CONFIG } from "./processRegistry";

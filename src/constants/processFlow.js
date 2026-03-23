@@ -1,3 +1,7 @@
+/**
+ * 프로세스 ID·흐름 맵만 (React/UI import 없음).
+ * `processTts` 등이 `@/constants` 경유 시 순환 의존을 막기 위해 분리.
+ */
 export const PROCESS_NAME = Object.freeze({
     START: "ProcessStart",
     MENU: "ProcessMenu",

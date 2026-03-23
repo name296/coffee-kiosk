@@ -2,11 +2,11 @@ import React, { memo, useContext } from "react";
 import { Button } from "@/components";
 import Icon from "@/components/Icon";
 import { PROCESS_NAME, TTS } from "@/constants";
+import { IDLE_WARNING_THRESHOLD_MS } from "@/lib/format";
 import { ModalContext, RefContext, ScreenRouteContext, TimeoutContext } from "@/contexts";
 import { useFocusTrap } from "@/hooks";
 
-const MODAL_TTS =
-    "알림, 시간연장, 사용시간이 20초 남았습니다, 계속 사용하시려면 연장 버튼을 누릅니다, ";
+const FALLBACK_REMAINING_SECONDS = Math.ceil(IDLE_WARNING_THRESHOLD_MS / 1000);
 
 export const ModalTimeout = memo(() => {
     const modal = useContext(ModalContext);
@@ -16,8 +16,11 @@ export const ModalTimeout = memo(() => {
     const isOpen = modal.ModalTimeout.isOpen;
     const { containerRef } = useFocusTrap(isOpen);
     const countdown = timeout?.globalRemainingTime;
-    const secText =
-        countdown !== undefined ? `${Math.ceil(countdown / 1000)}초` : "20초";
+    const remainingSec =
+        countdown !== undefined ? Math.ceil(countdown / 1000) : FALLBACK_REMAINING_SECONDS;
+    const secText = `${remainingSec}초`;
+    const modalTts =
+        `알림, 시간연장, 사용시간이 ${remainingSec}초 남았습니다, 계속 사용하시려면 연장 버튼을 누릅니다, `;
 
     if (!isOpen) return null;
 
@@ -26,7 +29,7 @@ export const ModalTimeout = memo(() => {
             <div
                 className="modal-panel"
                 ref={containerRef}
-                data-tts-text={MODAL_TTS + TTS.replay}
+                data-tts-text={modalTts + TTS.replay}
                 tabIndex={0}
             >
                 <div className="modal-head body1">

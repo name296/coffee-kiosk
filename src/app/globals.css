@@ -1,6 +1,35 @@
 @layer reset, root, layout, components, utilities;
 
-/* 폰트 @font-face는 basePath(GitHub Pages) 대응을 위해 layout.js에서 주입 */
+/* Pretendard GOV Medium — `globals.css` 기준 `public/fonts` (Webpack이 url 해석; 문서 상대 `fonts/`와 혼동 주의) */
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("../../public/fonts/PretendardGOV-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  unicode-range: U+0000-001F, U+0021-002F, U+003A-10FFFF;
+}
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("../../public/fonts/PretendardGOV-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 110%;
+  unicode-range: U+0020;
+}
+@font-face {
+  font-family: "MyFontLarge";
+  src: url("../../public/fonts/PretendardGOV-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 110%;
+  unicode-range: U+0030-0039;
+}
+@font-face {
+  font-family: "MyFont";
+  src: url("../../public/fonts/PretendardGOV-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
 
 /* =========================================================
    reset
@@ -85,7 +114,7 @@
     --font-size-d3: 128px;
     --font-size-d4: 180px;
 
-    --font-weight-default: 600;
+    --font-weight-default: 500;
 
     /* -----------------------------------------
        Primitive: palette

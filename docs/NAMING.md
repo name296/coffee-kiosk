@@ -56,7 +56,7 @@
   예: `ProcessMenu.js`, `ModalTimeout.js`, `Pagination.js` (컴포넌트 파일명)
 - **default export 컴포넌트명**: 파일명과 **동일**하게 맞춘다 (`ProcessMenu` ↔ `ProcessMenu.js`).
 - **폴더**: 기능/영역별 하위 폴더는 **소문자**·케밥·복수형 등 일관되게 (`modals/`, `processes/`와 동일 선상).  
-  현재: `modals/`, `processes/`, `screens/`, `pagination/` (폴더만 소문자; 내부 파일은 여전히 `Pagination.js` 등 PascalCase)
+  현재: `modals/`, `processes/`, `screens/` 등 (폴더만 소문자). 단독 UI는 루트에 `Pagination.js`처럼 PascalCase 파일만 둘 수 있음.
 - **index.js**: 해당 폴더의 **공개 API**만 re-export; 내부 전용 파일은 폴더 안에 두고 index에서 선택적으로 노출.
 
 ---
@@ -81,7 +81,7 @@
 
 - **유틸·헬퍼·데이터 맵**: **camelCase** 파일명.  
   예: `orderUtils.js`, `format.js`, `storage.js`, `processTts.js` (화면 문구 맵 등 비-UI 로직은 `components/`가 아니라 **`lib/`** 에 둔다)
-- **상수 모음**: **camelCase** 또는 **의미 있는 단일 이름** (`constants.js`, `processes.js`).  
+- **상수 모음**: **camelCase** 또는 **의미 있는 단일 이름** (`constants.js`, `processFlow.js`, `processRegistry.js`).  
   export는 `UPPER_SNAKE` 또는 `as const` 객체 등 한 가지 스타일로 통일.
 
 ---
@@ -105,7 +105,7 @@
 
 - **별칭**: `jsconfig.json` 기준 **`@/` = `src/`** 만 사용한다.  
   예: `import { x } from '@/lib/format'`
-- **상대 경로**: 같은 폴더·같은 기능 묶음(`processes/` 내부 `ProcessConfig` → `./ProcessStart` 등)에서만 `./` 허용.  
+- **상대 경로**: 같은 폴더·같은 기능 묶음에서만 `./` 허용. `processRegistry.js`만 `@/components/processes/...` 를 참조; `processFlow.js`는 순수 데이터(`processTts` 순환 방지).  
   **`components/` 루트끼리**, **`components/` ↔ `hooks/`**, **`app/` ↔ `src/`** 등은 **`@/`** 로 통일한다.
 
 ---
@@ -140,7 +140,7 @@
 |------|------|
 | 통합 아이콘 생성 | `scripts/svg-to-react.js` → `src/components/Icon.js` |
 | 화면별 TTS 문구 맵 | `src/lib/processTts.js` (`@/lib/processTts`) |
-| 페이지네이션 UI 폴더 | `src/components/pagination/` |
+| 페이지네이션 UI | `src/components/Pagination.js` (`@/components/Pagination`) |
 | 파비콘 (public) | `public/favicon.png` → 메타데이터 `icon: '/favicon.png'` |
 | 사운드 | `public/sounds/sound-on-pressed.mp3`, `sound-note.wav` |
 | 폰트 | `public/fonts/pretendard-gov-semibold.otf` |

@@ -2,7 +2,7 @@ import React, { memo, useContext, useEffect } from "react";
 import { AccessibilityContext, ScreenRouteContext } from "@/contexts";
 import { useTextHandler, useInteractiveTTSHandler, useFocusNavigationHandler, useCallHotkey } from "@/hooks";
 import { PROCESS_NAME } from "@/constants";
-import PROCESS_CONFIG from "./ProcessConfig";
+import PROCESS_CONFIG from "@/constants/processRegistry";
 
 /**
  * 현재 라우트에 해당하는 화면 컴포넌트만 렌더한다. 레이아웃은 각 Process* 가 직접 조립.

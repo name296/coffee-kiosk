@@ -1,6 +1,6 @@
 import React, { createContext, useMemo, useRef, useCallback } from "react";
 import { useTimeoutCountdown } from "@/hooks/useTimeoutCountdown";
-import { IDLE_TIMEOUT_MS } from "@/lib/format";
+import { IDLE_TIMEOUT_MS, IDLE_WARNING_THRESHOLD_MS } from "@/lib/format";
 
 export const TimeoutContext = createContext();
 
@@ -19,7 +19,7 @@ export const TimeoutProvider = ({ children }) => {
         restartOnTimeout: true,
         resetOnUserActivity: true,
         onWarning: (warningRemainingMs) => onWarningRef.current?.(warningRemainingMs),
-        warningThresholdMs: 20000
+        warningThresholdMs: IDLE_WARNING_THRESHOLD_MS
     });
 
     const value = useMemo(() => ({

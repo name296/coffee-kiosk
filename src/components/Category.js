@@ -1,7 +1,7 @@
 import React, { memo, useContext, useMemo } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
-import { PaginationIndicator } from "@/components/pagination";
+import { PaginationIndicator } from "@/components/Pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
 import { useCategoryAssemble } from "@/hooks";
 

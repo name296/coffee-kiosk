@@ -9,7 +9,7 @@ const ProcessPayments = memo(() => {
     const isLow = useContext(AccessibilityContext).isLow;
 
     return (
-        <div className="process forth" tabIndex={-1}>
+        <div className="process forth">
             <div className="black" />
             <div className="top body1" />
             <Step />

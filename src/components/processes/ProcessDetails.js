@@ -16,7 +16,7 @@ const ProcessDetails = memo(() => {
     }, [order.orderItems, navigateTo]);
 
     return (
-        <div className="process third" tabIndex={-1}>
+        <div className="process third">
             <div className="black" />
             <div className="top body1" />
             <Step />

@@ -1,6 +1,6 @@
 import React, { memo, useContext, useEffect } from "react";
 import Button from "@/components/Button";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/Pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
 import { usePageSlicer } from "@/hooks";
 

@@ -1,4 +1,6 @@
 export const IDLE_TIMEOUT_MS = 120000;
+/** 경고 모달 직전 남은 시간(밀리초). `useTimeoutCountdown`·ModalTimeout 폴백과 동일해야 함 */
+export const IDLE_WARNING_THRESHOLD_MS = 20000;
 
 export const formatRemainingTime = (ms) => {
     const s = Math.ceil(ms / 1000);

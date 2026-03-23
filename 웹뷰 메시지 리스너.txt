@@ -1,0 +1,36 @@
+
+// ============================================================================
+// 24. useWebViewMessage - 웹뷰 메시지 리스너
+// ============================================================================
+
+const WEBVIEW_RESPONSE_SUCCESS = 'SUCCESS';
+
+export const useWebViewMessage = (setisCreditPayContent) => {
+  useEffect(() => {
+    if (window.chrome?.webview) {
+      const handleMessage = (event) => {
+        let resData = event.data;
+        if (resData.arg.result === WEBVIEW_RESPONSE_SUCCESS) {
+          if (resData.Command === WEBVIEW.PAY) {
+            setisCreditPayContent(PAY.CARD_OUT);
+          }
+          if (resData.Command === WEBVIEW.PRINT) {
+            setisCreditPayContent(PAY.PRINT_SELECT);
+          }
+        } else {
+          console.log(resData.arg.errorMessage);
+        }
+      };
+
+      window.chrome.webview.addEventListener("message", handleMessage);
+
+      return () => {
+        if (window.chrome?.webview) {
+          window.chrome.webview.removeEventListener("message", handleMessage);
+        }
+      };
+    }
+  }, [setisCreditPayContent]);
+};
+
+

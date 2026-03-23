@@ -1,7 +1,7 @@
 import React, { memo, useContext } from "react";
 import Icon from "@/components/Icon";
 import OrderList from "@/components/OrderList";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/Pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
 import { usePageSlicer } from "@/hooks";
 

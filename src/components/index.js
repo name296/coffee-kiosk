@@ -6,6 +6,6 @@ export { default as Category } from "./Category";
 export { default as MenuGrid } from "./MenuGrid";
 export { default as OrderList } from "./OrderList";
 export { default as Cart } from "./Cart";
-export { default as Pagination, PaginationPrevButton, PaginationIndicator, PaginationNextButton } from "./pagination";
+export { default as Pagination, PaginationPrevButton, PaginationIndicator, PaginationNextButton } from "./Pagination";
 export { default as Summary } from "./Summary";
 export { default as Icon } from "./Icon";

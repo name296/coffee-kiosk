@@ -1,14 +1,23 @@
-import React, { memo, useContext } from "react";
+import React, { memo, useContext, useLayoutEffect } from "react";
 import { Button, Main, Step, Bottom } from "@/components";
 import { PROCESS_NAME } from "@/constants";
 import { AccessibilityContext, OrderContext, ScreenRouteContext } from "@/contexts";
 import { useTimeoutCountdown } from "@/hooks";
 import { processTts } from "@/lib/processTts";
 
+/** `updateOrderNumber` 실패·지연 시에만 사용 (기존 일반 모드와 동일) */
+const ORDER_NUMBER_FALLBACK = 100;
+
 const ProcessOrderComplete = memo(() => {
     const order = useContext(OrderContext);
     const { navigateTo } = useContext(ScreenRouteContext);
     const { isLow } = useContext(AccessibilityContext);
+
+    useLayoutEffect(() => {
+        order.updateOrderNumber();
+    }, [order.updateOrderNumber]);
+
+    const displayOrderNumber = order.orderNumber ?? ORDER_NUMBER_FALLBACK;
 
     const { remainingSeconds: countdown } = useTimeoutCountdown({
         durationMs: 60000,
@@ -18,7 +27,7 @@ const ProcessOrderComplete = memo(() => {
     });
 
     return (
-        <div className="process fifth" tabIndex={-1}>
+        <div className="process fifth">
             <div className="black" />
             <div className="top body1" />
             <Step />
@@ -30,7 +39,7 @@ const ProcessOrderComplete = memo(() => {
                                 <img src="images/device-printer-order.png" alt="" />
                                 <div className="order-num">
                                     <span>주문</span>
-                                    <span>{order.orderNumber || 100}</span>
+                                    <span>{displayOrderNumber}</span>
                                 </div>
                             </div>
                         </div>
@@ -86,7 +95,7 @@ const ProcessOrderComplete = memo(() => {
                                 <img src="images/device-printer-order.png" alt="" />
                                 <div className="order-num">
                                     <span>주문</span>
-                                    <span>{order.orderNumber || 100}</span>
+                                    <span>{displayOrderNumber}</span>
                                 </div>
                             </div>
                         </div>

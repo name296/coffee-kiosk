@@ -5,7 +5,7 @@ import { TakeinIcon, TakeoutIcon } from "@/components/Icon";
 import { processTts } from "@/lib/processTts";
 
 const ProcessStart = memo(() => (
-    <div className="process first" tabIndex={-1}>
+    <div className="process first">
         <div className="poster">
             <img src="images/poster.png" alt="커피포스터" />
         </div>
