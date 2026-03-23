@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react";
 import { useBreakpointsPageSlicer } from "./usePageSlicer";
 
 /** getBoundingClientRect() 기준이므로 스케일 적용된 화면 픽셀. 이 값보다 갭이 크면 isCompact */
@@ -30,7 +30,6 @@ export const useCategoryAssemble = (items, isLarge = false, selectedItemName = n
     const lastMeasureWidthRef = useRef(0);
     const lastContainerWidthRef = useRef(0);
     const isCalculatingRef = useRef(false);
-    const rafCalculateRef = useRef(null);
     const itemsRef = useRef(safeItems);
 
     // items 변경 시 breakpoint 재계산 트리거. 비교는 id/name만 사용(목록 교체·이름 변경 감지).
@@ -153,7 +152,8 @@ export const useCategoryAssemble = (items, isLarge = false, selectedItemName = n
         isCalculatingRef.current = false;
     }, []);
 
-    useEffect(() => {
+    // DOM 측정·브레이크포인트: 페인트 전에 맞춰 visibility 전환 시 깜빡임 완화
+    useLayoutEffect(() => {
         const currentItems = itemsRef.current;
         const measureEl = measureRef.current;
         const containerEl = containerRef.current;
@@ -173,6 +173,7 @@ export const useCategoryAssemble = (items, isLarge = false, selectedItemName = n
             return;
         }
 
+        // 폭 변화 시 동기 재계산(rAF 없음). isCalculatingRef로 콜백 재진입 시 스킵.
         const observer = new ResizeObserver((entries) => {
             if (isCalculatingRef.current) return;
             let shouldRecalc = false;
@@ -189,11 +190,7 @@ export const useCategoryAssemble = (items, isLarge = false, selectedItemName = n
                 }
             }
             if (shouldRecalc) {
-                if (rafCalculateRef.current != null) cancelAnimationFrame(rafCalculateRef.current);
-                rafCalculateRef.current = requestAnimationFrame(() => {
-                    rafCalculateRef.current = null;
-                    calculate();
-                });
+                calculate();
             }
         });
 
@@ -204,38 +201,30 @@ export const useCategoryAssemble = (items, isLarge = false, selectedItemName = n
             observer.observe(containerEl);
         }
 
-        // calcTrigger/safeItems.length가 바뀌었을 때는 ResizeObserver만 믿지 않고 한 번은 반드시 재계산
-        const rafId = requestAnimationFrame(() => {
-            calculate();
-        });
+        calculate();
 
         return () => {
-            cancelAnimationFrame(rafId);
-            if (rafCalculateRef.current != null) cancelAnimationFrame(rafCalculateRef.current);
             observer.disconnect();
         };
     }, [safeItems.length, calcTrigger, calculate]);
 
-    useEffect(() => {
+    // 실제 렌더된 탭 간격으로 compact 판정 — 레이아웃 직후 측정
+    useLayoutEffect(() => {
         if (!isReady || !containerRef.current) return;
 
-        const frameId = requestAnimationFrame(() => {
-            const renderedButtons = containerRef.current.querySelectorAll('.button');
-            if (renderedButtons.length > 1) {
-                let maxGap = 0;
-                for (let i = 0; i < renderedButtons.length - 1; i++) {
-                    const rect1 = renderedButtons[i].getBoundingClientRect();
-                    const rect2 = renderedButtons[i + 1].getBoundingClientRect();
-                    const actualGap = rect2.left - rect1.right;
-                    maxGap = Math.max(maxGap, actualGap);
-                }
-                setIsCompact(maxGap > ACTUAL_GAP_THRESHOLD);
-            } else {
-                setIsCompact(false);
+        const renderedButtons = containerRef.current.querySelectorAll('.button');
+        if (renderedButtons.length > 1) {
+            let maxGap = 0;
+            for (let i = 0; i < renderedButtons.length - 1; i++) {
+                const rect1 = renderedButtons[i].getBoundingClientRect();
+                const rect2 = renderedButtons[i + 1].getBoundingClientRect();
+                const actualGap = rect2.left - rect1.right;
+                maxGap = Math.max(maxGap, actualGap);
             }
-        });
-
-        return () => cancelAnimationFrame(frameId);
+            setIsCompact(maxGap > ACTUAL_GAP_THRESHOLD);
+        } else {
+            setIsCompact(false);
+        }
     }, [isReady, currentItems]);
 
     return {

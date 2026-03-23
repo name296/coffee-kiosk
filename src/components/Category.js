@@ -27,6 +27,7 @@ const Category = memo(() => {
         [order.categoryInfo]
     );
 
+    // 레이아웃 측정·브레이크포인트는 훅 내부 useLayoutEffect (Category에 중복 넣지 않음)
     const {
         containerRef: catContainerRef,
         measureRef: catMeasureRef,

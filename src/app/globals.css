@@ -286,12 +286,6 @@
       align-items: center;
       display: flex;
     }
-
-    /* 포스터만 shrink 허용 (.process > * 의 flex-shrink:0 보다 구체성 높음) */
-    & > .poster {
-      flex-shrink: 1;
-      min-block-size: 0;
-    }
   }
 
   .black {
@@ -407,15 +401,12 @@
      - .button.skin-* = skin
      - .button.state-* = state
   ----------------------------------------- */
-  .button {
-  
+  .button {  
     --button-min-side-lower-limit: calc(var(--layout-width) * 0.08);
     --button-min-side-raw: var(--button-min-side-lower-limit); /*js에서 덮어씀*/
-    --button-min-side-upper-limit: calc(var(--layout-width) * 0.16);    
-    --button-min-side-clamped: clamp(var(--button-min-side-lower-limit), var(--button-min-side-raw), var(--button-min-side-upper-limit));
-    
+    --button-min-side-upper-limit: calc(var(--layout-width) * 0.16);
+    --button-min-side-clamped: clamp(var(--button-min-side-lower-limit), var(--button-min-side-raw), var(--button-min-side-upper-limit));    
     --button-appearance-ratio: calc(var(--button-min-side-clamped) * 0.05);
-
     --button-padding-inline: calc(var(--button-appearance-ratio) * 2);
     --button-padding-block: 0;
 
@@ -1175,11 +1166,7 @@
     display: flex;
     flex: 0 1 auto;
     padding-inline: 0;
-
-    & img {
-      flex: 0 1 auto;
-      object-fit: cover;
-    }
+    min-block-size: 0;
   }
   
   .title {
@@ -1288,7 +1275,7 @@
   .summary {
     & .task-manager {
       & .button {
-        flex: 0 0 199px;
+        inline-size: 199px;
       }
     }
 

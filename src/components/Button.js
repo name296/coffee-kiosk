@@ -170,13 +170,13 @@ const Button = memo(({
         }
     }, [disabled, playSound, runAction, clearReleaseTimer]);
 
-    // 버튼 종료 이벤트 핸들러 (업 시점: release 타이머는 유지하여 100ms 풀림 보장)
+    // 버튼 종료 이벤트 핸들러 (업 시점: release 타이머는 유지 — BUTTON_RELEASE_DELAY_MS 동안 풀림 보장)
     const onEnd = useCallback((e) => {
         if (disabled || (e.type === 'keyup' && !isActionKey(e))) return;
         if (e.type === 'keyup' || e.type === 'touchend') e.preventDefault();
 
-        // release 타이머는 그대로 두어 다운 후 100ms 동안 isPressing 유지
-        // (빨리 손 떼어도 100ms 풀림 보장)
+        // release 타이머는 그대로 둠 → 다운 후 최소 BUTTON_RELEASE_DELAY_MS 동안 isPressing 유지
+        // (빨리 손 떼어도 그만큼은 눌림 표시 유지)
     }, [disabled]);
 
     return (
