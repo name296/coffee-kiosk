@@ -867,7 +867,8 @@
     align-items: center;
     gap: var(--spacing-md);  
     
-    & > .button {
+    /* 메뉴 타일은 .menu-page-slice 안에 있음(TTS 래퍼). > .button만 쓰면 래퍼 때문에 매칭 안 됨 */
+    & .menu-page-slice .button {
       inline-size: 100%;
       block-size: 100%;
       min-inline-size: 242px;

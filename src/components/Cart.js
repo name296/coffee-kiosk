@@ -36,6 +36,8 @@ const Cart = memo(({ className = "", paginationDirection, itemsPerPageOverride, 
         showFieldHeader ? "" : "without-field-header"
     ].filter(Boolean).join(" ");
 
+    const orderListSliceTts = `주문목록 ${pageNumber}페이지 총 버튼 ${order.orderItems.length}개,`;
+
     return (
         <div className={rootClassName} style={style}>
             {showFieldHeader ? (
@@ -49,10 +51,12 @@ const Cart = memo(({ className = "", paginationDirection, itemsPerPageOverride, 
                     </div>
                 </div>
             ) : null}
-            <OrderList
-                currentItems={currentItems}
-                startIndex={(pageNumber - 1) * itemsPerPage}
-            />
+            <div className="cart-order-slice" style={{ display: "contents" }} data-tts-text={orderListSliceTts}>
+                <OrderList
+                    currentItems={currentItems}
+                    startIndex={(pageNumber - 1) * itemsPerPage}
+                />
+            </div>
             <Pagination
                 className="details-pagination"
                 pageNumber={pageNumber}

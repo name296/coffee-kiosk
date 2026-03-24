@@ -1,8 +1,9 @@
-import React, { memo, useContext, useMemo, useRef, useEffect, useCallback } from "react";
+import React, { memo, useContext, useMemo, useRef, useState, useLayoutEffect, useEffect, useCallback } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import { AccessibilityContext } from "@/contexts";
 import { useTextHandler } from "@/hooks";
+import { countDirectChildButtons } from "@/lib";
 
 /** 이전 버튼. 정보만 받아서 렌더 */
 export const PaginationPrevButton = memo(({ label, icon, onClick, className, disabled, excludeFromFocus }) => (
@@ -71,12 +72,20 @@ const Pagination = memo(
         const accessibility = useContext(AccessibilityContext);
         const { handleText } = useTextHandler(accessibility.volume);
         const containerStyle = useMemo(() => style ?? {}, [style]);
+        const rootRef = useRef(null);
+        const [paginationButtonCounter, setPaginationButtonCounter] = useState(0);
+        const assignRootRef = useCallback(
+            (node) => {
+                rootRef.current = node;
+                if (sectionRef == null) return;
+                if (typeof sectionRef === "function") sectionRef(node);
+                else sectionRef.current = node;
+            },
+            [sectionRef]
+        );
         const current = pageNumber || 1;
         const total = totalPages || 1;
         const isSinglePage = total <= 1;
-        /** 섹션 포커스/호버: 총 페이지 포함 */
-        const getPaginationTtsSection = (currentPage) =>
-            `${ttsPrefix} ${currentPage}페이지 총${total}페이지,`;
         /** 이전·다음 클릭 후: 부모 state 반영 뒤 실제 pageNumber로만 읽음 (순환 페이징·비동기 갱신 대응) */
         const announceAfterNavRef = useRef(false);
 
@@ -97,13 +106,6 @@ const Pagination = memo(
             },
             [isSinglePage, onNext]
         );
-
-        useEffect(() => {
-            if (!announceAfterNavRef.current) return;
-            announceAfterNavRef.current = false;
-            const p = pageNumber || 1;
-            handleText(`${ttsPrefix} ${p}페이지,`, false);
-        }, [pageNumber, handleText, ttsPrefix]);
 
         const prevButtonInfo = useMemo(
             () => ({
@@ -131,12 +133,29 @@ const Pagination = memo(
             [nextLabel, nextIcon, handleNextWithTts, isSinglePage]
         );
 
+        useLayoutEffect(() => {
+            setPaginationButtonCounter(countDirectChildButtons(rootRef.current));
+        }, [pageNumber, totalPages, showPageNumber, isSinglePage]);
+
+        /** 페이지네이션 TTS: {prefix} N페이지 총 T페이지 버튼 x개, (x = 직계 자식 button 수) */
+        const paginationSectionTts = useMemo(
+            () => `${ttsPrefix} ${current}페이지 총 ${total}페이지 버튼 ${paginationButtonCounter}개,`,
+            [ttsPrefix, current, total, paginationButtonCounter]
+        );
+
+        useEffect(() => {
+            if (!announceAfterNavRef.current) return;
+            announceAfterNavRef.current = false;
+            const p = pageNumber || 1;
+            handleText(`${ttsPrefix} ${p}페이지 총 ${total}페이지 버튼 ${paginationButtonCounter}개,`, false);
+        }, [pageNumber, totalPages, handleText, ttsPrefix, paginationButtonCounter, total]);
+
         return (
             <div
                 className={className ? `pagination ${className}` : "pagination"}
                 style={containerStyle}
-                ref={sectionRef}
-                data-tts-text={getPaginationTtsSection(current)}
+                ref={assignRootRef}
+                data-tts-text={paginationSectionTts}
             >
                 <PaginationPrevButton {...prevButtonInfo} />
                 {showPageNumber && <PaginationIndicator {...indicatorInfo} />}

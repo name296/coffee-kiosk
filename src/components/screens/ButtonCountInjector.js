@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { convertToKoreanQuantity } from "@/lib";
+import { convertToKoreanQuantity, countDirectChildButtons } from "@/lib";
 
 const applyButtonCounts = () => {
     const parents = new Set();
@@ -11,7 +11,7 @@ const applyButtonCounts = () => {
     });
     parents.forEach(parent => {
         if (parent.classList?.contains('order-row')) return;
-        const count = parent.querySelectorAll(':scope > .button').length;
+        const count = countDirectChildButtons(parent);
         if (count <= 0) return;
         /* task-manager는 버튼 1개일 때 섹션 TTS만 (버튼 n개 접미사 생략) */
         if (parent.classList?.contains('task-manager') && count === 1) return;

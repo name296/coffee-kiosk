@@ -69,19 +69,21 @@ const MenuGrid = memo(() => {
         handleText(`${convertToKoreanQuantity(nextCount)} 개, ${formatNumber(nextSum)}원,`, false);
     };
 
+    /** {탭명}메뉴 N페이지 총 버튼 {탭소속버튼갯수}개, */
+    const menuSliceTts = `${order.selectedTab}메뉴 ${pageNumber}페이지 총 버튼 ${order.menuItems.length}개,`;
+
     return (
-        <div
-            className="menu"
-            data-tts-text={`메뉴, ${order.selectedTab},`}
-        >
-            {currentItems.map(item => (
-                <MenuItem
-                    key={item.id}
-                    item={item}
-                    disabled={item.id === 0}
-                    onPress={(e, target) => handleItemPress(e, item, target)}
-                />
-            ))}
+        <div className="menu">
+            <div className="menu-page-slice" style={{ display: "contents" }} data-tts-text={menuSliceTts}>
+                {currentItems.map(item => (
+                    <MenuItem
+                        key={item.id}
+                        item={item}
+                        disabled={item.id === 0}
+                        onPress={(e, target) => handleItemPress(e, item, target)}
+                    />
+                ))}
+            </div>
             <Pagination
                 pageNumber={pageNumber}
                 totalPages={totalPages}

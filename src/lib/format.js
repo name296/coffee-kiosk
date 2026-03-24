@@ -68,3 +68,12 @@ export const convertToKoreanOrdinal = (num) => {
     if (o > 0) r += SINO_ONES[o];
     return r || n;
 };
+
+/**
+ * 컨테이너 직계 자식 `.button` 개수.
+ * `ButtonCountInjector`·페이지네이션 TTS와 동일 기준.
+ */
+export function countDirectChildButtons(el) {
+    if (!el || typeof el.querySelectorAll !== "function") return 0;
+    return el.querySelectorAll(":scope > .button").length;
+}
