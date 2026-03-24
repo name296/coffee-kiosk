@@ -17,6 +17,7 @@ const closeAllModals = (modal) => {
 };
 
 const resetOrder = (order) => {
+    order?.finalizeOrderNumberOnSessionEnd?.();
     order?.setQuantities?.({});
 };
 

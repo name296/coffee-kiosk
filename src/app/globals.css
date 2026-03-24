@@ -455,7 +455,9 @@
     cursor: pointer;
     touch-action: none;
     text-align: center;
-    transition: transform 120ms;
+    /* 기본 transform 명시: none↔scale 보간이 사파리 등에서 끊기지 않게 */
+    transform: scale(1);
+    transition: transform 120ms linear;
 
     & .icon {
       display: inline-flex;
@@ -484,7 +486,6 @@
 
     &.state-pressing {
       transform: scale(0.84);
-      will-change: transform;
     }
 
     &.toggle.state-pressed::after {
@@ -752,7 +753,7 @@
     gap: var(--spacing-md);
 
     & .button {
-      inline-size: 199px;
+      inline-size: 200px;
       flex-flow: row nowrap;
     }
 
@@ -783,6 +784,7 @@
   }
 
   .banner {
+    flex: 0 0 auto;
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;
@@ -1335,7 +1337,7 @@
   .summary {
     & .task-manager {
       & .button {
-        inline-size: 199px;
+        inline-size: 200px;
       }
     }
 
@@ -1725,7 +1727,7 @@
 
       & .task-manager {
         & .button {
-          inline-size: 199px;
+          inline-size: 200px;
           block-size: 90px;
           flex-flow: row nowrap;
           overflow: hidden;
@@ -1770,7 +1772,6 @@
 
         & .banner {
           block-size: 150px;
-          flex-shrink: 0;
         }
 
         & .content-control {
@@ -1803,7 +1804,7 @@
 
           & .task-manager {
             & .button {
-              inline-size: 199px;
+              inline-size: 200px;
               block-size: 310px;
             }
           }

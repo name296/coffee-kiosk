@@ -4,7 +4,7 @@ import { PROCESS_NAME } from "@/constants";
 import { AccessibilityContext, OrderContext } from "@/contexts";
 import { processTts } from "@/lib/processTts";
 
-/** `updateOrderNumber` 실패·지연 시에만 사용 (기존 일반 모드와 동일) */
+/** `order.orderNumber` 미배정 시에만 사용 (주문완료 진입 시 `updateOrderNumber`로 배정) */
 const ORDER_NUMBER_FALLBACK = 100;
 
 const ProcessOrderComplete = memo(() => {
