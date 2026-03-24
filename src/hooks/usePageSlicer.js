@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useContext } from "react";
+import { HistoryContext } from "@/contexts";
 
 /**
  * breakpoints 모드 전용: items를 구간(breakpoints) 기준으로만 슬라이스. 카테고리 탭 등 고정 구간 페이징용
@@ -9,6 +10,7 @@ export const useBreakpointsPageSlicer = (items, breakpoints) =>
     usePageSlicer(items, 1, 1, false, breakpoints);
 
 export const usePageSlicer = (items, itemsPerPageNormal, itemsPerPageLow, isLow, breakpoints) => {
+    const history = useContext(HistoryContext);
     const useBreakpoints = Array.isArray(breakpoints) && breakpoints.length > 0;
     const normalizedBreakpoints = useMemo(() => {
         if (!useBreakpoints) return null;
@@ -41,8 +43,26 @@ export const usePageSlicer = (items, itemsPerPageNormal, itemsPerPageLow, isLow,
         useBreakpoints ? currentItems.length : itemsPerPage
     ), [useBreakpoints, currentItems.length, itemsPerPage]);
 
-    const handlePrevPage = useCallback(() => setPageNumber(p => p > 1 ? p - 1 : totalPages), [totalPages]);
-    const handleNextPage = useCallback(() => setPageNumber(p => p < totalPages ? p + 1 : 1), [totalPages]);
+    const registerPageUndo = useCallback((prevPage) => {
+        history?.pushHistory?.({
+            label: "실행 취소,",
+            undo: () => setPageNumber(prevPage)
+        });
+    }, [history]);
+
+    const handlePrevPage = useCallback(() => {
+        setPageNumber((p) => {
+            registerPageUndo(p);
+            return p > 1 ? p - 1 : totalPages;
+        });
+    }, [totalPages, registerPageUndo]);
+
+    const handleNextPage = useCallback(() => {
+        setPageNumber((p) => {
+            registerPageUndo(p);
+            return p < totalPages ? p + 1 : 1;
+        });
+    }, [totalPages, registerPageUndo]);
     const goToPage = useCallback((p) => { if (p >= 1 && p <= totalPages) setPageNumber(p); }, [totalPages]);
     const resetPage = useCallback(() => setPageNumber(1), []);
 

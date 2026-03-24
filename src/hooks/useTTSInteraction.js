@@ -24,6 +24,38 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
         document.addEventListener('mousedown', handleUserInteraction, { once: true, passive: true });
         document.addEventListener('touchstart', handleUserInteraction, { once: true, passive: true });
 
+        const isFocusable = (el) =>
+            !!el && (
+                el.matches?.('button, a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [contenteditable="true"]') ||
+                el.tabIndex >= 0
+            );
+
+        const findNearestFocusableParentWithTts = (fromEl) => {
+            if (!fromEl) return null;
+            for (let p = fromEl; p; p = p.parentElement) {
+                if (!isFocusable(p)) continue;
+                const tts = p.dataset?.ttsText || '';
+                if (tts) return p;
+            }
+            return null;
+        };
+
+        const isReplayHashKey = (e) =>
+            e.key === '#' ||
+            e.code === 'NumpadDecimal' ||
+            (e.key === '3' && e.shiftKey);
+
+        const handleReplayParentOnHash = (e) => {
+            if (!isReplayHashKey(e)) return;
+            const activeEl = document.activeElement;
+            if (!activeEl || activeEl === document.body) return;
+            const parent = findNearestFocusableParentWithTts(activeEl);
+            const tts = parent?.dataset?.ttsText || '';
+            if (!tts) return;
+            e.preventDefault();
+            finalHandleText(tts);
+        };
+
         const getHoverTtsTarget = (target) => {
             if (!target) return null;
 
@@ -109,6 +141,8 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
         document.addEventListener('focusin', handleTTS, true);
         // 마우스 오버 이벤트 (마우스 호버)
         document.addEventListener('mouseover', handleTTS, true);
+        // 샵(#) 버튼: 현재 포커스의 가장 가까운 포커서블 부모 TTS 재생
+        document.addEventListener('keydown', handleReplayParentOnHash, true);
 
         return () => {
             document.removeEventListener('keydown', handleUserInteraction);
@@ -116,6 +150,7 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
             document.removeEventListener('touchstart', handleUserInteraction);
             document.removeEventListener('focusin', handleTTS, true);
             document.removeEventListener('mouseover', handleTTS, true);
+            document.removeEventListener('keydown', handleReplayParentOnHash, true);
         };
     }, [enableGlobalHandlers, finalHandleText, ttsState]);
 };

@@ -10,6 +10,7 @@ import {
   ModalProvider,
   TimeoutProvider,
   OrderProvider,
+  HistoryProvider,
   RefProvider,
   ScreenRouteProvider
 } from "@/contexts";
@@ -90,23 +91,25 @@ export default function HomePage() {
       <TTSDBProvider>
         <TTSStateProvider>
           <AccessibilityProvider>
-            <ModalProvider>
-              <OrderProvider>
-                <RefProvider>
-                  <ScreenRouteProvider>
-                    <TickProvider>
-                      <TimeoutProvider>
-                        <ViewportInitializer />
-                        <InitialExecutor />
-                        <FocusExecutor />
-                        <ButtonCountInjector />
-                        <Screen />
-                      </TimeoutProvider>
-                    </TickProvider>
-                  </ScreenRouteProvider>
-                </RefProvider>
-              </OrderProvider>
-            </ModalProvider>
+            <HistoryProvider>
+              <ModalProvider>
+                <OrderProvider>
+                  <RefProvider>
+                    <ScreenRouteProvider>
+                      <TickProvider>
+                        <TimeoutProvider>
+                          <ViewportInitializer />
+                          <InitialExecutor />
+                          <FocusExecutor />
+                          <ButtonCountInjector />
+                          <Screen />
+                        </TimeoutProvider>
+                      </TickProvider>
+                    </ScreenRouteProvider>
+                  </RefProvider>
+                </OrderProvider>
+              </ModalProvider>
+            </HistoryProvider>
           </AccessibilityProvider>
         </TTSStateProvider>
       </TTSDBProvider>

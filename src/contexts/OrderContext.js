@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useMemo, useEffect, useRef } from "react";
+import React, { createContext, useState, useCallback, useMemo, useEffect, useRef, useContext } from "react";
 import { useMenuData } from "@/hooks";
 import {
     categorizeMenu,
@@ -9,6 +9,7 @@ import {
     safeLocalStorage,
     safeSessionStorage
 } from "@/lib";
+import { HistoryContext } from "./HistoryContext";
 
 export const OrderContext = createContext();
 
@@ -25,6 +26,7 @@ const LS_ORDER_NUMBER = "orderNumber";
 const LS_ORDER_NUMBER_DATE = "orderNumberDate";
 
 export const OrderProvider = ({ children }) => {
+    const history = useContext(HistoryContext);
     const { tabs, totalMenuItems, categoryInfo } = useMenuData();
 
     // PLACEHOLDER_MENU는 ProcessMenu로 이동했으나, OrderProvider에서도 사용하므로 기본값 제공
@@ -32,13 +34,26 @@ export const OrderProvider = ({ children }) => {
 
     // 상태
     const firstTab = tabs?.[0] ?? categoryInfo?.[0]?.cate_name ?? "전체메뉴";
-    const [selectedTab, setSelectedTab] = useState(firstTab);
+    const [selectedTab, setSelectedTabState] = useState(firstTab);
     const [quantities, setQuantities] = useState({});
 
     useEffect(() => {
         const next = tabs?.[0] ?? categoryInfo?.[0]?.cate_name ?? "전체메뉴";
-        setSelectedTab(next);
+        // 데이터 변경에 따른 기본 탭 보정은 Undo 스택에 쌓지 않음
+        setSelectedTabState(next);
     }, [tabs, categoryInfo]);
+
+    const setSelectedTab = useCallback((nextTab) => {
+        setSelectedTabState((prev) => {
+            const resolved = typeof nextTab === "function" ? nextTab(prev) : nextTab;
+            if (resolved === prev) return prev;
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: () => setSelectedTabState(prev)
+            });
+            return resolved;
+        });
+    }, [history]);
 
     // 메모이즈된 값
     const menuItems = useMemo(() =>
@@ -51,21 +66,55 @@ export const OrderProvider = ({ children }) => {
 
     // 수량 핸들러
     const handleIncrease = useCallback((id) => {
-        setQuantities(p => ({ ...p, [id]: (p[id] || 0) + 1 }));
-    }, []);
+        setQuantities(p => {
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: () => setQuantities(p)
+            });
+            return { ...p, [id]: (p[id] || 0) + 1 };
+        });
+    }, [history]);
 
     const handleDecrease = useCallback((id) => {
         setQuantities(p => {
             const q = p[id] ?? 0;
             if (q <= 1) return p;
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: () => setQuantities(p)
+            });
             return { ...p, [id]: q - 1 };
         });
-    }, []);
+    }, [history]);
 
     // 삭제 (수량을 0으로 설정 - 빼기 버튼 qty=1일 때와 동일한 결과)
     const handleDelete = useCallback((id) => {
-        setQuantities(p => ({ ...p, [id]: 0 }));
-    }, []);
+        setQuantities(p => {
+            const q = p[id] ?? 0;
+            if (q <= 0) return p;
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: () => setQuantities(p)
+            });
+            return { ...p, [id]: 0 };
+        });
+    }, [history]);
+
+    const undoLastAction = useCallback(() => {
+        return Boolean(history?.undoHistory?.());
+    }, [history]);
+
+    const pushUndoAction = useCallback((action) => {
+        if (!action) return false;
+        if (action.kind === "custom" && typeof action.apply === "function") {
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: action.apply
+            });
+            return true;
+        }
+        return false;
+    }, [history]);
 
     // 주문번호: sessionStorage(탭 단위). 표시는 주문완료 진입 시, +1 반영은 사용 종료(START 복귀·resetApp) 시.
     const [orderNumber, setOrderNumber] = useState(null);
@@ -138,12 +187,12 @@ export const OrderProvider = ({ children }) => {
     // Context value
     const value = useMemo(() => ({
         categoryInfo, menuItems, selectedTab, setSelectedTab,
-        quantities, setQuantities, handleIncrease, handleDecrease, handleDelete,
+        quantities, setQuantities, handleIncrease, handleDecrease, handleDelete, undoLastAction, pushUndoAction,
         totalCount, totalSum, orderItems,
         orderNumber, sendPrintReceiptToApp, updateOrderNumber, finalizeOrderNumberOnSessionEnd, resetOrderNumber
     }), [
         categoryInfo, menuItems, selectedTab, setSelectedTab,
-        quantities, handleIncrease, handleDecrease, handleDelete, totalCount, totalSum, orderItems,
+        quantities, handleIncrease, handleDecrease, handleDelete, undoLastAction, pushUndoAction, totalCount, totalSum, orderItems,
         orderNumber, sendPrintReceiptToApp, updateOrderNumber, finalizeOrderNumberOnSessionEnd, resetOrderNumber
     ]);
 

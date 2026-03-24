@@ -1,4 +1,5 @@
-import React, { createContext, useState, useMemo, useCallback, useRef } from "react";
+import React, { createContext, useState, useMemo, useCallback, useRef, useContext } from "react";
+import { HistoryContext } from "./HistoryContext";
 
 export const ModalContext = createContext();
 
@@ -29,6 +30,7 @@ const snapshotFocusBeforeModal = () => {
 };
 
 export const ModalProvider = ({ children }) => {
+    const history = useContext(HistoryContext);
     const [modals, setModals] = useState(createInitialModalState);
     const [openOrder, setOpenOrder] = useState([]);
     const [deleteItemId, setDeleteItemId] = useState(null);
@@ -37,7 +39,8 @@ export const ModalProvider = ({ children }) => {
     const modalLastFocusRef = useRef({});
     const pendingReturnFocusRef = useRef(null);
 
-    const openModal = useCallback((key, openerElement = null) => {
+    const openModal = useCallback((key, openerElement = null, options = {}) => {
+        const { recordHistory = true } = options;
         setModals((prev) => {
             if (!Object.prototype.hasOwnProperty.call(prev, key) || prev[key]) {
                 return prev;
@@ -47,11 +50,18 @@ export const ModalProvider = ({ children }) => {
             return { ...prev, [key]: true };
         });
         setOpenOrder((prev) => prev.includes(key) ? prev : [...prev.filter((k) => k !== key), key]);
-    }, []);
+        if (recordHistory) {
+            history?.pushHistory?.({
+                label: "닫기,",
+                undo: () => closeModal(key, { returnToOpener: true, recordHistory: false })
+            });
+        }
+    }, [history]);
 
     const closeModal = useCallback((key, options = {}) => {
         const returnToOpener = Boolean(options.returnToOpener);
         const returnToLastFocus = Boolean(options.returnToLastFocus);
+        const recordHistory = Boolean(options.recordHistory);
         /* React 18 Strict Mode는 이 업데이터를 연속 두 번 호출할 수 있음. 첫 호출에서 ref를 지우면
            둘째 호출에서 opener가 사라져 pending이 null이 됨 → 포커스가 항상 .main으로 감. */
         const capture = { opener: null, lastFocus: null, taken: false };
@@ -80,7 +90,13 @@ export const ModalProvider = ({ children }) => {
             return next;
         });
         setOpenOrder((prev) => prev.filter((k) => k !== key));
-    }, []);
+        if (recordHistory) {
+            history?.pushHistory?.({
+                label: "실행 취소,",
+                undo: () => openModal(key, null, { recordHistory: false })
+            });
+        }
+    }, [history]);
 
     const closeAllModals = useCallback(() => {
         pendingReturnFocusRef.current = null;

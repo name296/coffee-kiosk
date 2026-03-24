@@ -1079,6 +1079,7 @@
         justify-content: flex-end;
         align-items: center;
         inline-size: 100%;
+        min-inline-size: 8.1ch;
         text-align: right;
         overflow: hidden;
         text-overflow: ellipsis;
