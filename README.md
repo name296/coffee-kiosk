@@ -1,3 +1,6 @@
+# 빠른 체험
+name296.github.io/coffee-kiosk
+
 # coffee-kiosk
 
 Next.js 15(App Router) 기반 키오스크 UI 프로젝트입니다.  
