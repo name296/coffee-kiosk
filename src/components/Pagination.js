@@ -1,9 +1,9 @@
-import React, { memo, useContext, useMemo, useRef, useState, useLayoutEffect, useEffect, useCallback } from "react";
+import React, { memo, useContext, useMemo, useRef, useEffect, useCallback } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import { AccessibilityContext } from "@/contexts";
 import { useTextHandler } from "@/hooks";
-import { countDirectChildButtons } from "@/lib";
+import { countDirectChildButtons, paginationTtsAfterNav, paginationTtsPrefixForInjector } from "@/lib";
 
 /** 이전 버튼. 정보만 받아서 렌더 */
 export const PaginationPrevButton = memo(({ label, icon, onClick, className, disabled, excludeFromFocus }) => (
@@ -73,7 +73,6 @@ const Pagination = memo(
         const { handleText } = useTextHandler(accessibility.volume);
         const containerStyle = useMemo(() => style ?? {}, [style]);
         const rootRef = useRef(null);
-        const [paginationButtonCounter, setPaginationButtonCounter] = useState(0);
         const assignRootRef = useCallback(
             (node) => {
                 rootRef.current = node;
@@ -133,22 +132,19 @@ const Pagination = memo(
             [nextLabel, nextIcon, handleNextWithTts, isSinglePage]
         );
 
-        useLayoutEffect(() => {
-            setPaginationButtonCounter(countDirectChildButtons(rootRef.current));
-        }, [pageNumber, totalPages, showPageNumber, isSinglePage]);
-
-        /** 페이지네이션 TTS: {prefix} N페이지 총 T페이지 버튼 x개, (x = 직계 자식 button 수) */
+        /** 접두만 — `버튼 n개`는 ButtonCountInjector가 동일 기준으로 붙임 */
         const paginationSectionTts = useMemo(
-            () => `${ttsPrefix} ${current}페이지 총 ${total}페이지 버튼 ${paginationButtonCounter}개,`,
-            [ttsPrefix, current, total, paginationButtonCounter]
+            () => paginationTtsPrefixForInjector(ttsPrefix, current, total),
+            [ttsPrefix, current, total]
         );
 
         useEffect(() => {
             if (!announceAfterNavRef.current) return;
             announceAfterNavRef.current = false;
             const p = pageNumber || 1;
-            handleText(`${ttsPrefix} ${p}페이지 총 ${total}페이지 버튼 ${paginationButtonCounter}개,`, false);
-        }, [pageNumber, totalPages, handleText, ttsPrefix, paginationButtonCounter, total]);
+            const n = countDirectChildButtons(rootRef.current);
+            handleText(paginationTtsAfterNav(ttsPrefix, p, total, n), false);
+        }, [pageNumber, totalPages, handleText, ttsPrefix, total]);
 
         return (
             <div

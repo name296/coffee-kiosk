@@ -15,16 +15,19 @@ export const useCallHotkey = (enabled = true) => {
         const handleKeyDown = (e) => {
             if (e.key === "h" || e.key === "H") {
                 e.preventDefault();
-                modal.ModalCall.open();
+                const ae = document.activeElement;
+                modal.ModalCall.open(ae && ae !== document.body ? ae : null);
             } else if (e.key === "Home") {
                 e.preventDefault();
-                modal.ModalRestart.open();
+                const ae = document.activeElement;
+                modal.ModalRestart.open(ae && ae !== document.body ? ae : null);
             } else if (e.key === "Backspace") {
                 e.preventDefault();
                 if (modal.isAnyOpen && modal.openOrder?.length) {
-                    modal.closeModal(modal.openOrder[modal.openOrder.length - 1]);
+                    modal.closeModal(modal.openOrder[modal.openOrder.length - 1], { returnToOpener: true });
                 } else if (BACKSPACE_SHOWS_RESTART.includes(currentProcess)) {
-                    modal.ModalRestart.open();
+                    const ae = document.activeElement;
+                    modal.ModalRestart.open(ae && ae !== document.body ? ae : null);
                 } else {
                     const prev = PROCESS_PREV_BY_CURRENT[currentProcess];
                     if (prev) navigateTo(prev);

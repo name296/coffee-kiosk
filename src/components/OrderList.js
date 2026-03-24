@@ -13,20 +13,20 @@ const OrderRow = memo(({ item, index, quantity, onDecrease, onIncrease, onDelete
 
     return (
         <>
-            <div className="order-row">
-                <div className="order-item body2">
+            <div className="order-row" data-tts-text={rowTtsText}>
+                <div className="order-item order-image-div button-like skel-inline skin-neutral body2" tabIndex={0} data-tts-text={`${convertToKoreanOrdinal(index)}번 목록,`}>
                     <div className="order-index body1">{index}</div>
                     <img src={`images/${item.img}`} alt={item.name} className="order-image" />
                 </div>
-                <span className="button-like skel-inline skin-neutral order-name" tabIndex={0} data-tts-text={rowTtsText}>
+                <span className="button-like skel-inline skin-neutral order-name" tabIndex={0} data-tts-text={`${item.name},`}>
                     <span className="order-name__text">{item.name}</span>
                 </span>
                 <div className="order-quantity" data-tts-text='수량조절,'>
-                    <Button className="skel-inline skin-secondary counter" ttsText="빼기" svg={<MinusIcon />} onClick={onDecrease} />
+                    <Button className="skel-inline skin-secondary counter" ttsText="수량빼기" svg={<MinusIcon />} onClick={onDecrease} />
                     <span className="button-like skel-inline skin-neutral qty" tabIndex={0} data-tts-text={`${formatNumber(quantity)}개`}>
                         {quantity}
                     </span>
-                    <Button className="skel-inline skin-secondary counter" ttsText="더하기" svg={<PlusIcon />} onClick={onIncrease} />
+                    <Button className="skel-inline skin-secondary counter" ttsText="수량더하기" svg={<PlusIcon />} onClick={onIncrease} />
                 </div>
                 <span className="button-like skel-inline order-price skin-neutral" tabIndex={0} data-tts-text={`${formatNumber(totalPrice)}원`}>
                     {`${formatNumber(totalPrice)}원`}
@@ -50,15 +50,15 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
         quantitiesRef.current = order.quantities;
     }, [order.quantities]);
 
-    const openDeleteModal = (itemId) => {
+    const openDeleteModal = (itemId, openerElement) => {
         modal.setModalDeleteItemId(itemId);
         const isLastItem = order.orderItems.length === 1;
         const isMenuProcess = currentProcess === PROCESS_NAME.MENU;
 
         if (isMenuProcess) {
-            modal.ModalDelete.open();
+            modal.ModalDelete.open(openerElement);
         } else {
-            isLastItem ? modal.ModalDeleteCheck.open() : modal.ModalDelete.open();
+            (isLastItem ? modal.ModalDeleteCheck : modal.ModalDelete).open(openerElement);
         }
     };
 
@@ -66,7 +66,7 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
         const itemId = item.id;
         const current = quantitiesRef.current[itemId] ?? 0;
         if (current === 1) {
-            openDeleteModal(itemId);
+            openDeleteModal(itemId, target);
             return;
         }
         if (current <= 0) return;
@@ -88,7 +88,7 @@ const OrderList = memo(({ currentItems = [], startIndex = 0 } = {}) => {
     };
 
     const handleItemDelete = (itemId) => (e, target) => {
-        openDeleteModal(itemId);
+        openDeleteModal(itemId, target);
     };
 
     return (

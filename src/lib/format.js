@@ -70,10 +70,28 @@ export const convertToKoreanOrdinal = (num) => {
 };
 
 /**
- * 컨테이너 직계 자식 `.button` 개수.
+ * 컨테이너 직계 자식 인터랙티브 개수 (`.button`/`.button-like`/`[role="button"]`).
  * `ButtonCountInjector`·페이지네이션 TTS와 동일 기준.
  */
 export function countDirectChildButtons(el) {
     if (!el || typeof el.querySelectorAll !== "function") return 0;
-    return el.querySelectorAll(":scope > .button").length;
+    return el.querySelectorAll(':scope > .button, :scope > .button-like, :scope > [role="button"]').length;
+}
+
+/**
+ * 페이지네이션 행 `data-tts-text` 접두 — `ButtonCountInjector`가 `, 버튼 n개,`를 붙여 완성.
+ * sectionLabel: `{탭명}메뉴` | `주문목록` | `카테고리` 등.
+ */
+export function paginationTtsPrefixForInjector(sectionLabel, page, totalPages) {
+    const p = page || 1;
+    const t = totalPages || 1;
+    return `${sectionLabel} ${p}페이지 총 ${t}페이지`;
+}
+
+/** 이전·다음 직후 handleText — 포커스·인젝터와 동일: `…페이지, 버튼 n개,` */
+export function paginationTtsAfterNav(sectionLabel, page, totalPages, directChildButtonCount) {
+    const qty = convertToKoreanQuantity(directChildButtonCount);
+    const p = page || 1;
+    const t = totalPages || 1;
+    return `${sectionLabel} ${p}페이지 총 ${t}페이지, 버튼 ${qty}개,`;
 }

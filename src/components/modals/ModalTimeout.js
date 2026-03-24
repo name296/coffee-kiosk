@@ -20,7 +20,7 @@ export const ModalTimeout = memo(() => {
         countdown !== undefined ? Math.ceil(countdown / 1000) : FALLBACK_REMAINING_SECONDS;
     const secText = `${remainingSec}초`;
     const modalTts =
-        `알림, 시간연장, 사용시간이 ${remainingSec}초 남았습니다, 계속 사용하시려면 연장 버튼을 누릅니다, `;
+        `알림, 홈, ${remainingSec}초 후 홈으로 돌아갑니다, 계속 사용하시려면 연장 버튼을 누릅니다, `;
 
     if (!isOpen) return null;
 
@@ -33,13 +33,13 @@ export const ModalTimeout = memo(() => {
                 tabIndex={0}
             >
                 <div className="modal-head body1">
-                    <Icon className="primary" name="Extention" />
-                    <span className="primary">시간연장</span>
+                    <Icon className="primary" name="Home" />
+                    <span className="primary">홈</span>
                 </div>
                 <div className="modal-body body2">
                     <div className="modal-message">
                         <span>
-                            사용시간이 <span className="primary">{secText}</span> 남았습니다
+                            <span className="primary">{secText}</span> 후 홈으로 돌아갑니다
                         </span>
                         <span>
                             계속 사용하시려면 <span className="primary">연장</span> 버튼을 누릅니다
@@ -64,7 +64,7 @@ export const ModalTimeout = memo(() => {
                             svg={<Icon name="Extention" />}
                             label="연장"
                             onClick={() => {
-                                modal.ModalTimeout.close();
+                                modal.ModalTimeout.close({ returnToLastFocus: true });
                                 timeout?.resetIdleTimeout?.();
                             }}
                         />

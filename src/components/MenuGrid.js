@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useRef } from "react";
+import React, { memo, useContext, useEffect, useMemo, useRef } from "react";
 import Button from "@/components/Button";
 import Pagination from "@/components/Pagination";
 import { formatNumber, convertToKoreanQuantity } from "@/lib";
@@ -72,24 +72,27 @@ const MenuGrid = memo(() => {
     /** {탭명}메뉴 N페이지 총 버튼 {탭소속버튼갯수}개, */
     const menuSliceTts = `${order.selectedTab}메뉴 ${pageNumber}페이지 총 버튼 ${order.menuItems.length}개,`;
 
+    const menuPaginationTtsPrefix = useMemo(
+        () => `${order.selectedTab || ""}메뉴`,
+        [order.selectedTab]
+    );
+
     return (
-        <div className="menu">
-            <div className="menu-page-slice" style={{ display: "contents" }} data-tts-text={menuSliceTts}>
-                {currentItems.map(item => (
-                    <MenuItem
-                        key={item.id}
-                        item={item}
-                        disabled={item.id === 0}
-                        onPress={(e, target) => handleItemPress(e, item, target)}
-                    />
-                ))}
-            </div>
+        <div className="menu" data-tts-text={menuSliceTts}>
+            {currentItems.map(item => (
+                <MenuItem
+                    key={item.id}
+                    item={item}
+                    disabled={item.id === 0}
+                    onPress={(e, target) => handleItemPress(e, item, target)}
+                />
+            ))}
             <Pagination
                 pageNumber={pageNumber}
                 totalPages={totalPages}
                 onPrev={(e, target) => handlePrevPage()}
                 onNext={(e, target) => handleNextPage()}
-                ttsPrefix="메뉴"
+                ttsPrefix={menuPaginationTtsPrefix}
             />
         </div>
     );

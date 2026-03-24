@@ -46,7 +46,7 @@ export const ModalDeleteCheck = memo(() => {
                         ref={refs.Modal.footerButtonsRef}
                         className="task-manager"
                     >
-                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalDeleteCheck.close()} />
+                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalDeleteCheck.close({ returnToOpener: true })} />
                         <Button
                             className="skel-inline skin-primary"
                             svg={<Icon name="Add" />}
@@ -100,7 +100,7 @@ export const ModalDelete = memo(() => {
                         ref={refs.Modal.footerButtonsRef}
                         className="task-manager"
                     >
-                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalDelete.close()} />
+                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalDelete.close({ returnToOpener: true })} />
                         <Button
                             className="skel-inline skin-primary"
                             svg={<Icon name="Delete" />}

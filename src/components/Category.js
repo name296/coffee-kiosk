@@ -1,10 +1,10 @@
-import React, { memo, useContext, useMemo, useRef, useState, useLayoutEffect, useEffect, useCallback } from "react";
+import React, { memo, useContext, useMemo, useRef, useEffect, useCallback } from "react";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import { PaginationIndicator } from "@/components/Pagination";
 import { OrderContext, AccessibilityContext } from "@/contexts";
 import { useCategoryAssemble, useTextHandler } from "@/hooks";
-import { countDirectChildButtons } from "@/lib";
+import { countDirectChildButtons, paginationTtsAfterNav, paginationTtsPrefixForInjector } from "@/lib";
 
 // 카테고리 탭 버튼
 const CategoryTab = memo(({ tab, isSelected, onSelect }) => (
@@ -22,10 +22,6 @@ const CategorySeparator = () => <span className="category-separator" aria-hidden
 /** 슬라이스(탭 줄) TTS: 카테고리 1페이지 총 버튼 5개(전체 탭 수), */
 const categorySliceTtsLine = (page, totalButtonCount) =>
     `카테고리 ${page}페이지 총 버튼 ${totalButtonCount}개,`;
-
-/** 페이지네이션 TTS: 카테고리 N페이지 총 T페이지 버튼 x개, (x = 직계 자식 button 수) */
-const categoryPaginationTtsLine = (page, totalPages, buttonCount) =>
-    `카테고리 ${page}페이지 총 ${totalPages}페이지 버튼 ${buttonCount}개,`;
 
 const Category = memo(() => {
     const order = useContext(OrderContext);
@@ -57,14 +53,9 @@ const Category = memo(() => {
     const catTotal = catTotalPages || 1;
 
     const categoryPaginationRef = useRef(null);
-    const [categoryPaginationButtonCount, setCategoryPaginationButtonCount] = useState(0);
-
-    useLayoutEffect(() => {
-        setCategoryPaginationButtonCount(countDirectChildButtons(categoryPaginationRef.current));
-    }, [catHasPrev, catHasNext, catCurrentPage, catTotalPages]);
 
     const getCategoryPaginationTtsSection = () =>
-        categoryPaginationTtsLine(catCurrentPage, catTotal, categoryPaginationButtonCount);
+        paginationTtsPrefixForInjector("카테고리", catCurrentPage, catTotal);
 
     const categorySliceTts = categorySliceTtsLine(catCurrentPage, categories.length);
 
@@ -82,18 +73,27 @@ const Category = memo(() => {
         catNext();
     }, [catHasNext, catNext]);
 
+    const handleCategorySelect = useCallback(
+        (tabName) => {
+            order.setSelectedTab(tabName);
+            handleText(`카테고리 ${tabName},`, false);
+        },
+        [order, handleText]
+    );
+
     useEffect(() => {
         if (!announceAfterCatNavRef.current) return;
         announceAfterCatNavRef.current = false;
         const p = catCurrentPage || 1;
         const t = catTotalPages || 1;
-        handleText(categoryPaginationTtsLine(p, t, categoryPaginationButtonCount), false);
-    }, [catCurrentPage, catTotalPages, categoryPaginationButtonCount, handleText]);
+        const n = countDirectChildButtons(categoryPaginationRef.current);
+        handleText(paginationTtsAfterNav("카테고리", p, t, n), false);
+    }, [catCurrentPage, catTotalPages, handleText]);
 
     return (
         <div
             className="category-full"
-            data-tts-text={`메뉴 카테고리, 현재상태, ${order.selectedTab},`}
+            data-tts-text="메뉴 카테고리,"
         >
             <div ref={catMeasureRef} className="category measure" aria-hidden="true" inert={true}>
                 {categories.map((tab, idx) => (
@@ -111,7 +111,11 @@ const Category = memo(() => {
             >
                 {catItems.map((tab, idx) => (
                     <React.Fragment key={tab.id}>
-                        <CategoryTab tab={tab} isSelected={order.selectedTab === tab.name} onSelect={order.setSelectedTab} />
+                        <CategoryTab
+                            tab={tab}
+                            isSelected={order.selectedTab === tab.name}
+                            onSelect={handleCategorySelect}
+                        />
                         {idx < catItems.length - 1 && <CategorySeparator />}
                     </React.Fragment>
                 ))}

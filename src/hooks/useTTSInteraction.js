@@ -1,9 +1,6 @@
 
-import { useEffect, useContext, useRef } from "react";
+import { useEffect, useContext } from "react";
 import { TTSStateContext } from "@/contexts";
-
-// 이전 버튼의 부모 요소를 저장하는 전역 ref (같은 부모 안에서 버튼 변경 시 부모 TTS 재생 방지)
-const prevButtonParentRef = { current: null };
 
 // 포커스 인 및 마우스 엔터 시 TTS 재생 핸들러 (단일책임: 포커스 인 및 마우스 엔터 시 TTS 재생만)
 export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) => {
@@ -35,11 +32,18 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
                 return { type: 'button', element: btn };
             }
 
+            const panel = target.closest?.('.modal-panel');
+            if (panel) {
+                const hasHoveringInteractive = panel.querySelector('.button:hover, .button-like:hover, img:hover, [role="button"]:hover');
+                if (hasHoveringInteractive) return null;
+                return { type: 'container', element: panel };
+            }
+
             const main = target.closest?.('.main');
             if (main) {
                 const hasHoveringInteractive = main.querySelector('.button:hover, .button-like:hover, img:hover, [role="button"]:hover');
                 if (hasHoveringInteractive) return null;
-                return { type: 'main', element: main };
+                return { type: 'container', element: main };
             }
 
             return null;
@@ -56,26 +60,17 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
 
                 if (hoverTarget.type === 'button') {
                     const btn = hoverTarget.element;
-                    const currentParent = btn.parentElement?.closest('[data-tts-text]');
-                    const isButtonLike = btn.classList?.contains('button-like');
-                    const isSameParent = !isButtonLike && prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
-                    const parentTts = isButtonLike ? '' : (isSameParent ? '' : (currentParent?.dataset?.ttsText || ''));
                     const btnTts = btn.dataset?.ttsText || '';
-                    const ttsText = parentTts + btnTts;
-
-                    if (ttsText) {
-                        finalHandleText(ttsText);
+                    if (btnTts) {
+                        finalHandleText(btnTts);
                     }
-
-                    prevButtonParentRef.current = currentParent;
                     return;
                 }
 
-                if (hoverTarget.type === 'main') {
+                if (hoverTarget.type === 'container') {
                     const elementTts = hoverTarget.element.dataset?.ttsText || '';
                     if (elementTts) {
                         finalHandleText(elementTts);
-                        prevButtonParentRef.current = null;
                     }
                     return;
                 }
@@ -84,32 +79,29 @@ export const useInteractiveTTSHandler = (enableGlobalHandlers, finalHandleText) 
             // 버튼인 경우
             const btn = target.closest?.('.button, .button-like');
             if (btn) {
-                // 현재 버튼의 부모 요소 찾기
-                const currentParent = btn.parentElement?.closest('[data-tts-text]');
-                const isButtonLike = btn.classList?.contains('button-like');
-                const isSameParent = !isButtonLike && prevButtonParentRef.current && currentParent && prevButtonParentRef.current === currentParent;
-
-                // 같은 부모 안에서 버튼이 바뀌면 부모 TTS 재생하지 않음
-                const parentTts = isButtonLike ? '' : (isSameParent ? '' : (currentParent?.dataset?.ttsText || ''));
                 const btnTts = btn.dataset?.ttsText || '';
-                const ttsText = parentTts + btnTts;
-
-                // 이전과 같은 텍스트면 재생하지 않음
-                if (ttsText) {
-                    finalHandleText(ttsText);
+                if (btnTts) {
+                    finalHandleText(btnTts);
                 }
-
-                // 현재 부모를 이전 부모로 저장
-                prevButtonParentRef.current = currentParent;
                 return;
             }
 
-            // 버튼이 아닌 경우: data-tts-text가 있는 요소인지 확인 (예: .main)
-            const elementTts = target.dataset?.ttsText || '';
-            if (elementTts) {
-                finalHandleText(elementTts);
-                // .main 같은 경우는 부모가 없으므로 prevButtonParentRef를 null로 설정
-                prevButtonParentRef.current = null;
+            // 버튼이 아닌 경우: 섹션(data-tts-text) 자신이 포커스되면 부모 진입 컨텍스트 재생
+            if (e.type === 'focusin' && target.matches?.('[data-tts-text]')) {
+                const elementTts = target.dataset?.ttsText || '';
+                if (elementTts) {
+                    finalHandleText(elementTts);
+                }
+                return;
+            }
+
+            // 버튼이 아닌 경우: .main / .modal-panel 자신이 포커스됐을 때만 재생
+            const container = target.closest?.('.main, .modal-panel');
+            if (container && container === target) {
+                const elementTts = container.dataset?.ttsText || '';
+                if (elementTts) {
+                    finalHandleText(elementTts);
+                }
             }
         };
 

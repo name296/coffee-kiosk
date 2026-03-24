@@ -42,7 +42,7 @@ export const ModalReselect = memo(() => {
                         ref={refs.Modal.footerButtonsRef}
                         className="task-manager"
                     >
-                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalReselect.close()} />
+                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalReselect.close({ returnToOpener: true })} />
                         <Button
                             className="skel-inline skin-primary"
                             svg={<Icon name="Reset" />}

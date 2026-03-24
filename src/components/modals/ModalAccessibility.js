@@ -3,7 +3,7 @@ import { Button } from "@/components";
 import Icon from "@/components/Icon";
 import { TTS, VOLUME_MAP } from "@/constants";
 import { AccessibilityContext, ModalContext, RefContext } from "@/contexts";
-import { useAccessibilitySettings, useDOM, useFocusTrap } from "@/hooks";
+import { useAccessibilitySettings, useDOM, useFocusTrap, useTextHandler } from "@/hooks";
 
 const MODAL_TTS = "알림, 접근성, 원하시는 접근성 옵션을 선택하시고, 적용하기 버튼을 누릅니다, ";
 
@@ -12,6 +12,7 @@ export const ModalAccessibility = memo(() => {
     const modal = useContext(ModalContext);
     const refsData = useContext(RefContext);
     const { setAudioVolume } = useDOM();
+    const { handleText } = useTextHandler(accessibility.volume);
     const isOpen = modal.ModalAccessibility.isOpen;
     const { containerRef } = useFocusTrap(isOpen);
     const originalSettingsRef = useRef(null);
@@ -43,23 +44,28 @@ export const ModalAccessibility = memo(() => {
     const handleDarkChange = useCallback((val) => {
         setDark(val);
         accessibility.setIsDark(val);
-    }, [setDark, accessibility]);
+        handleText(`고대비 ${val ? "켬" : "끔"},`, false);
+    }, [setDark, accessibility, handleText]);
 
     const handleVolumeChange = useCallback((val) => {
         setSettingsVolume(val);
         accessibility.setVolume(val);
         setAudioVolume("audioPlayer", VOLUME_MAP[val]);
-    }, [setSettingsVolume, accessibility, setAudioVolume]);
+        const volumeLabel = val === 0 ? "끔" : val === 1 ? "약" : val === 2 ? "중" : "강";
+        handleText(`음량 ${volumeLabel},`, false, val);
+    }, [setSettingsVolume, accessibility, setAudioVolume, handleText]);
 
     const handleLargeChange = useCallback((val) => {
         setLarge(val);
         accessibility.setIsLarge(val);
-    }, [setLarge, accessibility]);
+        handleText(`큰글씨 ${val ? "켬" : "끔"},`, false);
+    }, [setLarge, accessibility, handleText]);
 
     const handleLowChange = useCallback((val) => {
         setLow(val);
         accessibility.setIsLow(val);
-    }, [setLow, accessibility]);
+        handleText(`낮은화면 ${val ? "켬" : "끔"},`, false);
+    }, [setLow, accessibility, handleText]);
 
     const handleInitialSettingsPress = useCallback(() => {
         updateAllSettings({ isDark: false, isLow: false, isLarge: false, volume: 1 });
@@ -79,7 +85,7 @@ export const ModalAccessibility = memo(() => {
             accessibility.setVolume(original.volume);
             setAudioVolume("audioPlayer", VOLUME_MAP[original.volume]);
         }
-        modal.ModalAccessibility.close();
+        modal.ModalAccessibility.close({ returnToOpener: true });
     }, [accessibility, modal, setAudioVolume]);
 
     const handleConfirmPress = useCallback(() => {
@@ -115,7 +121,7 @@ export const ModalAccessibility = memo(() => {
                                 <Icon name="Contrast" className="modal-graphic" aria-hidden />
                                 고대비
                             </span>
-                            <div className="task-manager" data-tts-text={`고대비 화면, 선택상태, ${getStatusText.dark},`}>
+                            <div className="task-manager" data-tts-text="고대비 설정,">
                                 <Button toggle value={currentSettings.isDark} selectedValue={false} onChange={handleDarkChange} label="끔" />
                                 <Button toggle value={currentSettings.isDark} selectedValue={true} onChange={handleDarkChange} label="켬" />
                             </div>
@@ -125,7 +131,7 @@ export const ModalAccessibility = memo(() => {
                                 <Icon name="Volume" className="modal-graphic" aria-hidden />
                                 음량
                             </span>
-                            <div className="task-manager" data-tts-text={`소리크기, 선택상태, ${getStatusText.volume},`}>
+                            <div className="task-manager" data-tts-text="음량 설정,">
                                 <Button toggle value={currentSettings.volume} selectedValue={0} onChange={handleVolumeChange} label="끔" />
                                 <Button toggle value={currentSettings.volume} selectedValue={1} onChange={handleVolumeChange} label="약" />
                                 <Button toggle value={currentSettings.volume} selectedValue={2} onChange={handleVolumeChange} label="중" />
@@ -137,7 +143,7 @@ export const ModalAccessibility = memo(() => {
                                 <Icon name="Large" className="modal-graphic" aria-hidden />
                                 큰글씨
                             </span>
-                            <div className="task-manager" data-tts-text={`큰글씨 화면, 선택상태, ${getStatusText.large},`}>
+                            <div className="task-manager" data-tts-text="큰글씨 설정,">
                                 <Button toggle value={currentSettings.isLarge} selectedValue={false} onChange={handleLargeChange} label="끔" />
                                 <Button toggle value={currentSettings.isLarge} selectedValue={true} onChange={handleLargeChange} label="켬" />
                             </div>
@@ -147,7 +153,7 @@ export const ModalAccessibility = memo(() => {
                                 <Icon name="Wheelchair" className="modal-graphic" aria-hidden />
                                 낮은화면
                             </span>
-                            <div className="task-manager" data-tts-text={`낮은화면, 선택상태, ${getStatusText.low},`}>
+                            <div className="task-manager" data-tts-text="낮은화면 설정,">
                                 <Button toggle value={currentSettings.isLow} selectedValue={false} onChange={handleLowChange} label="끔" />
                                 <Button toggle value={currentSettings.isLow} selectedValue={true} onChange={handleLowChange} label="켬" />
                             </div>

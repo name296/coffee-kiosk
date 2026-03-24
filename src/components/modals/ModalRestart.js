@@ -42,7 +42,7 @@ export const ModalRestart = memo(() => {
                         ref={refs.Modal.footerButtonsRef}
                         className="task-manager"
                     >
-                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalRestart.close()} />
+                        <Button className="skel-inline skin-secondary" svg={<Icon name="Cancel" />} label="취소" onClick={() => modal.ModalRestart.close({ returnToOpener: true })} />
                         <Button
                             className="skel-inline skin-primary"
                             svg={<Icon name="Home" />}

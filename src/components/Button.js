@@ -134,7 +134,7 @@ const Button = memo(({
             if (navigate) navigateTo(navigate);
             if (modal) {
                 const modalInstance = modalContext?.[`Modal${modal}`];
-                if (modalInstance) modalInstance.open();
+                if (modalInstance) modalInstance.open(btnRef.current);
             }
             if (onClick) onClick(e, btnRef.current);
         }
