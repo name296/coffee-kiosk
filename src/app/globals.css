@@ -54,14 +54,24 @@
 
   body {
     position: fixed;
-    inset: 50% auto auto 50%;
-    translate: -50% -50%; /* `translate: -50% -50%`만 있으면 기준점이 뷰포트 중앙이 아님 → 50%로 모서리를 중앙에 둔 뒤 당김 */
-    scale: initial; /* viewport.js가 오버라이드 */
-    inline-size: var(--layout-width);
-    block-size: var(--layout-height);
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--color-gray-01);
     font: normal normal var(--font-weight-default) var(--font-size-b1) / 1 var(--font-family-current);
     letter-spacing: -0.06em;
     user-select: none;
+  }
+
+  /* 1080×1920 캔버스 — scale·translate는 여기만 (body transform 금지: DevTools/오버레이 좌표계) */
+  .viewport-scaler {
+    position: relative;
+    inline-size: var(--layout-width);
+    block-size: var(--layout-height);
+    flex-shrink: 0;
+    scale: initial; /* viewport.js가 오버라이드 */
   }
 
   /* `*`의 border-box는 button에 특이도로 안 먹고, `all: unset`은 box-sizing을 initial로 돌림 → unset 직후에만 border-box 지정 */

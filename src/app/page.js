@@ -20,7 +20,8 @@ import {
   ViewportInitializer,
   InitialExecutor,
   FocusExecutor,
-  ButtonCountInjector
+  ButtonCountInjector,
+  FocusDebugOverlay
 } from "@/components/screens";
 
 // Hooks (TickProvider: 모든 카운트가 동시에 갱신되도록)
@@ -99,6 +100,7 @@ export default function HomePage() {
                       <TickProvider>
                         <TimeoutProvider>
                           <ViewportInitializer />
+                          <FocusDebugOverlay />
                           <InitialExecutor />
                           <FocusExecutor />
                           <ButtonCountInjector />

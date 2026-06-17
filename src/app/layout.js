@@ -11,7 +11,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <div id="viewport-scaler" className="viewport-scaler">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
