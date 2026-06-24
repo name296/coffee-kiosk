@@ -1,5 +1,6 @@
 import { getOverlayRoot } from "./viewportOverlay";
 import { collectImageMetrics } from "./imageDebugUtils";
+import { appendDebugYSpan, DEBUG_Y_BOLD_LIMIT } from "./layoutDebugUtils";
 
 const IMAGE_COLOR = "#00bcd4";
 const ICON_COLOR = "#ffb300";
@@ -32,7 +33,6 @@ const appendImageLabel = (root, rect, color) => {
     const w = Math.round(rect.width * 10) / 10;
     const h = Math.round(rect.height * 10) / 10;
     const tag = document.createElement("div");
-    tag.textContent = `${w}×${h}`;
     tag.style.cssText = [
         "position:fixed",
         `left:${rect.right}px`,
@@ -46,6 +46,8 @@ const appendImageLabel = (root, rect, color) => {
         "pointer-events:none",
         "z-index:2",
     ].join(";");
+    appendDebugYSpan(tag, rect, DEBUG_Y_BOLD_LIMIT.image);
+    tag.appendChild(document.createTextNode(`${w}×${h}`));
     root.appendChild(tag);
 };
 

@@ -1,3 +1,6 @@
+import { getViewportScale, getViewportScaler } from "./viewport";
+import { SCREEN } from "@/constants/constants";
+
 export const INTERACTIVE_SELECTOR = [
     "button:not([disabled])",
     "a[href]",
@@ -308,3 +311,32 @@ export const centerY = (r) => r.top + r.height / 2;
 
 export const verticalOverlap = (a, b) => Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
 export const horizontalOverlap = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left);
+
+export const DEBUG_Y_BOLD_LIMIT = {
+    bbox: 640,
+    text: 1216,
+    image: 1216,
+};
+
+/** 디버그 라벨 — 1920px 캔버스 바닥(하단) 기준 상단 y (px) */
+export const getTopYFromBottom = (rect) => {
+    const scaler = getViewportScaler();
+    if (!scaler) {
+        return Math.round(window.innerHeight - rect.top);
+    }
+    const scalerRect = scaler.getBoundingClientRect();
+    const scale = getViewportScale();
+    const designTop = (rect.top - scalerRect.top) / scale;
+    return Math.round(SCREEN.HEIGHT - designTop);
+};
+
+/** 디버그 라벨 앞부분 y 값 (limit 초과 시 bold), 뒤에 ", " 추가 */
+export const appendDebugYSpan = (parent, rect, boldLimit) => {
+    const y = getTopYFromBottom(rect);
+    const span = document.createElement("span");
+    span.textContent = String(y);
+    if (y > boldLimit) span.style.fontWeight = "bold";
+    parent.appendChild(span);
+    parent.appendChild(document.createTextNode(", "));
+    return y;
+};

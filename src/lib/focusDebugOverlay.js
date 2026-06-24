@@ -23,12 +23,12 @@ import {
     collectGapInteractiveItems,
     mountButtonSupportedStateLabel,
     isButtonActionTarget,
+    appendDebugYSpan,
+    DEBUG_Y_BOLD_LIMIT,
 } from "./layoutDebugUtils";
 
 const BOX_COLORS = ["#ff00e1", "#ff4800", "#ffe100", "#00e1ff", "#00ff88", "#b81a00"];
 const ACTIVE_COLOR = "#ff00e1";
-const BBOX_COORD_LIMIT = 640;
-const BBOX_OVERFLOW_COLOR = "#f44336";
 
 export {
     getLayoutDebugMode,
@@ -88,8 +88,6 @@ const appendBBoxLayer = (root, { highlightActive = true } = {}) => {
 
         const w = Math.round(rect.width * 10) / 10;
         const h = Math.round(rect.height * 10) / 10;
-        const top = Math.round(rect.top);
-        const topOverflow = top > BBOX_COORD_LIMIT;
 
         const box = document.createElement("div");
         box.style.cssText = [
@@ -122,14 +120,7 @@ const appendBBoxLayer = (root, { highlightActive = true } = {}) => {
             "white-space:nowrap",
         ].join(";");
 
-        const topSpan = document.createElement("span");
-        topSpan.textContent = String(top);
-        if (topOverflow) {
-            topSpan.style.fontWeight = "bold";
-            topSpan.style.color = BBOX_OVERFLOW_COLOR;
-        }
-        meta.appendChild(topSpan);
-        meta.appendChild(document.createTextNode(", "));
+        appendDebugYSpan(meta, rect, DEBUG_Y_BOLD_LIMIT.bbox);
 
         const size = document.createElement("span");
         size.textContent = `${w}×${h}`;

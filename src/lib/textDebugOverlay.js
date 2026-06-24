@@ -1,5 +1,6 @@
 import { getOverlayRoot } from "./viewportOverlay";
 import { collectTextMetrics } from "./textDebugUtils";
+import { appendDebugYSpan, DEBUG_Y_BOLD_LIMIT } from "./layoutDebugUtils";
 
 const INK_COLOR = "#e040fb";
 const CONTRAST_FAIL_COLOR = "#f44336";
@@ -13,14 +14,13 @@ const labelBackgroundForContrast = (contrastRatio) => {
     return CONTRAST_FAIL_COLOR;
 };
 
-const appendInkLabel = (root, left, top, inkH, contrastRatio) => {
+const appendInkLabel = (root, lineRect, inkH, contrastRatio) => {
     const contrastLabel = contrastRatio == null ? "?" : contrastRatio.toFixed(3);
     const tag = document.createElement("div");
-    tag.textContent = `${inkH}px, ${contrastLabel}`;
     tag.style.cssText = [
         "position:fixed",
-        `left:${left}px`,
-        `top:${top}px`,
+        `left:${lineRect.left}px`,
+        `top:${lineRect.top - 12}px`,
         `background:${labelBackgroundForContrast(contrastRatio)}`,
         "color:#000",
         "font:9px/1.1 monospace",
@@ -29,6 +29,8 @@ const appendInkLabel = (root, left, top, inkH, contrastRatio) => {
         "pointer-events:none",
         "z-index:2",
     ].join(";");
+    appendDebugYSpan(tag, lineRect, DEBUG_Y_BOLD_LIMIT.text);
+    tag.appendChild(document.createTextNode(`${inkH}px, ${contrastLabel}`));
     root.appendChild(tag);
 };
 
@@ -64,7 +66,7 @@ export const paintTextDebugOverlay = (root = getOverlayRoot()) => {
     for (const { lineRect, contrastRatio } of items) {
         appendInkRect(layer, lineRect);
         const inkH = Math.round(lineRect.height * 10) / 10;
-        appendInkLabel(layer, lineRect.left, lineRect.top - 12, inkH, contrastRatio);
+        appendInkLabel(layer, lineRect, inkH, contrastRatio);
         lineCount += 1;
     }
 
