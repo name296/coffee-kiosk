@@ -9,7 +9,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "start": "bun run scripts/start-full.js",
     "build": "next build",
     "svg-to-react": "bun run scripts/svg-to-react.js",

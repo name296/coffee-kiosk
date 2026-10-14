@@ -1,6 +1,6 @@
-# 레이아웃 디버그 (개발 전용)
+# 레이아웃 디버그
 
-`NODE_ENV === "development"` 일 때만 `FocusDebugOverlay`가 동작합니다.  
+배포(테스트 겸용 프로덕션)에서도 `FocusDebugOverlay`가 동작합니다.  
 모드는 **Shift + 단축키**로 켜고 끌 수 있으며, 상태는 **localStorage**에 저장됩니다.
 
 ## 단축키

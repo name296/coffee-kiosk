@@ -13,11 +13,9 @@ import {
     toggleTextDebug,
 } from "@/lib/focusDebugOverlay";
 
-/** 개발용: ?debug=bbox | ?debug=gap[=N] | ?debug=text | ?debug=focus | ?debug=image */
+/** ?debug=bbox | ?debug=gap[=N] | ?debug=text | ?debug=focus | ?debug=image */
 export const FocusDebugOverlay = () => {
     useEffect(() => {
-        if (process.env.NODE_ENV !== "development") return undefined;
-
         let rafId = 0;
 
         const repaint = () => {
@@ -25,9 +23,7 @@ export const FocusDebugOverlay = () => {
             rafId = requestAnimationFrame(() => {
                 if (isFocusDebugEnabled()) {
                     const result = paintFocusDebugOverlay();
-                    if (process.env.NODE_ENV === "development") {
-                        console.debug("[layout-debug]", result);
-                    }
+                    console.debug("[layout-debug]", result);
                 } else {
                     clearFocusDebugOverlay();
                 }
