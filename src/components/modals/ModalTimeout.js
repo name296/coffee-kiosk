@@ -49,18 +49,9 @@ export const ModalTimeout = memo(() => {
                         data-tts-text="작업관리,"
                         ref={refs.Modal.footerButtonsRef}
                         className="task-manager"
-                    >
+                    >                        
                         <Button
                             className="skel-inline skin-secondary"
-                            svg={<Icon name="Home" />}
-                            label="홈"
-                            onClick={() => {
-                                modal.ModalTimeout.close();
-                                navigateTo(PROCESS_NAME.START);
-                            }}
-                        />
-                        <Button
-                            className="skel-inline skin-primary"
                             svg={<Icon name="Extention" />}
                             label="연장"
                             onClick={() => {
@@ -68,6 +59,16 @@ export const ModalTimeout = memo(() => {
                                 timeout?.resetIdleTimeout?.();
                             }}
                         />
+                        <Button
+                            className="skel-inline skin-primary"
+                            svg={<Icon name="Home" />}
+                            label="홈"
+                            onClick={() => {
+                                modal.ModalTimeout.close();
+                                navigateTo(PROCESS_NAME.START);
+                            }}
+                        />
+
                     </div>
                 </div>
             </div>
